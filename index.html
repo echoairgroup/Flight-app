@@ -2,16 +2,22 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Flight — Flight Simulator Companion</title>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <meta
         name="description"
-        content="Flight is the ultimate companion for flight simulator pilots. Plan flights, check weather, manage aircraft, track statistics and more."
+        content="FlightDeck — the modern all-in-one companion for Microsoft Flight Simulator."
     >
 
-    <meta name="theme-color" content="#07100d">
+    <meta
+        name="theme-color"
+        content="#07111f"
+    >
+
+    <title>FlightDeck — Your Flight Simulator Companion</title>
 
     <!-- =========================================================
          FONTS
@@ -34,4976 +40,1898 @@
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
     >
 
-    <style>
-
-        /* =========================================================
-           ROOT
-        ========================================================== */
-
-        :root {
-
-            --bg: #050806;
-            --bg-2: #08100d;
-            --bg-3: #0c1511;
-
-            --panel: rgba(15, 24, 20, 0.72);
-            --panel-solid: #101914;
-
-            --border: rgba(255,255,255,0.075);
-            --border-hover: rgba(172,227,54,0.28);
-
-            --text: #f3f7f4;
-            --text-soft: #b1bbb5;
-            --text-muted: #718079;
-
-            --accent: #ace336;
-            --accent-2: #8fc51e;
-            --accent-soft: rgba(172,227,54,0.10);
-            --accent-glow: rgba(172,227,54,0.18);
-
-            --danger: #ff5e68;
-            --warning: #ffc857;
-            --success: #55d98a;
-            --blue: #55a9ff;
-
-            --sidebar-width: 265px;
-
-            --radius-sm: 10px;
-            --radius-md: 16px;
-            --radius-lg: 22px;
-            --radius-xl: 30px;
-
-            --shadow:
-                0 20px 70px rgba(0,0,0,.35);
-
-            --transition:
-                180ms cubic-bezier(.2,.8,.2,1);
-        }
-
-
-        /* =========================================================
-           RESET
-        ========================================================== */
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-        body {
-
-            font-family: "Inter", sans-serif;
-
-            background:
-                radial-gradient(
-                    circle at 75% 5%,
-                    rgba(172,227,54,.055),
-                    transparent 30%
-                ),
-                radial-gradient(
-                    circle at 10% 80%,
-                    rgba(49,105,72,.08),
-                    transparent 30%
-                ),
-                var(--bg);
-
-            color: var(--text);
-
-            min-height: 100vh;
-
-            overflow-x: hidden;
-        }
-
-        button,
-        input {
-            font: inherit;
-        }
-
-        button {
-            border: none;
-        }
-
-        a {
-            color: inherit;
-            text-decoration: none;
-        }
-
-        ::selection {
-            background: var(--accent);
-            color: #061000;
-        }
-
-
-        /* =========================================================
-           SCROLLBAR
-        ========================================================== */
-
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: var(--bg);
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: #26342c;
-            border-radius: 20px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #3c4d42;
-        }
-
-
-        /* =========================================================
-           GLOBAL BACKGROUND EFFECT
-        ========================================================== */
-
-        body::before {
-
-            content: "";
-
-            position: fixed;
-
-            inset: 0;
-
-            pointer-events: none;
-
-            background-image:
-                linear-gradient(
-                    rgba(255,255,255,.012) 1px,
-                    transparent 1px
-                ),
-                linear-gradient(
-                    90deg,
-                    rgba(255,255,255,.012) 1px,
-                    transparent 1px
-                );
-
-            background-size: 70px 70px;
-
-            mask-image:
-                linear-gradient(
-                    to bottom,
-                    black,
-                    transparent 80%
-                );
-
-            z-index: -2;
-        }
-
-
-        /* =========================================================
-           SIDEBAR
-        ========================================================== */
-
-        .sidebar {
-
-            position: fixed;
-
-            left: 0;
-            top: 0;
-            bottom: 0;
-
-            width: var(--sidebar-width);
-
-            background:
-                linear-gradient(
-                    180deg,
-                    rgba(12,19,15,.97),
-                    rgba(5,9,7,.98)
-                );
-
-            border-right: 1px solid var(--border);
-
-            padding: 24px 16px;
-
-            z-index: 1000;
-
-            display: flex;
-            flex-direction: column;
-
-            backdrop-filter: blur(20px);
-        }
-
-
-        /* =========================================================
-           LOGO
-        ========================================================== */
-
-        .logo {
-
-            display: flex;
-            align-items: center;
-
-            gap: 12px;
-
-            padding: 5px 10px 28px;
-        }
-
-        .logo-icon {
-
-            width: 40px;
-            height: 40px;
-
-            display: grid;
-            place-items: center;
-
-            border-radius: 12px;
-
-            background:
-                linear-gradient(
-                    145deg,
-                    var(--accent),
-                    #6d9f16
-                );
-
-            color: #071000;
-
-            box-shadow:
-                0 0 35px rgba(172,227,54,.16);
-
-            font-size: 18px;
-        }
-
-        .logo-text {
-
-            font-family: "Space Grotesk";
-
-            font-size: 21px;
-
-            font-weight: 700;
-
-            letter-spacing: -.6px;
-        }
-
-        .logo-text span {
-            color: var(--accent);
-        }
-
-
-        /* =========================================================
-           NAV
-        ========================================================== */
-
-        .nav-label {
-
-            padding:
-                0 12px
-                8px;
-
-            color: #53615a;
-
-            font-size: 10px;
-
-            font-weight: 800;
-
-            letter-spacing: 1.5px;
-
-            text-transform: uppercase;
-        }
-
-        .nav {
-
-            display: flex;
-            flex-direction: column;
-
-            gap: 4px;
-        }
-
-        .nav-item {
-
-            position: relative;
-
-            display: flex;
-            align-items: center;
-
-            gap: 13px;
-
-            padding: 11px 12px;
-
-            color: var(--text-soft);
-
-            border-radius: 11px;
-
-            cursor: pointer;
-
-            transition: var(--transition);
-
-            font-size: 13px;
-
-            font-weight: 600;
-        }
-
-        .nav-item i {
-
-            width: 20px;
-
-            text-align: center;
-
-            color: #68766e;
-
-            transition: var(--transition);
-        }
-
-        .nav-item:hover {
-
-            color: var(--text);
-
-            background: rgba(255,255,255,.035);
-
-            transform: translateX(2px);
-        }
-
-        .nav-item:hover i {
-            color: var(--accent);
-        }
-
-        .nav-item.active {
-
-            background:
-                linear-gradient(
-                    90deg,
-                    rgba(172,227,54,.13),
-                    rgba(172,227,54,.025)
-                );
-
-            color: var(--accent);
-        }
-
-        .nav-item.active i {
-            color: var(--accent);
-        }
-
-        .nav-item.active::before {
-
-            content: "";
-
-            position: absolute;
-
-            left: -16px;
-
-            top: 7px;
-            bottom: 7px;
-
-            width: 3px;
-
-            background: var(--accent);
-
-            border-radius: 0 5px 5px 0;
-
-            box-shadow:
-                0 0 15px var(--accent);
-        }
-
-        .nav-spacer {
-            height: 18px;
-        }
-
-
-        /* =========================================================
-           SIDEBAR BOTTOM
-        ========================================================== */
-
-        .sidebar-bottom {
-
-            margin-top: auto;
-        }
-
-        .system-card {
-
-            padding: 14px;
-
-            border:
-                1px solid var(--border);
-
-            border-radius: 15px;
-
-            background:
-                rgba(255,255,255,.025);
-        }
-
-        .system-title {
-
-            display: flex;
-            align-items: center;
-
-            justify-content: space-between;
-
-            margin-bottom: 12px;
-
-            font-size: 11px;
-
-            color: var(--text-soft);
-        }
-
-        .online-dot {
-
-            width: 7px;
-            height: 7px;
-
-            background: var(--success);
-
-            border-radius: 50%;
-
-            box-shadow:
-                0 0 10px var(--success);
-        }
-
-        .system-status {
-
-            font-size: 12px;
-
-            font-weight: 700;
-        }
-
-        .system-sub {
-
-            margin-top: 3px;
-
-            color: var(--text-muted);
-
-            font-size: 10px;
-        }
-
-
-        /* =========================================================
-           MAIN
-        ========================================================== */
-
-        .main {
-
-            margin-left: var(--sidebar-width);
-
-            min-height: 100vh;
-        }
-
-        .content {
-
-            max-width: 1700px;
-
-            margin: auto;
-
-            padding: 26px 34px 80px;
-        }
-
-
-        /* =========================================================
-           TOPBAR
-        ========================================================== */
-
-        .topbar {
-
-            height: 58px;
-
-            display: flex;
-            align-items: center;
-
-            justify-content: space-between;
-
-            margin-bottom: 28px;
-        }
-
-        .breadcrumbs {
-
-            display: flex;
-            align-items: center;
-
-            gap: 9px;
-
-            color: var(--text-muted);
-
-            font-size: 12px;
-        }
-
-        .breadcrumbs strong {
-            color: var(--text);
-        }
-
-        .top-actions {
-
-            display: flex;
-            align-items: center;
-
-            gap: 9px;
-        }
-
-        .top-button {
-
-            width: 39px;
-            height: 39px;
-
-            display: grid;
-            place-items: center;
-
-            border-radius: 11px;
-
-            background: rgba(255,255,255,.035);
-
-            border: 1px solid var(--border);
-
-            color: var(--text-soft);
-
-            cursor: pointer;
-
-            transition: var(--transition);
-        }
-
-        .top-button:hover {
-
-            color: var(--accent);
-
-            border-color: var(--border-hover);
-
-            background: var(--accent-soft);
-
-            transform: translateY(-2px);
-        }
-
-        .profile {
-
-            display: flex;
-            align-items: center;
-
-            gap: 10px;
-
-            margin-left: 6px;
-
-            padding-left: 12px;
-
-            border-left: 1px solid var(--border);
-
-            cursor: pointer;
-        }
-
-        .avatar {
-
-            width: 37px;
-            height: 37px;
-
-            border-radius: 11px;
-
-            display: grid;
-            place-items: center;
-
-            background:
-                linear-gradient(
-                    145deg,
-                    #27372d,
-                    #142019
-                );
-
-            border: 1px solid rgba(172,227,54,.15);
-
-            color: var(--accent);
-
-            font-size: 12px;
-
-            font-weight: 800;
-        }
-
-        .profile-name {
-
-            font-size: 12px;
-
-            font-weight: 700;
-        }
-
-        .profile-rank {
-
-            margin-top: 2px;
-
-            font-size: 9px;
-
-            color: var(--accent);
-
-            font-weight: 700;
-
-            text-transform: uppercase;
-
-            letter-spacing: .8px;
-        }
-
-
-        /* =========================================================
-           HERO
-        ========================================================== */
-
-        .hero {
-
-            position: relative;
-
-            min-height: 460px;
-
-            overflow: hidden;
-
-            border-radius: var(--radius-xl);
-
-            border: 1px solid var(--border);
-
-            background:
-
-                radial-gradient(
-                    circle at 85% 40%,
-                    rgba(172,227,54,.15),
-                    transparent 30%
-                ),
-
-                radial-gradient(
-                    circle at 70% 100%,
-                    rgba(0,0,0,.6),
-                    transparent 55%
-                ),
-
-                linear-gradient(
-                    120deg,
-                    #0c1711 0%,
-                    #0a120e 45%,
-                    #07100d 100%
-                );
-
-            box-shadow: var(--shadow);
-        }
-
-        .hero::before {
-
-            content: "";
-
-            position: absolute;
-
-            width: 650px;
-            height: 650px;
-
-            right: -220px;
-            top: -230px;
-
-            border-radius: 50%;
-
-            border:
-                1px solid rgba(172,227,54,.08);
-
-            box-shadow:
-                0 0 0 80px rgba(172,227,54,.015),
-                0 0 0 160px rgba(172,227,54,.01);
-        }
-
-        .hero::after {
-
-            content: "";
-
-            position: absolute;
-
-            inset: 0;
-
-            background:
-                linear-gradient(
-                    90deg,
-                    rgba(5,8,6,.97) 0%,
-                    rgba(5,8,6,.87) 36%,
-                    rgba(5,8,6,.35) 70%,
-                    rgba(5,8,6,.55) 100%
-                );
-
-            pointer-events: none;
-        }
-
-        .hero-grid {
-
-            position: absolute;
-
-            inset: 0;
-
-            opacity: .3;
-
-            background-image:
-                linear-gradient(
-                    rgba(172,227,54,.06) 1px,
-                    transparent 1px
-                ),
-                linear-gradient(
-                    90deg,
-                    rgba(172,227,54,.06) 1px,
-                    transparent 1px
-                );
-
-            background-size: 45px 45px;
-
-            mask-image:
-                radial-gradient(
-                    circle at 80% 40%,
-                    black,
-                    transparent 60%
-                );
-        }
-
-        .hero-content {
-
-            position: relative;
-
-            z-index: 3;
-
-            max-width: 750px;
-
-            padding: 68px 64px;
-        }
-
-        .eyebrow {
-
-            display: inline-flex;
-            align-items: center;
-
-            gap: 8px;
-
-            padding: 7px 11px;
-
-            border:
-                1px solid rgba(172,227,54,.18);
-
-            background:
-                rgba(172,227,54,.055);
-
-            color: var(--accent);
-
-            border-radius: 100px;
-
-            font-size: 10px;
-
-            font-weight: 800;
-
-            text-transform: uppercase;
-
-            letter-spacing: 1.2px;
-        }
-
-        .eyebrow i {
-            font-size: 8px;
-        }
-
-        .hero h1 {
-
-            margin-top: 22px;
-
-            font-family: "Space Grotesk";
-
-            font-size: clamp(
-                42px,
-                5vw,
-                74px
-            );
-
-            line-height: .98;
-
-            letter-spacing: -3.5px;
-
-            max-width: 720px;
-        }
-
-        .hero h1 span {
-            color: var(--accent);
-        }
-
-        .hero-description {
-
-            margin-top: 24px;
-
-            max-width: 570px;
-
-            color: var(--text-soft);
-
-            line-height: 1.75;
-
-            font-size: 14px;
-        }
-
-        .hero-buttons {
-
-            display: flex;
-
-            gap: 12px;
-
-            margin-top: 32px;
-
-            flex-wrap: wrap;
-        }
-
-        .btn {
-
-            display: inline-flex;
-            align-items: center;
-
-            justify-content: center;
-
-            gap: 9px;
-
-            min-height: 45px;
-
-            padding:
-                0 18px;
-
-            border-radius: 12px;
-
-            cursor: pointer;
-
-            transition: var(--transition);
-
-            font-size: 12px;
-
-            font-weight: 800;
-        }
-
-        .btn-primary {
-
-            background: var(--accent);
-
-            color: #081000;
-
-            box-shadow:
-                0 10px 30px rgba(172,227,54,.13);
-        }
-
-        .btn-primary:hover {
-
-            background: #b9f03e;
-
-            transform: translateY(-2px);
-
-            box-shadow:
-                0 15px 35px rgba(172,227,54,.2);
-        }
-
-        .btn-secondary {
-
-            background: rgba(255,255,255,.045);
-
-            border:
-                1px solid var(--border);
-
-            color: var(--text);
-        }
-
-        .btn-secondary:hover {
-
-            background: rgba(255,255,255,.075);
-
-            border-color: rgba(255,255,255,.13);
-
-            transform: translateY(-2px);
-        }
-
-
-        /* =========================================================
-           HERO FLIGHT DISPLAY
-        ========================================================== */
-
-        .hero-display {
-
-            position: absolute;
-
-            z-index: 4;
-
-            right: 45px;
-            bottom: 38px;
-
-            width: 360px;
-
-            padding: 18px;
-
-            background:
-                rgba(8,14,10,.76);
-
-            border:
-                1px solid rgba(255,255,255,.08);
-
-            border-radius: 20px;
-
-            backdrop-filter: blur(22px);
-
-            box-shadow:
-                0 25px 80px rgba(0,0,0,.45);
-        }
-
-        .display-top {
-
-            display: flex;
-            justify-content: space-between;
-
-            align-items: center;
-
-            padding-bottom: 14px;
-
-            border-bottom:
-                1px solid var(--border);
-        }
-
-        .display-title {
-
-            font-family: "Space Grotesk";
-
-            font-size: 13px;
-
-            font-weight: 700;
-        }
-
-        .display-live {
-
-            display: flex;
-            align-items: center;
-
-            gap: 6px;
-
-            color: var(--success);
-
-            font-size: 9px;
-
-            font-weight: 800;
-
-            text-transform: uppercase;
-        }
-
-        .display-live span {
-
-            width: 6px;
-            height: 6px;
-
-            background: var(--success);
-
-            border-radius: 50%;
-
-            box-shadow:
-                0 0 10px var(--success);
-        }
-
-        .route-display {
-
-            display: flex;
-            align-items: center;
-
-            justify-content: space-between;
-
-            padding: 18px 4px;
-        }
-
-        .airport-code {
-
-            font-family: "Space Grotesk";
-
-            font-size: 29px;
-
-            font-weight: 700;
-
-            letter-spacing: -1px;
-        }
-
-        .airport-city {
-
-            color: var(--text-muted);
-
-            font-size: 9px;
-
-            margin-top: 3px;
-        }
-
-        .route-line {
-
-            flex: 1;
-
-            height: 1px;
-
-            background:
-                linear-gradient(
-                    90deg,
-                    var(--accent),
-                    rgba(172,227,54,.05)
-                );
-
-            margin:
-                0 15px;
-
-            position: relative;
-        }
-
-        .route-line::after {
-
-            content: "✈";
-
-            position: absolute;
-
-            right: 35%;
-
-            top: -10px;
-
-            color: var(--accent);
-
-            font-size: 14px;
-
-            transform: rotate(0deg);
-        }
-
-        .display-data {
-
-            display: grid;
-
-            grid-template-columns:
-                repeat(3,1fr);
-
-            gap: 8px;
-        }
-
-        .display-stat {
-
-            padding: 10px;
-
-            border-radius: 10px;
-
-            background:
-                rgba(255,255,255,.025);
-        }
-
-        .display-stat-label {
-
-            color: var(--text-muted);
-
-            font-size: 8px;
-
-            text-transform: uppercase;
-
-            letter-spacing: .8px;
-        }
-
-        .display-stat-value {
-
-            margin-top: 4px;
-
-            font-size: 12px;
-
-            font-weight: 700;
-        }
-
-
-        /* =========================================================
-           SECTION HEADER
-        ========================================================== */
-
-        .section {
-
-            margin-top: 42px;
-        }
-
-        .section-header {
-
-            display: flex;
-
-            align-items: flex-end;
-
-            justify-content: space-between;
-
-            gap: 20px;
-
-            margin-bottom: 18px;
-        }
-
-        .section-title {
-
-            font-family: "Space Grotesk";
-
-            font-size: 21px;
-
-            letter-spacing: -.7px;
-        }
-
-        .section-subtitle {
-
-            margin-top: 5px;
-
-            color: var(--text-muted);
-
-            font-size: 11px;
-        }
-
-        .view-all {
-
-            color: var(--accent);
-
-            font-size: 11px;
-
-            font-weight: 800;
-
-            cursor: pointer;
-        }
-
-
-        /* =========================================================
-           QUICK STATS
-        ========================================================== */
-
-        .stats-grid {
-
-            display: grid;
-
-            grid-template-columns:
-                repeat(4, 1fr);
-
-            gap: 14px;
-        }
-
-        .stat-card {
-
-            position: relative;
-
-            overflow: hidden;
-
-            padding: 20px;
-
-            min-height: 135px;
-
-            background:
-                linear-gradient(
-                    145deg,
-                    rgba(20,31,25,.8),
-                    rgba(10,17,13,.72)
-                );
-
-            border:
-                1px solid var(--border);
-
-            border-radius: var(--radius-md);
-
-            transition: var(--transition);
-        }
-
-        .stat-card:hover {
-
-            transform: translateY(-4px);
-
-            border-color: var(--border-hover);
-
-            box-shadow:
-                0 18px 45px rgba(0,0,0,.22);
-        }
-
-        .stat-card::after {
-
-            content: "";
-
-            position: absolute;
-
-            width: 120px;
-            height: 120px;
-
-            right: -60px;
-            bottom: -70px;
-
-            border-radius: 50%;
-
-            background:
-                var(--accent);
-
-            opacity: .035;
-        }
-
-        .stat-top {
-
-            display: flex;
-            align-items: center;
-
-            justify-content: space-between;
-        }
-
-        .stat-icon {
-
-            width: 35px;
-            height: 35px;
-
-            display: grid;
-            place-items: center;
-
-            border-radius: 10px;
-
-            background:
-                var(--accent-soft);
-
-            color: var(--accent);
-
-            font-size: 13px;
-        }
-
-        .stat-change {
-
-            color: var(--success);
-
-            font-size: 9px;
-
-            font-weight: 800;
-        }
-
-        .stat-value {
-
-            margin-top: 17px;
-
-            font-family: "Space Grotesk";
-
-            font-size: 27px;
-
-            font-weight: 700;
-
-            letter-spacing: -1px;
-        }
-
-        .stat-label {
-
-            margin-top: 2px;
-
-            color: var(--text-muted);
-
-            font-size: 10px;
-        }
-
-
-        /* =========================================================
-           DASHBOARD GRID
-        ========================================================== */
-
-        .dashboard-grid {
-
-            display: grid;
-
-            grid-template-columns:
-                1.35fr
-                .65fr;
-
-            gap: 15px;
-        }
-
-
-        /* =========================================================
-           FLIGHT PLANNER CARD
-        ========================================================== */
-
-        .planner-card {
-
-            position: relative;
-
-            overflow: hidden;
-
-            padding: 25px;
-
-            min-height: 340px;
-
-            background:
-                linear-gradient(
-                    145deg,
-                    rgba(15,26,20,.95),
-                    rgba(7,12,9,.95)
-                );
-
-            border:
-                1px solid var(--border);
-
-            border-radius: var(--radius-lg);
-        }
-
-        .planner-card::before {
-
-            content: "";
-
-            position: absolute;
-
-            right: -130px;
-            top: -150px;
-
-            width: 380px;
-            height: 380px;
-
-            border-radius: 50%;
-
-            border:
-                1px solid rgba(172,227,54,.05);
-
-            box-shadow:
-                0 0 0 60px rgba(172,227,54,.015),
-                0 0 0 120px rgba(172,227,54,.008);
-        }
-
-        .card-heading {
-
-            display: flex;
-
-            justify-content: space-between;
-
-            align-items: flex-start;
-        }
-
-        .card-title {
-
-            font-family: "Space Grotesk";
-
-            font-size: 17px;
-
-            font-weight: 700;
-        }
-
-        .card-description {
-
-            margin-top: 4px;
-
-            color: var(--text-muted);
-
-            font-size: 10px;
-        }
-
-        .mini-icon {
-
-            width: 35px;
-            height: 35px;
-
-            display: grid;
-            place-items: center;
-
-            background: var(--accent-soft);
-
-            color: var(--accent);
-
-            border-radius: 10px;
-        }
-
-        .planner-route {
-
-            display: grid;
-
-            grid-template-columns:
-                1fr 60px 1fr;
-
-            align-items: center;
-
-            gap: 10px;
-
-            margin-top: 40px;
-        }
-
-        .airport-input {
-
-            padding: 17px;
-
-            border:
-                1px solid var(--border);
-
-            background:
-                rgba(255,255,255,.025);
-
-            border-radius: 13px;
-        }
-
-        .airport-input label {
-
-            display: block;
-
-            color: var(--text-muted);
-
-            font-size: 8px;
-
-            text-transform: uppercase;
-
-            letter-spacing: 1px;
-        }
-
-        .airport-input input {
-
-            width: 100%;
-
-            margin-top: 7px;
-
-            border: none;
-
-            outline: none;
-
-            background: transparent;
-
-            color: var(--text);
-
-            font-family: "Space Grotesk";
-
-            font-size: 25px;
-
-            font-weight: 700;
-
-            text-transform: uppercase;
-        }
-
-        .airport-input input::placeholder {
-            color: #526059;
-        }
-
-        .swap-button {
-
-            width: 43px;
-            height: 43px;
-
-            margin: auto;
-
-            border-radius: 50%;
-
-            background:
-                rgba(172,227,54,.08);
-
-            border:
-                1px solid rgba(172,227,54,.13);
-
-            color: var(--accent);
-
-            cursor: pointer;
-
-            transition: var(--transition);
-        }
-
-        .swap-button:hover {
-
-            transform: rotate(180deg);
-
-            background:
-                rgba(172,227,54,.15);
-        }
-
-        .planner-options {
-
-            display: grid;
-
-            grid-template-columns:
-                repeat(3,1fr);
-
-            gap: 9px;
-
-            margin-top: 12px;
-        }
-
-        .planner-option {
-
-            padding: 12px;
-
-            border:
-                1px solid var(--border);
-
-            border-radius: 11px;
-
-            background:
-                rgba(255,255,255,.02);
-        }
-
-        .planner-option-label {
-
-            color: var(--text-muted);
-
-            font-size: 8px;
-
-            text-transform: uppercase;
-        }
-
-        .planner-option-value {
-
-            margin-top: 4px;
-
-            font-size: 11px;
-
-            font-weight: 700;
-        }
-
-        .planner-action {
-
-            margin-top: 14px;
-
-            width: 100%;
-        }
-
-
-        /* =========================================================
-           UPCOMING FLIGHT
-        ========================================================== */
-
-        .flight-card {
-
-            padding: 25px;
-
-            min-height: 340px;
-
-            background:
-                linear-gradient(
-                    145deg,
-                    rgba(15,26,20,.9),
-                    rgba(7,12,9,.9)
-                );
-
-            border:
-                1px solid var(--border);
-
-            border-radius: var(--radius-lg);
-        }
-
-        .flight-status {
-
-            display: inline-flex;
-
-            align-items: center;
-
-            gap: 6px;
-
-            padding: 5px 8px;
-
-            background:
-                rgba(85,217,138,.08);
-
-            border:
-                1px solid rgba(85,217,138,.13);
-
-            color: var(--success);
-
-            border-radius: 7px;
-
-            font-size: 8px;
-
-            font-weight: 800;
-
-            text-transform: uppercase;
-        }
-
-        .flight-status span {
-
-            width: 5px;
-            height: 5px;
-
-            border-radius: 50%;
-
-            background: currentColor;
-        }
-
-        .flight-number {
-
-            margin-top: 20px;
-
-            font-family: "Space Grotesk";
-
-            font-size: 25px;
-
-            font-weight: 700;
-        }
-
-        .flight-aircraft {
-
-            color: var(--text-muted);
-
-            font-size: 10px;
-
-            margin-top: 3px;
-        }
-
-        .flight-route-large {
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 15px;
-
-            margin-top: 30px;
-        }
-
-        .large-code {
-
-            font-family: "Space Grotesk";
-
-            font-size: 26px;
-
-            font-weight: 700;
-        }
-
-        .large-city {
-
-            margin-top: 2px;
-
-            color: var(--text-muted);
-
-            font-size: 9px;
-        }
-
-        .large-route-line {
-
-            flex: 1;
-
-            height: 1px;
-
-            position: relative;
-
-            background:
-                repeating-linear-gradient(
-                    90deg,
-                    #3c4d43 0,
-                    #3c4d43 5px,
-                    transparent 5px,
-                    transparent 10px
-                );
-        }
-
-        .large-route-line i {
-
-            position: absolute;
-
-            left: 48%;
-            top: -7px;
-
-            color: var(--accent);
-
-            font-size: 12px;
-        }
-
-        .flight-meta {
-
-            display: grid;
-
-            grid-template-columns:
-                repeat(2,1fr);
-
-            gap: 8px;
-
-            margin-top: 27px;
-        }
-
-        .meta-box {
-
-            padding: 10px;
-
-            border-radius: 10px;
-
-            background:
-                rgba(255,255,255,.025);
-        }
-
-        .meta-label {
-
-            color: var(--text-muted);
-
-            font-size: 8px;
-
-            text-transform: uppercase;
-        }
-
-        .meta-value {
-
-            margin-top: 4px;
-
-            font-size: 11px;
-
-            font-weight: 700;
-        }
-
-
-        /* =========================================================
-           WEATHER
-        ========================================================== */
-
-        .weather-grid {
-
-            display: grid;
-
-            grid-template-columns:
-                1fr
-                1fr
-                1fr;
-
-            gap: 14px;
-        }
-
-        .weather-card {
-
-            padding: 22px;
-
-            border:
-                1px solid var(--border);
-
-            background:
-                rgba(13,22,17,.75);
-
-            border-radius: var(--radius-md);
-
-            transition: var(--transition);
-        }
-
-        .weather-card:hover {
-
-            transform: translateY(-3px);
-
-            border-color: var(--border-hover);
-        }
-
-        .weather-top {
-
-            display: flex;
-
-            justify-content: space-between;
-
-            align-items: flex-start;
-        }
-
-        .weather-airport {
-
-            font-family: "Space Grotesk";
-
-            font-size: 18px;
-
-            font-weight: 700;
-        }
-
-        .weather-city {
-
-            color: var(--text-muted);
-
-            font-size: 9px;
-
-            margin-top: 3px;
-        }
-
-        .weather-icon {
-
-            width: 38px;
-            height: 38px;
-
-            display: grid;
-            place-items: center;
-
-            color: var(--accent);
-
-            background:
-                var(--accent-soft);
-
-            border-radius: 10px;
-        }
-
-        .weather-main {
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: space-between;
-
-            margin-top: 25px;
-        }
-
-        .temperature {
-
-            font-family: "Space Grotesk";
-
-            font-size: 38px;
-
-            font-weight: 700;
-
-            letter-spacing: -2px;
-        }
-
-        .weather-condition {
-
-            color: var(--text-soft);
-
-            font-size: 10px;
-
-            margin-top: 2px;
-        }
-
-        .wind {
-
-            text-align: right;
-        }
-
-        .wind-value {
-
-            font-size: 13px;
-
-            font-weight: 700;
-        }
-
-        .wind-label {
-
-            color: var(--text-muted);
-
-            font-size: 8px;
-
-            margin-top: 3px;
-
-            text-transform: uppercase;
-        }
-
-        .metar {
-
-            margin-top: 18px;
-
-            padding: 9px;
-
-            background:
-                rgba(0,0,0,.25);
-
-            border-radius: 8px;
-
-            font-family: monospace;
-
-            font-size: 8px;
-
-            color: #85968c;
-
-            white-space: nowrap;
-
-            overflow: hidden;
-
-            text-overflow: ellipsis;
-        }
-
-
-        /* =========================================================
-           AIRPORTS
-        ========================================================== */
-
-        .airport-grid {
-
-            display: grid;
-
-            grid-template-columns:
-                repeat(4,1fr);
-
-            gap: 14px;
-        }
-
-        .airport-card {
-
-            position: relative;
-
-            min-height: 190px;
-
-            overflow: hidden;
-
-            padding: 20px;
-
-            border:
-                1px solid var(--border);
-
-            border-radius: var(--radius-md);
-
-            background:
-                linear-gradient(
-                    145deg,
-                    #111c16,
-                    #09100c
-                );
-
-            cursor: pointer;
-
-            transition: var(--transition);
-        }
-
-        .airport-card:hover {
-
-            transform: translateY(-5px);
-
-            border-color: var(--border-hover);
-
-            box-shadow:
-                0 20px 45px rgba(0,0,0,.3);
-        }
-
-        .airport-card::after {
-
-            content: "";
-
-            position: absolute;
-
-            width: 160px;
-            height: 160px;
-
-            right: -80px;
-            bottom: -100px;
-
-            border-radius: 50%;
-
-            border:
-                1px solid rgba(172,227,54,.1);
-        }
-
-        .airport-country {
-
-            color: var(--accent);
-
-            font-size: 8px;
-
-            font-weight: 800;
-
-            text-transform: uppercase;
-
-            letter-spacing: 1px;
-        }
-
-        .airport-card-code {
-
-            margin-top: 23px;
-
-            font-family: "Space Grotesk";
-
-            font-size: 34px;
-
-            font-weight: 700;
-
-            letter-spacing: -1px;
-        }
-
-        .airport-card-name {
-
-            margin-top: 2px;
-
-            color: var(--text-soft);
-
-            font-size: 10px;
-        }
-
-        .airport-runway {
-
-            margin-top: 25px;
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 7px;
-
-            color: var(--text-muted);
-
-            font-size: 8px;
-        }
-
-
-        /* =========================================================
-           FEATURES
-        ========================================================== */
-
-        .features {
-
-            display: grid;
-
-            grid-template-columns:
-                repeat(3,1fr);
-
-            gap: 14px;
-        }
-
-        .feature {
-
-            position: relative;
-
-            overflow: hidden;
-
-            padding: 25px;
-
-            min-height: 210px;
-
-            border:
-                1px solid var(--border);
-
-            border-radius: var(--radius-lg);
-
-            background:
-                linear-gradient(
-                    145deg,
-                    rgba(16,27,21,.8),
-                    rgba(8,13,10,.8)
-                );
-
-            transition: var(--transition);
-        }
-
-        .feature:hover {
-
-            transform: translateY(-5px);
-
-            border-color: var(--border-hover);
-        }
-
-        .feature-number {
-
-            position: absolute;
-
-            top: 20px;
-            right: 22px;
-
-            font-family: "Space Grotesk";
-
-            font-size: 11px;
-
-            color: #3a4740;
-        }
-
-        .feature-icon {
-
-            width: 45px;
-            height: 45px;
-
-            display: grid;
-            place-items: center;
-
-            border-radius: 13px;
-
-            color: var(--accent);
-
-            background:
-                rgba(172,227,54,.08);
-
-            border:
-                1px solid rgba(172,227,54,.1);
-
-            font-size: 16px;
-        }
-
-        .feature h3 {
-
-            margin-top: 22px;
-
-            font-family: "Space Grotesk";
-
-            font-size: 16px;
-        }
-
-        .feature p {
-
-            margin-top: 8px;
-
-            color: var(--text-muted);
-
-            font-size: 10px;
-
-            line-height: 1.7;
-
-            max-width: 310px;
-        }
-
-
-        /* =========================================================
-           RECENT FLIGHTS
-        ========================================================== */
-
-        .recent-table {
-
-            overflow: hidden;
-
-            border:
-                1px solid var(--border);
-
-            border-radius: var(--radius-lg);
-
-            background:
-                rgba(12,20,16,.7);
-        }
-
-        .flight-row {
-
-            display: grid;
-
-            grid-template-columns:
-                1.3fr
-                1.3fr
-                1fr
-                1fr
-                .8fr;
-
-            align-items: center;
-
-            gap: 10px;
-
-            padding: 15px 20px;
-
-            border-bottom:
-                1px solid var(--border);
-
-            transition: var(--transition);
-        }
-
-        .flight-row:last-child {
-            border-bottom: none;
-        }
-
-        .flight-row:not(.header):hover {
-
-            background:
-                rgba(255,255,255,.02);
-        }
-
-        .flight-row.header {
-
-            color: var(--text-muted);
-
-            font-size: 8px;
-
-            text-transform: uppercase;
-
-            letter-spacing: 1px;
-        }
-
-        .route-cell {
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 8px;
-
-            font-family: "Space Grotesk";
-
-            font-weight: 700;
-
-            font-size: 12px;
-        }
-
-        .route-cell span {
-
-            color: #53615a;
-
-            font-size: 8px;
-        }
-
-        .aircraft-cell {
-
-            color: var(--text-soft);
-
-            font-size: 10px;
-        }
-
-        .date-cell {
-
-            color: var(--text-muted);
-
-            font-size: 9px;
-        }
-
-        .rating {
-
-            display: inline-flex;
-
-            align-items: center;
-
-            gap: 3px;
-
-            color: var(--accent);
-
-            font-size: 10px;
-
-            font-weight: 800;
-        }
-
-        .status-complete {
-
-            color: var(--success);
-
-            font-size: 9px;
-
-            font-weight: 700;
-        }
-
-
-        /* =========================================================
-           LOWER GRID
-        ========================================================== */
-
-        .lower-grid {
-
-            display: grid;
-
-            grid-template-columns:
-                1fr
-                1fr;
-
-            gap: 15px;
-        }
-
-
-        /* =========================================================
-           AIRCRAFT
-        ========================================================== */
-
-        .aircraft-card {
-
-            padding: 25px;
-
-            border:
-                1px solid var(--border);
-
-            border-radius: var(--radius-lg);
-
-            background:
-                rgba(12,20,16,.7);
-        }
-
-        .aircraft-head {
-
-            display: flex;
-
-            justify-content: space-between;
-
-            align-items: center;
-        }
-
-        .aircraft-name {
-
-            font-family: "Space Grotesk";
-
-            font-size: 18px;
-
-            font-weight: 700;
-        }
-
-        .aircraft-reg {
-
-            margin-top: 3px;
-
-            color: var(--text-muted);
-
-            font-size: 9px;
-        }
-
-        .aircraft-badge {
-
-            padding: 6px 9px;
-
-            border-radius: 8px;
-
-            color: var(--success);
-
-            background:
-                rgba(85,217,138,.08);
-
-            font-size: 8px;
-
-            font-weight: 800;
-
-            text-transform: uppercase;
-        }
-
-        .aircraft-visual {
-
-            position: relative;
-
-            height: 115px;
-
-            margin-top: 18px;
-
-            overflow: hidden;
-
-            border-radius: 13px;
-
-            background:
-                linear-gradient(
-                    110deg,
-                    #101c15,
-                    #0b130f
-                );
-        }
-
-        .aircraft-visual::before {
-
-            content: "✈";
-
-            position: absolute;
-
-            left: 50%;
-
-            top: 50%;
-
-            transform:
-                translate(-50%,-50%)
-                rotate(-2deg);
-
-            font-size: 76px;
-
-            color: rgba(172,227,54,.12);
-
-        }
-
-        .aircraft-data {
-
-            display: grid;
-
-            grid-template-columns:
-                repeat(3,1fr);
-
-            gap: 8px;
-
-            margin-top: 13px;
-        }
-
-        .aircraft-stat {
-
-            padding: 10px;
-
-            background:
-                rgba(255,255,255,.025);
-
-            border-radius: 9px;
-        }
-
-        .aircraft-stat span {
-
-            display: block;
-
-            color: var(--text-muted);
-
-            font-size: 8px;
-
-            text-transform: uppercase;
-        }
-
-        .aircraft-stat strong {
-
-            display: block;
-
-            margin-top: 4px;
-
-            font-size: 11px;
-        }
-
-
-        /* =========================================================
-           QUICK TOOLS
-        ========================================================== */
-
-        .tools-card {
-
-            padding: 25px;
-
-            border:
-                1px solid var(--border);
-
-            border-radius: var(--radius-lg);
-
-            background:
-                rgba(12,20,16,.7);
-        }
-
-        .tools-grid {
-
-            display: grid;
-
-            grid-template-columns:
-                repeat(2,1fr);
-
-            gap: 8px;
-
-            margin-top: 20px;
-        }
-
-        .tool {
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 11px;
-
-            padding: 12px;
-
-            border-radius: 11px;
-
-            border:
-                1px solid transparent;
-
-            background:
-                rgba(255,255,255,.025);
-
-            cursor: pointer;
-
-            transition: var(--transition);
-        }
-
-        .tool:hover {
-
-            border-color: var(--border-hover);
-
-            background:
-                var(--accent-soft);
-        }
-
-        .tool-icon {
-
-            width: 31px;
-            height: 31px;
-
-            display: grid;
-            place-items: center;
-
-            border-radius: 9px;
-
-            color: var(--accent);
-
-            background:
-                rgba(172,227,54,.07);
-
-            font-size: 11px;
-        }
-
-        .tool-text {
-
-            font-size: 9px;
-
-            font-weight: 700;
-        }
-
-
-        /* =========================================================
-           CTA
-        ========================================================== */
-
-        .cta {
-
-            position: relative;
-
-            overflow: hidden;
-
-            margin-top: 42px;
-
-            padding: 50px;
-
-            border-radius: var(--radius-xl);
-
-            border:
-                1px solid rgba(172,227,54,.14);
-
-            background:
-                radial-gradient(
-                    circle at 80% 50%,
-                    rgba(172,227,54,.14),
-                    transparent 35%
-                ),
-                linear-gradient(
-                    120deg,
-                    #101b14,
-                    #0a120e
-                );
-        }
-
-        .cta::before {
-
-            content: "";
-
-            position: absolute;
-
-            width: 400px;
-            height: 400px;
-
-            right: -150px;
-            top: -180px;
-
-            border-radius: 50%;
-
-            border:
-                1px solid rgba(172,227,54,.08);
-
-            box-shadow:
-                0 0 0 70px rgba(172,227,54,.02),
-                0 0 0 140px rgba(172,227,54,.01);
-        }
-
-        .cta-content {
-
-            position: relative;
-
-            z-index: 2;
-        }
-
-        .cta h2 {
-
-            font-family: "Space Grotesk";
-
-            font-size: 32px;
-
-            letter-spacing: -1.5px;
-        }
-
-        .cta p {
-
-            margin-top: 8px;
-
-            color: var(--text-muted);
-
-            max-width: 570px;
-
-            font-size: 11px;
-
-            line-height: 1.7;
-        }
-
-        .cta-buttons {
-
-            margin-top: 22px;
-
-            display: flex;
-
-            gap: 10px;
-        }
-
-
-        /* =========================================================
-           FOOTER
-        ========================================================== */
-
-        footer {
-
-            margin-top: 55px;
-
-            padding-top: 25px;
-
-            border-top:
-                1px solid var(--border);
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: space-between;
-        }
-
-        .footer-logo {
-
-            font-family: "Space Grotesk";
-
-            font-weight: 700;
-
-            font-size: 14px;
-        }
-
-        .footer-logo span {
-            color: var(--accent);
-        }
-
-        .footer-copy {
-
-            color: var(--text-muted);
-
-            font-size: 9px;
-        }
-
-        .footer-links {
-
-            display: flex;
-
-            gap: 17px;
-
-            color: var(--text-muted);
-
-            font-size: 9px;
-        }
-
-        .footer-links a:hover {
-            color: var(--accent);
-        }
-
-
-        /* =========================================================
-           SEARCH OVERLAY
-        ========================================================== */
-
-        .overlay {
-
-            position: fixed;
-
-            inset: 0;
-
-            z-index: 2000;
-
-            display: none;
-
-            align-items: flex-start;
-
-            justify-content: center;
-
-            padding-top: 100px;
-
-            background:
-                rgba(0,0,0,.68);
-
-            backdrop-filter: blur(10px);
-        }
-
-        .overlay.active {
-            display: flex;
-        }
-
-        .search-box {
-
-            width: min(650px, calc(100% - 30px));
-
-            background:
-                #0e1712;
-
-            border:
-                1px solid var(--border);
-
-            border-radius: 18px;
-
-            overflow: hidden;
-
-            box-shadow:
-                0 40px 100px rgba(0,0,0,.6);
-        }
-
-        .search-input-wrapper {
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 12px;
-
-            padding: 18px;
-
-            border-bottom:
-                1px solid var(--border);
-        }
-
-        .search-input-wrapper i {
-            color: var(--accent);
-        }
-
-        .search-input {
-
-            flex: 1;
-
-            background: transparent;
-
-            border: none;
-
-            outline: none;
-
-            color: var(--text);
-
-            font-size: 14px;
-        }
-
-        .search-results {
-
-            padding: 10px;
-        }
-
-        .search-result {
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 12px;
-
-            padding: 12px;
-
-            border-radius: 10px;
-
-            cursor: pointer;
-        }
-
-        .search-result:hover {
-            background: rgba(255,255,255,.04);
-        }
-
-        .search-result-icon {
-
-            width: 32px;
-            height: 32px;
-
-            display: grid;
-            place-items: center;
-
-            background:
-                var(--accent-soft);
-
-            color: var(--accent);
-
-            border-radius: 8px;
-        }
-
-        .search-result-title {
-
-            font-size: 11px;
-
-            font-weight: 700;
-        }
-
-        .search-result-sub {
-
-            margin-top: 2px;
-
-            color: var(--text-muted);
-
-            font-size: 8px;
-        }
-
-
-        /* =========================================================
-           NOTIFICATION PANEL
-        ========================================================== */
-
-        .notification-panel {
-
-            position: fixed;
-
-            z-index: 1500;
-
-            right: 25px;
-
-            top: 80px;
-
-            width: 340px;
-
-            display: none;
-
-            background:
-                #0d1611;
-
-            border:
-                1px solid var(--border);
-
-            border-radius: 17px;
-
-            box-shadow:
-                0 30px 80px rgba(0,0,0,.5);
-
-            overflow: hidden;
-        }
-
-        .notification-panel.active {
-            display: block;
-        }
-
-        .notification-header {
-
-            padding: 15px 17px;
-
-            display: flex;
-
-            justify-content: space-between;
-
-            border-bottom:
-                1px solid var(--border);
-        }
-
-        .notification-title {
-
-            font-size: 12px;
-
-            font-weight: 800;
-        }
-
-        .notification-clear {
-
-            color: var(--accent);
-
-            font-size: 9px;
-
-            cursor: pointer;
-        }
-
-        .notification {
-
-            padding: 14px 17px;
-
-            display: flex;
-
-            gap: 10px;
-
-            border-bottom:
-                1px solid var(--border);
-        }
-
-        .notification:last-child {
-            border-bottom: none;
-        }
-
-        .notification-icon {
-
-            width: 30px;
-            height: 30px;
-
-            display: grid;
-            place-items: center;
-
-            flex-shrink: 0;
-
-            border-radius: 8px;
-
-            background:
-                var(--accent-soft);
-
-            color: var(--accent);
-
-            font-size: 10px;
-        }
-
-        .notification strong {
-
-            display: block;
-
-            font-size: 10px;
-        }
-
-        .notification p {
-
-            margin-top: 3px;
-
-            color: var(--text-muted);
-
-            font-size: 8px;
-
-            line-height: 1.5;
-        }
-
-
-        /* =========================================================
-           MOBILE MENU
-        ========================================================== */
-
-        .mobile-menu {
-
-            display: none;
-
-            width: 39px;
-            height: 39px;
-
-            place-items: center;
-
-            border:
-                1px solid var(--border);
-
-            background:
-                rgba(255,255,255,.035);
-
-            border-radius: 10px;
-
-            color: var(--text-soft);
-
-            cursor: pointer;
-        }
-
-
-        /* =========================================================
-           SCROLL ANIMATION
-        ========================================================== */
-
-        .reveal {
-
-            opacity: 0;
-
-            transform: translateY(20px);
-
-            transition:
-                opacity .7s ease,
-                transform .7s ease;
-        }
-
-        .reveal.visible {
-
-            opacity: 1;
-
-            transform: translateY(0);
-        }
-
-
-        /* =========================================================
-           RESPONSIVE
-        ========================================================== */
-
-        @media (max-width: 1250px) {
-
-            .hero-display {
-                right: 25px;
-                width: 320px;
-            }
-
-            .hero-content {
-                max-width: 650px;
-            }
-
-            .airport-grid {
-                grid-template-columns:
-                    repeat(2,1fr);
-            }
-
-            .stats-grid {
-                grid-template-columns:
-                    repeat(2,1fr);
-            }
-        }
-
-
-        @media (max-width: 1050px) {
-
-            :root {
-                --sidebar-width: 76px;
-            }
-
-            .sidebar {
-                padding: 20px 10px;
-            }
-
-            .logo {
-                justify-content: center;
-                padding-bottom: 25px;
-            }
-
-            .logo-text,
-            .nav-label,
-            .nav-item span,
-            .system-card {
-                display: none;
-            }
-
-            .nav-item {
-                justify-content: center;
-                padding: 13px;
-            }
-
-            .nav-item.active::before {
-                left: -10px;
-            }
-
-            .hero-display {
-                opacity: .45;
-            }
-
-            .dashboard-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .features {
-                grid-template-columns:
-                    repeat(2,1fr);
-            }
-        }
-
-
-        @media (max-width: 760px) {
-
-            :root {
-                --sidebar-width: 0px;
-            }
-
-            .sidebar {
-
-                transform:
-                    translateX(-100%);
-
-                width: 270px;
-
-                transition:
-                    transform .3s ease;
-            }
-
-            .sidebar.mobile-open {
-                transform:
-                    translateX(0);
-            }
-
-            .logo-text,
-            .nav-label,
-            .nav-item span,
-            .system-card {
-                display: block;
-            }
-
-            .logo {
-                justify-content: flex-start;
-            }
-
-            .nav-item {
-                justify-content: flex-start;
-            }
-
-            .mobile-menu {
-                display: grid;
-            }
-
-            .main {
-                margin-left: 0;
-            }
-
-            .content {
-                padding:
-                    15px
-                    15px
-                    60px;
-            }
-
-            .topbar {
-                margin-bottom: 15px;
-            }
-
-            .breadcrumbs {
-                display: none;
-            }
-
-            .profile-name {
-                display: none;
-            }
-
-            .hero {
-                min-height: 570px;
-            }
-
-            .hero-content {
-                padding: 40px 28px;
-            }
-
-            .hero h1 {
-                font-size: 45px;
-                letter-spacing: -2.5px;
-            }
-
-            .hero-display {
-
-                left: 20px;
-                right: 20px;
-
-                bottom: 20px;
-
-                width: auto;
-
-                opacity: 1;
-            }
-
-            .planner-route {
-                grid-template-columns:
-                    1fr;
-            }
-
-            .swap-button {
-                transform: rotate(90deg);
-            }
-
-            .swap-button:hover {
-                transform:
-                    rotate(270deg);
-            }
-
-            .planner-options {
-                grid-template-columns:
-                    1fr;
-            }
-
-            .weather-grid,
-            .features,
-            .lower-grid {
-                grid-template-columns:
-                    1fr;
-            }
-
-            .airport-grid {
-                grid-template-columns:
-                    1fr 1fr;
-            }
-
-            .flight-row {
-                grid-template-columns:
-                    1fr
-                    1fr
-                    1fr;
-            }
-
-            .flight-row.header {
-                display: none;
-            }
-
-            .flight-row > :nth-child(4),
-            .flight-row > :nth-child(5) {
-                display: none;
-            }
-
-            footer {
-                flex-direction: column;
-
-                gap: 15px;
-
-                align-items: flex-start;
-            }
-
-            .cta {
-                padding: 30px 25px;
-            }
-
-            .cta h2 {
-                font-size: 25px;
-            }
-        }
-
-
-        @media (max-width: 480px) {
-
-            .stats-grid {
-                grid-template-columns:
-                    1fr;
-            }
-
-            .airport-grid {
-                grid-template-columns:
-                    1fr;
-            }
-
-            .hero h1 {
-                font-size: 39px;
-            }
-
-            .display-data {
-                grid-template-columns:
-                    repeat(3,1fr);
-            }
-
-            .top-button:nth-child(2) {
-                display: none;
-            }
-
-            .notification-panel {
-
-                right: 10px;
-                left: 10px;
-
-                width: auto;
-            }
-        }
-
-    </style>
+    <!-- =========================================================
+         STYLES
+    ========================================================== -->
+
+    <link rel="stylesheet" href="css/home.css">
 </head>
-
 
 <body>
 
+<!-- =============================================================
+     BACKGROUND
+============================================================= -->
+
+<div class="background">
+
+    <div class="background-grid"></div>
+
+    <div class="orb orb-one"></div>
+    <div class="orb orb-two"></div>
+    <div class="orb orb-three"></div>
+
+    <div class="noise"></div>
+
+</div>
+
 
 <!-- =============================================================
-     SIDEBAR
-============================================================== -->
+     HEADER / NAVIGATION
+============================================================= -->
 
-<aside class="sidebar" id="sidebar">
+<header class="header" id="header">
 
-    <div class="logo">
+    <div class="header-inner">
 
-        <div class="logo-icon">
-            <i class="fa-solid fa-plane"></i>
-        </div>
+        <!-- LOGO -->
 
-        <div class="logo-text">
-            Flight<span>.</span>
-        </div>
+        <a href="#" class="logo">
 
-    </div>
+            <div class="logo-mark">
 
-
-    <div class="nav-label">
-        Workspace
-    </div>
-
-    <nav class="nav">
-
-        <a
-            href="#"
-            class="nav-item active"
-        >
-            <i class="fa-solid fa-grid-2"></i>
-            <span>Dashboard</span>
-        </a>
-
-        <a
-            href="#planner"
-            class="nav-item"
-        >
-            <i class="fa-solid fa-route"></i>
-            <span>Flight Planner</span>
-        </a>
-
-        <a
-            href="#dispatch"
-            class="nav-item"
-        >
-            <i class="fa-solid fa-file-lines"></i>
-            <span>Dispatch</span>
-        </a>
-
-        <a
-            href="#weather"
-            class="nav-item"
-        >
-            <i class="fa-solid fa-cloud-sun"></i>
-            <span>Weather</span>
-        </a>
-
-        <a
-            href="#airports"
-            class="nav-item"
-        >
-            <i class="fa-solid fa-tower-observation"></i>
-            <span>Airports</span>
-        </a>
-
-        <a
-            href="#performance"
-            class="nav-item"
-        >
-            <i class="fa-solid fa-gauge-high"></i>
-            <span>Performance</span>
-        </a>
-
-
-        <div class="nav-spacer"></div>
-
-        <div class="nav-label">
-            Pilot
-        </div>
-
-        <a
-            href="#logbook"
-            class="nav-item"
-        >
-            <i class="fa-solid fa-book"></i>
-            <span>Logbook</span>
-        </a>
-
-        <a
-            href="#training"
-            class="nav-item"
-        >
-            <i class="fa-solid fa-graduation-cap"></i>
-            <span>Training</span>
-        </a>
-
-        <a
-            href="#checklists"
-            class="nav-item"
-        >
-            <i class="fa-solid fa-list-check"></i>
-            <span>Checklists</span>
-        </a>
-
-        <a
-            href="#achievements"
-            class="nav-item"
-        >
-            <i class="fa-solid fa-trophy"></i>
-            <span>Achievements</span>
-        </a>
-
-    </nav>
-
-
-    <div class="sidebar-bottom">
-
-        <div class="system-card">
-
-            <div class="system-title">
-
-                <span>Flight Systems</span>
-
-                <span class="online-dot"></span>
+                <i class="fa-solid fa-plane"></i>
 
             </div>
 
-            <div class="system-status">
-                All systems operational
+            <div class="logo-text">
+
+                <span class="logo-name">
+                    FlightDeck
+                </span>
+
+                <span class="logo-subtitle">
+                    SIMULATOR COMPANION
+                </span>
+
             </div>
 
-            <div class="system-sub">
-                Last synchronization: just now
-            </div>
+        </a>
+
+
+        <!-- DESKTOP NAVIGATION -->
+
+        <nav class="navigation">
+
+            <a href="#home" class="nav-link active">
+                Home
+            </a>
+
+            <a href="#tools" class="nav-link">
+                Tools
+            </a>
+
+            <a href="#features" class="nav-link">
+                Features
+            </a>
+
+            <a href="#flights" class="nav-link">
+                Flights
+            </a>
+
+            <a href="#about" class="nav-link">
+                About
+            </a>
+
+        </nav>
+
+
+        <!-- HEADER ACTIONS -->
+
+        <div class="header-actions">
+
+            <button
+                class="icon-button"
+                id="themeButton"
+                aria-label="Change theme"
+            >
+                <i class="fa-solid fa-moon"></i>
+            </button>
+
+            <button
+                class="header-button"
+                id="openToolsButton"
+            >
+                <i class="fa-solid fa-grid-2"></i>
+                <span>Open Tools</span>
+            </button>
+
+            <button
+                class="mobile-menu-button"
+                id="mobileMenuButton"
+            >
+                <i class="fa-solid fa-bars"></i>
+            </button>
 
         </div>
 
     </div>
 
-</aside>
+</header>
 
+
+<!-- =============================================================
+     MOBILE MENU
+============================================================= -->
+
+<div class="mobile-menu" id="mobileMenu">
+
+    <a href="#home">
+        <i class="fa-solid fa-house"></i>
+        Home
+    </a>
+
+    <a href="#tools">
+        <i class="fa-solid fa-toolbox"></i>
+        Tools
+    </a>
+
+    <a href="#features">
+        <i class="fa-solid fa-sparkles"></i>
+        Features
+    </a>
+
+    <a href="#flights">
+        <i class="fa-solid fa-plane-departure"></i>
+        Flights
+    </a>
+
+    <a href="#about">
+        <i class="fa-solid fa-circle-info"></i>
+        About
+    </a>
+
+</div>
 
 
 <!-- =============================================================
      MAIN
-============================================================== -->
+============================================================= -->
 
-<main class="main">
-
-    <div class="content">
+<main>
 
 
-        <!-- =====================================================
-             TOPBAR
-        ====================================================== -->
+<!-- =============================================================
+     HERO SECTION
+============================================================= -->
 
-        <header class="topbar">
+<section class="hero section" id="home">
 
-            <div style="display:flex;align-items:center;gap:10px;">
+    <div class="hero-content">
 
-                <button
-                    class="mobile-menu"
-                    id="mobileMenu"
-                    aria-label="Open menu"
-                >
-                    <i class="fa-solid fa-bars"></i>
+        <!-- STATUS -->
+
+        <div class="status-pill">
+
+            <span class="status-dot"></span>
+
+            <span>
+                FlightDeck is ready for departure
+            </span>
+
+            <i class="fa-solid fa-arrow-right"></i>
+
+        </div>
+
+
+        <!-- MAIN HEADING -->
+
+        <h1 class="hero-title">
+
+            <span>
+                Everything you need
+            </span>
+
+            <span class="gradient-text">
+                before you fly.
+            </span>
+
+        </h1>
+
+
+        <!-- DESCRIPTION -->
+
+        <p class="hero-description">
+
+            A modern all-in-one companion for flight simulation.
+            Plan your route, check the weather, calculate performance,
+            manage your flights and become a better virtual pilot.
+
+        </p>
+
+
+        <!-- HERO BUTTONS -->
+
+        <div class="hero-buttons">
+
+            <button
+                class="primary-button"
+                id="startPlanning"
+            >
+
+                <i class="fa-solid fa-route"></i>
+
+                <span>
+                    Start Planning
+                </span>
+
+                <i class="fa-solid fa-arrow-right button-arrow"></i>
+
+            </button>
+
+
+            <button
+                class="secondary-button"
+                id="exploreTools"
+            >
+
+                <i class="fa-solid fa-compass"></i>
+
+                Explore Tools
+
+            </button>
+
+        </div>
+
+
+        <!-- TRUST / STATS -->
+
+        <div class="hero-stats">
+
+            <div class="hero-stat">
+
+                <strong>
+                    25+
+                </strong>
+
+                <span>
+                    Flight Tools
+                </span>
+
+            </div>
+
+
+            <div class="hero-stat-divider"></div>
+
+
+            <div class="hero-stat">
+
+                <strong>
+                    100%
+                </strong>
+
+                <span>
+                    Free to use
+                </span>
+
+            </div>
+
+
+            <div class="hero-stat-divider"></div>
+
+
+            <div class="hero-stat">
+
+                <strong>
+                    MSFS
+                </strong>
+
+                <span>
+                    Built for simmers
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================================
+         HERO FLIGHT CARD
+    ========================================================== -->
+
+    <div class="hero-visual">
+
+        <div class="hero-glow"></div>
+
+
+        <div class="flight-card">
+
+            <!-- TOP -->
+
+            <div class="flight-card-top">
+
+                <div>
+
+                    <span class="eyebrow">
+                        NEXT FLIGHT
+                    </span>
+
+                    <h3>
+                        Amsterdam
+                        <i class="fa-solid fa-arrow-right-long"></i>
+                        Barcelona
+                    </h3>
+
+                </div>
+
+                <div class="flight-status">
+                    <span></span>
+                    READY
+                </div>
+
+            </div>
+
+
+            <!-- ROUTE -->
+
+            <div class="route-visual">
+
+                <div class="airport-point">
+
+                    <div class="airport-circle">
+                        AMS
+                    </div>
+
+                    <span>
+                        EHAM
+                    </span>
+
+                </div>
+
+
+                <div class="route-line">
+
+                    <div class="route-plane">
+                        <i class="fa-solid fa-plane"></i>
+                    </div>
+
+                </div>
+
+
+                <div class="airport-point">
+
+                    <div class="airport-circle">
+                        BCN
+                    </div>
+
+                    <span>
+                        LEBL
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- FLIGHT DATA -->
+
+            <div class="flight-data">
+
+                <div class="flight-data-item">
+
+                    <span>
+                        DISTANCE
+                    </span>
+
+                    <strong>
+                        616 NM
+                    </strong>
+
+                </div>
+
+
+                <div class="flight-data-item">
+
+                    <span>
+                        EST. TIME
+                    </span>
+
+                    <strong>
+                        02:04
+                    </strong>
+
+                </div>
+
+
+                <div class="flight-data-item">
+
+                    <span>
+                        AIRCRAFT
+                    </span>
+
+                    <strong>
+                        A320
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <!-- CARD FOOTER -->
+
+            <div class="flight-card-footer">
+
+                <div class="weather-preview">
+
+                    <i class="fa-solid fa-cloud-sun"></i>
+
+                    <div>
+
+                        <strong>
+                            VFR Conditions
+                        </strong>
+
+                        <span>
+                            Good visibility
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <button class="small-arrow-button">
+
+                    <i class="fa-solid fa-arrow-up-right"></i>
+
                 </button>
 
-                <div class="breadcrumbs">
+            </div>
 
-                    <span>Flight</span>
+        </div>
 
-                    <i class="fa-solid fa-chevron-right"
-                       style="font-size:8px;">
-                    </i>
 
-                    <strong>Dashboard</strong>
+        <!-- FLOATING CARD -->
 
-                </div>
+        <div class="floating-card floating-card-weather">
+
+            <div class="floating-icon">
+
+                <i class="fa-solid fa-wind"></i>
 
             </div>
 
+            <div>
 
-            <div class="top-actions">
+                <span>
+                    WIND
+                </span>
 
-                <div
-                    class="top-button"
-                    id="searchButton"
-                    title="Search"
-                >
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                </div>
-
-                <div
-                    class="top-button"
-                    id="notificationButton"
-                    title="Notifications"
-                >
-                    <i class="fa-regular fa-bell"></i>
-                </div>
-
-                <div
-                    class="top-button"
-                    id="commandButton"
-                    title="Command palette"
-                >
-                    <i class="fa-solid fa-terminal"></i>
-                </div>
-
-
-                <div class="profile">
-
-                    <div class="avatar">
-                        CO
-                    </div>
-
-                    <div>
-
-                        <div class="profile-name">
-                            Pilot
-                        </div>
-
-                        <div class="profile-rank">
-                            Captain
-                        </div>
-
-                    </div>
-
-                </div>
+                <strong>
+                    240° / 12kt
+                </strong>
 
             </div>
 
-        </header>
+        </div>
 
 
+        <div class="floating-card floating-card-altitude">
 
-        <!-- =====================================================
-             HERO
-        ====================================================== -->
+            <div class="altitude-icon">
 
-        <section class="hero reveal">
-
-            <div class="hero-grid"></div>
-
-            <div class="hero-content">
-
-                <div class="eyebrow">
-
-                    <i class="fa-solid fa-circle"></i>
-
-                    Flight Operations Platform
-
-                </div>
-
-
-                <h1>
-
-                    Fly smarter.
-                    <br>
-
-                    <span>Fly further.</span>
-
-                </h1>
-
-
-                <p class="hero-description">
-
-                    Your complete companion for Microsoft Flight Simulator
-                    and modern flight simulation. Plan your flights,
-                    monitor weather, calculate performance and keep
-                    your entire pilot operation in one place.
-
-                </p>
-
-
-                <div class="hero-buttons">
-
-                    <button
-                        class="btn btn-primary"
-                        onclick="scrollToPlanner()"
-                    >
-
-                        <i class="fa-solid fa-route"></i>
-
-                        Plan a flight
-
-                    </button>
-
-
-                    <button
-                        class="btn btn-secondary"
-                        onclick="openSearch()"
-                    >
-
-                        <i class="fa-solid fa-compass"></i>
-
-                        Explore Flight
-
-                    </button>
-
-                </div>
+                <i class="fa-solid fa-arrow-up"></i>
 
             </div>
 
+            <div>
 
-            <!-- Flight instrument card -->
+                <span>
+                    CRUISE
+                </span>
 
-            <div class="hero-display">
-
-                <div class="display-top">
-
-                    <div class="display-title">
-                        Active Flight
-                    </div>
-
-                    <div class="display-live">
-
-                        <span></span>
-
-                        Live
-
-                    </div>
-
-                </div>
-
-
-                <div class="route-display">
-
-                    <div>
-
-                        <div class="airport-code">
-                            EHAM
-                        </div>
-
-                        <div class="airport-city">
-                            Amsterdam
-                        </div>
-
-                    </div>
-
-
-                    <div class="route-line"></div>
-
-
-                    <div style="text-align:right;">
-
-                        <div class="airport-code">
-                            LIRF
-                        </div>
-
-                        <div class="airport-city">
-                            Rome
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <div class="display-data">
-
-                    <div class="display-stat">
-
-                        <div class="display-stat-label">
-                            Distance
-                        </div>
-
-                        <div class="display-stat-value">
-                            670 NM
-                        </div>
-
-                    </div>
-
-
-                    <div class="display-stat">
-
-                        <div class="display-stat-label">
-                            Flight time
-                        </div>
-
-                        <div class="display-stat-value">
-                            02:08
-                        </div>
-
-                    </div>
-
-
-                    <div class="display-stat">
-
-                        <div class="display-stat-label">
-                            Aircraft
-                        </div>
-
-                        <div class="display-stat-value">
-                            A320
-                        </div>
-
-                    </div>
-
-                </div>
+                <strong>
+                    FL360
+                </strong>
 
             </div>
 
-        </section>
+        </div>
+
+    </div>
+
+</section>
 
 
+<!-- =============================================================
+     QUICK SEARCH
+============================================================= -->
 
-        <!-- =====================================================
-             STATS
-        ====================================================== -->
+<section class="search-section">
 
-        <section class="section reveal">
+    <div class="search-box">
 
-            <div class="section-header">
+        <div class="search-icon">
 
-                <div>
+            <i class="fa-solid fa-magnifying-glass"></i>
 
-                    <div class="section-title">
-                        Flight Overview
-                    </div>
+        </div>
 
-                    <div class="section-subtitle">
-                        Your simulation activity at a glance
-                    </div>
-
-                </div>
-
-                <div class="view-all">
-                    View statistics →
-                </div>
-
-            </div>
-
-
-            <div class="stats-grid">
-
-
-                <div class="stat-card">
-
-                    <div class="stat-top">
-
-                        <div class="stat-icon">
-                            <i class="fa-solid fa-clock"></i>
-                        </div>
-
-                        <div class="stat-change">
-                            +12.4%
-                        </div>
-
-                    </div>
-
-                    <div class="stat-value">
-                        <span data-count="184">0</span>h
-                    </div>
-
-                    <div class="stat-label">
-                        Total flight time
-                    </div>
-
-                </div>
-
-
-                <div class="stat-card">
-
-                    <div class="stat-top">
-
-                        <div class="stat-icon">
-                            <i class="fa-solid fa-plane"></i>
-                        </div>
-
-                        <div class="stat-change">
-                            +8 flights
-                        </div>
-
-                    </div>
-
-                    <div class="stat-value">
-                        <span data-count="126">0</span>
-                    </div>
-
-                    <div class="stat-label">
-                        Flights completed
-                    </div>
-
-                </div>
-
-
-                <div class="stat-card">
-
-                    <div class="stat-top">
-
-                        <div class="stat-icon">
-                            <i class="fa-solid fa-earth-europe"></i>
-                        </div>
-
-                        <div class="stat-change">
-                            +5
-                        </div>
-
-                    </div>
-
-                    <div class="stat-value">
-                        <span data-count="38">0</span>
-                    </div>
-
-                    <div class="stat-label">
-                        Airports visited
-                    </div>
-
-                </div>
-
-
-                <div class="stat-card">
-
-                    <div class="stat-top">
-
-                        <div class="stat-icon">
-                            <i class="fa-solid fa-star"></i>
-                        </div>
-
-                        <div class="stat-change">
-                            Excellent
-                        </div>
-
-                    </div>
-
-                    <div class="stat-value">
-                        <span data-count="94">0</span>%
-                    </div>
-
-                    <div class="stat-label">
-                        Average flight rating
-                    </div>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-
-        <!-- =====================================================
-             PLANNER + UPCOMING FLIGHT
-        ====================================================== -->
-
-        <section
-            class="section reveal"
-            id="planner"
+        <input
+            type="text"
+            id="globalSearch"
+            placeholder="Search airports, tools, aircraft or features..."
+            autocomplete="off"
         >
 
-            <div class="section-header">
+        <div class="search-shortcut">
+            CTRL K
+        </div>
 
-                <div>
+    </div>
 
-                    <div class="section-title">
-                        Flight Operations
-                    </div>
+</section>
 
-                    <div class="section-subtitle">
-                        Build your next flight plan
-                    </div>
 
-                </div>
+<!-- =============================================================
+     QUICK ACCESS
+============================================================= -->
 
-            </div>
+<section class="quick-section section-small">
 
+    <div class="section-header">
 
-            <div class="dashboard-grid">
+        <div>
 
+            <span class="section-label">
+                QUICK ACCESS
+            </span>
 
-                <!-- PLANNER -->
+            <h2>
+                Jump right in.
+            </h2>
 
-                <div class="planner-card">
+        </div>
 
-                    <div class="card-heading">
+        <a href="#tools" class="view-all">
+            View all tools
+            <i class="fa-solid fa-arrow-right"></i>
+        </a>
 
-                        <div>
+    </div>
 
-                            <div class="card-title">
-                                Quick Flight Planner
-                            </div>
 
-                            <div class="card-description">
-                                Calculate a route in seconds
-                            </div>
+    <div class="quick-grid">
 
-                        </div>
+        <!-- FLIGHT PLANNER -->
 
-                        <div class="mini-icon">
-                            <i class="fa-solid fa-route"></i>
-                        </div>
-
-                    </div>
-
-
-                    <div class="planner-route">
-
-                        <div class="airport-input">
-
-                            <label>
-                                Departure
-                            </label>
-
-                            <input
-                                id="departure"
-                                value="EHAM"
-                                maxlength="4"
-                                autocomplete="off"
-                            >
-
-                        </div>
-
-
-                        <button
-                            class="swap-button"
-                            id="swapButton"
-                            title="Swap airports"
-                        >
-                            <i class="fa-solid fa-arrow-right-arrow-left"></i>
-                        </button>
-
-
-                        <div class="airport-input">
-
-                            <label>
-                                Arrival
-                            </label>
-
-                            <input
-                                id="arrival"
-                                value="LIRF"
-                                maxlength="4"
-                                autocomplete="off"
-                            >
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="planner-options">
-
-                        <div class="planner-option">
-
-                            <div class="planner-option-label">
-                                Aircraft
-                            </div>
-
-                            <div class="planner-option-value">
-                                Airbus A320
-                            </div>
-
-                        </div>
-
-                        <div class="planner-option">
-
-                            <div class="planner-option-label">
-                                Distance
-                            </div>
-
-                            <div
-                                class="planner-option-value"
-                                id="plannerDistance"
-                            >
-                                670 NM
-                            </div>
-
-                        </div>
-
-                        <div class="planner-option">
-
-                            <div class="planner-option-label">
-                                Est. Time
-                            </div>
-
-                            <div
-                                class="planner-option-value"
-                                id="plannerTime"
-                            >
-                                02:08
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-                    <button
-                        class="btn btn-primary planner-action"
-                        onclick="createFlightPlan()"
-                    >
-
-                        <i class="fa-solid fa-wand-magic-sparkles"></i>
-
-                        Create Flight Plan
-
-                    </button>
-
-                </div>
-
-
-
-                <!-- UPCOMING -->
-
-                <div class="flight-card">
-
-                    <div class="card-heading">
-
-                        <div>
-
-                            <div class="card-title">
-                                Next Flight
-                            </div>
-
-                            <div class="card-description">
-                                Your upcoming operation
-                            </div>
-
-                        </div>
-
-                        <div class="flight-status">
-
-                            <span></span>
-
-                            Planned
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="flight-number">
-                        ECV142
-                    </div>
-
-                    <div class="flight-aircraft">
-                        Airbus A320neo · KLM-style operation
-                    </div>
-
-
-                    <div class="flight-route-large">
-
-                        <div>
-
-                            <div class="large-code">
-                                EHAM
-                            </div>
-
-                            <div class="large-city">
-                                Amsterdam
-                            </div>
-
-                        </div>
-
-
-                        <div class="large-route-line">
-                            <i class="fa-solid fa-plane"></i>
-                        </div>
-
-
-                        <div style="text-align:right;">
-
-                            <div class="large-code">
-                                LIRF
-                            </div>
-
-                            <div class="large-city">
-                                Rome Fiumicino
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="flight-meta">
-
-                        <div class="meta-box">
-
-                            <div class="meta-label">
-                                Departure
-                            </div>
-
-                            <div class="meta-value">
-                                18:45 UTC
-                            </div>
-
-                        </div>
-
-                        <div class="meta-box">
-
-                            <div class="meta-label">
-                                Flight time
-                            </div>
-
-                            <div class="meta-value">
-                                02h 08m
-                            </div>
-
-                        </div>
-
-                        <div class="meta-box">
-
-                            <div class="meta-label">
-                                Cruise
-                            </div>
-
-                            <div class="meta-value">
-                                FL360
-                            </div>
-
-                        </div>
-
-                        <div class="meta-box">
-
-                            <div class="meta-label">
-                                Route
-                            </div>
-
-                            <div class="meta-value">
-                                IFR
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-
-        <!-- =====================================================
-             WEATHER
-        ====================================================== -->
-
-        <section
-            class="section reveal"
-            id="weather"
+        <button
+            class="quick-card"
+            data-tool="planner"
         >
 
-            <div class="section-header">
+            <div class="quick-card-icon blue">
 
-                <div>
-
-                    <div class="section-title">
-                        Weather
-                    </div>
-
-                    <div class="section-subtitle">
-                        Current simulator weather overview
-                    </div>
-
-                </div>
-
-                <div class="view-all">
-                    Open weather center →
-                </div>
+                <i class="fa-solid fa-route"></i>
 
             </div>
 
-
-            <div class="weather-grid">
-
-
-                <div class="weather-card">
-
-                    <div class="weather-top">
-
-                        <div>
-
-                            <div class="weather-airport">
-                                EHAM
-                            </div>
-
-                            <div class="weather-city">
-                                Amsterdam Schiphol
-                            </div>
-
-                        </div>
-
-                        <div class="weather-icon">
-                            <i class="fa-solid fa-cloud-sun"></i>
-                        </div>
-
-                    </div>
-
-
-                    <div class="weather-main">
-
-                        <div>
-
-                            <div class="temperature">
-                                17°
-                            </div>
-
-                            <div class="weather-condition">
-                                Partly cloudy
-                            </div>
-
-                        </div>
-
-                        <div class="wind">
-
-                            <div class="wind-value">
-                                240° / 12kt
-                            </div>
-
-                            <div class="wind-label">
-                                Wind
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="metar">
-                        EHAM 071825Z 24012KT 9999 SCT025 17/12 Q1018
-                    </div>
-
-                </div>
-
-
-
-                <div class="weather-card">
-
-                    <div class="weather-top">
-
-                        <div>
-
-                            <div class="weather-airport">
-                                LIRF
-                            </div>
-
-                            <div class="weather-city">
-                                Rome Fiumicino
-                            </div>
-
-                        </div>
-
-                        <div class="weather-icon">
-                            <i class="fa-solid fa-sun"></i>
-                        </div>
-
-                    </div>
-
-
-                    <div class="weather-main">
-
-                        <div>
-
-                            <div class="temperature">
-                                24°
-                            </div>
-
-                            <div class="weather-condition">
-                                Clear sky
-                            </div>
-
-                        </div>
-
-                        <div class="wind">
-
-                            <div class="wind-value">
-                                180° / 7kt
-                            </div>
-
-                            <div class="wind-label">
-                                Wind
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="metar">
-                        LIRF 071825Z 18007KT CAVOK 24/15 Q1019
-                    </div>
-
-                </div>
-
-
-
-                <div class="weather-card">
-
-                    <div class="weather-top">
-
-                        <div>
-
-                            <div class="weather-airport">
-                                EDDF
-                            </div>
-
-                            <div class="weather-city">
-                                Frankfurt
-                            </div>
-
-                        </div>
-
-                        <div class="weather-icon">
-                            <i class="fa-solid fa-cloud"></i>
-                        </div>
-
-                    </div>
-
-
-                    <div class="weather-main">
-
-                        <div>
-
-                            <div class="temperature">
-                                15°
-                            </div>
-
-                            <div class="weather-condition">
-                                Overcast
-                            </div>
-
-                        </div>
-
-                        <div class="wind">
-
-                            <div class="wind-value">
-                                260° / 14kt
-                            </div>
-
-                            <div class="wind-label">
-                                Wind
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="metar">
-                        EDDF 071825Z 26014KT 8000 OVC012 15/13 Q1016
-                    </div>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-
-        <!-- =====================================================
-             AIRPORTS
-        ====================================================== -->
-
-        <section
-            class="section reveal"
-            id="airports"
-        >
-
-            <div class="section-header">
-
-                <div>
-
-                    <div class="section-title">
-                        Popular Airports
-                    </div>
-
-                    <div class="section-subtitle">
-                        Explore airports around the world
-                    </div>
-
-                </div>
-
-                <div class="view-all">
-                    Explore all airports →
-                </div>
-
-            </div>
-
-
-            <div class="airport-grid">
-
-
-                <div class="airport-card">
-
-                    <div class="airport-country">
-                        Netherlands · Europe
-                    </div>
-
-                    <div class="airport-card-code">
-                        EHAM
-                    </div>
-
-                    <div class="airport-card-name">
-                        Amsterdam Schiphol
-                    </div>
-
-                    <div class="airport-runway">
-
-                        <i class="fa-solid fa-road"></i>
-
-                        18/36 · 3,800m
-
-                    </div>
-
-                </div>
-
-
-                <div class="airport-card">
-
-                    <div class="airport-country">
-                        Italy · Europe
-                    </div>
-
-                    <div class="airport-card-code">
-                        LIRF
-                    </div>
-
-                    <div class="airport-card-name">
-                        Rome Fiumicino
-                    </div>
-
-                    <div class="airport-runway">
-
-                        <i class="fa-solid fa-road"></i>
-
-                        16L/34R · 3,900m
-
-                    </div>
-
-                </div>
-
-
-                <div class="airport-card">
-
-                    <div class="airport-country">
-                        Germany · Europe
-                    </div>
-
-                    <div class="airport-card-code">
-                        EDDF
-                    </div>
-
-                    <div class="airport-card-name">
-                        Frankfurt Main
-                    </div>
-
-                    <div class="airport-runway">
-
-                        <i class="fa-solid fa-road"></i>
-
-                        07C/25C · 4,000m
-
-                    </div>
-
-                </div>
-
-
-                <div class="airport-card">
-
-                    <div class="airport-country">
-                        United Kingdom · Europe
-                    </div>
-
-                    <div class="airport-card-code">
-                        EGLL
-                    </div>
-
-                    <div class="airport-card-name">
-                        London Heathrow
-                    </div>
-
-                    <div class="airport-runway">
-
-                        <i class="fa-solid fa-road"></i>
-
-                        09L/27R · 3,902m
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-
-        <!-- =====================================================
-             FEATURES
-        ====================================================== -->
-
-        <section class="section reveal">
-
-            <div class="section-header">
-
-                <div>
-
-                    <div class="section-title">
-                        Everything a Pilot Needs
-                    </div>
-
-                    <div class="section-subtitle">
-                        One platform for your entire simulation workflow
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <div class="features">
-
-
-                <div class="feature">
-
-                    <div class="feature-number">
-                        01
-                    </div>
-
-                    <div class="feature-icon">
-                        <i class="fa-solid fa-route"></i>
-                    </div>
-
-                    <h3>
-                        Advanced Flight Planning
-                    </h3>
-
-                    <p>
-                        Build detailed IFR and VFR flights with airports,
-                        routes, distances, estimated flight time,
-                        cruise levels and operational information.
-                    </p>
-
-                </div>
-
-
-                <div class="feature">
-
-                    <div class="feature-number">
-                        02
-                    </div>
-
-                    <div class="feature-icon">
-                        <i class="fa-solid fa-cloud-sun"></i>
-                    </div>
-
-                    <h3>
-                        Live Weather
-                    </h3>
-
-                    <p>
-                        Quickly inspect METAR and TAF information,
-                        wind, visibility, pressure and other conditions
-                        before starting your flight.
-                    </p>
-
-                </div>
-
-
-                <div class="feature">
-
-                    <div class="feature-number">
-                        03
-                    </div>
-
-                    <div class="feature-icon">
-                        <i class="fa-solid fa-gauge-high"></i>
-                    </div>
-
-                    <h3>
-                        Aircraft Performance
-                    </h3>
-
-                    <p>
-                        Calculate takeoff, landing, climb, descent,
-                        fuel and other simulator-focused performance
-                        values.
-                    </p>
-
-                </div>
-
-
-                <div class="feature">
-
-                    <div class="feature-number">
-                        04
-                    </div>
-
-                    <div class="feature-icon">
-                        <i class="fa-solid fa-book-open"></i>
-                    </div>
-
-                    <h3>
-                        Pilot Logbook
-                    </h3>
-
-                    <p>
-                        Automatically organize your flights and monitor
-                        flight hours, aircraft, airports, routes and
-                        personal statistics.
-                    </p>
-
-                </div>
-
-
-                <div class="feature">
-
-                    <div class="feature-number">
-                        05
-                    </div>
-
-                    <div class="feature-icon">
-                        <i class="fa-solid fa-list-check"></i>
-                    </div>
-
-                    <h3>
-                        Digital Checklists
-                    </h3>
-
-                    <p>
-                        Keep your aircraft checklists available directly
-                        in your browser and follow each phase of flight
-                        without leaving your cockpit.
-                    </p>
-
-                </div>
-
-
-                <div class="feature">
-
-                    <div class="feature-number">
-                        06
-                    </div>
-
-                    <div class="feature-icon">
-                        <i class="fa-solid fa-trophy"></i>
-                    </div>
-
-                    <h3>
-                        Pilot Progression
-                    </h3>
-
-                    <p>
-                        Earn achievements, track milestones and build
-                        your virtual pilot profile as you complete
-                        more flights.
-                    </p>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-
-        <!-- =====================================================
-             RECENT FLIGHTS
-        ====================================================== -->
-
-        <section
-            class="section reveal"
-            id="logbook"
-        >
-
-            <div class="section-header">
-
-                <div>
-
-                    <div class="section-title">
-                        Recent Flights
-                    </div>
-
-                    <div class="section-subtitle">
-                        Your latest completed operations
-                    </div>
-
-                </div>
-
-                <div class="view-all">
-                    Open logbook →
-                </div>
-
-            </div>
-
-
-            <div class="recent-table">
-
-
-                <div class="flight-row header">
-
-                    <div>
-                        Route
-                    </div>
-
-                    <div>
-                        Aircraft
-                    </div>
-
-                    <div>
-                        Duration
-                    </div>
-
-                    <div>
-                        Date
-                    </div>
-
-                    <div>
-                        Rating
-                    </div>
-
-                </div>
-
-
-                <div class="flight-row">
-
-                    <div class="route-cell">
-
-                        EHAM
-
-                        <span>→</span>
-
-                        LIRF
-
-                    </div>
-
-                    <div class="aircraft-cell">
-                        Airbus A320
-                    </div>
-
-                    <div class="date-cell">
-                        02h 11m
-                    </div>
-
-                    <div class="date-cell">
-                        Sep 06, 2026
-                    </div>
-
-                    <div class="rating">
-                        <i class="fa-solid fa-star"></i>
-                        96%
-                    </div>
-
-                </div>
-
-
-                <div class="flight-row">
-
-                    <div class="route-cell">
-
-                        LIRF
-
-                        <span>→</span>
-
-                        LEBL
-
-                    </div>
-
-                    <div class="aircraft-cell">
-                        Airbus A321neo
-                    </div>
-
-                    <div class="date-cell">
-                        01h 34m
-                    </div>
-
-                    <div class="date-cell">
-                        Sep 04, 2026
-                    </div>
-
-                    <div class="rating">
-                        <i class="fa-solid fa-star"></i>
-                        91%
-                    </div>
-
-                </div>
-
-
-                <div class="flight-row">
-
-                    <div class="route-cell">
-
-                        LEBL
-
-                        <span>→</span>
-
-                        LPPT
-
-                    </div>
-
-                    <div class="aircraft-cell">
-                        Airbus A320neo
-                    </div>
-
-                    <div class="date-cell">
-                        01h 58m
-                    </div>
-
-                    <div class="date-cell">
-                        Sep 01, 2026
-                    </div>
-
-                    <div class="rating">
-                        <i class="fa-solid fa-star"></i>
-                        94%
-                    </div>
-
-                </div>
-
-
-                <div class="flight-row">
-
-                    <div class="route-cell">
-
-                        LPPT
-
-                        <span>→</span>
-
-                        EGLL
-
-                    </div>
-
-                    <div class="aircraft-cell">
-                        Boeing 737-800
-                    </div>
-
-                    <div class="date-cell">
-                        02h 19m
-                    </div>
-
-                    <div class="date-cell">
-                        Aug 29, 2026
-                    </div>
-
-                    <div class="rating">
-                        <i class="fa-solid fa-star"></i>
-                        89%
-                    </div>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-
-        <!-- =====================================================
-             AIRCRAFT + TOOLS
-        ====================================================== -->
-
-        <section class="section reveal">
-
-            <div class="lower-grid">
-
-
-                <!-- AIRCRAFT -->
-
-                <div
-                    class="aircraft-card"
-                    id="performance"
-                >
-
-                    <div class="aircraft-head">
-
-                        <div>
-
-                            <div class="aircraft-name">
-                                Airbus A320neo
-                            </div>
-
-                            <div class="aircraft-reg">
-                                Your most flown aircraft
-                            </div>
-
-                        </div>
-
-                        <div class="aircraft-badge">
-                            Active
-                        </div>
-
-                    </div>
-
-
-                    <div class="aircraft-visual"></div>
-
-
-                    <div class="aircraft-data">
-
-                        <div class="aircraft-stat">
-
-                            <span>
-                                Flights
-                            </span>
-
-                            <strong>
-                                47
-                            </strong>
-
-                        </div>
-
-                        <div class="aircraft-stat">
-
-                            <span>
-                                Hours
-                            </span>
-
-                            <strong>
-                                72h
-                            </strong>
-
-                        </div>
-
-                        <div class="aircraft-stat">
-
-                            <span>
-                                Landings
-                            </span>
-
-                            <strong>
-                                46
-                            </strong>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-
-                <!-- TOOLS -->
-
-                <div
-                    class="tools-card"
-                    id="dispatch"
-                >
-
-                    <div class="card-heading">
-
-                        <div>
-
-                            <div class="card-title">
-                                Quick Tools
-                            </div>
-
-                            <div class="card-description">
-                                Frequently used aviation utilities
-                            </div>
-
-                        </div>
-
-                        <div class="mini-icon">
-                            <i class="fa-solid fa-screwdriver-wrench"></i>
-                        </div>
-
-                    </div>
-
-
-                    <div class="tools-grid">
-
-
-                        <div class="tool">
-
-                            <div class="tool-icon">
-                                <i class="fa-solid fa-wind"></i>
-                            </div>
-
-                            <div class="tool-text">
-                                Crosswind Calculator
-                            </div>
-
-                        </div>
-
-
-                        <div class="tool">
-
-                            <div class="tool-icon">
-                                <i class="fa-solid fa-arrow-down"></i>
-                            </div>
-
-                            <div class="tool-text">
-                                Descent Calculator
-                            </div>
-
-                        </div>
-
-
-                        <div class="tool">
-
-                            <div class="tool-icon">
-                                <i class="fa-solid fa-gas-pump"></i>
-                            </div>
-
-                            <div class="tool-text">
-                                Fuel Calculator
-                            </div>
-
-                        </div>
-
-
-                        <div class="tool">
-
-                            <div class="tool-icon">
-                                <i class="fa-solid fa-compass"></i>
-                            </div>
-
-                            <div class="tool-text">
-                                Heading Calculator
-                            </div>
-
-                        </div>
-
-
-                        <div class="tool">
-
-                            <div class="tool-icon">
-                                <i class="fa-solid fa-stopwatch"></i>
-                            </div>
-
-                            <div class="tool-text">
-                                Flight Timer
-                            </div>
-
-                        </div>
-
-
-                        <div class="tool">
-
-                            <div class="tool-icon">
-                                <i class="fa-solid fa-calculator"></i>
-                            </div>
-
-                            <div class="tool-text">
-                                Aviation Calculator
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-
-        <!-- =====================================================
-             CTA
-        ====================================================== -->
-
-        <section
-            class="cta reveal"
-            id="training"
-        >
-
-            <div class="cta-content">
-
-                <h2>
-                    Your cockpit.
-                    <span style="color:var(--accent);">
-                        Your operations center.
-                    </span>
-                </h2>
+            <div class="quick-card-content">
+
+                <h3>
+                    Flight Planner
+                </h3>
 
                 <p>
-                    Flight is designed to bring everything you need
-                    before, during and after a flight together in one
-                    clean aviation-focused workspace.
+                    Build your route
+                    and calculate distance.
                 </p>
 
+            </div>
 
-                <div class="cta-buttons">
+            <i class="fa-solid fa-arrow-up-right quick-arrow"></i>
 
-                    <button
-                        class="btn btn-primary"
-                        onclick="scrollToPlanner()"
-                    >
-
-                        <i class="fa-solid fa-plane-departure"></i>
-
-                        Start planning
-
-                    </button>
+        </button>
 
 
-                    <button
-                        class="btn btn-secondary"
-                        onclick="openSearch()"
-                    >
+        <!-- WEATHER -->
 
-                        Explore all tools
+        <button
+            class="quick-card"
+            data-tool="weather"
+        >
 
-                    </button>
+            <div class="quick-card-icon cyan">
+
+                <i class="fa-solid fa-cloud-sun"></i>
+
+            </div>
+
+            <div class="quick-card-content">
+
+                <h3>
+                    Weather
+                </h3>
+
+                <p>
+                    METAR, TAF and
+                    aviation weather.
+                </p>
+
+            </div>
+
+            <i class="fa-solid fa-arrow-up-right quick-arrow"></i>
+
+        </button>
+
+
+        <!-- PERFORMANCE -->
+
+        <button
+            class="quick-card"
+            data-tool="performance"
+        >
+
+            <div class="quick-card-icon purple">
+
+                <i class="fa-solid fa-gauge-high"></i>
+
+            </div>
+
+            <div class="quick-card-content">
+
+                <h3>
+                    Performance
+                </h3>
+
+                <p>
+                    Calculate takeoff,
+                    landing and fuel.
+                </p>
+
+            </div>
+
+            <i class="fa-solid fa-arrow-up-right quick-arrow"></i>
+
+        </button>
+
+
+        <!-- AIRPORTS -->
+
+        <button
+            class="quick-card"
+            data-tool="airports"
+        >
+
+            <div class="quick-card-icon orange">
+
+                <i class="fa-solid fa-tower-broadcast"></i>
+
+            </div>
+
+            <div class="quick-card-content">
+
+                <h3>
+                    Airport Explorer
+                </h3>
+
+                <p>
+                    Explore airports,
+                    runways and frequencies.
+                </p>
+
+            </div>
+
+            <i class="fa-solid fa-arrow-up-right quick-arrow"></i>
+
+        </button>
+
+    </div>
+
+</section>
+
+
+<!-- =============================================================
+     FEATURED TOOLS
+============================================================= -->
+
+<section
+    class="tools-section section"
+    id="tools"
+>
+
+    <div class="section-header large">
+
+        <div>
+
+            <span class="section-label">
+                FLIGHTDECK TOOLS
+            </span>
+
+            <h2>
+                Your cockpit,
+                <span class="gradient-text">
+                    outside the simulator.
+                </span>
+            </h2>
+
+            <p>
+                Everything from flight planning to post-flight
+                statistics, organized in one clean workspace.
+            </p>
+
+        </div>
+
+        <button
+            class="outline-button"
+            id="allToolsButton"
+        >
+
+            Explore all tools
+
+            <i class="fa-solid fa-arrow-right"></i>
+
+        </button>
+
+    </div>
+
+
+    <div class="tools-grid">
+
+
+        <!-- TOOL 1 -->
+
+        <article class="tool-card tool-card-large">
+
+            <div class="tool-card-background"></div>
+
+            <div class="tool-card-top">
+
+                <div class="tool-icon">
+
+                    <i class="fa-solid fa-route"></i>
+
+                </div>
+
+                <span class="tool-number">
+                    01
+                </span>
+
+            </div>
+
+            <div class="tool-card-body">
+
+                <span class="tool-category">
+                    PLANNING
+                </span>
+
+                <h3>
+                    Flight Planner
+                </h3>
+
+                <p>
+                    Create a complete route from departure
+                    to destination. Calculate distance,
+                    bearing, estimated flight time and
+                    descent planning.
+                </p>
+
+                <div class="tool-tags">
+
+                    <span>
+                        ROUTE
+                    </span>
+
+                    <span>
+                        DISTANCE
+                    </span>
+
+                    <span>
+                        TOD
+                    </span>
 
                 </div>
 
             </div>
 
-        </section>
+            <button class="tool-open">
+
+                Open planner
+
+                <i class="fa-solid fa-arrow-right"></i>
+
+            </button>
+
+        </article>
 
 
+        <!-- TOOL 2 -->
 
-        <!-- =====================================================
-             FOOTER
-        ====================================================== -->
+        <article class="tool-card">
 
-        <footer>
+            <div class="tool-card-top">
 
-            <div class="footer-logo">
-                Flight<span>.</span>
+                <div class="tool-icon cyan">
+
+                    <i class="fa-solid fa-cloud-sun"></i>
+
+                </div>
+
+                <span class="tool-number">
+                    02
+                </span>
+
             </div>
 
-            <div class="footer-copy">
-                Built for flight simulation · 2026
+            <div class="tool-card-body">
+
+                <span class="tool-category">
+                    WEATHER
+                </span>
+
+                <h3>
+                    Live Weather
+                </h3>
+
+                <p>
+                    Decode METAR and TAF reports and get
+                    a clean overview of the current
+                    aviation weather.
+                </p>
+
             </div>
 
-            <div class="footer-links">
+            <button class="tool-open">
+
+                Check weather
+
+                <i class="fa-solid fa-arrow-right"></i>
+
+            </button>
+
+        </article>
+
+
+        <!-- TOOL 3 -->
+
+        <article class="tool-card">
+
+            <div class="tool-card-top">
+
+                <div class="tool-icon purple">
+
+                    <i class="fa-solid fa-gauge-high"></i>
+
+                </div>
+
+                <span class="tool-number">
+                    03
+                </span>
+
+            </div>
+
+            <div class="tool-card-body">
+
+                <span class="tool-category">
+                    PERFORMANCE
+                </span>
+
+                <h3>
+                    Aircraft Performance
+                </h3>
+
+                <p>
+                    Estimate takeoff distance, landing
+                    performance, fuel usage and
+                    climb requirements.
+                </p>
+
+            </div>
+
+            <button class="tool-open">
+
+                Calculate
+
+                <i class="fa-solid fa-arrow-right"></i>
+
+            </button>
+
+        </article>
+
+
+        <!-- TOOL 4 -->
+
+        <article class="tool-card">
+
+            <div class="tool-card-top">
+
+                <div class="tool-icon orange">
+
+                    <i class="fa-solid fa-book-open"></i>
+
+                </div>
+
+                <span class="tool-number">
+                    04
+                </span>
+
+            </div>
+
+            <div class="tool-card-body">
+
+                <span class="tool-category">
+                    KNOWLEDGE
+                </span>
+
+                <h3>
+                    Pilot Training
+                </h3>
+
+                <p>
+                    Improve your aviation knowledge with
+                    quizzes, lessons, checklists and
+                    practical training.
+                </p>
+
+            </div>
+
+            <button class="tool-open">
+
+                Start training
+
+                <i class="fa-solid fa-arrow-right"></i>
+
+            </button>
+
+        </article>
+
+
+        <!-- TOOL 5 -->
+
+        <article class="tool-card">
+
+            <div class="tool-card-top">
+
+                <div class="tool-icon green">
+
+                    <i class="fa-solid fa-book"></i>
+
+                </div>
+
+                <span class="tool-number">
+                    05
+                </span>
+
+            </div>
+
+            <div class="tool-card-body">
+
+                <span class="tool-category">
+                    LOGBOOK
+                </span>
+
+                <h3>
+                    Pilot Logbook
+                </h3>
+
+                <p>
+                    Keep track of your flights, flight
+                    hours, aircraft, routes and personal
+                    statistics.
+                </p>
+
+            </div>
+
+            <button class="tool-open">
+
+                Open logbook
+
+                <i class="fa-solid fa-arrow-right"></i>
+
+            </button>
+
+        </article>
+
+
+        <!-- TOOL 6 -->
+
+        <article class="tool-card">
+
+            <div class="tool-card-top">
+
+                <div class="tool-icon pink">
+
+                    <i class="fa-solid fa-trophy"></i>
+
+                </div>
+
+                <span class="tool-number">
+                    06
+                </span>
+
+            </div>
+
+            <div class="tool-card-body">
+
+                <span class="tool-category">
+                    PROGRESS
+                </span>
+
+                <h3>
+                    Achievements
+                </h3>
+
+                <p>
+                    Complete challenges, unlock badges and
+                    track your progress as a virtual pilot.
+                </p>
+
+            </div>
+
+            <button class="tool-open">
+
+                View achievements
+
+                <i class="fa-solid fa-arrow-right"></i>
+
+            </button>
+
+        </article>
+
+    </div>
+
+</section>
+
+
+<!-- =============================================================
+     FEATURE SHOWCASE
+============================================================= -->
+
+<section
+    class="feature-section section"
+    id="features"
+>
+
+    <div class="feature-layout">
+
+
+        <!-- LEFT -->
+
+        <div class="feature-text">
+
+            <span class="section-label">
+                BUILT FOR SIMMERS
+            </span>
+
+            <h2>
+                Less searching.
+                <br>
+                More flying.
+            </h2>
+
+            <p>
+                FlightDeck brings the tools you normally have
+                spread across multiple websites into one
+                beautifully designed cockpit companion.
+            </p>
+
+
+            <div class="feature-list">
+
+                <div class="feature-item">
+
+                    <div class="feature-check">
+                        <i class="fa-solid fa-check"></i>
+                    </div>
+
+                    <div>
+
+                        <h4>
+                            Fast and simple
+                        </h4>
+
+                        <p>
+                            Get the information you need
+                            without digging through menus.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="feature-item">
+
+                    <div class="feature-check">
+                        <i class="fa-solid fa-check"></i>
+                    </div>
+
+                    <div>
+
+                        <h4>
+                            Designed for aviation
+                        </h4>
+
+                        <p>
+                            Every screen is built around
+                            the workflow of a virtual pilot.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="feature-item">
+
+                    <div class="feature-check">
+                        <i class="fa-solid fa-check"></i>
+                    </div>
+
+                    <div>
+
+                        <h4>
+                            Your data stays yours
+                        </h4>
+
+                        <p>
+                            Personal settings and local
+                            flight data can stay in your browser.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <button class="primary-button">
+
+                Discover FlightDeck
+
+                <i class="fa-solid fa-arrow-right"></i>
+
+            </button>
+
+        </div>
+
+
+        <!-- RIGHT VISUAL -->
+
+        <div class="feature-dashboard">
+
+            <div class="dashboard-window">
+
+                <!-- WINDOW TOP -->
+
+                <div class="window-header">
+
+                    <div class="window-dots">
+
+                        <span></span>
+                        <span></span>
+                        <span></span>
+
+                    </div>
+
+                    <span>
+                        flightdeck / dashboard
+                    </span>
+
+                    <i class="fa-solid fa-ellipsis"></i>
+
+                </div>
+
+
+                <!-- DASHBOARD CONTENT -->
+
+                <div class="mini-dashboard">
+
+                    <div class="mini-dashboard-header">
+
+                        <div>
+
+                            <span>
+                                GOOD EVENING
+                            </span>
+
+                            <h3>
+                                Ready to fly?
+                            </h3>
+
+                        </div>
+
+                        <div class="mini-clock">
+                            20:04Z
+                        </div>
+
+                    </div>
+
+
+                    <div class="mini-stats">
+
+                        <div>
+
+                            <span>
+                                FLIGHTS
+                            </span>
+
+                            <strong>
+                                24
+                            </strong>
+
+                        </div>
+
+                        <div>
+
+                            <span>
+                                HOURS
+                            </span>
+
+                            <strong>
+                                58.4
+                            </strong>
+
+                        </div>
+
+                        <div>
+
+                            <span>
+                                NM
+                            </span>
+
+                            <strong>
+                                17,842
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="mini-route">
+
+                        <div class="mini-route-header">
+
+                            <span>
+                                NEXT FLIGHT
+                            </span>
+
+                            <span>
+                                02:04
+                            </span>
+
+                        </div>
+
+                        <div class="mini-airports">
+
+                            <strong>
+                                EHAM
+                            </strong>
+
+                            <div class="mini-route-line">
+
+                                <span></span>
+
+                                <i class="fa-solid fa-plane"></i>
+
+                                <span></span>
+
+                            </div>
+
+                            <strong>
+                                LEBL
+                            </strong>
+
+                        </div>
+
+                        <div class="mini-route-footer">
+
+                            <span>
+                                Amsterdam
+                            </span>
+
+                            <span>
+                                Barcelona
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="mini-bottom">
+
+                        <div>
+
+                            <i class="fa-solid fa-cloud-sun"></i>
+
+                            <span>
+                                Weather
+                            </span>
+
+                            <strong>
+                                VMC
+                            </strong>
+
+                        </div>
+
+                        <div>
+
+                            <i class="fa-solid fa-wind"></i>
+
+                            <span>
+                                Wind
+                            </span>
+
+                            <strong>
+                                240 / 12
+                            </strong>
+
+                        </div>
+
+                        <div>
+
+                            <i class="fa-solid fa-plane-up"></i>
+
+                            <span>
+                                Aircraft
+                            </span>
+
+                            <strong>
+                                A320
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =============================================================
+     LIVE STATUS
+============================================================= -->
+
+<section class="status-section section-small">
+
+    <div class="status-panel">
+
+        <div class="status-main">
+
+            <div class="live-indicator">
+
+                <span></span>
+
+                LIVE
+
+            </div>
+
+            <div>
+
+                <strong>
+                    Aviation Time
+                </strong>
+
+                <span>
+                    Coordinated Universal Time
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="utc-clock">
+
+            <span id="utcTime">
+                00:00:00
+            </span>
+
+            <small>
+                UTC
+            </small>
+
+        </div>
+
+
+        <div class="status-info">
+
+            <div>
+
+                <span>
+                    DATE
+                </span>
+
+                <strong id="utcDate">
+                    ---
+                </strong>
+
+            </div>
+
+            <div>
+
+                <span>
+                    ZULU
+                </span>
+
+                <strong>
+                    ACTIVE
+                </strong>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =============================================================
+     RECENT FLIGHTS
+============================================================= -->
+
+<section
+    class="flights-section section"
+    id="flights"
+>
+
+    <div class="section-header">
+
+        <div>
+
+            <span class="section-label">
+                FLIGHT ACTIVITY
+            </span>
+
+            <h2>
+                Recent flights.
+            </h2>
+
+        </div>
+
+        <button class="view-all-button">
+
+            Open logbook
+
+            <i class="fa-solid fa-arrow-right"></i>
+
+        </button>
+
+    </div>
+
+
+    <div class="flight-table">
+
+        <!-- HEADER -->
+
+        <div class="flight-row flight-header">
+
+            <span>
+                FLIGHT
+            </span>
+
+            <span>
+                ROUTE
+            </span>
+
+            <span>
+                AIRCRAFT
+            </span>
+
+            <span>
+                DURATION
+            </span>
+
+            <span>
+                STATUS
+            </span>
+
+        </div>
+
+
+        <!-- ROW 1 -->
+
+        <div class="flight-row">
+
+            <div class="flight-id">
+
+                <div class="row-icon">
+                    <i class="fa-solid fa-plane"></i>
+                </div>
+
+                <div>
+
+                    <strong>
+                        FD102
+                    </strong>
+
+                    <span>
+                        Today
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="route-cell">
+
+                <strong>
+                    EHAM
+                </strong>
+
+                <i class="fa-solid fa-arrow-right"></i>
+
+                <strong>
+                    LEBL
+                </strong>
+
+            </div>
+
+
+            <div>
+                Airbus A320
+            </div>
+
+
+            <div>
+                02:04
+            </div>
+
+
+            <div>
+
+                <span class="completed">
+                    <i class="fa-solid fa-check"></i>
+                    Completed
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- ROW 2 -->
+
+        <div class="flight-row">
+
+            <div class="flight-id">
+
+                <div class="row-icon">
+                    <i class="fa-solid fa-plane"></i>
+                </div>
+
+                <div>
+
+                    <strong>
+                        FD088
+                    </strong>
+
+                    <span>
+                        Yesterday
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="route-cell">
+
+                <strong>
+                    EGLL
+                </strong>
+
+                <i class="fa-solid fa-arrow-right"></i>
+
+                <strong>
+                    EHAM
+                </strong>
+
+            </div>
+
+
+            <div>
+                Boeing 737-800
+            </div>
+
+
+            <div>
+                00:58
+            </div>
+
+
+            <div>
+
+                <span class="completed">
+                    <i class="fa-solid fa-check"></i>
+                    Completed
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- ROW 3 -->
+
+        <div class="flight-row">
+
+            <div class="flight-id">
+
+                <div class="row-icon">
+                    <i class="fa-solid fa-plane"></i>
+                </div>
+
+                <div>
+
+                    <strong>
+                        FD071
+                    </strong>
+
+                    <span>
+                        Sep 04
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="route-cell">
+
+                <strong>
+                    LIRF
+                </strong>
+
+                <i class="fa-solid fa-arrow-right"></i>
+
+                <strong>
+                    LSZH
+                </strong>
+
+            </div>
+
+
+            <div>
+                Airbus A319
+            </div>
+
+
+            <div>
+                01:32
+            </div>
+
+
+            <div>
+
+                <span class="completed">
+                    <i class="fa-solid fa-check"></i>
+                    Completed
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =============================================================
+     CALL TO ACTION
+============================================================= -->
+
+<section class="cta-section section">
+
+    <div class="cta-card">
+
+        <div class="cta-glow"></div>
+
+        <div class="cta-content">
+
+            <span class="section-label">
+                READY FOR DEPARTURE?
+            </span>
+
+            <h2>
+                Your next flight
+                starts here.
+            </h2>
+
+            <p>
+                Plan smarter, fly better and keep every part
+                of your virtual aviation life in one place.
+            </p>
+
+            <div class="cta-buttons">
+
+                <button class="primary-button">
+
+                    <i class="fa-solid fa-plane-departure"></i>
+
+                    Plan a Flight
+
+                    <i class="fa-solid fa-arrow-right"></i>
+
+                </button>
+
+                <button class="secondary-button">
+
+                    Explore FlightDeck
+
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <div class="cta-plane">
+
+            <i class="fa-solid fa-plane"></i>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =============================================================
+     ABOUT
+============================================================= -->
+
+<section
+    class="about-section section-small"
+    id="about"
+>
+
+    <div class="about-grid">
+
+        <div>
+
+            <span class="section-label">
+                ABOUT FLIGHTDECK
+            </span>
+
+            <h2>
+                Made by simmers,
+                <span class="gradient-text">
+                    for simmers.
+                </span>
+            </h2>
+
+        </div>
+
+
+        <div>
+
+            <p>
+                FlightDeck is designed to make flight simulation
+                more immersive without making it complicated.
+                Whether you're preparing a short European hop
+                or a long-haul flight across the Atlantic,
+                FlightDeck gives you the tools to prepare,
+                operate and review your flight.
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+</main>
+
+
+<!-- =============================================================
+     FOOTER
+============================================================= -->
+
+<footer class="footer">
+
+    <div class="footer-inner">
+
+        <div class="footer-brand">
+
+            <a href="#" class="logo">
+
+                <div class="logo-mark">
+
+                    <i class="fa-solid fa-plane"></i>
+
+                </div>
+
+                <div class="logo-text">
+
+                    <span class="logo-name">
+                        FlightDeck
+                    </span>
+
+                    <span class="logo-subtitle">
+                        SIMULATOR COMPANION
+                    </span>
+
+                </div>
+
+            </a>
+
+            <p>
+                The modern companion for virtual aviation.
+            </p>
+
+        </div>
+
+
+        <div class="footer-links">
+
+            <div>
+
+                <span>
+                    PRODUCT
+                </span>
+
+                <a href="#tools">
+                    Tools
+                </a>
+
+                <a href="#features">
+                    Features
+                </a>
+
+                <a href="#flights">
+                    Flights
+                </a>
+
+            </div>
+
+
+            <div>
+
+                <span>
+                    TOOLS
+                </span>
 
                 <a href="#">
-                    Documentation
+                    Flight Planner
+                </a>
+
+                <a href="#">
+                    Weather
+                </a>
+
+                <a href="#">
+                    Logbook
+                </a>
+
+            </div>
+
+
+            <div>
+
+                <span>
+                    INFORMATION
+                </span>
+
+                <a href="#about">
+                    About
                 </a>
 
                 <a href="#">
@@ -5016,137 +1944,154 @@
 
             </div>
 
-        </footer>
-
+        </div>
 
     </div>
 
-</main>
 
+    <div class="footer-bottom">
+
+        <span>
+            © 2026 FlightDeck. Built for flight simulation.
+        </span>
+
+        <span>
+            Not affiliated with Microsoft.
+        </span>
+
+    </div>
+
+</footer>
 
 
 <!-- =============================================================
      SEARCH MODAL
-============================================================== -->
+============================================================= -->
 
 <div
-    class="overlay"
-    id="searchOverlay"
+    class="search-modal"
+    id="searchModal"
 >
 
-    <div class="search-box">
+    <div class="search-modal-backdrop"></div>
 
-        <div class="search-input-wrapper">
+    <div class="search-modal-window">
+
+        <div class="search-modal-header">
 
             <i class="fa-solid fa-magnifying-glass"></i>
 
             <input
-                class="search-input"
-                id="searchInput"
-                placeholder="Search Flight..."
-                autocomplete="off"
+                type="text"
+                id="modalSearch"
+                placeholder="Search FlightDeck..."
             >
 
-            <span
-                style="
-                    color:#56635c;
-                    font-size:9px;
-                "
-            >
+            <button id="closeSearch">
                 ESC
-            </span>
+            </button>
 
         </div>
 
 
-        <div
-            class="search-results"
-            id="searchResults"
-        >
+        <div class="search-results">
 
-            <div
-                class="search-result"
-                onclick="scrollToPlanner()"
-            >
+            <div class="search-result">
 
-                <div class="search-result-icon">
+                <div class="result-icon blue">
                     <i class="fa-solid fa-route"></i>
                 </div>
 
                 <div>
 
-                    <div class="search-result-title">
+                    <strong>
                         Flight Planner
-                    </div>
+                    </strong>
 
-                    <div class="search-result-sub">
-                        Plan your next route
-                    </div>
+                    <span>
+                        Plan a new flight
+                    </span>
 
                 </div>
+
+                <kbd>
+                    ENTER
+                </kbd>
 
             </div>
 
 
             <div class="search-result">
 
-                <div class="search-result-icon">
+                <div class="result-icon cyan">
                     <i class="fa-solid fa-cloud-sun"></i>
                 </div>
 
                 <div>
 
-                    <div class="search-result-title">
-                        Weather Center
-                    </div>
+                    <strong>
+                        Weather
+                    </strong>
 
-                    <div class="search-result-sub">
-                        METAR and TAF
-                    </div>
+                    <span>
+                        Check METAR & TAF
+                    </span>
 
                 </div>
+
+                <kbd>
+                    2
+                </kbd>
 
             </div>
 
 
             <div class="search-result">
 
-                <div class="search-result-icon">
+                <div class="result-icon purple">
                     <i class="fa-solid fa-gauge-high"></i>
                 </div>
 
                 <div>
 
-                    <div class="search-result-title">
+                    <strong>
                         Performance
-                    </div>
+                    </strong>
 
-                    <div class="search-result-sub">
+                    <span>
                         Aircraft calculations
-                    </div>
+                    </span>
 
                 </div>
+
+                <kbd>
+                    3
+                </kbd>
 
             </div>
 
 
             <div class="search-result">
 
-                <div class="search-result-icon">
-                    <i class="fa-solid fa-book"></i>
+                <div class="result-icon orange">
+                    <i class="fa-solid fa-tower-broadcast"></i>
                 </div>
 
                 <div>
 
-                    <div class="search-result-title">
-                        Pilot Logbook
-                    </div>
+                    <strong>
+                        Airport Explorer
+                    </strong>
 
-                    <div class="search-result-sub">
-                        View your flight history
-                    </div>
+                    <span>
+                        Find airport information
+                    </span>
 
                 </div>
+
+                <kbd>
+                    4
+                </kbd>
 
             </div>
 
@@ -5157,1353 +2102,11 @@
 </div>
 
 
-
-<!-- =============================================================
-     NOTIFICATIONS
-============================================================== -->
-
-<div
-    class="notification-panel"
-    id="notificationPanel"
->
-
-    <div class="notification-header">
-
-        <div class="notification-title">
-            Notifications
-        </div>
-
-        <div
-            class="notification-clear"
-            onclick="clearNotifications()"
-        >
-            Mark all read
-        </div>
-
-    </div>
-
-
-    <div class="notification">
-
-        <div class="notification-icon">
-            <i class="fa-solid fa-plane"></i>
-        </div>
-
-        <div>
-
-            <strong>
-                Flight plan ready
-            </strong>
-
-            <p>
-                Your EHAM → LIRF flight plan has been generated.
-            </p>
-
-        </div>
-
-    </div>
-
-
-    <div class="notification">
-
-        <div class="notification-icon">
-            <i class="fa-solid fa-cloud-sun"></i>
-        </div>
-
-        <div>
-
-            <strong>
-                Weather updated
-            </strong>
-
-            <p>
-                METAR information for EHAM was updated.
-            </p>
-
-        </div>
-
-    </div>
-
-
-    <div class="notification">
-
-        <div class="notification-icon">
-            <i class="fa-solid fa-trophy"></i>
-        </div>
-
-        <div>
-
-            <strong>
-                Achievement unlocked
-            </strong>
-
-            <p>
-                You completed another European route.
-            </p>
-
-        </div>
-
-    </div>
-
-</div>
-
-
-
 <!-- =============================================================
      JAVASCRIPT
-============================================================== -->
+============================================================= -->
 
-<script>
-
-
-/* =============================================================
-   GLOBAL STATE
-============================================================= */
-
-const FlightApp = {
-
-    user: {
-        name: "Pilot",
-        rank: "Captain"
-    },
-
-    settings: {
-
-        theme:
-            localStorage.getItem("flight-theme")
-            || "dark"
-
-    },
-
-    planner: {
-
-        departure: "EHAM",
-
-        arrival: "LIRF"
-
-    }
-
-};
-
-
-
-/* =============================================================
-   AIRPORT DATABASE
-============================================================= */
-
-const airports = {
-
-    EHAM: {
-        code: "EHAM",
-        city: "Amsterdam",
-        lat: 52.3086,
-        lon: 4.7639
-    },
-
-    LIRF: {
-        code: "LIRF",
-        city: "Rome",
-        lat: 41.8003,
-        lon: 12.2389
-    },
-
-    LEBL: {
-        code: "LEBL",
-        city: "Barcelona",
-        lat: 41.2974,
-        lon: 2.0833
-    },
-
-    EDDF: {
-        code: "EDDF",
-        city: "Frankfurt",
-        lat: 50.0379,
-        lon: 8.5622
-    },
-
-    EGLL: {
-        code: "EGLL",
-        city: "London",
-        lat: 51.4700,
-        lon: -0.4543
-    },
-
-    LOWW: {
-        code: "LOWW",
-        city: "Vienna",
-        lat: 48.1103,
-        lon: 16.5697
-    },
-
-    LSZH: {
-        code: "LSZH",
-        city: "Zurich",
-        lat: 47.4581,
-        lon: 8.5555
-    },
-
-    LPPT: {
-        code: "LPPT",
-        city: "Lisbon",
-        lat: 38.7742,
-        lon: -9.1342
-    },
-
-    KJFK: {
-        code: "KJFK",
-        city: "New York",
-        lat: 40.6413,
-        lon: -73.7781
-    },
-
-    RJTT: {
-        code: "RJTT",
-        city: "Tokyo",
-        lat: 35.5494,
-        lon: 139.7798
-    },
-
-    OMDB: {
-        code: "OMDB",
-        city: "Dubai",
-        lat: 25.2532,
-        lon: 55.3657
-    },
-
-    WSSS: {
-        code: "WSSS",
-        city: "Singapore",
-        lat: 1.3644,
-        lon: 103.9915
-    }
-
-};
-
-
-
-/* =============================================================
-   HAVERSINE DISTANCE
-============================================================= */
-
-function calculateDistance(lat1, lon1, lat2, lon2) {
-
-    const earthRadius = 3440.065;
-
-    const dLat =
-        toRadians(lat2 - lat1);
-
-    const dLon =
-        toRadians(lon2 - lon1);
-
-    const a =
-        Math.sin(dLat / 2) ** 2
-        +
-        Math.cos(toRadians(lat1))
-        *
-        Math.cos(toRadians(lat2))
-        *
-        Math.sin(dLon / 2) ** 2;
-
-    const c =
-        2 *
-        Math.atan2(
-            Math.sqrt(a),
-            Math.sqrt(1 - a)
-        );
-
-    return earthRadius * c;
-
-}
-
-
-
-function toRadians(degrees) {
-
-    return degrees *
-        Math.PI /
-        180;
-
-}
-
-
-
-/* =============================================================
-   UPDATE PLANNER
-============================================================= */
-
-function updatePlanner() {
-
-    const departure =
-        document
-            .getElementById("departure")
-            .value
-            .toUpperCase()
-            .trim();
-
-    const arrival =
-        document
-            .getElementById("arrival")
-            .value
-            .toUpperCase()
-            .trim();
-
-
-    if (
-        !airports[departure]
-        ||
-        !airports[arrival]
-    ) {
-
-        return;
-
-    }
-
-
-    const from =
-        airports[departure];
-
-    const to =
-        airports[arrival];
-
-
-    const distance =
-        calculateDistance(
-            from.lat,
-            from.lon,
-            to.lat,
-            to.lon
-        );
-
-
-    const cruiseSpeed = 450;
-
-    const hours =
-        distance /
-        cruiseSpeed;
-
-
-    const totalMinutes =
-        Math.round(
-            hours * 60
-        );
-
-
-    const h =
-        Math.floor(
-            totalMinutes / 60
-        );
-
-    const m =
-        totalMinutes % 60;
-
-
-    document
-        .getElementById("plannerDistance")
-        .textContent =
-            `${Math.round(distance)} NM`;
-
-
-    document
-        .getElementById("plannerTime")
-        .textContent =
-            `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}`;
-
-
-    FlightApp.planner.departure =
-        departure;
-
-    FlightApp.planner.arrival =
-        arrival;
-
-}
-
-
-
-/* =============================================================
-   PLANNER EVENTS
-============================================================= */
-
-document
-    .getElementById("departure")
-    .addEventListener(
-        "input",
-        updatePlanner
-    );
-
-
-document
-    .getElementById("arrival")
-    .addEventListener(
-        "input",
-        updatePlanner
-    );
-
-
-
-/* =============================================================
-   SWAP AIRPORTS
-============================================================= */
-
-document
-    .getElementById("swapButton")
-    .addEventListener(
-        "click",
-        () => {
-
-            const departure =
-                document
-                    .getElementById("departure");
-
-            const arrival =
-                document
-                    .getElementById("arrival");
-
-
-            const temp =
-                departure.value;
-
-            departure.value =
-                arrival.value;
-
-            arrival.value =
-                temp;
-
-
-            updatePlanner();
-
-        }
-    );
-
-
-
-/* =============================================================
-   CREATE FLIGHT PLAN
-============================================================= */
-
-function createFlightPlan() {
-
-    const departure =
-        document
-            .getElementById("departure")
-            .value
-            .toUpperCase();
-
-    const arrival =
-        document
-            .getElementById("arrival")
-            .value
-            .toUpperCase();
-
-
-    if (
-        !airports[departure]
-        ||
-        !airports[arrival]
-    ) {
-
-        showToast(
-            "Please enter valid ICAO airport codes."
-        );
-
-        return;
-
-    }
-
-
-    showToast(
-        `Flight plan created: ${departure} → ${arrival}`
-    );
-
-}
-
-
-
-/* =============================================================
-   TOAST
-============================================================= */
-
-function showToast(message) {
-
-    const toast =
-        document.createElement("div");
-
-
-    toast.innerHTML = `
-
-        <div style="
-            display:flex;
-            align-items:center;
-            gap:10px;
-        ">
-
-            <i
-                class="fa-solid fa-circle-check"
-                style="color:var(--accent)"
-            ></i>
-
-            <span>${message}</span>
-
-        </div>
-
-    `;
-
-
-    Object.assign(
-        toast.style,
-        {
-
-            position: "fixed",
-
-            right: "25px",
-
-            bottom: "25px",
-
-            zIndex: "3000",
-
-            padding: "14px 17px",
-
-            background: "#101a14",
-
-            border:
-                "1px solid rgba(172,227,54,.2)",
-
-            borderRadius: "12px",
-
-            color: "#f3f7f4",
-
-            fontSize: "11px",
-
-            fontWeight: "700",
-
-            boxShadow:
-                "0 20px 50px rgba(0,0,0,.45)",
-
-            transform:
-                "translateY(20px)",
-
-            opacity: "0",
-
-            transition:
-                "all .3s ease"
-
-        }
-
-    );
-
-
-    document
-        .body
-        .appendChild(toast);
-
-
-    requestAnimationFrame(() => {
-
-        toast.style.transform =
-            "translateY(0)";
-
-        toast.style.opacity =
-            "1";
-
-    });
-
-
-    setTimeout(() => {
-
-        toast.style.transform =
-            "translateY(20px)";
-
-        toast.style.opacity =
-            "0";
-
-
-        setTimeout(() => {
-
-            toast.remove();
-
-        }, 300);
-
-    }, 3000);
-
-}
-
-
-
-/* =============================================================
-   SCROLL TO PLANNER
-============================================================= */
-
-function scrollToPlanner() {
-
-    document
-        .getElementById("planner")
-        .scrollIntoView({
-            behavior: "smooth"
-        });
-
-}
-
-
-
-/* =============================================================
-   SEARCH
-============================================================= */
-
-const searchOverlay =
-    document.getElementById(
-        "searchOverlay"
-    );
-
-
-function openSearch() {
-
-    searchOverlay
-        .classList
-        .add("active");
-
-
-    setTimeout(() => {
-
-        document
-            .getElementById("searchInput")
-            .focus();
-
-    }, 100);
-
-}
-
-
-function closeSearch() {
-
-    searchOverlay
-        .classList
-        .remove("active");
-
-}
-
-
-document
-    .getElementById("searchButton")
-    .addEventListener(
-        "click",
-        openSearch
-    );
-
-
-searchOverlay
-    .addEventListener(
-        "click",
-        event => {
-
-            if (
-                event.target ===
-                searchOverlay
-            ) {
-
-                closeSearch();
-
-            }
-
-        }
-    );
-
-
-
-/* =============================================================
-   SEARCH FILTER
-============================================================= */
-
-document
-    .getElementById("searchInput")
-    .addEventListener(
-        "input",
-        function() {
-
-            const query =
-                this.value
-                    .toLowerCase()
-                    .trim();
-
-
-            document
-                .querySelectorAll(
-                    ".search-result"
-                )
-                .forEach(
-                    result => {
-
-                        const text =
-                            result
-                                .innerText
-                                .toLowerCase();
-
-
-                        result.style.display =
-                            text.includes(query)
-                            ? "flex"
-                            : "none";
-
-                    }
-                );
-
-        }
-    );
-
-
-
-/* =============================================================
-   NOTIFICATIONS
-============================================================= */
-
-const notificationPanel =
-    document.getElementById(
-        "notificationPanel"
-    );
-
-
-document
-    .getElementById("notificationButton")
-    .addEventListener(
-        "click",
-        event => {
-
-            event.stopPropagation();
-
-            notificationPanel
-                .classList
-                .toggle("active");
-
-        }
-    );
-
-
-function clearNotifications() {
-
-    document
-        .querySelectorAll(
-            ".notification"
-        )
-        .forEach(
-            notification => {
-
-                notification.style.opacity =
-                    ".5";
-
-            }
-        );
-
-
-    showToast(
-        "All notifications marked as read."
-    );
-
-}
-
-
-document.addEventListener(
-    "click",
-    event => {
-
-        if (
-            !notificationPanel.contains(
-                event.target
-            )
-            &&
-            !event.target.closest(
-                "#notificationButton"
-            )
-        ) {
-
-            notificationPanel
-                .classList
-                .remove("active");
-
-        }
-
-    }
-);
-
-
-
-/* =============================================================
-   MOBILE MENU
-============================================================= */
-
-document
-    .getElementById("mobileMenu")
-    .addEventListener(
-        "click",
-        () => {
-
-            document
-                .getElementById("sidebar")
-                .classList
-                .toggle("mobile-open");
-
-        }
-    );
-
-
-document
-    .querySelectorAll(".nav-item")
-    .forEach(
-        item => {
-
-            item.addEventListener(
-                "click",
-                () => {
-
-                    if (
-                        window.innerWidth <= 760
-                    ) {
-
-                        document
-                            .getElementById("sidebar")
-                            .classList
-                            .remove(
-                                "mobile-open"
-                            );
-
-                    }
-
-                }
-            );
-
-        }
-    );
-
-
-
-/* =============================================================
-   ACTIVE NAVIGATION
-============================================================= */
-
-const navItems =
-    document.querySelectorAll(
-        ".nav-item"
-    );
-
-
-navItems.forEach(
-    item => {
-
-        item.addEventListener(
-            "click",
-            () => {
-
-                navItems.forEach(
-                    nav =>
-                        nav.classList.remove(
-                            "active"
-                        )
-                );
-
-
-                item.classList.add(
-                    "active"
-                );
-
-            }
-        );
-
-    }
-);
-
-
-
-/* =============================================================
-   SCROLL REVEAL
-============================================================= */
-
-const revealObserver =
-    new IntersectionObserver(
-        entries => {
-
-            entries.forEach(
-                entry => {
-
-                    if (
-                        entry.isIntersecting
-                    ) {
-
-                        entry.target
-                            .classList
-                            .add(
-                                "visible"
-                            );
-
-                    }
-
-                }
-            );
-
-        },
-        {
-            threshold: .12
-        }
-    );
-
-
-document
-    .querySelectorAll(".reveal")
-    .forEach(
-        element =>
-            revealObserver.observe(
-                element
-            )
-    );
-
-
-
-/* =============================================================
-   COUNTER ANIMATION
-============================================================= */
-
-function animateCounter(
-    element
-) {
-
-    const target =
-        Number(
-            element.dataset.count
-        );
-
-
-    const duration =
-        1300;
-
-    const start =
-        performance.now();
-
-
-    function update(
-        currentTime
-    ) {
-
-        const progress =
-            Math.min(
-                (
-                    currentTime -
-                    start
-                ) /
-                duration,
-                1
-            );
-
-
-        const eased =
-            1 -
-            Math.pow(
-                1 - progress,
-                3
-            );
-
-
-        element.textContent =
-            Math.floor(
-                target *
-                eased
-            );
-
-
-        if (
-            progress < 1
-        ) {
-
-            requestAnimationFrame(
-                update
-            );
-
-        }
-
-    }
-
-
-    requestAnimationFrame(
-        update
-    );
-
-}
-
-
-
-const counterObserver =
-    new IntersectionObserver(
-        entries => {
-
-            entries.forEach(
-                entry => {
-
-                    if (
-                        entry.isIntersecting
-                    ) {
-
-                        animateCounter(
-                            entry.target
-                        );
-
-                        counterObserver.unobserve(
-                            entry.target
-                        );
-
-                    }
-
-                }
-            );
-
-        },
-        {
-            threshold: .7
-        }
-    );
-
-
-document
-    .querySelectorAll(
-        "[data-count]"
-    )
-    .forEach(
-        counter =>
-            counterObserver.observe(
-                counter
-            )
-    );
-
-
-
-/* =============================================================
-   UTC CLOCK
-============================================================= */
-
-function updateUTCClock() {
-
-    const now =
-        new Date();
-
-
-    const hours =
-        String(
-            now.getUTCHours()
-        ).padStart(
-            2,
-            "0"
-        );
-
-
-    const minutes =
-        String(
-            now.getUTCMinutes()
-        ).padStart(
-            2,
-            "0"
-        );
-
-
-    const seconds =
-        String(
-            now.getUTCSeconds()
-        ).padStart(
-            2,
-            "0"
-        );
-
-
-    document.title =
-        `Flight · ${hours}:${minutes}:${seconds}Z`;
-
-}
-
-
-setInterval(
-    updateUTCClock,
-    1000
-);
-
-updateUTCClock();
-
-
-
-/* =============================================================
-   KEYBOARD SHORTCUTS
-============================================================= */
-
-document.addEventListener(
-    "keydown",
-    event => {
-
-        /*
-         * ESC
-         */
-
-        if (
-            event.key === "Escape"
-        ) {
-
-            closeSearch();
-
-            notificationPanel
-                .classList
-                .remove("active");
-
-        }
-
-
-        /*
-         * /
-         * Open search
-         */
-
-        if (
-            event.key === "/" &&
-            document.activeElement.tagName
-            !== "INPUT"
-        ) {
-
-            event.preventDefault();
-
-            openSearch();
-
-        }
-
-
-        /*
-         * CTRL + K
-         */
-
-        if (
-            event.ctrlKey &&
-            event.key.toLowerCase()
-            === "k"
-        ) {
-
-            event.preventDefault();
-
-            openSearch();
-
-        }
-
-    }
-);
-
-
-
-/* =============================================================
-   COMMAND BUTTON
-============================================================= */
-
-document
-    .getElementById("commandButton")
-    .addEventListener(
-        "click",
-        () => {
-
-            openSearch();
-
-        }
-    );
-
-
-
-/* =============================================================
-   INITIAL PLANNER
-============================================================= */
-
-updatePlanner();
-
-
-
-/* =============================================================
-   LOCAL STORAGE
-============================================================= */
-
-function saveSetting(
-    key,
-    value
-) {
-
-    localStorage.setItem(
-        `flight-${key}`,
-        value
-    );
-
-}
-
-
-function loadSetting(
-    key,
-    fallback
-) {
-
-    return (
-        localStorage.getItem(
-            `flight-${key}`
-        )
-        ||
-        fallback
-    );
-
-}
-
-
-
-/* =============================================================
-   PREVENT DEMO LINKS
-============================================================= */
-
-document
-    .querySelectorAll(
-        'a[href="#"]'
-    )
-    .forEach(
-        link => {
-
-            link.addEventListener(
-                "click",
-                event => {
-
-                    event.preventDefault();
-
-                }
-            );
-
-        }
-    );
-
-
-
-/* =============================================================
-   TOOL INTERACTIONS
-============================================================= */
-
-document
-    .querySelectorAll(".tool")
-    .forEach(
-        tool => {
-
-            tool.addEventListener(
-                "click",
-                () => {
-
-                    const name =
-                        tool
-                            .querySelector(
-                                ".tool-text"
-                            )
-                            .textContent
-                            .trim();
-
-
-                    showToast(
-                        `${name} will open here.`
-                    );
-
-                }
-            );
-
-        }
-    );
-
-
-
-/* =============================================================
-   AIRPORT INTERACTIONS
-============================================================= */
-
-document
-    .querySelectorAll(".airport-card")
-    .forEach(
-        card => {
-
-            card.addEventListener(
-                "click",
-                () => {
-
-                    const code =
-                        card
-                            .querySelector(
-                                ".airport-card-code"
-                            )
-                            .textContent
-                            .trim();
-
-
-                    showToast(
-                        `Opening airport ${code}...`
-                    );
-
-                }
-            );
-
-        }
-    );
-
-
-
-/* =============================================================
-   FEATURE INTERACTIONS
-============================================================= */
-
-document
-    .querySelectorAll(".feature")
-    .forEach(
-        feature => {
-
-            feature.addEventListener(
-                "click",
-                () => {
-
-                    const title =
-                        feature
-                            .querySelector("h3")
-                            .textContent
-                            .trim();
-
-
-                    showToast(
-                        `${title} module selected.`
-                    );
-
-                }
-            );
-
-        }
-    );
-
-
-
-/* =============================================================
-   SYSTEM STARTUP
-============================================================= */
-
-console.log(
-    "%c Flight. ",
-    `
-        background:#ace336;
-        color:#071000;
-        font-weight:800;
-        padding:5px 10px;
-        border-radius:5px;
-    `
-);
-
-console.log(
-    "Flight application initialized."
-);
-
-console.log(
-    "Keyboard shortcuts:"
-);
-
-console.log(
-    "CTRL + K / / = Search"
-);
-
-console.log(
-    "ESC = Close overlays"
-);
-
-
-</script>
-
+<script src="js/home.js"></script>
 
 </body>
 </html>
