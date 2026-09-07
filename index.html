@@ -2,41 +2,29 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Flight App — Flight Simulator Companion</title>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <meta
         name="description"
-        content="A modern flight simulator companion for planning flights, checking weather and managing your virtual aviation operations."
+        content="Flight-app — a modern flight simulator companion for planning, weather, airports and flight operations."
     >
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet"
-    >
+    <meta name="theme-color" content="#f7f9fc">
+
+    <title>Flight-app — Flight Simulator Companion</title>
 
     <style>
+        /* =========================================================
+           RESET
+        ========================================================= */
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-        }
-
-        :root {
-            --blue: #1264e8;
-            --blue-dark: #0847b8;
-            --blue-light: #eaf3ff;
-            --navy: #0d1b35;
-            --text: #18243a;
-            --muted: #718096;
-            --border: #e4ebf5;
-            --white: #ffffff;
-            --background: #f6f9fd;
-            --success: #19a974;
-            --shadow: 0 12px 35px rgba(31, 68, 120, 0.08);
         }
 
         html {
@@ -44,15 +32,19 @@
         }
 
         body {
-            font-family: "Inter", sans-serif;
-            background: var(--background);
-            color: var(--text);
-            line-height: 1.6;
-        }
+            font-family:
+                Inter,
+                ui-sans-serif,
+                system-ui,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                sans-serif;
 
-        a {
-            color: inherit;
-            text-decoration: none;
+            background: #f7f9fc;
+            color: #172033;
+            line-height: 1.5;
+            overflow-x: hidden;
         }
 
         button,
@@ -61,546 +53,752 @@
             font: inherit;
         }
 
-        /* =========================
-           NAVBAR
-        ========================= */
-
-        .navbar {
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            height: 76px;
-            background: rgba(255, 255, 255, 0.94);
-            backdrop-filter: blur(14px);
-            border-bottom: 1px solid var(--border);
-        }
-
-        .nav-container {
-            width: min(1180px, calc(100% - 40px));
-            height: 100%;
-            margin: auto;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 11px;
-            font-weight: 800;
-            font-size: 20px;
-            color: var(--navy);
-        }
-
-        .logo-icon {
-            width: 38px;
-            height: 38px;
-            border-radius: 11px;
-            background: linear-gradient(135deg, var(--blue), #3887ff);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 18px;
-            box-shadow: 0 7px 20px rgba(18, 100, 232, 0.22);
-        }
-
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 7px;
-        }
-
-        .nav-links a {
-            padding: 9px 13px;
-            border-radius: 9px;
-            color: #55657d;
-            font-size: 14px;
-            font-weight: 600;
-            transition: 0.2s ease;
-        }
-
-        .nav-links a:hover,
-        .nav-links a.active {
-            color: var(--blue);
-            background: var(--blue-light);
-        }
-
-        .nav-action {
-            padding: 10px 17px !important;
-            background: var(--blue) !important;
-            color: white !important;
-            box-shadow: 0 6px 17px rgba(18, 100, 232, 0.2);
-        }
-
-        .nav-action:hover {
-            background: var(--blue-dark) !important;
-            transform: translateY(-1px);
-        }
-
-        .mobile-menu {
-            display: none;
-            border: 0;
-            background: transparent;
-            font-size: 25px;
+        button {
             cursor: pointer;
-            color: var(--navy);
         }
 
-        /* =========================
-           HERO
-        ========================= */
-
-        .hero {
-            position: relative;
-            overflow: hidden;
-            background: white;
-            border-bottom: 1px solid var(--border);
+        a {
+            color: inherit;
+            text-decoration: none;
         }
 
-        .hero::before {
-            content: "";
-            position: absolute;
-            width: 500px;
-            height: 500px;
-            background: #e8f2ff;
-            border-radius: 50%;
-            top: -280px;
-            right: -160px;
+        /* =========================================================
+           VARIABLES
+        ========================================================= */
+
+        :root {
+            --bg: #f7f9fc;
+            --surface: #ffffff;
+            --surface-2: #f1f5f9;
+            --border: #e4e9f0;
+
+            --text: #172033;
+            --muted: #6d7788;
+            --muted-2: #929baa;
+
+            --primary: #4263eb;
+            --primary-dark: #304dcc;
+            --secondary: #7c4dff;
+
+            --success: #159a68;
+            --warning: #d88900;
+            --danger: #dc4c64;
+
+            --shadow-sm:
+                0 4px 16px rgba(24, 39, 75, 0.05);
+
+            --shadow:
+                0 15px 45px rgba(24, 39, 75, 0.08);
+
+            --shadow-lg:
+                0 30px 80px rgba(24, 39, 75, 0.13);
+
+            --radius-sm: 10px;
+            --radius: 18px;
+            --radius-lg: 28px;
         }
 
-        .hero-container {
-            width: min(1180px, calc(100% - 40px));
-            min-height: 515px;
-            margin: auto;
-            display: grid;
-            grid-template-columns: 1.1fr 0.9fr;
-            align-items: center;
-            gap: 60px;
-            position: relative;
-            z-index: 1;
+        /* =========================================================
+           GLOBAL
+        ========================================================= */
+
+        .container {
+            width: min(1200px, calc(100% - 40px));
+            margin: 0 auto;
         }
 
-        .hero-content {
-            padding: 55px 0;
+        .hidden {
+            display: none !important;
+        }
+
+        .muted {
+            color: var(--muted);
+        }
+
+        .unavailable {
+            color: var(--muted-2);
+            font-style: italic;
         }
 
         .eyebrow {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            padding: 7px 12px;
-            border-radius: 30px;
-            background: var(--blue-light);
-            color: var(--blue);
+
+            color: var(--primary);
             font-size: 12px;
             font-weight: 800;
-            letter-spacing: 0.4px;
+
             text-transform: uppercase;
-            margin-bottom: 18px;
+            letter-spacing: 0.12em;
         }
 
-        .status-dot {
+        .eyebrow::before {
+            content: "";
             width: 7px;
             height: 7px;
-            background: var(--success);
             border-radius: 50%;
-            box-shadow: 0 0 0 4px rgba(25, 169, 116, 0.12);
+            background: currentColor;
         }
 
-        .hero h1 {
-            max-width: 690px;
-            font-size: clamp(42px, 5vw, 66px);
-            line-height: 1.04;
-            letter-spacing: -2.8px;
-            color: var(--navy);
-            margin-bottom: 20px;
+        /* =========================================================
+           HEADER
+        ========================================================= */
+
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+
+            background: rgba(247, 249, 252, 0.86);
+            backdrop-filter: blur(20px);
+
+            border-bottom: 1px solid rgba(228, 233, 240, 0.8);
         }
 
-        .hero h1 span {
-            color: var(--blue);
+        .nav {
+            height: 76px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 30px;
         }
 
-        .hero-text {
-            max-width: 590px;
-            color: var(--muted);
-            font-size: 17px;
-            line-height: 1.8;
-            margin-bottom: 30px;
-        }
-
-        .hero-buttons {
+        .brand {
             display: flex;
             align-items: center;
             gap: 12px;
-            flex-wrap: wrap;
+
+            font-weight: 900;
+            font-size: 19px;
+            letter-spacing: -0.03em;
         }
 
-        .btn {
-            border: 0;
-            cursor: pointer;
-            border-radius: 10px;
-            padding: 13px 20px;
-            font-size: 14px;
-            font-weight: 700;
-            transition: 0.2s ease;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
+        .brand-icon {
+            width: 40px;
+            height: 40px;
 
-        .btn-primary {
-            background: var(--blue);
+            display: grid;
+            place-items: center;
+
+            border-radius: 13px;
+
             color: white;
-            box-shadow: 0 8px 20px rgba(18, 100, 232, 0.22);
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--primary),
+                    var(--secondary)
+                );
+
+            box-shadow:
+                0 8px 20px rgba(66, 99, 235, 0.22);
         }
 
-        .btn-primary:hover {
-            background: var(--blue-dark);
-            transform: translateY(-2px);
+        .brand-icon svg {
+            width: 21px;
+            height: 21px;
         }
 
-        .btn-secondary {
-            background: white;
-            color: var(--navy);
-            border: 1px solid var(--border);
-        }
-
-        .btn-secondary:hover {
-            border-color: #c8d7ed;
-            background: #f9fbff;
-        }
-
-        /* Hero visual */
-
-        .hero-visual {
-            position: relative;
-            min-height: 380px;
+        .nav-links {
             display: flex;
             align-items: center;
-            justify-content: center;
+            gap: 6px;
         }
 
-        .flight-card {
-            width: min(420px, 100%);
-            background: white;
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            box-shadow: 0 25px 65px rgba(36, 75, 130, 0.13);
-            overflow: hidden;
-            position: relative;
-        }
+        .nav-links a {
+            padding: 9px 12px;
 
-        .flight-card-header {
-            padding: 17px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .flight-card-title {
-            font-size: 13px;
-            font-weight: 800;
-            color: var(--navy);
-        }
-
-        .live-label {
-            font-size: 10px;
-            font-weight: 800;
-            color: var(--success);
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .flight-route {
-            padding: 28px 22px 23px;
-        }
-
-        .route-airports {
-            display: grid;
-            grid-template-columns: 1fr auto 1fr;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .airport-box:last-child {
-            text-align: right;
-        }
-
-        .airport-code {
-            font-size: 31px;
-            line-height: 1;
-            font-weight: 800;
-            color: var(--navy);
-        }
-
-        .airport-name {
-            margin-top: 5px;
-            font-size: 11px;
             color: var(--muted);
+            font-size: 14px;
+            font-weight: 650;
+
+            border-radius: 9px;
+
+            transition:
+                color 0.2s ease,
+                background 0.2s ease;
         }
 
-        .route-line {
-            width: 100px;
-            position: relative;
+        .nav-links a:hover {
+            color: var(--text);
+            background: var(--surface-2);
         }
 
-        .route-line::before {
-            content: "";
-            position: absolute;
-            top: 50%;
-            left: 0;
-            right: 0;
-            border-top: 1px dashed #b8c8dc;
-        }
-
-        .plane {
-            position: relative;
-            z-index: 1;
-            display: block;
-            width: 30px;
-            height: 30px;
-            margin: auto;
-            border-radius: 50%;
-            background: var(--blue-light);
-            color: var(--blue);
+        .nav-actions {
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-size: 13px;
-        }
-
-        .flight-details {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            border-top: 1px solid var(--border);
-        }
-
-        .flight-detail {
-            padding: 15px 10px;
-            text-align: center;
-            border-right: 1px solid var(--border);
-        }
-
-        .flight-detail:last-child {
-            border-right: 0;
-        }
-
-        .detail-label {
-            font-size: 10px;
-            color: var(--muted);
-            margin-bottom: 3px;
-        }
-
-        .detail-value {
-            font-size: 12px;
-            font-weight: 800;
-            color: var(--navy);
-        }
-
-        /* =========================
-           QUICK PLANNER
-        ========================= */
-
-        .section {
-            width: min(1180px, calc(100% - 40px));
-            margin: auto;
-        }
-
-        .quick-planner {
-            margin-top: -42px;
-            position: relative;
-            z-index: 10;
-        }
-
-        .planner-card {
-            background: white;
-            border: 1px solid var(--border);
-            border-radius: 15px;
-            box-shadow: var(--shadow);
-            padding: 22px;
-        }
-
-        .planner-heading {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 16px;
-        }
-
-        .planner-heading h2 {
-            font-size: 16px;
-            color: var(--navy);
-        }
-
-        .planner-heading span {
-            font-size: 11px;
-            color: var(--muted);
-        }
-
-        .planner-form {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1.1fr auto;
             gap: 10px;
         }
 
-        .input-group {
-            position: relative;
-        }
+        .icon-btn {
+            width: 42px;
+            height: 42px;
 
-        .input-group label {
-            position: absolute;
-            top: 7px;
-            left: 13px;
-            font-size: 9px;
-            color: var(--muted);
-            font-weight: 700;
-            text-transform: uppercase;
-            z-index: 1;
-        }
-
-        .input-group input,
-        .input-group select {
-            width: 100%;
-            height: 57px;
-            border: 1px solid var(--border);
-            border-radius: 9px;
-            outline: none;
-            padding: 22px 13px 7px;
-            color: var(--navy);
-            background: white;
-            font-weight: 700;
-            font-size: 13px;
-            transition: 0.2s ease;
-        }
-
-        .input-group input:focus,
-        .input-group select:focus {
-            border-color: var(--blue);
-            box-shadow: 0 0 0 3px rgba(18, 100, 232, 0.08);
-        }
-
-        .planner-form .btn {
-            height: 57px;
-            padding: 0 22px;
-        }
-
-        /* =========================
-           FEATURES
-        ========================= */
-
-        .features {
-            padding: 85px 0 75px;
-        }
-
-        .section-header {
-            margin-bottom: 30px;
-        }
-
-        .section-header .small-title {
-            color: var(--blue);
-            font-size: 11px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 7px;
-        }
-
-        .section-header h2 {
-            font-size: 31px;
-            letter-spacing: -1px;
-            color: var(--navy);
-            margin-bottom: 8px;
-        }
-
-        .section-header p {
-            color: var(--muted);
-            font-size: 14px;
-            max-width: 620px;
-        }
-
-        .feature-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-        }
+            place-items: center;
 
-        .feature-card {
-            background: white;
             border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 24px;
+            border-radius: 12px;
+
+            background: var(--surface);
+            color: var(--muted);
+
             transition: 0.2s ease;
         }
 
-        .feature-card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow);
-            border-color: #d4e2f5;
+        .icon-btn:hover {
+            color: var(--text);
+            border-color: #ccd4e0;
+            transform: translateY(-1px);
         }
 
-        .feature-icon {
-            width: 43px;
-            height: 43px;
-            border-radius: 11px;
-            background: var(--blue-light);
-            color: var(--blue);
-            display: flex;
+        .mobile-menu {
+            display: none;
+        }
+
+        /* =========================================================
+           BUTTONS
+        ========================================================= */
+
+        .btn {
+            display: inline-flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
-            margin-bottom: 17px;
+            gap: 9px;
+
+            min-height: 44px;
+            padding: 0 17px;
+
+            border: 0;
+            border-radius: 12px;
+
+            font-size: 14px;
+            font-weight: 750;
+
+            transition:
+                transform 0.2s ease,
+                box-shadow 0.2s ease,
+                background 0.2s ease;
         }
 
-        .feature-card h3 {
-            font-size: 15px;
-            color: var(--navy);
-            margin-bottom: 7px;
+        .btn:hover {
+            transform: translateY(-1px);
         }
 
-        .feature-card p {
+        .btn-primary {
+            color: white;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--primary),
+                    var(--secondary)
+                );
+
+            box-shadow:
+                0 10px 24px rgba(66, 99, 235, 0.18);
+        }
+
+        .btn-primary:hover {
+            box-shadow:
+                0 14px 30px rgba(66, 99, 235, 0.25);
+        }
+
+        .btn-secondary {
+            color: var(--text);
+            background: var(--surface);
+            border: 1px solid var(--border);
+        }
+
+        .btn-danger {
+            color: white;
+            background: var(--danger);
+        }
+
+        /* =========================================================
+           HERO
+        ========================================================= */
+
+        .hero {
+            padding: 78px 0 55px;
+        }
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1.15fr 0.85fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .hero h1 {
+            margin-top: 17px;
+
+            max-width: 760px;
+
+            font-size: clamp(42px, 6vw, 70px);
+            line-height: 0.98;
+            letter-spacing: -0.055em;
+        }
+
+        .hero h1 span {
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--primary),
+                    var(--secondary)
+                );
+
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .hero-description {
+            max-width: 650px;
+            margin-top: 22px;
+
+            color: var(--muted);
+            font-size: 17px;
+        }
+
+        .hero-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 11px;
+            margin-top: 30px;
+        }
+
+        .hero-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+
+            margin-top: 20px;
+
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+
+            border-radius: 50%;
+            background: var(--success);
+        }
+
+        /* =========================================================
+           HERO VISUAL
+        ========================================================= */
+
+        .hero-card {
+            position: relative;
+
+            min-height: 410px;
+
+            padding: 25px;
+
+            border: 1px solid var(--border);
+            border-radius: 30px;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    #ffffff,
+                    #f2f5ff
+                );
+
+            box-shadow: var(--shadow-lg);
+
+            overflow: hidden;
+        }
+
+        .hero-card::before {
+            content: "";
+
+            position: absolute;
+
+            width: 280px;
+            height: 280px;
+
+            right: -90px;
+            top: -90px;
+
+            border-radius: 50%;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    rgba(66, 99, 235, 0.12),
+                    rgba(124, 77, 255, 0.08)
+                );
+        }
+
+        .flight-panel {
+            position: relative;
+            z-index: 2;
+
+            padding: 20px;
+
+            border-radius: 20px;
+
+            background: rgba(255, 255, 255, 0.78);
+            border: 1px solid rgba(228, 233, 240, 0.9);
+
+            backdrop-filter: blur(12px);
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            margin-bottom: 22px;
+        }
+
+        .panel-label {
             color: var(--muted);
             font-size: 12px;
-            line-height: 1.7;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
         }
 
-        /* =========================
+        .panel-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+
+            color: var(--success);
+            font-size: 12px;
+            font-weight: 750;
+        }
+
+        .route-visual {
+            display: grid;
+            grid-template-columns: 1fr 60px 1fr;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .airport-big {
+            font-size: 32px;
+            font-weight: 900;
+            letter-spacing: -0.04em;
+        }
+
+        .airport-name {
+            color: var(--muted);
+            font-size: 12px;
+            margin-top: 2px;
+        }
+
+        .route-line {
+            position: relative;
+            height: 1px;
+            background: #ccd4e0;
+        }
+
+        .route-line::after {
+            content: "";
+
+            position: absolute;
+
+            left: 50%;
+            top: 50%;
+
+            width: 8px;
+            height: 8px;
+
+            transform:
+                translate(-50%, -50%)
+                rotate(45deg);
+
+            border-radius: 2px;
+
+            background: var(--primary);
+        }
+
+        .plane-symbol {
+            position: absolute;
+
+            left: 50%;
+            top: -13px;
+
+            transform:
+                translateX(-50%)
+                rotate(90deg);
+
+            color: var(--primary);
+        }
+
+        .hero-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+
+            margin-top: 22px;
+
+            border-top: 1px solid var(--border);
+            padding-top: 20px;
+        }
+
+        .metric {
+            padding-right: 15px;
+        }
+
+        .metric + .metric {
+            padding-left: 15px;
+            border-left: 1px solid var(--border);
+        }
+
+        .metric-label {
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        .metric-value {
+            margin-top: 4px;
+
+            font-size: 17px;
+            font-weight: 800;
+        }
+
+        .hero-orbit {
+            position: absolute;
+
+            width: 440px;
+            height: 160px;
+
+            left: 50%;
+            bottom: -35px;
+
+            transform: translateX(-50%);
+
+            border:
+                1px solid rgba(66, 99, 235, 0.13);
+
+            border-radius: 50%;
+
+            transform-origin: center;
+        }
+
+        /* =========================================================
+           SECTION
+        ========================================================= */
+
+        section {
+            padding: 55px 0;
+        }
+
+        .section-heading {
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+
+            gap: 30px;
+
+            margin-bottom: 25px;
+        }
+
+        .section-heading h2 {
+            margin-top: 7px;
+
+            font-size: 30px;
+            letter-spacing: -0.04em;
+        }
+
+        .section-heading p {
+            max-width: 580px;
+
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        /* =========================================================
+           QUICK PLANNER
+        ========================================================= */
+
+        .planner-card {
+            padding: 25px;
+
+            border:
+                1px solid var(--border);
+
+            border-radius: var(--radius-lg);
+
+            background: var(--surface);
+
+            box-shadow: var(--shadow);
+        }
+
+        .planner-grid {
+            display: grid;
+            grid-template-columns:
+                minmax(0, 1fr)
+                50px
+                minmax(0, 1fr)
+                auto;
+
+            gap: 13px;
+            align-items: end;
+        }
+
+        .field label {
+            display: block;
+
+            margin-bottom: 7px;
+
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 750;
+        }
+
+        .input {
+            width: 100%;
+            height: 47px;
+
+            padding: 0 14px;
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 11px;
+
+            outline: none;
+
+            color: var(--text);
+            background: var(--surface);
+
+            transition:
+                border 0.2s ease,
+                box-shadow 0.2s ease;
+        }
+
+        .input:focus {
+            border-color: var(--primary);
+
+            box-shadow:
+                0 0 0 4px rgba(66, 99, 235, 0.08);
+        }
+
+        .swap-button {
+            width: 45px;
+            height: 47px;
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 11px;
+
+            color: var(--muted);
+            background: var(--surface);
+
+            transition: 0.2s ease;
+        }
+
+        .swap-button:hover {
+            color: var(--primary);
+            border-color: #cbd4e4;
+            transform: rotate(180deg);
+        }
+
+        .planner-result {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+
+            gap: 15px;
+
+            margin-top: 20px;
+            padding-top: 20px;
+
+            border-top: 1px solid var(--border);
+        }
+
+        .result-box {
+            padding: 17px;
+
+            border-radius: 14px;
+
+            background: var(--surface-2);
+        }
+
+        .result-box small {
+            display: block;
+
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        .result-box strong {
+            display: block;
+
+            margin-top: 4px;
+
+            font-size: 19px;
+        }
+
+        /* =========================================================
            WEATHER
-        ========================= */
-
-        .weather-section {
-            padding: 10px 0 80px;
-        }
+        ========================================================= */
 
         .weather-layout {
             display: grid;
-            grid-template-columns: 0.8fr 1.2fr;
-            gap: 15px;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 18px;
         }
 
-        .weather-search-card,
-        .weather-result-card {
-            background: white;
-            border: 1px solid var(--border);
-            border-radius: 14px;
+        .card {
+            border:
+                1px solid var(--border);
+
+            border-radius: var(--radius);
+
+            background: var(--surface);
+
+            box-shadow: var(--shadow-sm);
+        }
+
+        .card-padding {
             padding: 23px;
         }
 
-        .weather-search-card h3,
-        .weather-result-card h3 {
-            font-size: 15px;
-            color: var(--navy);
-            margin-bottom: 6px;
+        .weather-top {
+            display: flex;
+            align-items: start;
+            justify-content: space-between;
+
+            gap: 20px;
         }
 
-        .weather-search-card p {
+        .airport-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .airport-icon {
+            width: 45px;
+            height: 45px;
+
+            display: grid;
+            place-items: center;
+
+            border-radius: 13px;
+
+            color: var(--primary);
+            background: #eef1ff;
+        }
+
+        .airport-title h3 {
+            font-size: 22px;
+            letter-spacing: -0.03em;
+        }
+
+        .airport-title p {
             color: var(--muted);
             font-size: 12px;
-            margin-bottom: 20px;
         }
 
         .weather-search {
@@ -608,427 +806,786 @@
             gap: 8px;
         }
 
-        .weather-search input {
-            flex: 1;
-            height: 46px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 0 12px;
-            outline: none;
-            font-weight: 700;
-            text-transform: uppercase;
-        }
-
-        .weather-search input:focus {
-            border-color: var(--blue);
-        }
-
-        .weather-search button {
-            height: 46px;
-            padding: 0 16px;
+        .weather-search .input {
+            width: 110px;
         }
 
         .weather-status {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 5px 9px;
-            border-radius: 6px;
-            background: #edf9f4;
-            color: var(--success);
-            font-size: 10px;
-            font-weight: 800;
-            margin-bottom: 15px;
+            margin-top: 22px;
         }
 
-        .weather-status.offline {
-            background: #f3f5f8;
-            color: var(--muted);
-        }
-
-        .metar {
-            background: #f7faff;
-            border: 1px solid #e7eef8;
-            border-radius: 9px;
+        .metar-box {
+            margin-top: 17px;
             padding: 16px;
-            font-family: monospace;
+
+            border-radius: 13px;
+
+            background: var(--surface-2);
+
+            font-family:
+                "SFMono-Regular",
+                Consolas,
+                monospace;
+
             font-size: 12px;
-            color: var(--navy);
-            word-break: break-word;
-            min-height: 65px;
+
+            overflow-x: auto;
         }
 
-        .weather-meta {
-            margin-top: 12px;
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-            font-size: 11px;
-            color: var(--muted);
-        }
-
-        .weather-meta strong {
-            color: var(--navy);
-        }
-
-        /* =========================
-           DATA SECTION
-        ========================= */
-
-        .data-section {
-            padding: 0 0 80px;
-        }
-
-        .data-grid {
+        .weather-details {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(4, 1fr);
+
+            margin-top: 18px;
+
+            border-top: 1px solid var(--border);
+            padding-top: 18px;
+        }
+
+        .weather-detail span {
+            display: block;
+
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        .weather-detail strong {
+            display: block;
+
+            margin-top: 3px;
+
+            font-size: 15px;
+        }
+
+        .api-card {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+
+            min-height: 100%;
+        }
+
+        .api-icon {
+            width: 50px;
+            height: 50px;
+
+            display: grid;
+            place-items: center;
+
+            border-radius: 15px;
+
+            color: var(--primary);
+            background: #eef1ff;
+        }
+
+        .api-card h3 {
+            margin-top: 18px;
+
+            font-size: 20px;
+        }
+
+        .api-card p {
+            margin-top: 8px;
+
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .api-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            margin-top: 22px;
+
+            color: var(--success);
+
+            font-size: 12px;
+            font-weight: 750;
+        }
+
+        /* =========================================================
+           FEATURES
+        ========================================================= */
+
+        .features-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(4, minmax(0, 1fr));
+
             gap: 15px;
         }
 
-        .data-card {
-            background: white;
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            overflow: hidden;
+        .feature-card {
+            min-height: 190px;
+
+            padding: 22px;
+
+            border:
+                1px solid var(--border);
+
+            border-radius: var(--radius);
+
+            background: var(--surface);
+
+            transition:
+                transform 0.2s ease,
+                box-shadow 0.2s ease;
         }
 
-        .data-card-header {
-            padding: 18px 20px;
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow);
+        }
+
+        .feature-icon {
+            width: 43px;
+            height: 43px;
+
+            display: grid;
+            place-items: center;
+
+            border-radius: 12px;
+
+            color: var(--primary);
+            background: #eef1ff;
+        }
+
+        .feature-card h3 {
+            margin-top: 17px;
+
+            font-size: 16px;
+        }
+
+        .feature-card p {
+            margin-top: 6px;
+
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .feature-card .feature-link {
+            display: inline-flex;
+
+            margin-top: 15px;
+
+            color: var(--primary);
+
+            font-size: 12px;
+            font-weight: 750;
+        }
+
+        /* =========================================================
+           RECENT FLIGHTS
+        ========================================================= */
+
+        .flight-list {
+            overflow: hidden;
+
+            border:
+                1px solid var(--border);
+
+            border-radius: var(--radius);
+
+            background: var(--surface);
+
+            box-shadow: var(--shadow-sm);
+        }
+
+        .flight-row {
+            display: grid;
+
+            grid-template-columns:
+                1fr
+                110px
+                110px
+                130px;
+
+            align-items: center;
+
+            gap: 20px;
+
+            padding: 18px 22px;
+
+            border-bottom:
+                1px solid var(--border);
+        }
+
+        .flight-row:last-child {
+            border-bottom: 0;
+        }
+
+        .flight-route {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            border-bottom: 1px solid var(--border);
+            gap: 12px;
         }
 
-        .data-card-header h3 {
-            font-size: 14px;
-            color: var(--navy);
+        .flight-route strong {
+            font-size: 16px;
         }
 
-        .view-link {
-            color: var(--blue);
-            font-size: 11px;
-            font-weight: 700;
+        .flight-arrow {
+            color: var(--muted-2);
+        }
+
+        .flight-info small {
+            display: block;
+
+            color: var(--muted);
+            font-size: 10px;
+        }
+
+        .flight-info strong {
+            display: block;
+
+            margin-top: 2px;
+
+            font-size: 13px;
         }
 
         .empty-state {
-            padding: 38px 20px;
+            padding: 45px 20px;
+
             text-align: center;
-            color: var(--muted);
-            font-size: 12px;
         }
 
         .empty-icon {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            background: var(--blue-light);
-            color: var(--blue);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 12px;
+            width: 55px;
+            height: 55px;
+
+            display: grid;
+            place-items: center;
+
+            margin: 0 auto 13px;
+
+            border-radius: 17px;
+
+            color: var(--muted);
+            background: var(--surface-2);
         }
 
-        /* =========================
-           API STATUS
-        ========================= */
-
-        .api-bar {
-            background: var(--navy);
-            color: white;
-            padding: 17px 0;
+        .empty-state h3 {
+            font-size: 16px;
         }
 
-        .api-inner {
-            width: min(1180px, calc(100% - 40px));
-            margin: auto;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 20px;
-        }
+        .empty-state p {
+            max-width: 400px;
 
-        .api-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            margin: 6px auto 0;
+
+            color: var(--muted);
             font-size: 12px;
         }
 
-        .api-dot {
-            width: 8px;
-            height: 8px;
-            background: var(--success);
-            border-radius: 50%;
+        /* =========================================================
+           STATS
+        ========================================================= */
+
+        .stats-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(4, minmax(0, 1fr));
+
+            gap: 14px;
         }
 
-        .api-dot.offline {
-            background: #e05252;
+        .stat-card {
+            padding: 21px;
+
+            border:
+                1px solid var(--border);
+
+            border-radius: var(--radius);
+
+            background: var(--surface);
         }
 
-        .api-info strong {
-            font-weight: 700;
+        .stat-card span {
+            color: var(--muted);
+            font-size: 12px;
         }
 
-        .api-info span {
-            color: #aebbd0;
+        .stat-card strong {
+            display: block;
+
+            margin-top: 6px;
+
+            font-size: 27px;
+            letter-spacing: -0.04em;
         }
 
-        .api-check {
-            color: #aebbd0;
-            font-size: 11px;
-        }
-
-        /* =========================
+        /* =========================================================
            CTA
-        ========================= */
+        ========================================================= */
 
         .cta {
-            padding: 0 0 75px;
+            padding: 65px 0;
         }
 
-        .cta-card {
-            background: linear-gradient(135deg, #1264e8, #0847b8);
-            border-radius: 17px;
-            padding: 43px;
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 30px;
-            overflow: hidden;
+        .cta-inner {
             position: relative;
+            overflow: hidden;
+
+            padding: 45px;
+
+            border-radius: 30px;
+
+            color: white;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #334fd4,
+                    #6c43dc
+                );
+
+            box-shadow:
+                0 25px 60px rgba(66, 70, 180, 0.2);
         }
 
-        .cta-card::after {
+        .cta-inner::after {
             content: "";
+
             position: absolute;
+
             width: 300px;
             height: 300px;
-            border: 1px solid rgba(255,255,255,0.1);
+
+            right: -80px;
+            top: -120px;
+
+            border:
+                1px solid rgba(255,255,255,0.14);
+
             border-radius: 50%;
-            right: -100px;
-            top: -130px;
         }
 
-        .cta-card h2 {
-            font-size: 27px;
-            margin-bottom: 6px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .cta-card p {
-            font-size: 13px;
-            color: rgba(255,255,255,0.75);
-            position: relative;
-            z-index: 1;
-        }
-
-        .cta-card .btn {
-            background: white;
-            color: var(--blue);
+        .cta h2 {
             position: relative;
             z-index: 2;
-            white-space: nowrap;
+
+            max-width: 600px;
+
+            font-size: 34px;
+            line-height: 1.05;
+
+            letter-spacing: -0.04em;
         }
 
-        .cta-card .btn:hover {
-            transform: translateY(-2px);
+        .cta p {
+            position: relative;
+            z-index: 2;
+
+            max-width: 600px;
+
+            margin-top: 10px;
+
+            color: rgba(255,255,255,0.78);
         }
 
-        /* =========================
+        .cta-actions {
+            position: relative;
+            z-index: 2;
+
+            display: flex;
+            gap: 10px;
+
+            margin-top: 24px;
+        }
+
+        .cta .btn-secondary {
+            background: rgba(255,255,255,0.12);
+            border-color: rgba(255,255,255,0.18);
+            color: white;
+        }
+
+        /* =========================================================
            FOOTER
-        ========================= */
+        ========================================================= */
 
         footer {
-            background: white;
-            border-top: 1px solid var(--border);
+            padding: 35px 0 45px;
+
+            border-top:
+                1px solid var(--border);
         }
 
-        .footer-inner {
-            width: min(1180px, calc(100% - 40px));
-            margin: auto;
-            min-height: 85px;
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .footer-brand {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            gap: 20px;
+            gap: 10px;
+
+            font-weight: 850;
         }
 
-        .footer-copy {
+        .footer-text {
+            margin-top: 8px;
+
             color: var(--muted);
-            font-size: 11px;
+            font-size: 12px;
         }
 
         .footer-links {
             display: flex;
-            gap: 18px;
-        }
+            gap: 17px;
 
-        .footer-links a {
-            font-size: 11px;
             color: var(--muted);
+
+            font-size: 12px;
         }
 
         .footer-links a:hover {
-            color: var(--blue);
+            color: var(--text);
         }
 
-        /* =========================
+        /* =========================================================
            TOAST
-        ========================= */
+        ========================================================= */
 
-        .toast {
+        .toast-container {
             position: fixed;
+
             right: 20px;
             bottom: 20px;
+
             z-index: 5000;
-            background: var(--navy);
-            color: white;
-            padding: 13px 17px;
-            border-radius: 9px;
-            font-size: 12px;
-            box-shadow: 0 12px 35px rgba(0,0,0,0.18);
-            transform: translateY(120px);
-            opacity: 0;
-            transition: 0.25s ease;
+
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
 
-        .toast.show {
-            transform: translateY(0);
-            opacity: 1;
+        .toast {
+            min-width: 260px;
+            max-width: 380px;
+
+            padding: 14px 16px;
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 13px;
+
+            background: var(--surface);
+
+            box-shadow: var(--shadow-lg);
+
+            animation:
+                toastIn 0.25s ease forwards;
         }
 
-        /* =========================
-           RESPONSIVE
-        ========================= */
+        .toast strong {
+            display: block;
 
-        @media (max-width: 900px) {
+            font-size: 13px;
+        }
+
+        .toast span {
+            display: block;
+
+            margin-top: 3px;
+
+            color: var(--muted);
+
+            font-size: 11px;
+        }
+
+        @keyframes toastIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* =========================================================
+           SEARCH MODAL
+        ========================================================= */
+
+        .modal {
+            position: fixed;
+
+            inset: 0;
+
+            z-index: 4000;
+
+            display: none;
+            align-items: flex-start;
+            justify-content: center;
+
+            padding: 90px 20px;
+
+            background: rgba(16, 23, 38, 0.38);
+
+            backdrop-filter: blur(8px);
+        }
+
+        .modal.open {
+            display: flex;
+        }
+
+        .modal-box {
+            width: min(650px, 100%);
+
+            overflow: hidden;
+
+            border-radius: 20px;
+
+            background: var(--surface);
+
+            box-shadow: var(--shadow-lg);
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            padding: 15px;
+
+            border-bottom:
+                1px solid var(--border);
+        }
+
+        .search-box input {
+            flex: 1;
+
+            border: 0;
+            outline: 0;
+
+            font-size: 16px;
+            color: var(--text);
+        }
+
+        .search-results {
+            max-height: 420px;
+
+            overflow-y: auto;
+        }
+
+        .search-result {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            width: 100%;
+
+            padding: 15px 18px;
+
+            border: 0;
+            border-bottom:
+                1px solid var(--border);
+
+            text-align: left;
+
+            background: transparent;
+
+            transition: background 0.15s ease;
+        }
+
+        .search-result:hover {
+            background: var(--surface-2);
+        }
+
+        .search-result strong {
+            display: block;
+
+            font-size: 14px;
+        }
+
+        .search-result span {
+            display: block;
+
+            margin-top: 2px;
+
+            color: var(--muted);
+
+            font-size: 11px;
+        }
+
+        /* =========================================================
+           MOBILE
+        ========================================================= */
+
+        @media (max-width: 950px) {
+
             .nav-links {
                 display: none;
-                position: absolute;
-                top: 76px;
-                left: 0;
-                right: 0;
-                background: white;
-                border-bottom: 1px solid var(--border);
-                padding: 12px 20px;
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .nav-links.open {
-                display: flex;
-            }
-
-            .nav-links a {
-                padding: 12px;
             }
 
             .mobile-menu {
-                display: block;
+                display: grid;
             }
 
-            .hero-container {
+            .hero-grid {
                 grid-template-columns: 1fr;
-                min-height: auto;
-                gap: 20px;
             }
 
-            .hero-content {
-                padding: 65px 0 25px;
-            }
-
-            .hero-visual {
-                min-height: 330px;
-                padding-bottom: 55px;
-            }
-
-            .quick-planner {
-                margin-top: 0;
-                padding-top: 20px;
-            }
-
-            .planner-form {
-                grid-template-columns: 1fr 1fr;
-            }
-
-            .planner-form .btn {
-                width: 100%;
-            }
-
-            .feature-grid {
-                grid-template-columns: 1fr 1fr;
+            .hero {
+                padding-top: 55px;
             }
 
             .weather-layout {
                 grid-template-columns: 1fr;
             }
+
+            .features-grid {
+                grid-template-columns:
+                    repeat(2, minmax(0, 1fr));
+            }
+
+            .stats-grid {
+                grid-template-columns:
+                    repeat(2, minmax(0, 1fr));
+            }
         }
 
-        @media (max-width: 620px) {
-            .nav-container,
-            .section,
-            .api-inner,
-            .footer-inner {
-                width: min(100% - 28px, 1180px);
+        @media (max-width: 700px) {
+
+            .container {
+                width: min(
+                    100% - 26px,
+                    1200px
+                );
+            }
+
+            .nav {
+                height: 68px;
             }
 
             .hero h1 {
-                font-size: 41px;
-                letter-spacing: -1.8px;
+                font-size: 43px;
             }
 
-            .hero-text {
-                font-size: 14px;
+            .hero-description {
+                font-size: 15px;
             }
 
-            .hero-buttons {
+            .planner-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .swap-button {
                 width: 100%;
             }
 
-            .hero-buttons .btn {
+            .planner-result {
+                grid-template-columns: 1fr;
+            }
+
+            .weather-details {
+                grid-template-columns:
+                    repeat(2, 1fr);
+
+                row-gap: 16px;
+            }
+
+            .weather-top {
+                flex-direction: column;
+            }
+
+            .weather-search {
+                width: 100%;
+            }
+
+            .weather-search .input {
                 flex: 1;
+                width: auto;
             }
 
-            .planner-form {
+            .features-grid {
                 grid-template-columns: 1fr;
             }
 
-            .feature-grid,
-            .data-grid {
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .flight-row {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .flight-info:last-child {
+                text-align: right;
+            }
+
+            .section-heading {
+                display: block;
+            }
+
+            .section-heading p {
+                margin-top: 10px;
+            }
+
+            .cta-inner {
+                padding: 30px;
+            }
+
+            .cta h2 {
+                font-size: 28px;
+            }
+
+            .footer-grid {
                 grid-template-columns: 1fr;
             }
 
-            .features {
-                padding-top: 65px;
+            .footer-links {
+                flex-wrap: wrap;
+            }
+        }
+
+        @media (max-width: 480px) {
+
+            .nav-actions .btn {
+                display: none;
             }
 
-            .section-header h2 {
+            .hero-card {
+                min-height: 350px;
+                padding: 15px;
+            }
+
+            .airport-big {
                 font-size: 26px;
             }
 
-            .cta-card {
-                padding: 30px 25px;
-                flex-direction: column;
-                align-items: flex-start;
+            .route-visual {
+                grid-template-columns:
+                    1fr 35px 1fr;
             }
 
-            .footer-inner {
-                padding: 22px 0;
-                flex-direction: column;
-                align-items: flex-start;
+            .stats-grid {
+                grid-template-columns: 1fr;
             }
 
-            .api-inner {
-                align-items: flex-start;
-                flex-direction: column;
-                gap: 6px;
+            .flight-row {
+                grid-template-columns: 1fr;
+                gap: 10px;
             }
 
-            .flight-card {
+            .flight-info:last-child {
+                text-align: left;
+            }
+
+            .cta-actions {
+                flex-direction: column;
+            }
+
+            .cta-actions .btn {
                 width: 100%;
             }
         }
@@ -1037,557 +1594,1156 @@
 
 <body>
 
-<!-- =========================
-     NAVIGATION
-========================= -->
+<!-- =============================================================
+     HEADER
+============================================================= -->
 
-<header class="navbar">
-    <div class="nav-container">
+<header>
 
-        <a href="index.html" class="logo">
-            <div class="logo-icon">✈</div>
-            <span>Flight App</span>
+    <div class="container nav">
+
+        <a href="index.html" class="brand">
+
+            <div class="brand-icon">
+
+                <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                >
+                    <path d="M2 16l20-8"/>
+                    <path d="M8 13l2 6"/>
+                    <path d="M13 11l6 2"/>
+                    <path d="M4 14l3 1"/>
+                </svg>
+
+            </div>
+
+            Flight-app
+
         </a>
 
-        <nav class="nav-links" id="navLinks">
-            <a href="index.html" class="active">Home</a>
-            <a href="planner.html">Flight Planner</a>
+        <nav class="nav-links">
+
+            <a href="index.html">Home</a>
+            <a href="planner.html">Planner</a>
             <a href="weather.html">Weather</a>
             <a href="airports.html">Airports</a>
             <a href="flights.html">Flights</a>
             <a href="logbook.html">Logbook</a>
-            <a href="statistics.html">Statistics</a>
-            <a href="navigation.html">Navigation</a>
-            <a href="performance.html">Performance</a>
-            <a href="settings.html">Settings</a>
+
         </nav>
 
-        <button class="mobile-menu" id="mobileMenu" aria-label="Open menu">
-            ☰
-        </button>
+        <div class="nav-actions">
+
+            <button
+                class="icon-btn"
+                id="searchButton"
+                title="Search"
+                aria-label="Search"
+            >
+                <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
+                    <circle cx="11" cy="11" r="7"/>
+                    <path d="m20 20-4-4"/>
+                </svg>
+            </button>
+
+            <a
+                href="planner.html"
+                class="btn btn-primary"
+            >
+                Plan a flight
+            </a>
+
+            <button
+                class="icon-btn mobile-menu"
+                id="mobileMenuButton"
+                aria-label="Menu"
+            >
+                <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
+                    <path d="M4 6h16"/>
+                    <path d="M4 12h16"/>
+                    <path d="M4 18h16"/>
+                </svg>
+            </button>
+
+        </div>
 
     </div>
+
 </header>
 
 
-<!-- =========================
-     HERO
-========================= -->
-
-<section class="hero">
-
-    <div class="hero-container">
-
-        <div class="hero-content">
-
-            <div class="eyebrow">
-                <span class="status-dot"></span>
-                Flight simulator companion
-            </div>
-
-            <h1>
-                Fly smarter.<br>
-                <span>Plan better.</span>
-            </h1>
-
-            <p class="hero-text">
-                Everything you need for your next flight in one place.
-                Plan your route, check live aviation weather, manage your
-                flights and keep your flight data organized.
-            </p>
-
-            <div class="hero-buttons">
-                <a href="planner.html" class="btn btn-primary">
-                    ✈ Start planning
-                </a>
-
-                <a href="weather.html" class="btn btn-secondary">
-                    Check weather
-                </a>
-            </div>
-
-        </div>
-
-
-        <div class="hero-visual">
-
-            <div class="flight-card">
-
-                <div class="flight-card-header">
-                    <div class="flight-card-title">
-                        Flight overview
-                    </div>
-
-                    <div class="live-label">
-                        <span class="status-dot"></span>
-                        LIVE DATA
-                    </div>
-                </div>
-
-                <div class="flight-route">
-
-                    <div class="route-airports">
-
-                        <div class="airport-box">
-                            <div class="airport-code">EHAM</div>
-                            <div class="airport-name">Amsterdam</div>
-                        </div>
-
-                        <div class="route-line">
-                            <div class="plane">✈</div>
-                        </div>
-
-                        <div class="airport-box">
-                            <div class="airport-code">EGLL</div>
-                            <div class="airport-name">London Heathrow</div>
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <div class="flight-details">
-
-                    <div class="flight-detail">
-                        <div class="detail-label">DISTANCE</div>
-                        <div class="detail-value" id="heroDistance">
-                            —
-                        </div>
-                    </div>
-
-                    <div class="flight-detail">
-                        <div class="detail-label">AIRCRAFT</div>
-                        <div class="detail-value">
-                            —
-                        </div>
-                    </div>
-
-                    <div class="flight-detail">
-                        <div class="detail-label">STATUS</div>
-                        <div class="detail-value">
-                            Ready
-                        </div>
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- =========================
-     QUICK PLANNER
-========================= -->
-
-<section class="section quick-planner">
-
-    <div class="planner-card">
-
-        <div class="planner-heading">
-            <h2>Quick flight planner</h2>
-            <span>Use ICAO airport codes</span>
-        </div>
-
-        <form class="planner-form" id="quickPlanner">
-
-            <div class="input-group">
-                <label>Departure</label>
-                <input
-                    id="departure"
-                    type="text"
-                    placeholder="EHAM"
-                    maxlength="4"
-                    autocomplete="off"
-                    required
-                >
-            </div>
-
-            <div class="input-group">
-                <label>Arrival</label>
-                <input
-                    id="arrival"
-                    type="text"
-                    placeholder="EGLL"
-                    maxlength="4"
-                    autocomplete="off"
-                    required
-                >
-            </div>
-
-            <div class="input-group">
-                <label>Aircraft</label>
-                <select id="aircraft">
-                    <option value="">Select aircraft</option>
-                    <option value="A320">Airbus A320</option>
-                    <option value="A20N">Airbus A320neo</option>
-                    <option value="A21N">Airbus A321neo</option>
-                    <option value="A319">Airbus A319</option>
-                    <option value="B738">Boeing 737-800</option>
-                    <option value="B38M">Boeing 737 MAX 8</option>
-                    <option value="E190">Embraer E190</option>
-                    <option value="A359">Airbus A350-900</option>
-                </select>
-            </div>
-
-            <button class="btn btn-primary" type="submit">
-                Plan flight
-            </button>
-
-        </form>
-
-    </div>
-
-</section>
-
-
-<!-- =========================
-     FEATURES
-========================= -->
-
-<section class="section features">
-
-    <div class="section-header">
-
-        <div class="small-title">Everything in one place</div>
-
-        <h2>Your flight, your data.</h2>
-
-        <p>
-            Built around the tools flight sim pilots actually need.
-        </p>
-
-    </div>
-
-
-    <div class="feature-grid">
-
-        <a href="planner.html" class="feature-card">
-
-            <div class="feature-icon">✈</div>
-
-            <h3>Flight Planner</h3>
-
-            <p>
-                Build and save your flight plans with departure,
-                arrival, aircraft and route information.
-            </p>
-
-        </a>
-
-
-        <a href="weather.html" class="feature-card">
-
-            <div class="feature-icon">☁</div>
-
-            <h3>Live Weather</h3>
-
-            <p>
-                Check current aviation weather with live METAR
-                and TAF information.
-            </p>
-
-        </a>
-
-
-        <a href="airports.html" class="feature-card">
-
-            <div class="feature-icon">◉</div>
-
-            <h3>Airport Information</h3>
-
-            <p>
-                Look up airport information and keep important
-                airport data accessible.
-            </p>
-
-        </a>
-
-
-        <a href="flights.html" class="feature-card">
-
-            <div class="feature-icon">▣</div>
-
-            <h3>Flight Management</h3>
-
-            <p>
-                Keep track of your planned and completed flights
-                from one dashboard.
-            </p>
-
-        </a>
-
-
-        <a href="logbook.html" class="feature-card">
-
-            <div class="feature-icon">▤</div>
-
-            <h3>Digital Logbook</h3>
-
-            <p>
-                Store your flight history and build your personal
-                digital aviation logbook.
-            </p>
-
-        </a>
-
-
-        <a href="statistics.html" class="feature-card">
-
-            <div class="feature-icon">⌁</div>
-
-            <h3>Statistics</h3>
-
-            <p>
-                Analyze your flight activity using the data
-                stored in your account.
-            </p>
-
-        </a>
-
-    </div>
-
-</section>
-
-
-<!-- =========================
-     WEATHER
-========================= -->
-
-<section class="section weather-section">
-
-    <div class="section-header">
-
-        <div class="small-title">Live aviation data</div>
-
-        <h2>Current airport weather</h2>
-
-        <p>
-            Weather is retrieved from the backend and AviationWeather.gov.
-        </p>
-
-    </div>
-
-
-    <div class="weather-layout">
-
-        <div class="weather-search-card">
-
-            <h3>Check an airport</h3>
-
-            <p>
-                Enter a four-letter ICAO code to retrieve the latest METAR.
-            </p>
-
-            <div class="weather-search">
-
-                <input
-                    type="text"
-                    id="weatherAirport"
-                    placeholder="EHAM"
-                    maxlength="4"
-                >
-
-                <button
-                    class="btn btn-primary"
-                    id="weatherButton"
-                >
-                    Search
-                </button>
-
-            </div>
-
-        </div>
-
-
-        <div class="weather-result-card">
-
-            <div class="weather-status" id="weatherStatus">
-                <span class="status-dot"></span>
-                Ready
-            </div>
-
-            <h3 id="weatherAirportTitle">
-                EHAM — Amsterdam
-            </h3>
-
-            <div class="metar" id="metarResult">
-                Enter an airport ICAO code to load live METAR data.
-            </div>
-
-            <div class="weather-meta">
-
-                <div>
-                    Source:
-                    <strong>AviationWeather.gov</strong>
-                </div>
-
-                <div>
-                    Backend:
-                    <strong id="backendStatus">
-                        Checking...
-                    </strong>
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- =========================
-     DATA
-========================= -->
-
-<section class="section data-section">
-
-    <div class="data-grid">
-
-        <div class="data-card">
-
-            <div class="data-card-header">
-
-                <h3>Recent flights</h3>
-
-                <a href="flights.html" class="view-link">
-                    View all →
-                </a>
-
-            </div>
-
-            <div class="empty-state">
-
-                <div class="empty-icon">✈</div>
-
-                <div>
-                    No flight data available yet.
-                </div>
-
-                <div style="margin-top:5px;font-size:10px;">
-                    Your real flight data will appear here once flights
-                    are recorded.
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <div class="data-card">
-
-            <div class="data-card-header">
-
-                <h3>Flight statistics</h3>
-
-                <a href="statistics.html" class="view-link">
-                    View statistics →
-                </a>
-
-            </div>
-
-            <div class="empty-state">
-
-                <div class="empty-icon">⌁</div>
-
-                <div>
-                    No statistics available yet.
-                </div>
-
-                <div style="margin-top:5px;font-size:10px;">
-                    Statistics will be calculated from your actual
-                    flight records.
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- =========================
-     API STATUS
-========================= -->
-
-<div class="api-bar">
-
-    <div class="api-inner">
-
-        <div class="api-info">
-
-            <span class="api-dot" id="apiDot"></span>
-
-            <strong>Flight App API</strong>
-
-            <span id="apiText">
-                Checking connection...
-            </span>
-
-        </div>
-
-        <div class="api-check">
-            Render + Neon
-        </div>
+<!-- =============================================================
+     MOBILE NAV
+============================================================= -->
+
+<div
+    id="mobileNav"
+    class="hidden"
+    style="
+        position:fixed;
+        top:68px;
+        left:0;
+        right:0;
+        z-index:999;
+        padding:15px;
+        background:white;
+        border-bottom:1px solid #e4e9f0;
+        box-shadow:0 15px 30px rgba(0,0,0,.08);
+    "
+>
+
+    <div
+        style="
+            display:flex;
+            flex-direction:column;
+            gap:4px;
+        "
+    >
+
+        <a class="nav-links-mobile" href="index.html">Home</a>
+        <a class="nav-links-mobile" href="planner.html">Planner</a>
+        <a class="nav-links-mobile" href="weather.html">Weather</a>
+        <a class="nav-links-mobile" href="airports.html">Airports</a>
+        <a class="nav-links-mobile" href="flights.html">Flights</a>
+        <a class="nav-links-mobile" href="logbook.html">Logbook</a>
 
     </div>
 
 </div>
 
 
-<!-- =========================
-     CTA
-========================= -->
+<!-- =============================================================
+     HERO
+============================================================= -->
 
-<section class="section cta">
+<main>
 
-    <div class="cta-card">
+<section class="hero">
+
+    <div class="container hero-grid">
 
         <div>
 
-            <h2>Ready for your next flight?</h2>
+            <div class="eyebrow">
+                Flight simulator companion
+            </div>
 
-            <p>
-                Start planning your route and get the information
-                you need before departure.
+            <h1>
+                Plan smarter.
+                <span>Fly better.</span>
+            </h1>
+
+            <p class="hero-description">
+                Flight-app brings your flight planning, live aviation
+                weather, airport information and flight data together
+                in one clean workspace.
             </p>
+
+            <div class="hero-actions">
+
+                <a
+                    href="planner.html"
+                    class="btn btn-primary"
+                >
+                    Open Flight Planner
+
+                    <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <path d="M5 12h14"/>
+                        <path d="m13 6 6 6-6 6"/>
+                    </svg>
+
+                </a>
+
+                <button
+                    class="btn btn-secondary"
+                    id="heroWeatherButton"
+                >
+                    Check live weather
+                </button>
+
+            </div>
+
+            <div class="hero-status">
+
+                <span class="status-dot"></span>
+
+                Backend connection:
+                <strong id="backendStatus">
+                    Checking...
+                </strong>
+
+            </div>
 
         </div>
 
-        <a href="planner.html" class="btn">
-            Open Flight Planner →
-        </a>
+
+        <div class="hero-card">
+
+            <div class="flight-panel">
+
+                <div class="panel-header">
+
+                    <div class="panel-label">
+                        Flight overview
+                    </div>
+
+                    <div class="panel-status">
+
+                        <span class="status-dot"></span>
+
+                        API connected
+
+                    </div>
+
+                </div>
+
+                <div class="route-visual">
+
+                    <div>
+
+                        <div
+                            class="airport-big"
+                            id="heroDeparture"
+                        >
+                            EHAM
+                        </div>
+
+                        <div class="airport-name">
+                            Amsterdam
+                        </div>
+
+                    </div>
+
+                    <div class="route-line">
+
+                        <div class="plane-symbol">
+
+                            <svg
+                                width="20"
+                                height="20"
+                                viewBox="0 0 24 24"
+                                fill="currentColor"
+                            >
+                                <path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/>
+                            </svg>
+
+                        </div>
+
+                    </div>
+
+                    <div style="text-align:right">
+
+                        <div
+                            class="airport-big"
+                            id="heroArrival"
+                        >
+                            Unavailable
+                        </div>
+
+                        <div class="airport-name">
+                            Arrival airport
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="hero-metrics">
+
+                    <div class="metric">
+
+                        <div class="metric-label">
+                            Distance
+                        </div>
+
+                        <div
+                            class="metric-value"
+                            id="heroDistance"
+                        >
+                            Unavailable
+                        </div>
+
+                    </div>
+
+                    <div class="metric">
+
+                        <div class="metric-label">
+                            Aircraft
+                        </div>
+
+                        <div
+                            class="metric-value"
+                            id="heroAircraft"
+                        >
+                            Unavailable
+                        </div>
+
+                    </div>
+
+                    <div class="metric">
+
+                        <div class="metric-label">
+                            Weather
+                        </div>
+
+                        <div
+                            class="metric-value"
+                            id="heroWeather"
+                        >
+                            Loading...
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="hero-orbit"></div>
+
+        </div>
 
     </div>
 
 </section>
 
 
-<!-- =========================
+<!-- =============================================================
+     QUICK PLANNER
+============================================================= -->
+
+<section>
+
+    <div class="container">
+
+        <div class="section-heading">
+
+            <div>
+
+                <div class="eyebrow">
+                    Quick planner
+                </div>
+
+                <h2>
+                    Start your next flight
+                </h2>
+
+            </div>
+
+            <p>
+                Enter two ICAO airport codes to calculate the
+                great-circle distance and initial bearing.
+            </p>
+
+        </div>
+
+
+        <div class="planner-card">
+
+            <div class="planner-grid">
+
+                <div class="field">
+
+                    <label for="departureInput">
+                        Departure ICAO
+                    </label>
+
+                    <input
+                        id="departureInput"
+                        class="input"
+                        type="text"
+                        maxlength="4"
+                        placeholder="EHAM"
+                        autocomplete="off"
+                    >
+
+                </div>
+
+
+                <button
+                    class="swap-button"
+                    id="swapButton"
+                    title="Swap airports"
+                >
+
+                    ⇄
+
+                </button>
+
+
+                <div class="field">
+
+                    <label for="arrivalInput">
+                        Arrival ICAO
+                    </label>
+
+                    <input
+                        id="arrivalInput"
+                        class="input"
+                        type="text"
+                        maxlength="4"
+                        placeholder="EGLL"
+                        autocomplete="off"
+                    >
+
+                </div>
+
+
+                <button
+                    class="btn btn-primary"
+                    id="calculateButton"
+                >
+                    Calculate
+                </button>
+
+            </div>
+
+
+            <div class="planner-result">
+
+                <div class="result-box">
+
+                    <small>
+                        Great-circle distance
+                    </small>
+
+                    <strong id="distanceResult">
+                        Unavailable
+                    </strong>
+
+                </div>
+
+                <div class="result-box">
+
+                    <small>
+                        Initial bearing
+                    </small>
+
+                    <strong id="bearingResult">
+                        Unavailable
+                    </strong>
+
+                </div>
+
+                <div class="result-box">
+
+                    <small>
+                        Data source
+                    </small>
+
+                    <strong id="plannerSource">
+                        Local airport data
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =============================================================
+     LIVE WEATHER
+============================================================= -->
+
+<section>
+
+    <div class="container">
+
+        <div class="section-heading">
+
+            <div>
+
+                <div class="eyebrow">
+                    Live aviation weather
+                </div>
+
+                <h2>
+                    Current airport conditions
+                </h2>
+
+            </div>
+
+            <p>
+                Weather is requested through the Flight-app backend
+                and retrieved from AviationWeather.gov.
+            </p>
+
+        </div>
+
+
+        <div class="weather-layout">
+
+
+            <div class="card card-padding">
+
+                <div class="weather-top">
+
+                    <div class="airport-title">
+
+                        <div class="airport-icon">
+
+                            <svg
+                                width="21"
+                                height="21"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                            >
+                                <path d="M2 16l20-8"/>
+                                <path d="M8 13l2 6"/>
+                                <path d="M13 11l6 2"/>
+                            </svg>
+
+                        </div>
+
+                        <div>
+
+                            <h3 id="weatherAirport">
+                                EHAM
+                            </h3>
+
+                            <p>
+                                Live METAR
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="weather-search">
+
+                        <input
+                            id="weatherInput"
+                            class="input"
+                            maxlength="4"
+                            value="EHAM"
+                            placeholder="ICAO"
+                        >
+
+                        <button
+                            id="weatherButton"
+                            class="btn btn-primary"
+                        >
+                            Update
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="weatherStatus"
+                    class="weather-status muted"
+                >
+                    Loading weather...
+                </div>
+
+
+                <div
+                    id="metarBox"
+                    class="metar-box"
+                >
+                    Loading...
+                </div>
+
+
+                <div class="weather-details">
+
+                    <div class="weather-detail">
+
+                        <span>
+                            Wind
+                        </span>
+
+                        <strong id="windValue">
+                            Unavailable
+                        </strong>
+
+                    </div>
+
+                    <div class="weather-detail">
+
+                        <span>
+                            Visibility
+                        </span>
+
+                        <strong id="visibilityValue">
+                            Unavailable
+                        </strong>
+
+                    </div>
+
+                    <div class="weather-detail">
+
+                        <span>
+                            Temperature
+                        </span>
+
+                        <strong id="temperatureValue">
+                            Unavailable
+                        </strong>
+
+                    </div>
+
+                    <div class="weather-detail">
+
+                        <span>
+                            Pressure
+                        </span>
+
+                        <strong id="pressureValue">
+                            Unavailable
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="card card-padding api-card">
+
+                <div>
+
+                    <div class="api-icon">
+
+                        <svg
+                            width="23"
+                            height="23"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <path d="M12 2v20"/>
+                            <path d="M2 12h20"/>
+                            <circle cx="12" cy="12" r="8"/>
+                        </svg>
+
+                    </div>
+
+                    <h3>
+                        Flight-app API
+                    </h3>
+
+                    <p>
+                        The homepage uses your Render backend instead
+                        of contacting the aviation weather service
+                        directly from the browser.
+                    </p>
+
+                    <div class="api-status">
+
+                        <span class="status-dot"></span>
+
+                        <span id="apiStatusText">
+                            Checking API...
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <button
+                    class="btn btn-secondary"
+                    id="refreshApiButton"
+                    style="margin-top:20px"
+                >
+                    Test connection
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =============================================================
+     FEATURES
+============================================================= -->
+
+<section>
+
+    <div class="container">
+
+        <div class="section-heading">
+
+            <div>
+
+                <div class="eyebrow">
+                    Toolkit
+                </div>
+
+                <h2>
+                    Everything around your flight
+                </h2>
+
+            </div>
+
+            <p>
+                Every tool is designed to become part of the same
+                Flight-app system instead of isolated pages.
+            </p>
+
+        </div>
+
+
+        <div class="features-grid">
+
+
+            <a
+                href="planner.html"
+                class="feature-card"
+            >
+
+                <div class="feature-icon">
+
+                    <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <path d="M3 6h18"/>
+                        <path d="M3 12h18"/>
+                        <path d="M3 18h18"/>
+                    </svg>
+
+                </div>
+
+                <h3>
+                    Flight Planner
+                </h3>
+
+                <p>
+                    Build routes, calculate distances and prepare
+                    flights from one workspace.
+                </p>
+
+                <span class="feature-link">
+                    Open planner →
+                </span>
+
+            </a>
+
+
+            <a
+                href="weather.html"
+                class="feature-card"
+            >
+
+                <div class="feature-icon">
+
+                    <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <path d="M17.5 19H9a7 7 0 1 1 6.7-9"/>
+                        <path d="M16 16l1.5 1.5L21 14"/>
+                    </svg>
+
+                </div>
+
+                <h3>
+                    Live Weather
+                </h3>
+
+                <p>
+                    Retrieve current METAR and TAF information through
+                    the Flight-app backend.
+                </p>
+
+                <span class="feature-link">
+                    Open weather →
+                </span>
+
+            </a>
+
+
+            <a
+                href="airports.html"
+                class="feature-card"
+            >
+
+                <div class="feature-icon">
+
+                    <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <circle cx="12" cy="12" r="8"/>
+                        <path d="M12 8v4l3 2"/>
+                    </svg>
+
+                </div>
+
+                <h3>
+                    Airport Explorer
+                </h3>
+
+                <p>
+                    Search airport information and connect it with
+                    weather and flight planning.
+                </p>
+
+                <span class="feature-link">
+                    Explore airports →
+                </span>
+
+            </a>
+
+
+            <a
+                href="logbook.html"
+                class="feature-card"
+            >
+
+                <div class="feature-icon">
+
+                    <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <path d="M4 19V5"/>
+                        <path d="M4 19h16"/>
+                        <path d="M8 15v-4"/>
+                        <path d="M12 15V8"/>
+                        <path d="M16 15v-6"/>
+                    </svg>
+
+                </div>
+
+                <h3>
+                    Pilot Logbook
+                </h3>
+
+                <p>
+                    Keep track of your flights and build statistics
+                    from your actual saved flight data.
+                </p>
+
+                <span class="feature-link">
+                    Open logbook →
+                </span>
+
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =============================================================
+     RECENT FLIGHTS
+============================================================= -->
+
+<section>
+
+    <div class="container">
+
+        <div class="section-heading">
+
+            <div>
+
+                <div class="eyebrow">
+                    Flight history
+                </div>
+
+                <h2>
+                    Recent flights
+                </h2>
+
+            </div>
+
+            <a
+                href="flights.html"
+                class="btn btn-secondary"
+            >
+                View all
+            </a>
+
+        </div>
+
+
+        <div class="flight-list" id="recentFlights">
+
+            <div class="empty-state">
+
+                <div class="empty-icon">
+
+                    <svg
+                        width="22"
+                        height="22"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <path d="M2 16l20-8"/>
+                        <path d="M8 13l2 6"/>
+                        <path d="M13 11l6 2"/>
+                    </svg>
+
+                </div>
+
+                <h3>
+                    No flight data available
+                </h3>
+
+                <p>
+                    There are currently no saved flights available
+                    from the backend.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =============================================================
+     STATISTICS
+============================================================= -->
+
+<section>
+
+    <div class="container">
+
+        <div class="section-heading">
+
+            <div>
+
+                <div class="eyebrow">
+                    Your data
+                </div>
+
+                <h2>
+                    Flight statistics
+                </h2>
+
+            </div>
+
+            <p>
+                Statistics are only calculated from actual flight
+                records. No example numbers are displayed.
+            </p>
+
+        </div>
+
+
+        <div class="stats-grid">
+
+            <div class="stat-card">
+
+                <span>
+                    Total flights
+                </span>
+
+                <strong id="statFlights">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <span>
+                    Flight time
+                </span>
+
+                <strong id="statHours">
+                    0 h
+                </strong>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <span>
+                    Distance
+                </span>
+
+                <strong id="statDistance">
+                    0 NM
+                </strong>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <span>
+                    Saved plans
+                </span>
+
+                <strong id="statPlans">
+                    0
+                </strong>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =============================================================
+     CTA
+============================================================= -->
+
+<section class="cta">
+
+    <div class="container">
+
+        <div class="cta-inner">
+
+            <h2>
+                Build your next flight with real aviation data.
+            </h2>
+
+            <p>
+                Start with the planner and use the same backend
+                throughout Flight-app.
+            </p>
+
+            <div class="cta-actions">
+
+                <a
+                    href="planner.html"
+                    class="btn btn-primary"
+                    style="background:white;color:#334fd4"
+                >
+                    Open Flight Planner
+                </a>
+
+                <a
+                    href="weather.html"
+                    class="btn btn-secondary"
+                >
+                    Check Weather
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+</main>
+
+
+<!-- =============================================================
      FOOTER
-========================= -->
+============================================================= -->
 
 <footer>
 
-    <div class="footer-inner">
+    <div class="container footer-grid">
 
-        <div class="footer-copy">
-            © 2026 Flight App. Built for flight simulation.
+        <div>
+
+            <div class="footer-brand">
+
+                <div class="brand-icon" style="width:34px;height:34px">
+
+                    <svg
+                        width="17"
+                        height="17"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <path d="M2 16l20-8"/>
+                        <path d="M8 13l2 6"/>
+                        <path d="M13 11l6 2"/>
+                    </svg>
+
+                </div>
+
+                Flight-app
+
+            </div>
+
+            <div class="footer-text">
+                Flight simulator tools, connected through one backend.
+            </div>
+
         </div>
 
+
         <div class="footer-links">
+
             <a href="planner.html">Planner</a>
             <a href="weather.html">Weather</a>
             <a href="airports.html">Airports</a>
-            <a href="settings.html">Settings</a>
+            <a href="flights.html">Flights</a>
+            <a href="logbook.html">Logbook</a>
+
         </div>
 
     </div>
@@ -1595,52 +2751,156 @@
 </footer>
 
 
-<div class="toast" id="toast"></div>
+<!-- =============================================================
+     SEARCH MODAL
+============================================================= -->
+
+<div
+    class="modal"
+    id="searchModal"
+>
+
+    <div class="modal-box">
+
+        <div class="search-box">
+
+            <svg
+                width="19"
+                height="19"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+            >
+                <circle cx="11" cy="11" r="7"/>
+                <path d="m20 20-4-4"/>
+            </svg>
+
+            <input
+                id="globalSearch"
+                type="text"
+                placeholder="Search Flight-app..."
+                autocomplete="off"
+            >
+
+            <button
+                id="closeSearch"
+                class="icon-btn"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <div
+            class="search-results"
+            id="searchResults"
+        ></div>
+
+    </div>
+
+</div>
+
+
+<!-- =============================================================
+     TOASTS
+============================================================= -->
+
+<div
+    class="toast-container"
+    id="toastContainer"
+></div>
 
 
 <script>
-    /*
-     * ==========================================
-     * FLIGHT APP BACKEND
-     * ==========================================
-     */
+
+    /* =========================================================
+       CONFIGURATION
+    ========================================================= */
 
     const API_BASE =
         "https://flight-app-api-g36e.onrender.com";
 
 
-    /*
-     * ==========================================
-     * HELPERS
-     * ==========================================
-     */
+    /* =========================================================
+       ELEMENT HELPERS
+    ========================================================= */
 
-    function showToast(message) {
-        const toast = document.getElementById("toast");
+    const $ = selector =>
+        document.querySelector(selector);
 
-        toast.textContent = message;
-        toast.classList.add("show");
+
+    /* =========================================================
+       TOAST
+    ========================================================= */
+
+    function toast(title, message) {
+
+        const container =
+            $("#toastContainer");
+
+        const element =
+            document.createElement("div");
+
+        element.className = "toast";
+
+        element.innerHTML = `
+            <strong>${escapeHTML(title)}</strong>
+            <span>${escapeHTML(message)}</span>
+        `;
+
+        container.appendChild(element);
 
         setTimeout(() => {
-            toast.classList.remove("show");
-        }, 2800);
+
+            element.remove();
+
+        }, 4000);
     }
 
 
-    async function apiRequest(endpoint, options = {}) {
+    /* =========================================================
+       HTML ESCAPE
+    ========================================================= */
 
-        const response = await fetch(
-            `${API_BASE}${endpoint}`,
-            {
-                ...options,
-                headers: {
-                    "Accept": "application/json",
-                    ...(options.headers || {})
+    function escapeHTML(value) {
+
+        if (value === null || value === undefined) {
+            return "";
+        }
+
+        return String(value)
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;")
+            .replaceAll("'", "&#039;");
+    }
+
+
+    /* =========================================================
+       API REQUEST
+    ========================================================= */
+
+    async function apiFetch(
+        endpoint,
+        options = {}
+    ) {
+
+        const response =
+            await fetch(
+                `${API_BASE}${endpoint}`,
+                {
+                    ...options,
+                    headers: {
+                        "Accept": "application/json",
+                        ...(options.headers || {})
+                    }
                 }
-            }
-        );
+            );
 
-        let data;
+        let data = null;
 
         try {
             data = await response.json();
@@ -1649,336 +2909,1196 @@
         }
 
         if (!response.ok) {
+
             throw new Error(
                 data?.error ||
-                `API request failed (${response.status})`
+                data?.message ||
+                `HTTP ${response.status}`
             );
+
         }
 
         return data;
     }
 
 
-    /*
-     * ==========================================
-     * API HEALTH
-     * ==========================================
-     */
+    /* =========================================================
+       BACKEND HEALTH
+    ========================================================= */
 
     async function checkBackend() {
 
-        const dot = document.getElementById("apiDot");
-        const text = document.getElementById("apiText");
-        const backendStatus =
-            document.getElementById("backendStatus");
+        const status =
+            $("#backendStatus");
+
+        const apiStatus =
+            $("#apiStatusText");
 
         try {
 
             const data =
-                await apiRequest("/api/health");
+                await apiFetch("/api/health");
 
-            if (data.status === "ok") {
+            if (
+                data.status === "ok"
+            ) {
 
-                dot.classList.remove("offline");
-
-                text.textContent =
+                status.textContent =
                     "Connected";
 
-                backendStatus.textContent =
-                    "Online";
+                status.style.color =
+                    "var(--success)";
+
+                apiStatus.textContent =
+                    data.database === "Connected"
+                        ? "API and database connected"
+                        : "API connected; database unavailable";
 
             } else {
 
-                throw new Error("API unavailable");
+                throw new Error(
+                    "Backend returned an unexpected response."
+                );
+
             }
 
         } catch (error) {
 
-            dot.classList.add("offline");
+            console.error(
+                "Backend health check failed:",
+                error
+            );
 
-            text.textContent =
+            status.textContent =
                 "Unavailable";
 
-            backendStatus.textContent =
-                "Unavailable";
+            status.style.color =
+                "var(--danger)";
+
+            apiStatus.textContent =
+                "API unavailable";
 
         }
+
     }
 
 
-    /*
-     * ==========================================
-     * WEATHER
-     * ==========================================
-     */
+    /* =========================================================
+       AIRPORT DATABASE
+       
+       This is deliberately only a small fallback database for
+       calculations on the homepage.
 
-    async function loadWeather() {
+       It is NOT presented as live airport information.
+       ========================================================= */
 
-        const input =
-            document.getElementById("weatherAirport");
+    const AIRPORTS = {
 
-        const button =
-            document.getElementById("weatherButton");
+        EHAM: {
+            name: "Amsterdam Schiphol",
+            lat: 52.3086,
+            lon: 4.7639
+        },
 
-        const result =
-            document.getElementById("metarResult");
+        EGLL: {
+            name: "London Heathrow",
+            lat: 51.4700,
+            lon: -0.4543
+        },
 
-        const status =
-            document.getElementById("weatherStatus");
+        LFPG: {
+            name: "Paris Charles de Gaulle",
+            lat: 49.0097,
+            lon: 2.5479
+        },
 
-        const title =
-            document.getElementById("weatherAirportTitle");
+        EDDF: {
+            name: "Frankfurt Airport",
+            lat: 50.0379,
+            lon: 8.5622
+        },
 
-        const icao =
-            input.value.trim().toUpperCase();
+        LIRF: {
+            name: "Rome Fiumicino",
+            lat: 41.8003,
+            lon: 12.2389
+        },
 
-        if (!/^[A-Z]{4}$/.test(icao)) {
+        LEBL: {
+            name: "Barcelona El Prat",
+            lat: 41.2974,
+            lon: 2.0833
+        },
 
-            showToast(
-                "Enter a valid 4-letter ICAO code."
+        EIDW: {
+            name: "Dublin Airport",
+            lat: 53.4213,
+            lon: -6.2701
+        },
+
+        EKCH: {
+            name: "Copenhagen Airport",
+            lat: 55.6180,
+            lon: 12.6508
+        },
+
+        ESSA: {
+            name: "Stockholm Arlanda",
+            lat: 59.6519,
+            lon: 17.9186
+        },
+
+        ENGM: {
+            name: "Oslo Gardermoen",
+            lat: 60.1976,
+            lon: 11.1004
+        },
+
+        LPPT: {
+            name: "Lisbon Airport",
+            lat: 38.7742,
+            lon: -9.1342
+        },
+
+        KJFK: {
+            name: "John F. Kennedy International",
+            lat: 40.6413,
+            lon: -73.7781
+        },
+
+        KLAX: {
+            name: "Los Angeles International",
+            lat: 33.9416,
+            lon: -118.4085
+        },
+
+        KORD: {
+            name: "Chicago O'Hare",
+            lat: 41.9742,
+            lon: -87.9073
+        },
+
+        RJTT: {
+            name: "Tokyo Haneda",
+            lat: 35.5494,
+            lon: 139.7798
+        },
+
+        OMDB: {
+            name: "Dubai International",
+            lat: 25.2532,
+            lon: 55.3657
+        }
+
+    };
+
+
+    /* =========================================================
+       DISTANCE
+    ========================================================= */
+
+    function toRadians(degrees) {
+        return degrees * Math.PI / 180;
+    }
+
+
+    function calculateDistance(
+        lat1,
+        lon1,
+        lat2,
+        lon2
+    ) {
+
+        const R =
+            3440.065;
+
+        const phi1 =
+            toRadians(lat1);
+
+        const phi2 =
+            toRadians(lat2);
+
+        const deltaPhi =
+            toRadians(lat2 - lat1);
+
+        const deltaLambda =
+            toRadians(lon2 - lon1);
+
+        const a =
+            Math.sin(deltaPhi / 2) ** 2 +
+            Math.cos(phi1) *
+            Math.cos(phi2) *
+            Math.sin(deltaLambda / 2) ** 2;
+
+        const c =
+            2 *
+            Math.atan2(
+                Math.sqrt(a),
+                Math.sqrt(1 - a)
+            );
+
+        return R * c;
+    }
+
+
+    /* =========================================================
+       BEARING
+    ========================================================= */
+
+    function calculateBearing(
+        lat1,
+        lon1,
+        lat2,
+        lon2
+    ) {
+
+        const phi1 =
+            toRadians(lat1);
+
+        const phi2 =
+            toRadians(lat2);
+
+        const lambda =
+            toRadians(lon2 - lon1);
+
+        const y =
+            Math.sin(lambda) *
+            Math.cos(phi2);
+
+        const x =
+            Math.cos(phi1) *
+            Math.sin(phi2) -
+            Math.sin(phi1) *
+            Math.cos(phi2) *
+            Math.cos(lambda);
+
+        const bearing =
+            Math.atan2(y, x) *
+            180 /
+            Math.PI;
+
+        return (
+            bearing + 360
+        ) % 360;
+
+    }
+
+
+    function formatBearing(value) {
+
+        return `${Math.round(value)}°`;
+
+    }
+
+
+    /* =========================================================
+       QUICK PLANNER
+    ========================================================= */
+
+    function calculateQuickRoute() {
+
+        const departure =
+            $("#departureInput")
+                .value
+                .trim()
+                .toUpperCase();
+
+        const arrival =
+            $("#arrivalInput")
+                .value
+                .trim()
+                .toUpperCase();
+
+        $("#departureInput").value =
+            departure;
+
+        $("#arrivalInput").value =
+            arrival;
+
+        if (!AIRPORTS[departure]) {
+
+            $("#distanceResult").textContent =
+                "Unavailable";
+
+            $("#bearingResult").textContent =
+                "Unavailable";
+
+            toast(
+                "Airport unavailable",
+                `${departure || "Departure"} is not in the homepage calculation database.`
             );
 
             return;
+
         }
 
-        button.disabled = true;
+        if (!AIRPORTS[arrival]) {
 
-        button.textContent =
+            $("#distanceResult").textContent =
+                "Unavailable";
+
+            $("#bearingResult").textContent =
+                "Unavailable";
+
+            toast(
+                "Airport unavailable",
+                `${arrival || "Arrival"} is not in the homepage calculation database.`
+            );
+
+            return;
+
+        }
+
+        if (departure === arrival) {
+
+            $("#distanceResult").textContent =
+                "0 NM";
+
+            $("#bearingResult").textContent =
+                "0°";
+
+            return;
+
+        }
+
+        const dep =
+            AIRPORTS[departure];
+
+        const arr =
+            AIRPORTS[arrival];
+
+        const distance =
+            calculateDistance(
+                dep.lat,
+                dep.lon,
+                arr.lat,
+                arr.lon
+            );
+
+        const bearing =
+            calculateBearing(
+                dep.lat,
+                dep.lon,
+                arr.lat,
+                arr.lon
+            );
+
+        $("#distanceResult").textContent =
+            `${Math.round(distance).toLocaleString()} NM`;
+
+        $("#bearingResult").textContent =
+            formatBearing(bearing);
+
+        $("#plannerSource").textContent =
+            "Airport coordinate data";
+
+        $("#heroDeparture").textContent =
+            departure;
+
+        $("#heroArrival").textContent =
+            arrival;
+
+        $("#heroDistance").textContent =
+            `${Math.round(distance).toLocaleString()} NM`;
+
+    }
+
+
+    /* =========================================================
+       SWAP
+    ========================================================= */
+
+    $("#swapButton")
+        .addEventListener(
+            "click",
+            () => {
+
+                const departure =
+                    $("#departureInput");
+
+                const arrival =
+                    $("#arrivalInput");
+
+                const temp =
+                    departure.value;
+
+                departure.value =
+                    arrival.value;
+
+                arrival.value =
+                    temp;
+
+                calculateQuickRoute();
+
+            }
+        );
+
+
+    $("#calculateButton")
+        .addEventListener(
+            "click",
+            calculateQuickRoute
+        );
+
+
+    /* =========================================================
+       ENTER KEY
+    ========================================================= */
+
+    [
+        "#departureInput",
+        "#arrivalInput"
+    ].forEach(selector => {
+
+        $(selector)
+            .addEventListener(
+                "keydown",
+                event => {
+
+                    if (
+                        event.key === "Enter"
+                    ) {
+
+                        calculateQuickRoute();
+
+                    }
+
+                }
+            );
+
+    });
+
+
+    /* =========================================================
+       WEATHER HELPERS
+    ========================================================= */
+
+    function setWeatherUnavailable() {
+
+        $("#weatherStatus").textContent =
+            "No weather data available.";
+
+        $("#metarBox").textContent =
+            "Unavailable";
+
+        $("#windValue").textContent =
+            "Unavailable";
+
+        $("#visibilityValue").textContent =
+            "Unavailable";
+
+        $("#temperatureValue").textContent =
+            "Unavailable";
+
+        $("#pressureValue").textContent =
+            "Unavailable";
+
+        $("#heroWeather").textContent =
+            "Unavailable";
+
+    }
+
+
+    function extractWind(metar) {
+
+        if (!metar) {
+            return null;
+        }
+
+        const direction =
+            metar.wdir;
+
+        const speed =
+            metar.wspd;
+
+        if (
+            direction === undefined ||
+            speed === undefined
+        ) {
+
+            return null;
+
+        }
+
+        if (
+            direction === null ||
+            speed === null
+        ) {
+
+            return null;
+
+        }
+
+        return `${direction}° / ${speed} kt`;
+
+    }
+
+
+    function extractVisibility(metar) {
+
+        if (!metar) {
+            return null;
+        }
+
+        const visibility =
+            metar.visib;
+
+        if (
+            visibility === undefined ||
+            visibility === null
+        ) {
+
+            return null;
+
+        }
+
+        return `${visibility}`;
+
+    }
+
+
+    function extractTemperature(metar) {
+
+        if (!metar) {
+            return null;
+        }
+
+        const temperature =
+            metar.temp;
+
+        if (
+            temperature === undefined ||
+            temperature === null
+        ) {
+
+            return null;
+
+        }
+
+        return `${temperature}°C`;
+
+    }
+
+
+    function extractPressure(metar) {
+
+        if (!metar) {
+            return null;
+        }
+
+        const pressure =
+            metar.altim;
+
+        if (
+            pressure === undefined ||
+            pressure === null
+        ) {
+
+            return null;
+
+        }
+
+        return `${pressure} hPa`;
+
+    }
+
+
+    /* =========================================================
+       LOAD WEATHER
+    ========================================================= */
+
+    async function loadWeather(
+        requestedICAO = "EHAM"
+    ) {
+
+        const icao =
+            requestedICAO
+                .trim()
+                .toUpperCase();
+
+        $("#weatherAirport").textContent =
+            icao;
+
+        $("#weatherStatus").textContent =
+            "Requesting live weather...";
+
+        $("#metarBox").textContent =
             "Loading...";
-
-        status.innerHTML =
-            `<span class="status-dot"></span> Loading`;
-
-        status.classList.remove("offline");
-
-        result.textContent =
-            "Loading live METAR data...";
-
-        title.textContent =
-            `${icao} — Loading airport data`;
 
         try {
 
             const data =
-                await apiRequest(
-                    `/api/weather/${icao}`
+                await apiFetch(
+                    `/api/weather/${encodeURIComponent(icao)}`
                 );
 
-            if (!data.available) {
+            if (
+                !data ||
+                data.available !== true ||
+                !data.metar
+            ) {
 
-                result.textContent =
-                    "No METAR data available for this airport.";
-
-                status.innerHTML =
-                    "Unavailable";
-
-                status.classList.add("offline");
-
-                title.textContent =
-                    `${icao} — Weather unavailable`;
+                setWeatherUnavailable();
 
                 return;
+
             }
 
             const metar =
-                data.data?.[0]?.rawOb ||
-                data.data?.[0]?.raw_text ||
-                data.metar ||
-                data.raw ||
-                JSON.stringify(data.data?.[0] || data);
+                data.metar;
 
-            result.textContent =
-                metar || "No METAR data available.";
+            $("#weatherStatus").textContent =
+                "Live METAR received.";
 
-            title.textContent =
-                `${icao} — Live METAR`;
+            const raw =
+                metar.rawOb ||
+                metar.raw_text ||
+                metar.raw_text ||
+                null;
 
-            status.innerHTML =
-                `<span class="status-dot"></span> Live`;
+            $("#metarBox").textContent =
+                raw ||
+                "Unavailable";
 
-            status.classList.remove("offline");
+            const wind =
+                extractWind(metar);
+
+            const visibility =
+                extractVisibility(metar);
+
+            const temperature =
+                extractTemperature(metar);
+
+            const pressure =
+                extractPressure(metar);
+
+            $("#windValue").textContent =
+                wind || "Unavailable";
+
+            $("#visibilityValue").textContent =
+                visibility || "Unavailable";
+
+            $("#temperatureValue").textContent =
+                temperature || "Unavailable";
+
+            $("#pressureValue").textContent =
+                pressure || "Unavailable";
+
+            if (wind) {
+
+                $("#heroWeather").textContent =
+                    wind;
+
+            } else {
+
+                $("#heroWeather").textContent =
+                    "Available";
+
+            }
 
         } catch (error) {
 
-            result.textContent =
-                "Unable to retrieve weather data.";
-
-            status.innerHTML =
-                "Unavailable";
-
-            status.classList.add("offline");
-
-            title.textContent =
-                `${icao} — Weather unavailable`;
-
-            showToast(
-                "Could not load weather data."
+            console.error(
+                "Weather request failed:",
+                error
             );
 
-        } finally {
+            setWeatherUnavailable();
 
-            button.disabled = false;
+            toast(
+                "Weather unavailable",
+                `Could not retrieve METAR for ${icao}.`
+            );
 
-            button.textContent =
-                "Search";
         }
+
     }
 
 
-    /*
-     * ==========================================
-     * QUICK PLANNER
-     * ==========================================
-     */
+    /* =========================================================
+       WEATHER BUTTON
+    ========================================================= */
 
-    document
-        .getElementById("quickPlanner")
-        .addEventListener("submit", async event => {
-
-            event.preventDefault();
-
-            const departure =
-                document
-                    .getElementById("departure")
-                    .value
-                    .trim()
-                    .toUpperCase();
-
-            const arrival =
-                document
-                    .getElementById("arrival")
-                    .value
-                    .trim()
-                    .toUpperCase();
-
-            const aircraft =
-                document
-                    .getElementById("aircraft")
-                    .value;
-
-            if (
-                !/^[A-Z]{4}$/.test(departure) ||
-                !/^[A-Z]{4}$/.test(arrival)
-            ) {
-
-                showToast(
-                    "Use valid four-letter ICAO codes."
-                );
-
-                return;
-            }
-
-            if (departure === arrival) {
-
-                showToast(
-                    "Departure and arrival cannot be the same."
-                );
-
-                return;
-            }
-
-            const params =
-                new URLSearchParams({
-                    departure,
-                    arrival
-                });
-
-            if (aircraft) {
-                params.set(
-                    "aircraft",
-                    aircraft
-                );
-            }
-
-            window.location.href =
-                `planner.html?${params.toString()}`;
-        });
-
-
-    /*
-     * ==========================================
-     * WEATHER EVENTS
-     * ==========================================
-     */
-
-    document
-        .getElementById("weatherButton")
+    $("#weatherButton")
         .addEventListener(
             "click",
-            loadWeather
+            () => {
+
+                const icao =
+                    $("#weatherInput")
+                        .value
+                        .trim()
+                        .toUpperCase();
+
+                if (
+                    !/^[A-Z]{4}$/.test(icao)
+                ) {
+
+                    toast(
+                        "Invalid ICAO",
+                        "Enter a four-letter ICAO airport code."
+                    );
+
+                    return;
+
+                }
+
+                loadWeather(icao);
+
+            }
         );
 
 
-    document
-        .getElementById("weatherAirport")
+    $("#weatherInput")
         .addEventListener(
             "keydown",
             event => {
 
-                if (event.key === "Enter") {
-                    loadWeather();
+                if (
+                    event.key === "Enter"
+                ) {
+
+                    $("#weatherButton")
+                        .click();
+
                 }
 
             }
         );
 
 
-    /*
-     * ==========================================
-     * MOBILE MENU
-     * ==========================================
-     */
+    /* =========================================================
+       HERO WEATHER
+    ========================================================= */
 
-    const mobileMenu =
-        document.getElementById("mobileMenu");
+    $("#heroWeatherButton")
+        .addEventListener(
+            "click",
+            () => {
 
-    const navLinks =
-        document.getElementById("navLinks");
+                document
+                    .querySelector(
+                        "#weatherInput"
+                    )
+                    .scrollIntoView({
+                        behavior: "smooth",
+                        block: "center"
+                    });
 
-    mobileMenu.addEventListener(
-        "click",
-        () => {
+                setTimeout(() => {
 
-            navLinks.classList.toggle("open");
+                    $("#weatherInput")
+                        .focus();
 
-        }
-    );
+                }, 500);
 
-
-    navLinks
-        .querySelectorAll("a")
-        .forEach(link => {
-
-            link.addEventListener(
-                "click",
-                () => {
-                    navLinks.classList.remove("open");
-                }
-            );
-
-        });
+            }
+        );
 
 
-    /*
-     * ==========================================
-     * LOAD DEFAULT WEATHER
-     * ==========================================
-     */
+    /* =========================================================
+       REFRESH API
+    ========================================================= */
 
-    document.addEventListener(
-        "DOMContentLoaded",
-        () => {
+    $("#refreshApiButton")
+        .addEventListener(
+            "click",
+            async () => {
 
-            checkBackend();
+                $("#apiStatusText").textContent =
+                    "Testing...";
+
+                await checkBackend();
+
+                toast(
+                    "API check complete",
+                    "The Render backend connection has been tested."
+                );
+
+            }
+        );
+
+
+    /* =========================================================
+       RECENT FLIGHTS
+    ========================================================= */
+
+    async function loadRecentFlights() {
+
+        const container =
+            $("#recentFlights");
+
+        try {
 
             /*
-             * Automatically load EHAM.
-             * This is real live data from the backend.
+             * The current backend does not expose a public
+             * flight-history endpoint yet.
+             *
+             * Therefore we deliberately do NOT invent flights.
              */
-            loadWeather();
+
+            container.innerHTML = `
+                <div class="empty-state">
+
+                    <div class="empty-icon">
+
+                        <svg
+                            width="22"
+                            height="22"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <path d="M2 16l20-8"/>
+                            <path d="M8 13l2 6"/>
+                            <path d="M13 11l6 2"/>
+                        </svg>
+
+                    </div>
+
+                    <h3>
+                        No flight data available
+                    </h3>
+
+                    <p>
+                        Flight history will appear here once the
+                        flight-record API is available.
+                    </p>
+
+                </div>
+            `;
+
+        } catch (error) {
+
+            console.error(error);
+
+        }
+
+    }
+
+
+    /* =========================================================
+       SAVED PLANS
+    ========================================================= */
+
+    async function loadPlanStatistics() {
+
+        try {
+
+            const data =
+                await apiFetch(
+                    "/api/plans"
+                );
+
+            const plans =
+                Array.isArray(data.plans)
+                    ? data.plans
+                    : [];
+
+            $("#statPlans").textContent =
+                plans.length;
+
+        } catch (error) {
+
+            console.error(
+                "Could not load plans:",
+                error
+            );
+
+            $("#statPlans").textContent =
+                "Unavailable";
+
+        }
+
+    }
+
+
+    /* =========================================================
+       SEARCH
+    ========================================================= */
+
+    const searchPages = [
+
+        {
+            name: "Flight Planner",
+            description: "Plan and calculate your next flight.",
+            url: "planner.html"
+        },
+
+        {
+            name: "Weather",
+            description: "Check live METAR and TAF data.",
+            url: "weather.html"
+        },
+
+        {
+            name: "Airports",
+            description: "Explore airport information.",
+            url: "airports.html"
+        },
+
+        {
+            name: "Flights",
+            description: "View your flight records.",
+            url: "flights.html"
+        },
+
+        {
+            name: "Logbook",
+            description: "Manage your pilot logbook.",
+            url: "logbook.html"
+        }
+
+    ];
+
+
+    function renderSearch(
+        query = ""
+    ) {
+
+        const results =
+            $("#searchResults");
+
+        const normalized =
+            query
+                .trim()
+                .toLowerCase();
+
+        const filtered =
+            searchPages.filter(
+                page =>
+                    page.name
+                        .toLowerCase()
+                        .includes(normalized) ||
+                    page.description
+                        .toLowerCase()
+                        .includes(normalized)
+            );
+
+        if (
+            filtered.length === 0
+        ) {
+
+            results.innerHTML = `
+                <div class="empty-state">
+                    <h3>No results</h3>
+                    <p>
+                        No Flight-app page matches your search.
+                    </p>
+                </div>
+            `;
+
+            return;
+
+        }
+
+        results.innerHTML =
+            filtered
+                .map(page => `
+                    <a
+                        class="search-result"
+                        href="${page.url}"
+                    >
+
+                        <div>
+
+                            <strong>
+                                ${escapeHTML(page.name)}
+                            </strong>
+
+                            <span>
+                                ${escapeHTML(page.description)}
+                            </span>
+
+                        </div>
+
+                        <span>
+                            →
+                        </span>
+
+                    </a>
+                `)
+                .join("");
+
+    }
+
+
+    $("#searchButton")
+        .addEventListener(
+            "click",
+            () => {
+
+                $("#searchModal")
+                    .classList
+                    .add("open");
+
+                $("#globalSearch")
+                    .value = "";
+
+                renderSearch();
+
+                setTimeout(
+                    () =>
+                        $("#globalSearch")
+                            .focus(),
+                    100
+                );
+
+            }
+        );
+
+
+    $("#closeSearch")
+        .addEventListener(
+            "click",
+            () => {
+
+                $("#searchModal")
+                    .classList
+                    .remove("open");
+
+            }
+        );
+
+
+    $("#globalSearch")
+        .addEventListener(
+            "input",
+            event => {
+
+                renderSearch(
+                    event.target.value
+                );
+
+            }
+        );
+
+
+    $("#searchModal")
+        .addEventListener(
+            "click",
+            event => {
+
+                if (
+                    event.target ===
+                    $("#searchModal")
+                ) {
+
+                    $("#searchModal")
+                        .classList
+                        .remove("open");
+
+                }
+
+            }
+        );
+
+
+    document.addEventListener(
+        "keydown",
+        event => {
+
+            if (
+                event.key === "/" &&
+                document.activeElement.tagName !== "INPUT"
+            ) {
+
+                event.preventDefault();
+
+                $("#searchButton")
+                    .click();
+
+            }
+
+            if (
+                event.key === "Escape"
+            ) {
+
+                $("#searchModal")
+                    .classList
+                    .remove("open");
+
+            }
 
         }
     );
+
+
+    /* =========================================================
+       MOBILE MENU
+    ========================================================= */
+
+    $("#mobileMenuButton")
+        .addEventListener(
+            "click",
+            () => {
+
+                $("#mobileNav")
+                    .classList
+                    .toggle("hidden");
+
+            }
+        );
+
+
+    /* =========================================================
+       INITIALISE
+    ========================================================= */
+
+    async function initialise() {
+
+        /*
+         * Set sensible calculator inputs.
+         */
+
+        $("#departureInput").value =
+            "EHAM";
+
+        $("#arrivalInput").value =
+            "EGLL";
+
+
+        /*
+         * Calculate route.
+         */
+
+        calculateQuickRoute();
+
+
+        /*
+         * Test backend.
+         */
+
+        await checkBackend();
+
+
+        /*
+         * Load actual live weather.
+         */
+
+        await loadWeather("EHAM");
+
+
+        /*
+         * Load plans from Neon.
+         */
+
+        await loadPlanStatistics();
+
+
+        /*
+         * Flights intentionally show unavailable
+         * until the proper flight endpoint exists.
+         */
+
+        await loadRecentFlights();
+
+    }
+
+
+    initialise();
+
 </script>
 
 </body>
