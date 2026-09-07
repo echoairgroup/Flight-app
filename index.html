@@ -1589,6 +1589,324 @@
                 width: 100%;
             }
         }
+
+
+        /* =========================================================
+           PREMIUM BLUE / WHITE VISUAL REFINEMENT
+           Keeps the original structure while removing the generic
+           template feeling. The existing HTML/JS functionality is
+           intentionally preserved.
+        ========================================================= */
+
+        body {
+            background:
+                radial-gradient(circle at 8% 0%, rgba(66,99,235,.045), transparent 26%),
+                radial-gradient(circle at 92% 15%, rgba(66,99,235,.035), transparent 24%),
+                #f7f9fc;
+        }
+
+        header {
+            background: rgba(255,255,255,.88);
+            box-shadow: 0 1px 0 rgba(20,43,82,.025);
+        }
+
+        .nav {
+            height: 72px;
+        }
+
+        .brand-icon {
+            background: linear-gradient(145deg,#4b73ee 0%,#4263eb 48%,#3154d0 100%);
+            box-shadow: 0 10px 25px rgba(66,99,235,.20);
+        }
+
+        .nav-links a {
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: "";
+            position: absolute;
+            left: 12px;
+            right: 12px;
+            bottom: 5px;
+            height: 2px;
+            border-radius: 99px;
+            background: var(--primary);
+            transform: scaleX(0);
+            transform-origin: center;
+            transition: transform .18s ease;
+        }
+
+        .nav-links a:hover::after,
+        .nav-links a.active::after {
+            transform: scaleX(1);
+        }
+
+        .hero {
+            min-height: 575px;
+            display: flex;
+            align-items: center;
+            padding: 75px 0 88px;
+            background:
+                linear-gradient(180deg,#fbfcff 0%,#f7f9fc 100%);
+        }
+
+        .hero::before {
+            width: 760px;
+            height: 760px;
+            right: -390px;
+            top: -370px;
+            border-color: rgba(66,99,235,.075);
+        }
+
+        .hero::after {
+            width: 470px;
+            height: 470px;
+            right: -240px;
+            top: -225px;
+            border-color: rgba(66,99,235,.055);
+        }
+
+        .hero-grid {
+            gap: 78px;
+        }
+
+        .hero h1 {
+            max-width: 700px;
+            font-size: clamp(48px,6vw,76px);
+            line-height: .96;
+        }
+
+        .hero h1 span {
+            display: inline-block;
+            color: var(--primary);
+            background: none;
+            -webkit-text-fill-color: initial;
+        }
+
+        .hero-description {
+            max-width: 625px;
+            font-size: 16px;
+        }
+
+        .hero-actions .btn-primary {
+            padding-inline: 20px;
+        }
+
+        .hero-status {
+            padding: 8px 11px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: rgba(255,255,255,.65);
+        }
+
+        .hero-card {
+            min-height: 425px;
+            border-color: #dce5f0;
+            border-radius: 27px;
+            background:
+                linear-gradient(145deg,#ffffff 0%,#f5f8ff 100%);
+            box-shadow:
+                0 30px 80px rgba(32,58,105,.12),
+                0 2px 5px rgba(32,58,105,.035);
+        }
+
+        .flight-panel {
+            min-height: 385px;
+            border-color: #e0e7f1;
+            background: rgba(255,255,255,.88);
+        }
+
+        .route-visual {
+            margin-top: 52px;
+        }
+
+        .airport-big {
+            font-size: 37px;
+        }
+
+        .route-line {
+            background: linear-gradient(90deg,#c3cfdf,#aebed3,#c3cfdf);
+        }
+
+        .plane-symbol {
+            filter: drop-shadow(0 4px 8px rgba(66,99,235,.17));
+        }
+
+        .hero-metrics {
+            margin-top: 49px;
+        }
+
+        .metric-value {
+            font-size: 17px;
+        }
+
+        .quick-planner {
+            margin-top: -33px;
+        }
+
+        .planner-card {
+            border-color: #dfe7f1;
+            border-radius: 19px;
+            box-shadow:
+                0 20px 45px rgba(32,63,105,.075),
+                0 2px 6px rgba(32,63,105,.035);
+        }
+
+        .planner-grid .input,
+        .planner-grid .swap-button {
+            background: #fcfdff;
+        }
+
+        section.content-section {
+            padding-top: 92px;
+        }
+
+        .section-heading h2 {
+            font-size: 32px;
+        }
+
+        .section-heading p {
+            line-height: 1.75;
+        }
+
+        .card,
+        .feature-card,
+        .stat-card,
+        .flight-list {
+            border-color: #dfe7f1;
+        }
+
+        .card {
+            box-shadow: 0 8px 25px rgba(32,63,105,.045);
+        }
+
+        .weather-layout {
+            gap: 20px;
+        }
+
+        .weather-status {
+            border: 1px solid rgba(21,154,104,.08);
+        }
+
+        .metar-box {
+            background:
+                linear-gradient(180deg,#f5f8fc,#f1f5f9);
+        }
+
+        .api-card {
+            background:
+                linear-gradient(145deg,#ffffff 0%,#f8faff 100%);
+        }
+
+        .features-grid {
+            gap: 16px;
+        }
+
+        .feature-card {
+            min-height: 215px;
+            background:
+                linear-gradient(180deg,#ffffff 0%,#fcfdff 100%);
+        }
+
+        .feature-icon,
+        .api-icon,
+        .airport-icon {
+            border: 1px solid rgba(66,99,235,.06);
+            background: #edf2ff;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: #ccd8e8;
+            box-shadow: 0 18px 40px rgba(32,63,105,.09);
+        }
+
+        .flight-list {
+            box-shadow: 0 8px 25px rgba(32,63,105,.045);
+        }
+
+        .stat-card {
+            background:
+                linear-gradient(145deg,#ffffff 0%,#fbfdff 100%);
+        }
+
+        .stat-card strong {
+            color: #172c50;
+        }
+
+        .cta {
+            padding-top: 95px;
+        }
+
+        .cta-inner {
+            border-radius: 25px;
+            background:
+                linear-gradient(135deg,#4263eb 0%,#365bd3 55%,#2f50c2 100%);
+            box-shadow: 0 28px 65px rgba(53,87,207,.18);
+        }
+
+        footer {
+            background: #fff;
+        }
+
+        /* Subtle entrance treatment. No distracting parallax or
+           continuously moving objects. */
+        @keyframes flightAppFadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero > .container {
+            animation: flightAppFadeUp .55s ease both;
+        }
+
+        .quick-planner {
+            animation: flightAppFadeUp .55s .08s ease both;
+        }
+
+        @media (max-width:1080px) {
+            .hero {
+                min-height: auto;
+            }
+
+            .quick-planner {
+                margin-top: 0;
+                padding-top: 22px;
+            }
+        }
+
+        @media (max-width:600px) {
+            .hero {
+                padding: 52px 0 62px;
+            }
+
+            .hero h1 {
+                font-size: 44px;
+            }
+
+            .hero-card {
+                min-height: 380px;
+            }
+
+            .flight-panel {
+                min-height: 350px;
+            }
+        }
+
+        @media (prefers-reduced-motion:reduce) {
+            .hero > .container,
+            .quick-planner {
+                animation: none;
+            }
+        }
+
     </style>
 </head>
 
