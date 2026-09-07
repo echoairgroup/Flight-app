@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1769ff">
+<meta name="description" content="Flight-app flight planner — plan, calculate and save your simulator flights.">
+<title>Flight Planner — Flight-app</title>
+
+<style>
+:root{
+    --blue:#1769ff;
+    --blue-2:#0b4dcc;
+    --blue-3:#eaf2ff;
+    --ink:#122033;
+    --muted:#6d7b8e;
+    --line:#dfe7f2;
+    --bg:#f5f8fc;
+    --white:#fff;
+    --success:#16885b;
+    --danger:#c83c3c;
+    --shadow:0 18px 55px rgba(26,61,110,.10);
+    --shadow-sm:0 8px 28px rgba(26,61,110,.08);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+    margin:0;
+    color:var(--ink);
+    background:
+        radial-gradient(circle at 8% 0%,rgba(23,105,255,.10),transparent 28rem),
+        radial-gradient(circle at 100% 15%,rgba(71,145,255,.07),transparent 30rem),
+        var(--bg);
+    font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+button,input,select{font:inherit}
+button{cursor:pointer}
+a{text-decoration:none;color:inherit}
+
+.header{
+    position:sticky;top:0;z-index:20;
+    height:74px;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:0 clamp(20px,5vw,72px);
+    background:rgba(255,255,255,.88);
+    backdrop-filter:blur(18px);
+    border-bottom:1px solid rgba(215,225,239,.8);
+}
+.brand{display:flex;align-items:center;gap:12px;font-weight:850;letter-spacing:-.03em}
+.logo{
+    width:39px;height:39px;border-radius:12px;
+    display:grid;place-items:center;
+    color:white;background:linear-gradient(145deg,#3282ff,#0955d9);
+    box-shadow:0 8px 22px rgba(23,105,255,.28);
+}
+.logo svg{width:21px;height:21px}
+.nav{display:flex;align-items:center;gap:7px}
+.nav a{
+    padding:10px 13px;border-radius:10px;
+    color:#66758a;font-size:14px;font-weight:700;
+}
+.nav a:hover{background:#f0f5fc;color:var(--ink)}
+.nav a.active{background:var(--blue-3);color:var(--blue)}
+.nav-toggle{display:none;border:0;background:none;font-size:25px}
+
+.wrap{width:min(1240px,calc(100% - 40px));margin:auto}
+.page-head{padding:58px 0 30px}
+.eyebrow{
+    display:inline-flex;align-items:center;gap:8px;
+    color:var(--blue);font-size:12px;font-weight:850;
+    text-transform:uppercase;letter-spacing:.13em;
+}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--blue)}
+h1{margin:11px 0 10px;font-size:clamp(36px,5vw,58px);line-height:.98;letter-spacing:-.055em}
+.page-head p{margin:0;max-width:680px;color:var(--muted);font-size:16px;line-height:1.7}
+
+.grid{
+    display:grid;grid-template-columns:minmax(0,1.6fr) minmax(310px,.9fr);
+    gap:22px;align-items:start;padding-bottom:70px;
+}
+.card{
+    background:rgba(255,255,255,.92);
+    border:1px solid var(--line);
+    border-radius:22px;
+    box-shadow:var(--shadow-sm);
+}
+.card-head{padding:25px 27px 20px;border-bottom:1px solid var(--line)}
+.card-head h2{margin:0 0 6px;font-size:19px;letter-spacing:-.025em}
+.card-head p{margin:0;color:var(--muted);font-size:13px;line-height:1.5}
+.card-body{padding:26px 27px}
+
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:17px}
+.field{display:flex;flex-direction:column;gap:7px}
+.field.full{grid-column:1/-1}
+label{font-size:12px;font-weight:800;color:#526175}
+input,select{
+    width:100%;height:48px;border:1px solid #d7e1ee;border-radius:12px;
+    padding:0 14px;background:#fff;color:var(--ink);outline:none;
+    transition:.18s ease;
+}
+input:focus,select:focus{
+    border-color:#70a1ff;
+    box-shadow:0 0 0 4px rgba(23,105,255,.09);
+}
+.input-wrap{position:relative}
+.input-wrap input{padding-right:58px}
+.suffix{position:absolute;right:14px;top:50%;transform:translateY(-50%);color:#8794a6;font-size:12px;font-weight:700}
+
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+.btn{
+    min-height:46px;padding:0 17px;border-radius:11px;border:1px solid var(--line);
+    background:#fff;color:#425268;font-weight:800;font-size:13px;
+}
+.btn:hover{transform:translateY(-1px);box-shadow:0 7px 18px rgba(20,54,100,.08)}
+.btn.primary{
+    color:#fff;border-color:var(--blue);
+    background:linear-gradient(135deg,#2d7aff,#0e59df);
+    box-shadow:0 10px 22px rgba(23,105,255,.22);
+}
+.btn.primary:hover{box-shadow:0 13px 27px rgba(23,105,255,.29)}
+.btn.danger{color:var(--danger)}
+
+.route-card{margin-top:20px;overflow:hidden}
+.route-top{
+    display:flex;align-items:center;justify-content:space-between;gap:15px;
+    padding:18px 22px;border-bottom:1px solid var(--line);
+}
+.route-top strong{font-size:14px}
+.status{
+    display:inline-flex;align-items:center;gap:7px;
+    padding:7px 10px;border-radius:999px;background:#f1f4f8;color:#718096;
+    font-size:11px;font-weight:800;
+}
+.status.ready{background:#eaf8f1;color:var(--success)}
+.status .sdot{width:6px;height:6px;border-radius:50%;background:currentColor}
+.route-display{padding:27px 22px}
+.route-line{display:grid;grid-template-columns:1fr 80px 1fr;align-items:center;gap:12px}
+.airport{text-align:center}
+.airport .icao{font-size:31px;font-weight:900;letter-spacing:-.045em}
+.airport .city{margin-top:4px;color:var(--muted);font-size:12px}
+.connector{position:relative;height:34px}
+.connector:before{
+    content:"";position:absolute;left:5px;right:5px;top:50%;
+    height:1px;background:#c8d6e8;
+}
+.plane{
+    position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+    width:35px;height:35px;border-radius:50%;display:grid;place-items:center;
+    background:#fff;border:1px solid #d7e3f1;color:var(--blue);
+    box-shadow:0 5px 15px rgba(24,61,108,.10);
+}
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:25px}
+.metric{padding:15px;background:#f7faff;border:1px solid #e5edf7;border-radius:13px}
+.metric span{display:block;color:var(--muted);font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+.metric strong{display:block;margin-top:5px;font-size:17px}
+
+.side-stack{display:grid;gap:20px}
+.saved-list{padding:12px}
+.saved-empty{text-align:center;padding:34px 18px;color:var(--muted);font-size:13px}
+.saved-item{
+    padding:14px;border:1px solid transparent;border-radius:14px;
+    display:flex;justify-content:space-between;gap:12px;
+}
+.saved-item:hover{background:#f6f9fd;border-color:#e4ebf4}
+.saved-route{font-weight:850;font-size:14px}
+.saved-meta{margin-top:4px;color:var(--muted);font-size:11px}
+.icon-btn{border:0;background:none;color:#8996a7;font-size:17px}
+.info{
+    padding:17px 19px;background:#f5f9ff;border:1px solid #dce9fb;
+    border-radius:15px;color:#607087;font-size:12px;line-height:1.65;
+}
+.info strong{display:block;color:#26374c;margin-bottom:4px}
+
+.toast{
+    position:fixed;right:22px;bottom:22px;z-index:50;
+    max-width:360px;padding:14px 17px;border-radius:13px;
+    background:#13243a;color:#fff;box-shadow:0 15px 45px rgba(0,0,0,.18);
+    font-size:13px;font-weight:700;transform:translateY(20px);opacity:0;pointer-events:none;transition:.25s;
+}
+.toast.show{transform:none;opacity:1}
+.toast.error{background:#a92f36}
+
+.footer{
+    padding:28px 0 42px;border-top:1px solid var(--line);
+    color:#8793a3;font-size:12px;
+}
+.footer-inner{display:flex;justify-content:space-between;gap:20px}
+
+@media(max-width:900px){
+    .grid{grid-template-columns:1fr}
+}
+@media(max-width:720px){
+    .nav{display:none}
+    .nav.open{
+        display:flex;position:absolute;left:15px;right:15px;top:68px;
+        flex-direction:column;align-items:stretch;padding:10px;
+        background:#fff;border:1px solid var(--line);border-radius:15px;box-shadow:var(--shadow);
+    }
+    .nav a{padding:13px}
+    .nav-toggle{display:block}
+    .form-grid{grid-template-columns:1fr}
+    .field.full{grid-column:auto}
+    .route-line{grid-template-columns:1fr 50px 1fr}
+    .airport .icao{font-size:24px}
+    .metrics{grid-template-columns:1fr}
+    .wrap{width:min(100% - 28px,1240px)}
+    .page-head{padding-top:40px}
+}
+@media(prefers-reduced-motion:no-preference){
+    .card{animation:rise .45s ease both}
+    @keyframes rise{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+}
+</style>
+</head>
+
+<body>
+<header class="header">
+    <a class="brand" href="index.html">
+        <span class="logo" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+                <path d="M3 14.2 21 5l-5.1 7.1 5.1 2.1-1.3 2.1-6.2-1.5-3.3 4.4-1.9-.8 1.5-5.1-6.8-1.8L3 14.2Z" fill="currentColor"/>
+            </svg>
+        </span>
+        <span>Flight-app</span>
+    </a>
+    <nav class="nav" id="nav">
+        <a href="index.html">Home</a>
+        <a class="active" href="planner.html">Planner</a>
+        <a href="weather.html">Weather</a>
+        <a href="airports.html">Airports</a>
+        <a href="flights.html">Flights</a>
+        <a href="logbook.html">Logbook</a>
+        <a href="statistics.html">Statistics</a>
+    </nav>
+    <button class="nav-toggle" id="navToggle" aria-label="Open navigation">☰</button>
+</header>
+
+<main class="wrap">
+    <section class="page-head">
+        <div class="eyebrow"><span class="dot"></span> Flight planning</div>
+        <h1>Plan the flight.<br>Then fly it.</h1>
+        <p>
+            Build a clean flight plan for your simulator, calculate the great-circle distance
+            and estimated flight time, and save plans to your Flight-app account.
+        </p>
+    </section>
+
+    <section class="grid">
+        <div>
+            <article class="card">
+                <div class="card-head">
+                    <h2>Flight details</h2>
+                    <p>Enter the airports and aircraft you intend to use.</p>
+                </div>
+                <div class="card-body">
+                    <form id="plannerForm">
+                        <div class="form-grid">
+                            <div class="field">
+                                <label for="departure">Departure ICAO</label>
+                                <input id="departure" name="departure" maxlength="4" placeholder="EHAM" autocomplete="off" spellcheck="false" required>
+                            </div>
+
+                            <div class="field">
+                                <label for="arrival">Arrival ICAO</label>
+                                <input id="arrival" name="arrival" maxlength="4" placeholder="EGLL" autocomplete="off" spellcheck="false" required>
+                            </div>
+
+                            <div class="field">
+                                <label for="aircraft">Aircraft ICAO</label>
+                                <input id="aircraft" name="aircraft" maxlength="8" placeholder="A320" autocomplete="off" spellcheck="false">
+                            </div>
+
+                            <div class="field">
+                                <label for="altitude">Cruise altitude</label>
+                                <div class="input-wrap">
+                                    <input id="altitude" name="altitude" type="number" min="0" max="60000" step="100" placeholder="36000">
+                                    <span class="suffix">FT</span>
+                                </div>
+                            </div>
+
+                            <div class="field full">
+                                <label for="route">Route</label>
+                                <input id="route" name="route" placeholder="Optional — e.g. SID DCT waypoint STAR">
+                            </div>
+
+                            <div class="field full">
+                                <label for="planName">Plan name</label>
+                                <input id="planName" name="planName" maxlength="150" placeholder="Optional — e.g. Amsterdam to London">
+                            </div>
+                        </div>
+
+                        <div class="actions">
+                            <button class="btn primary" type="submit">Calculate route</button>
+                            <button class="btn" type="button" id="swapBtn">Swap airports</button>
+                            <button class="btn" type="button" id="clearBtn">Clear</button>
+                        </div>
+                    </form>
+                </div>
+            </article>
+
+            <article class="card route-card">
+                <div class="route-top">
+                    <strong>Route overview</strong>
+                    <span class="status" id="routeStatus"><span class="sdot"></span> Waiting for route</span>
+                </div>
+                <div class="route-display">
+                    <div class="route-line">
+                        <div class="airport">
+                            <div class="icao" id="depDisplay">----</div>
+                            <div class="city" id="depCity">Departure</div>
+                        </div>
+                        <div class="connector">
+                            <div class="plane">
+                                <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+                                    <path d="M3 14.2 21 5l-5.1 7.1 5.1 2.1-1.3 2.1-6.2-1.5-3.3 4.4-1.9-.8 1.5-5.1-6.8-1.8L3 14.2Z" fill="currentColor"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="airport">
+                            <div class="icao" id="arrDisplay">----</div>
+                            <div class="city" id="arrCity">Arrival</div>
+                        </div>
+                    </div>
+
+                    <div class="metrics">
+                        <div class="metric">
+                            <span>Distance</span>
+                            <strong id="distance">—</strong>
+                        </div>
+                        <div class="metric">
+                            <span>Estimated time</span>
+                            <strong id="duration">—</strong>
+                        </div>
+                        <div class="metric">
+                            <span>Aircraft</span>
+                            <strong id="aircraftDisplay">—</strong>
+                        </div>
+                    </div>
+
+                    <div class="actions">
+                        <button class="btn primary" id="saveBtn" type="button" disabled>Save plan</button>
+                    </div>
+                </div>
+            </article>
+        </div>
+
+        <aside class="side-stack">
+            <article class="card">
+                <div class="card-head">
+                    <h2>Saved plans</h2>
+                    <p>Plans stored in the Flight-app backend.</p>
+                </div>
+                <div class="saved-list" id="savedPlans">
+                    <div class="saved-empty">Loading saved plans…</div>
+                </div>
+            </article>
+
+            <div class="info">
+                <strong>About the calculation</strong>
+                Distance is calculated as great-circle distance between the airport coordinates.
+                Estimated time is an approximation based on the selected aircraft's cruise-speed
+                assumption where available. It is not an operational dispatch calculation.
+            </div>
+        </aside>
+    </section>
+</main>
+
+<footer class="footer">
+    <div class="wrap footer-inner">
+        <span>Flight-app</span>
+        <span>Built for flight simulation</span>
+    </div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API_BASE = "https://flight-app-api-g36e.onrender.com";
+
+const AIRPORTS = {
+    EHAM:{city:"Amsterdam",name:"Amsterdam Airport Schiphol",lat:52.3086,lon:4.7639},
+    EGLL:{city:"London",name:"London Heathrow",lat:51.4700,lon:-0.4543},
+    LFPG:{city:"Paris",name:"Paris Charles de Gaulle",lat:49.0097,lon:2.5479},
+    EDDF:{city:"Frankfurt",name:"Frankfurt Airport",lat:50.0379,lon:8.5622},
+    LIRF:{city:"Rome",name:"Rome Fiumicino",lat:41.8003,lon:12.2389},
+    LEBL:{city:"Barcelona",name:"Barcelona–El Prat",lat:41.2974,lon:2.0833},
+    EIDW:{city:"Dublin",name:"Dublin Airport",lat:53.4213,lon:-6.2701},
+    EKCH:{city:"Copenhagen",name:"Copenhagen Airport",lat:55.6181,lon:12.6560},
+    ESSA:{city:"Stockholm",name:"Stockholm Arlanda",lat:59.6519,lon:17.9186},
+    ENGM:{city:"Oslo",name:"Oslo Airport",lat:60.1976,lon:11.1004},
+    LPPT:{city:"Lisbon",name:"Humberto Delgado Airport",lat:38.7742,lon:-9.1342},
+    KJFK:{city:"New York",name:"John F. Kennedy International",lat:40.6413,lon:-73.7781},
+    KLAX:{city:"Los Angeles",name:"Los Angeles International",lat:33.9416,lon:-118.4085},
+    KORD:{city:"Chicago",name:"Chicago O'Hare",lat:41.9742,lon:-87.9073},
+    RJTT:{city:"Tokyo",name:"Tokyo Haneda",lat:35.5494,lon:139.7798},
+    OMDB:{city:"Dubai",name:"Dubai International",lat:25.2532,lon:55.3657}
+};
+
+const SPEEDS = {
+    A319:450,A320:450,A20N:450,A321:450,A21N:450,
+    A332:470,A333:470,A339:470,A359:480,A35K:480,
+    B737:450,B737NG:450,B738:450,B38M:450,B739:450,
+    B744:490,B748:490,B772:490,B773:490,B77W:490,B789:490,B78X:490,
+    E170:430,E175:430,E190:430,E195:430
+};
+
+let currentPlan = null;
+
+const $ = id => document.getElementById(id);
+
+function toast(message, error=false){
+    const el=$("toast");
+    el.textContent=message;
+    el.className="toast show"+(error?" error":"");
+    clearTimeout(window.toastTimer);
+    window.toastTimer=setTimeout(()=>el.className="toast",3200);
+}
+
+function normalizeICAO(value){
+    return value.trim().toUpperCase();
+}
+
+function haversineNM(a,b){
+    const R=3440.065;
+    const rad=x=>x*Math.PI/180;
+    const dLat=rad(b.lat-a.lat);
+    const dLon=rad(b.lon-a.lon);
+    const x=Math.sin(dLat/2)**2+
+        Math.cos(rad(a.lat))*Math.cos(rad(b.lat))*Math.sin(dLon/2)**2;
+    return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));
+}
+
+function formatDuration(minutes){
+    if(!Number.isFinite(minutes)) return "—";
+    const h=Math.floor(minutes/60);
+    const m=Math.round(minutes%60);
+    return h ? `${h}h ${String(m).padStart(2,"0")}m` : `${m}m`;
+}
+
+function setRouteStatus(text, ready=false){
+    $("routeStatus").className="status"+(ready?" ready":"");
+    $("routeStatus").innerHTML=`<span class="sdot"></span> ${text}`;
+}
+
+async function calculateRoute(){
+    const dep=normalizeICAO($("departure").value);
+    const arr=normalizeICAO($("arrival").value);
+    const aircraft=normalizeICAO($("aircraft").value);
+
+    $("departure").value=dep;
+    $("arrival").value=arr;
+    $("aircraft").value=aircraft;
+
+    if(!dep || !arr){
+        toast("Enter both departure and arrival ICAO codes.",true);
+        return;
+    }
+    if(dep===arr){
+        toast("Departure and arrival cannot be the same airport.",true);
+        return;
+    }
+
+    setRouteStatus("Calculating…");
+    const depData=AIRPORTS[dep];
+    const arrData=AIRPORTS[arr];
+
+    if(!depData || !arrData){
+        $("depDisplay").textContent=dep;
+        $("arrDisplay").textContent=arr;
+        $("depCity").textContent=depData?.city || "Unavailable";
+        $("arrCity").textContent=arrData?.city || "Unavailable";
+        $("distance").textContent="Unavailable";
+        $("duration").textContent="Unavailable";
+        $("aircraftDisplay").textContent=aircraft || "—";
+        $("saveBtn").disabled=true;
+        setRouteStatus("Airport data unavailable");
+        toast("This planner currently has no coordinate data for one or both airports.",true);
+        currentPlan=null;
+        return;
+    }
+
+    const distance=haversineNM(depData,arrData);
+    const speed=SPEEDS[aircraft];
+    const minutes=speed ? (distance/speed)*60+30 : null;
+
+    $("depDisplay").textContent=dep;
+    $("arrDisplay").textContent=arr;
+    $("depCity").textContent=depData.city;
+    $("arrCity").textContent=arrData.city;
+    $("distance").textContent=`${Math.round(distance).toLocaleString()} NM`;
+    $("duration").textContent=minutes ? formatDuration(minutes) : "Unavailable";
+    $("aircraftDisplay").textContent=aircraft || "Not selected";
+
+    currentPlan={
+        departure_icao:dep,
+        arrival_icao:arr,
+        aircraft_icao:aircraft || null,
+        cruise_altitude:$("altitude").value ? Number($("altitude").value) : null,
+        route:$("route").value.trim() || null,
+        distance_nm:Number(distance.toFixed(2)),
+        estimated_minutes:minutes ? Math.round(minutes) : null
+    };
+
+    $("saveBtn").disabled=false;
+    setRouteStatus("Route calculated",true);
+}
+
+async function savePlan(){
+    if(!currentPlan) return;
+
+    const name=$("planName").value.trim() ||
+        `${currentPlan.departure_icao} → ${currentPlan.arrival_icao}`;
+
+    try{
+        $("saveBtn").disabled=true;
+        const response=await fetch(`${API_BASE}/api/plans`,{
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body:JSON.stringify({...currentPlan,name})
+        });
+
+        const data=await response.json();
+        if(!response.ok) throw new Error(data.error || "Could not save plan.");
+
+        toast("Flight plan saved.");
+        await loadPlans();
+    }catch(error){
+        console.error(error);
+        toast(error.message || "Could not save the plan.",true);
+    }finally{
+        $("saveBtn").disabled=false;
+    }
+}
+
+async function loadPlans(){
+    const list=$("savedPlans");
+    try{
+        const response=await fetch(`${API_BASE}/api/plans`);
+        const data=await response.json();
+        if(!response.ok) throw new Error(data.error || "Request failed.");
+
+        const plans=Array.isArray(data) ? data : (data.plans || []);
+        if(!plans.length){
+            list.innerHTML='<div class="saved-empty">No saved plans yet.</div>';
+            return;
+        }
+
+        list.innerHTML=plans.map(plan=>`
+            <div class="saved-item">
+                <div>
+                    <div class="saved-route">${escapeHTML(plan.departure_icao || "----")} → ${escapeHTML(plan.arrival_icao || "----")}</div>
+                    <div class="saved-meta">
+                        ${escapeHTML(plan.name || "Unnamed plan")}
+                        ${plan.distance_nm ? ` · ${Math.round(Number(plan.distance_nm))} NM` : ""}
+                    </div>
+                </div>
+                <button class="icon-btn" title="Delete plan" onclick="deletePlan(${Number(plan.id)})">×</button>
+            </div>
+        `).join("");
+    }catch(error){
+        console.error(error);
+        list.innerHTML='<div class="saved-empty">Saved plans unavailable.</div>';
+    }
+}
+
+async function deletePlan(id){
+    if(!confirm("Delete this saved plan?")) return;
+    try{
+        const response=await fetch(`${API_BASE}/api/plans/${encodeURIComponent(id)}`,{method:"DELETE"});
+        const data=await response.json().catch(()=>({}));
+        if(!response.ok) throw new Error(data.error || "Could not delete plan.");
+        toast("Plan deleted.");
+        loadPlans();
+    }catch(error){
+        toast(error.message || "Could not delete plan.",true);
+    }
+}
+
+function escapeHTML(value){
+    return String(value).replace(/[&<>"']/g,char=>({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+    }[char]));
+}
+
+$("plannerForm").addEventListener("submit",event=>{
+    event.preventDefault();
+    calculateRoute();
+});
+
+$("saveBtn").addEventListener("click",savePlan);
+
+$("swapBtn").addEventListener("click",()=>{
+    const dep=$("departure").value;
+    $("departure").value=$("arrival").value;
+    $("arrival").value=dep;
+    if($("departure").value && $("arrival").value) calculateRoute();
+});
+
+$("clearBtn").addEventListener("click",()=>{
+    $("plannerForm").reset();
+    ["depDisplay","arrDisplay"].forEach(id=>$(id).textContent="----");
+    $("depCity").textContent="Departure";
+    $("arrCity").textContent="Arrival";
+    $("distance").textContent="—";
+    $("duration").textContent="—";
+    $("aircraftDisplay").textContent="—";
+    $("saveBtn").disabled=true;
+    currentPlan=null;
+    setRouteStatus("Waiting for route");
+});
+
+$("navToggle").addEventListener("click",()=>$("nav").classList.toggle("open"));
+
+loadPlans();
+</script>
+</body>
+</html>
