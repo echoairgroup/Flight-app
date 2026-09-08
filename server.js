@@ -506,11 +506,12 @@ app.get("/api/weather/:icao/cache", async (req, res) => {
 
 /*
 |--------------------------------------------------------------------------
-| AIRPORT CACHE LOOKUP
+| AIRPORT INFORMATION
 |--------------------------------------------------------------------------
 */
 
 app.get("/api/airports/:icao", async (req, res) => {
+
     const icao = req.params.icao
         .toUpperCase()
         .trim();
@@ -523,7 +524,14 @@ app.get("/api/airports/:icao", async (req, res) => {
     }
 
     try {
-        const result = await pool.query(
+
+        /*
+        |--------------------------------------------------------------------------
+        | FIRST: CHECK AIRPORT CACHE
+        |--------------------------------------------------------------------------
+        */
+
+        const airportResult = await pool.query(
             `
             SELECT
                 icao,
@@ -543,29 +551,144 @@ app.get("/api/airports/:icao", async (req, res) => {
             [icao]
         );
 
-        if (result.rows.length === 0) {
+        if (airportResult.rows.length > 0) {
+
+            return res.json({
+                available: true,
+                airport: airportResult.rows[0]
+            });
+
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | FALLBACK: USE LATEST METAR DATA
+        |--------------------------------------------------------------------------
+        */
+
+        const weatherResult = await pool.query(
+            `
+            SELECT
+                raw_metar,
+                fetched_at
+            FROM weather_cache
+            WHERE icao = $1
+              AND raw_metar IS NOT NULL
+            ORDER BY fetched_at DESC
+            LIMIT 1
+            `,
+            [icao]
+        );
+
+        if (weatherResult.rows.length === 0) {
+
             return res.json({
                 available: false,
                 icao,
                 message: "Unavailable"
             });
+
         }
 
-        res.json({
+        let metarData;
+
+        try {
+
+            metarData =
+                typeof weatherResult.rows[0].raw_metar === "string"
+                    ? JSON.parse(weatherResult.rows[0].raw_metar)
+                    : weatherResult.rows[0].raw_metar;
+
+        } catch (parseError) {
+
+            console.error(
+                "Could not parse cached METAR:",
+                parseError.message
+            );
+
+            return res.json({
+                available: false,
+                icao,
+                message: "Unavailable"
+            });
+
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | BUILD AIRPORT OBJECT
+        |--------------------------------------------------------------------------
+        */
+
+        const airport = {
+
+            icao:
+                metarData.icaoId ||
+                icao,
+
+            name:
+                metarData.name ||
+                "--",
+
+            iata:
+                metarData.iata ||
+                null,
+
+            latitude:
+                metarData.lat != null
+                    ? metarData.lat
+                    : null,
+
+            longitude:
+                metarData.lon != null
+                    ? metarData.lon
+                    : null,
+
+            elevation_ft:
+                metarData.elev != null
+                    ? metarData.elev
+                    : null,
+
+            country:
+                null,
+
+            city:
+                null,
+
+            raw_data:
+                metarData,
+
+            updated_at:
+                weatherResult.rows[0].fetched_at
+
+        };
+
+        /*
+        |--------------------------------------------------------------------------
+        | RETURN AIRPORT INFORMATION
+        |--------------------------------------------------------------------------
+        */
+
+        return res.json({
             available: true,
-            airport: result.rows[0]
+            airport
         });
+
     } catch (error) {
+
         console.error(
-            "Airport lookup failed:",
+            "Airport information lookup failed:",
             error.message
         );
 
-        res.status(503).json({
+        return res.status(503).json({
             available: false,
+            icao,
             message: "Unavailable"
         });
+
     }
+
 });
 
 /*
