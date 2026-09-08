@@ -1,83 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <meta
-        name="theme-color"
-        content="#f5f8fc"
-    >
-
-    <meta
-        name="description"
-        content="Flight App — Aviation Weather"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Flight App — Weather</title>
 
-
-    <!-- =========================================================
-         FONTS
-    ========================================================== -->
-
     <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
     <link
-        rel="preconnect"
-        href="https://fonts.gstatic.com"
-        crossorigin
-    >
-
-    <link
-        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap"
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap"
         rel="stylesheet"
     >
-
-
-    <!-- =========================================================
-         ICONS
-    ========================================================== -->
 
     <link
         rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
     >
 
-
-    <!-- =========================================================
-         FAVICON
-    ========================================================== -->
-
-    <link
-        rel="icon"
-        href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='25' fill='%235b7cfa'/%3E%3Cpath d='M21 55L78 22L65 78L51 58L21 55Z' fill='white'/%3E%3C/svg%3E"
-    >
-
-
     <style>
-
-        /* =====================================================
-           ROOT
-        ====================================================== */
-
         :root {
-
             --background: #f4f7fb;
 
             --surface: #ffffff;
-            --surface-2: #f8faff;
-            --surface-3: #eef3f9;
+            --surface-soft: #f8faff;
 
             --text: #101828;
-            --text-secondary: #667085;
-            --text-muted: #98a2b3;
+            --secondary: #667085;
+            --muted: #98a2b3;
 
             --border: #e4e9f0;
 
@@ -89,220 +40,112 @@
             --violet: #8b72f7;
 
             --success: #1daf86;
-            --success-light: #eafaf5;
-
             --warning: #f3a83b;
-            --warning-light: #fff6e8;
-
             --danger: #e85d68;
-            --danger-light: #fff0f1;
 
-            --shadow-xs:
-                0 2px 8px rgba(16, 24, 40, 0.04);
-
-            --shadow-sm:
-                0 8px 25px rgba(16, 24, 40, 0.055);
-
-            --shadow-md:
-                0 18px 50px rgba(16, 24, 40, 0.09);
-
-            --shadow-lg:
-                0 30px 80px rgba(16, 24, 40, 0.13);
+            --shadow-sm: 0 4px 14px rgba(16, 24, 40, 0.05);
+            --shadow-md: 0 12px 35px rgba(16, 24, 40, 0.08);
 
             --radius-sm: 10px;
-            --radius-md: 15px;
+            --radius-md: 16px;
             --radius-lg: 22px;
-            --radius-xl: 30px;
 
             --nav-height: 76px;
-
             --content-width: 1400px;
-
-            --transition:
-                180ms cubic-bezier(.4,0,.2,1);
-
         }
-
-
-        /* =====================================================
-           RESET
-        ====================================================== */
 
         * {
-            margin: 0;
-            padding: 0;
             box-sizing: border-box;
         }
-
 
         html {
             scroll-behavior: smooth;
         }
 
-
         body {
-
+            margin: 0;
             min-height: 100vh;
 
-            font-family:
-                "DM Sans",
-                sans-serif;
+            font-family: "DM Sans", sans-serif;
 
             color: var(--text);
 
             background:
                 radial-gradient(
-                    circle at 10% 0%,
-                    rgba(91, 124, 250, .08),
-                    transparent 30%
+                    circle at top left,
+                    rgba(91, 124, 250, 0.08),
+                    transparent 32%
                 ),
                 radial-gradient(
-                    circle at 90% 5%,
-                    rgba(76, 201, 232, .07),
+                    circle at top right,
+                    rgba(139, 114, 247, 0.07),
                     transparent 28%
                 ),
                 var(--background);
-
-            overflow-x: hidden;
-
         }
-
-
-        a {
-            color: inherit;
-            text-decoration: none;
-        }
-
 
         button,
         input {
             font: inherit;
         }
 
-
         button {
-            border: 0;
             cursor: pointer;
         }
 
-
-        input {
-            outline: none;
-        }
-
-
-        /* =====================================================
-           SCROLLBAR
-        ====================================================== */
-
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-
-
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-
-        ::-webkit-scrollbar-thumb {
-            background: #ccd5e2;
-            border-radius: 50px;
-        }
-
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #b8c4d4;
-        }
-
-
-        /* =====================================================
-           CONTAINER
-        ====================================================== */
-
-        .container {
-
-            width:
-                min(
-                    var(--content-width),
-                    calc(100% - 48px)
-                );
-
-            margin: 0 auto;
-
-        }
-
-
-        /* =====================================================
+        /* =========================================================
            NAVBAR
-        ====================================================== */
+        ========================================================= */
 
         .navbar {
-
             position: sticky;
-
             top: 0;
-
-            z-index: 1000;
+            z-index: 100;
 
             height: var(--nav-height);
 
-            background:
-                rgba(255, 255, 255, .84);
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
 
-            backdrop-filter:
-                blur(22px);
-
-            -webkit-backdrop-filter:
-                blur(22px);
-
-            border-bottom:
-                1px solid
-                rgba(228, 233, 240, .82);
-
+            border-bottom: 1px solid rgba(228, 233, 240, 0.8);
         }
 
-
-        .navbar-inner {
-
+        .nav-inner {
+            max-width: var(--content-width);
             height: 100%;
 
+            margin: 0 auto;
+            padding: 0 28px;
+
             display: flex;
-
             align-items: center;
-
-            gap: 25px;
-
+            justify-content: space-between;
+            gap: 30px;
         }
-
-
-        /* =====================================================
-           BRAND
-        ====================================================== */
 
         .brand {
-
             display: flex;
-
             align-items: center;
-
             gap: 12px;
 
-            flex-shrink: 0;
+            text-decoration: none;
+            color: var(--text);
 
+            font-family: "Manrope", sans-serif;
+            font-weight: 800;
+            font-size: 18px;
         }
 
-
         .brand-mark {
+            width: 38px;
+            height: 38px;
 
-            width: 42px;
-            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
 
-            display: grid;
-
-            place-items: center;
-
-            border-radius: 13px;
+            border-radius: 12px;
 
             color: white;
 
@@ -314,457 +157,196 @@
                 );
 
             box-shadow:
-                0 9px 25px
-                rgba(91,124,250,.27);
-
+                0 7px 18px rgba(91, 124, 250, 0.25);
         }
-
-
-        .brand-mark i {
-
-            font-size: 17px;
-
-            transform:
-                rotate(-12deg);
-
-        }
-
-
-        .brand-name {
-
-            font-family:
-                "Manrope",
-                sans-serif;
-
-            font-size: 18px;
-
-            font-weight: 800;
-
-            letter-spacing: -.5px;
-
-        }
-
-
-        .brand-version {
-
-            margin-left: 4px;
-
-            padding: 3px 7px;
-
-            border-radius: 6px;
-
-            color: var(--primary);
-
-            background: var(--primary-light);
-
-            font-size: 9px;
-
-            font-weight: 700;
-
-            letter-spacing: .5px;
-
-        }
-
-
-        /* =====================================================
-           NAV
-        ====================================================== */
 
         .nav-links {
-
             display: flex;
-
             align-items: center;
+            gap: 6px;
 
-            gap: 3px;
-
-            margin-left: auto;
-
+            flex: 1;
+            justify-content: center;
         }
 
-
         .nav-link {
-
-            padding:
-                9px 13px;
+            padding: 10px 14px;
 
             border-radius: 10px;
 
-            color:
-                var(--text-secondary);
+            text-decoration: none;
 
-            font-size: 13px;
+            color: var(--secondary);
 
+            font-size: 14px;
             font-weight: 600;
 
             transition:
-                color var(--transition),
-                background var(--transition);
-
+                background 0.2s ease,
+                color 0.2s ease;
         }
 
+        .nav-link:hover {
+            color: var(--text);
+            background: #f4f6fa;
+        }
 
-        .nav-link:hover,
         .nav-link.active {
-
-            color:
-                var(--primary);
-
-            background:
-                var(--primary-light);
-
+            color: var(--primary);
+            background: var(--primary-light);
         }
 
-
-        .nav-actions {
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 9px;
-
-        }
-
-
-        .icon-button {
-
+        .profile-button {
             width: 40px;
             height: 40px;
 
-            display: grid;
-
-            place-items: center;
-
-            border:
-                1px solid
-                var(--border);
-
-            border-radius: 11px;
-
-            color:
-                var(--text-secondary);
-
-            background:
-                white;
-
-        }
-
-
-        .icon-button:hover {
-
-            color:
-                var(--primary);
-
-            border-color:
-                #cbd5ff;
-
-        }
-
-
-        .profile-button {
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 9px;
-
-            padding:
-                4px 10px 4px 5px;
-
-            border:
-                1px solid
-                var(--border);
-
-            border-radius: 30px;
-
-            background:
-                white;
-
-        }
-
-
-        .profile-avatar {
-
-            width: 32px;
-            height: 32px;
-
-            display: grid;
-
-            place-items: center;
-
+            border: 1px solid var(--border);
             border-radius: 50%;
 
-            color: white;
+            color: var(--secondary);
+            background: white;
 
-            background:
-                linear-gradient(
-                    135deg,
-                    var(--primary),
-                    var(--cyan)
-                );
+            box-shadow: var(--shadow-sm);
 
-            font-size: 10px;
-
-            font-weight: 800;
-
+            transition: 0.2s ease;
         }
 
-
-        .profile-name {
-
-            font-size: 12px;
-
-            font-weight: 700;
-
+        .profile-button:hover {
+            color: var(--primary);
+            border-color: #cfd7ee;
+            transform: translateY(-1px);
         }
 
+        /* =========================================================
+           MAIN
+        ========================================================= */
 
-        /* =====================================================
-           PAGE HEADER
-        ====================================================== */
+        .container {
+            max-width: var(--content-width);
 
-        .page {
-
-            padding:
-                55px 0 80px;
-
+            margin: 0 auto;
+            padding: 42px 28px 70px;
         }
-
 
         .page-header {
-
-            max-width: 850px;
-
-            margin-bottom: 30px;
-
-        }
-
-
-        .page-badge {
-
-            display: inline-flex;
-
-            align-items: center;
-
-            gap: 8px;
-
-            padding:
-                7px 11px;
-
-            margin-bottom: 16px;
-
-            border:
-                1px solid
-                #dbe3f0;
-
-            border-radius: 50px;
-
-            color:
-                var(--primary);
-
-            background:
-                rgba(255,255,255,.78);
-
-            font-size: 11px;
-
-            font-weight: 700;
-
-            box-shadow:
-                var(--shadow-xs);
-
-        }
-
-
-        .page-badge i {
-
-            font-size: 10px;
-
-        }
-
-
-        .page-title {
-
-            font-family:
-                "Manrope",
-                sans-serif;
-
-            font-size:
-                clamp(38px, 5vw, 64px);
-
-            line-height:
-                1.05;
-
-            letter-spacing:
-                -3px;
-
-            font-weight:
-                800;
-
-        }
-
-
-        .page-title .gradient {
-
-            color: transparent;
-
-            background:
-                linear-gradient(
-                    110deg,
-                    var(--primary),
-                    var(--violet),
-                    var(--cyan)
-                );
-
-            -webkit-background-clip:
-                text;
-
-            background-clip:
-                text;
-
-        }
-
-
-        .page-description {
-
-            max-width: 680px;
-
-            margin-top: 16px;
-
-            color:
-                var(--text-secondary);
-
-            font-size: 15px;
-
-            line-height: 1.7;
-
-        }
-
-
-        /* =====================================================
-           SEARCH
-        ====================================================== */
-
-        .search-card {
-
-            padding: 18px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 25px;
 
             margin-bottom: 28px;
-
-            border:
-                1px solid
-                rgba(255,255,255,.9);
-
-            border-radius:
-                var(--radius-lg);
-
-            background:
-                rgba(255,255,255,.9);
-
-            box-shadow:
-                var(--shadow-md);
-
         }
 
-
-        .search-wrapper {
-
+        .eyebrow {
             display: flex;
+            align-items: center;
+            gap: 8px;
 
-            gap: 10px;
+            margin-bottom: 8px;
 
+            color: var(--primary);
+
+            font-size: 12px;
+            font-weight: 700;
+
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
         }
 
+        .page-header h1 {
+            margin: 0;
+
+            font-family: "Manrope", sans-serif;
+
+            font-size: clamp(30px, 4vw, 42px);
+            line-height: 1.15;
+            font-weight: 800;
+        }
+
+        .page-header p {
+            margin: 10px 0 0;
+
+            color: var(--secondary);
+
+            font-size: 15px;
+        }
+
+        /* =========================================================
+           SEARCH
+        ========================================================= */
+
+        .search-card {
+            padding: 20px;
+
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+
+            background: var(--surface);
+
+            box-shadow: var(--shadow-sm);
+
+            margin-bottom: 24px;
+        }
+
+        .search-row {
+            display: flex;
+            gap: 12px;
+        }
 
         .search-input-wrapper {
-
             position: relative;
-
             flex: 1;
-
         }
 
-
         .search-input-wrapper i {
-
             position: absolute;
 
             left: 16px;
-
             top: 50%;
 
-            transform:
-                translateY(-50%);
+            transform: translateY(-50%);
 
-            color:
-                var(--text-muted);
-
+            color: var(--muted);
         }
 
-
         .search-input {
-
             width: 100%;
 
             height: 52px;
 
-            padding:
-                0 18px 0 45px;
+            padding: 0 18px 0 45px;
 
-            border:
-                1px solid
-                var(--border);
-
+            border: 1px solid var(--border);
             border-radius: 13px;
 
-            color:
-                var(--text);
+            outline: none;
 
-            background:
-                var(--surface-2);
+            color: var(--text);
+            background: #fbfcfe;
 
-            font-size: 14px;
-
+            font-size: 15px;
             font-weight: 600;
 
-            text-transform:
-                uppercase;
+            text-transform: uppercase;
 
-            transition:
-                border var(--transition),
-                box-shadow var(--transition);
-
+            transition: 0.2s ease;
         }
-
 
         .search-input:focus {
+            border-color: var(--primary);
 
-            border-color:
-                #bdc9ff;
+            background: white;
 
             box-shadow:
-                0 0 0 4px
-                rgba(91,124,250,.08);
-
+                0 0 0 4px rgba(91, 124, 250, 0.10);
         }
 
-
         .search-button {
-
             height: 52px;
 
-            padding:
-                0 22px;
+            padding: 0 22px;
 
-            display: inline-flex;
-
-            align-items: center;
-
-            justify-content: center;
-
-            gap: 9px;
-
+            border: 0;
             border-radius: 13px;
 
             color: white;
@@ -776,3328 +358,2054 @@
                     var(--primary-dark)
                 );
 
-            box-shadow:
-                0 10px 24px
-                rgba(91,124,250,.22);
-
-            font-size: 13px;
-
             font-weight: 700;
 
-        }
+            box-shadow:
+                0 7px 18px rgba(91, 124, 250, 0.22);
 
+            transition: 0.2s ease;
+        }
 
         .search-button:hover {
-
-            transform:
-                translateY(-1px);
-
-        }
-
-
-        /* =====================================================
-           STATES
-        ====================================================== */
-
-        .message {
-
-            display: none;
-
-            padding: 18px;
-
-            margin-bottom: 25px;
-
-            border-radius: 14px;
-
-            font-size: 13px;
-
-            font-weight: 600;
-
-        }
-
-
-        .message.error {
-
-            color:
-                var(--danger);
-
-            background:
-                var(--danger-light);
-
-            border:
-                1px solid
-                #ffd5d9;
-
-        }
-
-
-        .message.show {
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 10px;
-
-        }
-
-
-        .loading {
-
-            display: none;
-
-            align-items: center;
-
-            justify-content: center;
-
-            gap: 10px;
-
-            padding: 50px;
-
-            color:
-                var(--text-secondary);
-
-            font-size: 13px;
-
-            font-weight: 600;
-
-        }
-
-
-        .loading.show {
-
-            display: flex;
-
-        }
-
-
-        .spinner {
-
-            width: 19px;
-            height: 19px;
-
-            border:
-                2px solid
-                #dbe2ed;
-
-            border-top-color:
-                var(--primary);
-
-            border-radius: 50%;
-
-            animation:
-                spin .8s linear infinite;
-
-        }
-
-
-        @keyframes spin {
-
-            to {
-                transform: rotate(360deg);
-            }
-
-        }
-
-
-        /* =====================================================
-           WEATHER CONTENT
-        ====================================================== */
-
-        #weatherContent {
-
-            display: none;
-
-        }
-
-
-        #weatherContent.show {
-
-            display: block;
-
-        }
-
-
-        /* =====================================================
-           MAIN WEATHER CARD
-        ====================================================== */
-
-        .weather-main {
-
-            position: relative;
-
-            overflow: hidden;
-
-            padding: 30px;
-
-            border:
-                1px solid
-                rgba(255,255,255,.95);
-
-            border-radius:
-                var(--radius-xl);
-
-            background:
-                rgba(255,255,255,.92);
+            transform: translateY(-1px);
 
             box-shadow:
-                var(--shadow-lg);
-
+                0 10px 22px rgba(91, 124, 250, 0.27);
         }
 
-
-        .weather-main::before {
-
-            content: "";
-
-            position: absolute;
-
-            width: 330px;
-            height: 330px;
-
-            right: -100px;
-            top: -130px;
-
-            border-radius: 50%;
-
-            background:
-                radial-gradient(
-                    circle,
-                    rgba(91,124,250,.15),
-                    transparent 68%
-                );
-
-        }
-
-
-        .weather-top {
-
-            position: relative;
-
+        .quick-airports {
             display: flex;
-
-            align-items: flex-start;
-
-            justify-content: space-between;
-
-            gap: 20px;
-
-        }
-
-
-        .airport-label {
-
-            color:
-                var(--text-muted);
-
-            font-size: 10px;
-
-            font-weight: 800;
-
-            letter-spacing:
-                1px;
-
-            text-transform:
-                uppercase;
-
-        }
-
-
-        .airport-code {
-
-            margin-top: 5px;
-
-            font-family:
-                "Manrope",
-                sans-serif;
-
-            font-size: 42px;
-
-            line-height: 1;
-
-            letter-spacing:
-                -2px;
-
-            font-weight:
-                800;
-
-        }
-
-
-        .airport-name {
-
-            margin-top: 6px;
-
-            color:
-                var(--text-secondary);
-
-            font-size: 13px;
-
-        }
-
-
-        .live-status {
-
-            display: inline-flex;
-
             align-items: center;
+            gap: 8px;
 
-            gap: 7px;
+            margin-top: 14px;
 
-            padding:
-                7px 10px;
-
-            border-radius: 9px;
-
-            color:
-                var(--success);
-
-            background:
-                var(--success-light);
-
-            font-size: 9px;
-
-            font-weight: 800;
-
-            text-transform:
-                uppercase;
-
-            letter-spacing:
-                .5px;
-
+            flex-wrap: wrap;
         }
 
+        .quick-label {
+            color: var(--muted);
 
-        .live-dot {
-
-            width: 6px;
-            height: 6px;
-
-            border-radius: 50%;
-
-            background:
-                var(--success);
-
-            animation:
-                pulse 1.8s infinite;
-
-        }
-
-
-        @keyframes pulse {
-
-            0%,100% {
-                opacity: 1;
-            }
-
-            50% {
-                opacity: .3;
-            }
-
-        }
-
-
-        /* =====================================================
-           CONDITIONS
-        ====================================================== */
-
-        .condition-row {
-
-            position: relative;
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 25px;
-
-            margin-top: 32px;
-
-        }
-
-
-        .weather-icon {
-
-            width: 90px;
-            height: 90px;
-
-            display: grid;
-
-            place-items: center;
-
-            border-radius: 25px;
-
-            color:
-                var(--primary);
-
-            background:
-                var(--primary-light);
-
-            font-size: 40px;
-
-        }
-
-
-        .temperature {
-
-            font-family:
-                "Manrope",
-                sans-serif;
-
-            font-size: 58px;
-
-            line-height: 1;
-
-            letter-spacing:
-                -3px;
-
-            font-weight:
-                800;
-
-        }
-
-
-        .temperature-unit {
-
-            margin-left: 5px;
-
-            color:
-                var(--text-muted);
-
-            font-size: 20px;
-
-            vertical-align:
-                top;
-
-        }
-
-
-        .condition-text {
-
-            margin-top: 6px;
-
-            color:
-                var(--text-secondary);
-
-            font-size: 13px;
-
+            font-size: 12px;
             font-weight: 600;
 
+            margin-right: 4px;
         }
 
+        .airport-chip {
+            padding: 7px 11px;
 
-        .flight-category {
+            border: 1px solid var(--border);
+            border-radius: 9px;
 
-            display: inline-flex;
+            background: white;
+            color: var(--secondary);
+
+            font-size: 12px;
+            font-weight: 700;
+
+            transition: 0.2s ease;
+        }
+
+        .airport-chip:hover {
+            color: var(--primary);
+
+            border-color: #cfd7ee;
+            background: var(--primary-light);
+        }
+
+        /* =========================================================
+           STATUS
+        ========================================================= */
+
+        .status {
+            display: none;
 
             align-items: center;
-
-            padding:
-                7px 11px;
-
-            margin-top: 9px;
-
-            border-radius: 8px;
-
-            font-size: 10px;
-
-            font-weight: 800;
-
-            letter-spacing:
-                .4px;
-
-        }
-
-
-        .flight-category.vfr {
-
-            color:
-                var(--success);
-
-            background:
-                var(--success-light);
-
-        }
-
-
-        .flight-category.mvfr {
-
-            color:
-                #087ca3;
-
-            background:
-                #e8f8fd;
-
-        }
-
-
-        .flight-category.ifr {
-
-            color:
-                var(--danger);
-
-            background:
-                var(--danger-light);
-
-        }
-
-
-        .flight-category.lifr {
-
-            color:
-                #7b2cbf;
-
-            background:
-                #f4e9ff;
-
-        }
-
-
-        /* =====================================================
-           WEATHER STATS
-        ====================================================== */
-
-        .weather-stats {
-
-            position: relative;
-
-            display: grid;
-
-            grid-template-columns:
-                repeat(4, 1fr);
-
             gap: 10px;
 
-            margin-top: 30px;
+            padding: 14px 16px;
 
-        }
-
-
-        .stat {
-
-            padding: 15px;
-
-            border:
-                1px solid
-                var(--border);
+            margin-bottom: 24px;
 
             border-radius: 13px;
 
-            background:
-                var(--surface-2);
-
+            font-size: 14px;
+            font-weight: 600;
         }
 
-
-        .stat-label {
-
+        .status.show {
             display: flex;
-
-            align-items: center;
-
-            gap: 6px;
-
-            color:
-                var(--text-muted);
-
-            font-size: 9px;
-
-            font-weight: 800;
-
-            letter-spacing:
-                .4px;
-
-            text-transform:
-                uppercase;
-
         }
 
-
-        .stat-label i {
-
-            color:
-                var(--primary);
-
+        .status.loading {
+            color: var(--primary);
+            background: var(--primary-light);
         }
 
-
-        .stat-value {
-
-            margin-top: 7px;
-
-            font-family:
-                "Manrope",
-                sans-serif;
-
-            font-size: 16px;
-
-            font-weight:
-                800;
-
+        .status.error {
+            color: var(--danger);
+            background: #fff0f2;
         }
 
+        /* =========================================================
+           WEATHER HERO
+        ========================================================= */
 
-        .stat-sub {
-
-            margin-top: 2px;
-
-            color:
-                var(--text-muted);
-
-            font-size: 9px;
-
-        }
-
-
-        /* =====================================================
-           GRID
-        ====================================================== */
-
-        .weather-grid {
-
+        .weather-layout {
             display: grid;
 
             grid-template-columns:
-                repeat(2, 1fr);
+                minmax(0, 1.45fr)
+                minmax(330px, 0.55fr);
 
-            gap: 20px;
+            gap: 24px;
 
-            margin-top: 20px;
-
+            margin-bottom: 24px;
         }
 
+        .weather-card {
+            position: relative;
+            overflow: hidden;
 
-        .card {
+            min-height: 300px;
 
-            padding: 24px;
+            padding: 30px;
 
-            border:
-                1px solid
-                rgba(255,255,255,.9);
-
-            border-radius:
-                var(--radius-lg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
 
             background:
-                rgba(255,255,255,.9);
+                linear-gradient(
+                    135deg,
+                    #ffffff 0%,
+                    #f8faff 100%
+                );
 
-            box-shadow:
-                var(--shadow-sm);
-
+            box-shadow: var(--shadow-md);
         }
 
+        .weather-card::after {
+            content: "";
 
-        .card-header {
+            position: absolute;
 
-            display: flex;
+            width: 250px;
+            height: 250px;
 
-            align-items: center;
-
-            justify-content: space-between;
-
-            margin-bottom: 20px;
-
-        }
-
-
-        .card-title {
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 9px;
-
-            font-family:
-                "Manrope",
-                sans-serif;
-
-            font-size: 15px;
-
-            font-weight:
-                800;
-
-        }
-
-
-        .card-title i {
-
-            color:
-                var(--primary);
-
-        }
-
-
-        .card-label {
-
-            color:
-                var(--text-muted);
-
-            font-size: 9px;
-
-            font-weight: 800;
-
-            text-transform:
-                uppercase;
-
-            letter-spacing:
-                .6px;
-
-        }
-
-
-        /* =====================================================
-           WIND
-        ====================================================== */
-
-        .wind-content {
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 25px;
-
-        }
-
-
-        .wind-compass {
-
-            position: relative;
-
-            width: 125px;
-            height: 125px;
-
-            flex-shrink: 0;
-
-            display: grid;
-
-            place-items: center;
-
-            border:
-                2px solid
-                #e5eaf2;
+            right: -90px;
+            top: -90px;
 
             border-radius: 50%;
 
             background:
                 radial-gradient(
                     circle,
-                    #ffffff,
-                    #f7f9fc
+                    rgba(91, 124, 250, 0.15),
+                    transparent 70%
                 );
 
+            pointer-events: none;
         }
 
-
-        .compass-mark {
-
-            position: absolute;
-
-            color:
-                var(--text-muted);
-
-            font-size: 8px;
-
-            font-weight: 800;
-
-        }
-
-
-        .compass-n {
-            top: 10px;
-        }
-
-
-        .compass-e {
-            right: 11px;
-        }
-
-
-        .compass-s {
-            bottom: 10px;
-        }
-
-
-        .compass-w {
-            left: 11px;
-        }
-
-
-        .wind-arrow {
-
-            width: 4px;
-            height: 48px;
-
-            position: relative;
-
-            background:
-                var(--primary);
-
-            border-radius: 5px;
-
-            transform-origin:
-                center bottom;
-
-        }
-
-
-        .wind-arrow::after {
-
-            content: "";
-
-            position: absolute;
-
-            left: 50%;
-
-            top: -1px;
-
-            transform:
-                translateX(-50%);
-
-            border-left:
-                7px solid transparent;
-
-            border-right:
-                7px solid transparent;
-
-            border-bottom:
-                14px solid
-                var(--primary);
-
-        }
-
-
-        .wind-details {
-
-            flex: 1;
-
-        }
-
-
-        .wind-speed {
-
-            font-family:
-                "Manrope",
-                sans-serif;
-
-            font-size: 31px;
-
-            font-weight:
-                800;
-
-        }
-
-
-        .wind-direction {
-
-            margin-top: 3px;
-
-            color:
-                var(--text-secondary);
-
-            font-size: 12px;
-
-            font-weight: 600;
-
-        }
-
-
-        .gust {
-
-            margin-top: 13px;
-
-            padding-top: 12px;
-
-            border-top:
-                1px solid
-                var(--border);
-
-            color:
-                var(--text-secondary);
-
-            font-size: 11px;
-
-        }
-
-
-        .gust strong {
-
-            color:
-                var(--text);
-
-        }
-
-
-        /* =====================================================
-           CLOUDS
-        ====================================================== */
-
-        .cloud-list {
-
+        .weather-top {
             display: flex;
-
-            flex-direction: column;
-
-            gap: 9px;
-
-        }
-
-
-        .cloud-row {
-
-            display: flex;
-
-            align-items: center;
-
+            align-items: flex-start;
             justify-content: space-between;
 
-            padding:
-                12px 13px;
+            gap: 20px;
 
-            border:
-                1px solid
-                var(--border);
-
-            border-radius: 11px;
-
-            background:
-                var(--surface-2);
-
+            position: relative;
+            z-index: 1;
         }
 
+        .airport-title {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
 
-        .cloud-type {
+        .airport-icon {
+            width: 50px;
+            height: 50px;
 
             display: flex;
-
             align-items: center;
+            justify-content: center;
 
-            gap: 9px;
+            border-radius: 15px;
+
+            color: var(--primary);
+
+            background: var(--primary-light);
+
+            font-size: 20px;
+        }
+
+        .airport-code {
+            margin: 0;
+
+            font-family: "Manrope", sans-serif;
+
+            font-size: 28px;
+            font-weight: 800;
+        }
+
+        .airport-name {
+            margin: 4px 0 0;
+
+            color: var(--secondary);
+
+            font-size: 14px;
+        }
+
+        .category-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+
+            padding: 9px 12px;
+
+            border-radius: 999px;
 
             font-size: 12px;
+            font-weight: 800;
 
-            font-weight: 700;
-
+            letter-spacing: 0.04em;
         }
 
-
-        .cloud-type i {
-
-            color:
-                var(--primary);
-
+        .category-vfr {
+            color: #087f5b;
+            background: #e8f8f2;
         }
 
-
-        .cloud-altitude {
-
-            font-family:
-                "Manrope",
-                sans-serif;
-
-            font-size: 12px;
-
-            font-weight:
-                800;
-
+        .category-mvfr {
+            color: #087ea4;
+            background: #e7f7fc;
         }
 
-
-        .no-data {
-
-            padding: 20px;
-
-            text-align: center;
-
-            color:
-                var(--text-muted);
-
-            font-size: 12px;
-
+        .category-ifr {
+            color: #a15c00;
+            background: #fff3df;
         }
 
-
-        /* =====================================================
-           METAR / TAF
-        ====================================================== */
-
-        .full-card {
-
-            margin-top: 20px;
-
+        .category-lifr {
+            color: #a52a35;
+            background: #ffe8eb;
         }
 
-
-        .raw-weather {
-
-            padding: 17px;
-
-            border:
-                1px solid
-                var(--border);
-
-            border-radius: 12px;
-
-            color:
-                var(--text-secondary);
-
-            background:
-                var(--surface-2);
-
-            font-family:
-                "DM Mono",
-                "Courier New",
-                monospace;
-
-            font-size: 12px;
-
-            line-height: 1.7;
-
-            word-break:
-                break-word;
-
+        .category-unknown {
+            color: var(--secondary);
+            background: #f1f3f6;
         }
 
-
-        .weather-meta {
-
+        .temperature-area {
             display: flex;
-
             align-items: center;
+            gap: 28px;
 
+            margin-top: 48px;
+
+            position: relative;
+            z-index: 1;
+        }
+
+        .temperature {
+            font-family: "Manrope", sans-serif;
+
+            font-size: clamp(60px, 8vw, 88px);
+            line-height: 0.95;
+
+            font-weight: 800;
+            letter-spacing: -0.06em;
+        }
+
+        .temperature span {
+            font-size: 32px;
+
+            vertical-align: top;
+
+            margin-left: 5px;
+
+            color: var(--secondary);
+        }
+
+        .weather-description {
+            color: var(--secondary);
+
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .weather-description strong {
+            display: block;
+
+            margin-bottom: 4px;
+
+            color: var(--text);
+
+            font-size: 16px;
+        }
+
+        .observation {
+            position: absolute;
+
+            left: 30px;
+            bottom: 25px;
+
+            color: var(--muted);
+
+            font-size: 12px;
+        }
+
+        /* =========================================================
+           AIRPORT INFO
+        ========================================================= */
+
+        .info-card {
+            padding: 26px;
+
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+
+            background: white;
+
+            box-shadow: var(--shadow-sm);
+        }
+
+        .card-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            margin-bottom: 22px;
+        }
+
+        .card-title h2 {
+            margin: 0;
+
+            font-family: "Manrope", sans-serif;
+
+            font-size: 17px;
+            font-weight: 800;
+        }
+
+        .card-title i {
+            color: var(--primary);
+        }
+
+        .info-list {
+            display: grid;
+
+            gap: 13px;
+        }
+
+        .info-row {
+            display: flex;
+            align-items: center;
             justify-content: space-between;
 
             gap: 15px;
 
-            margin-top: 12px;
+            padding-bottom: 13px;
 
-            color:
-                var(--text-muted);
-
-            font-size: 10px;
-
+            border-bottom: 1px solid #eef1f5;
         }
 
+        .info-row:last-child {
+            padding-bottom: 0;
+            border-bottom: 0;
+        }
 
-        /* =====================================================
-           AIRPORT INFO
-        ====================================================== */
+        .info-label {
+            color: var(--secondary);
 
-        .airport-info {
+            font-size: 13px;
+        }
 
+        .info-value {
+            color: var(--text);
+
+            font-size: 13px;
+            font-weight: 700;
+
+            text-align: right;
+        }
+
+        /* =========================================================
+           METRICS
+        ========================================================= */
+
+        .metrics {
             display: grid;
 
             grid-template-columns:
-                repeat(4, 1fr);
+                repeat(4, minmax(0, 1fr));
 
-            gap: 10px;
+            gap: 16px;
 
+            margin-bottom: 24px;
         }
 
+        .metric {
+            padding: 21px;
 
-        .airport-info-item {
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
 
-            padding: 13px;
+            background: white;
 
-            border:
-                1px solid
-                var(--border);
+            box-shadow: var(--shadow-sm);
+
+            transition: 0.2s ease;
+        }
+
+        .metric:hover {
+            transform: translateY(-2px);
+
+            box-shadow: var(--shadow-md);
+        }
+
+        .metric-icon {
+            width: 38px;
+            height: 38px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            margin-bottom: 15px;
 
             border-radius: 11px;
 
-            background:
-                var(--surface-2);
-
+            color: var(--primary);
+            background: var(--primary-light);
         }
 
-
-        .airport-info-label {
-
-            color:
-                var(--text-muted);
-
-            font-size: 8px;
-
-            font-weight:
-                800;
-
-            text-transform:
-                uppercase;
-
-            letter-spacing:
-                .5px;
-
-        }
-
-
-        .airport-info-value {
-
-            margin-top: 5px;
+        .metric-label {
+            color: var(--secondary);
 
             font-size: 12px;
-
-            font-weight:
-                700;
-
+            font-weight: 600;
         }
 
+        .metric-value {
+            margin-top: 5px;
 
-        /* =====================================================
+            font-family: "Manrope", sans-serif;
+
+            font-size: 21px;
+            font-weight: 800;
+        }
+
+        /* =========================================================
+           CLOUDS + TAF
+        ========================================================= */
+
+        .bottom-grid {
+            display: grid;
+
+            grid-template-columns:
+                minmax(0, 1fr)
+                minmax(0, 1fr);
+
+            gap: 24px;
+
+            margin-bottom: 24px;
+        }
+
+        .panel {
+            padding: 26px;
+
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+
+            background: white;
+
+            box-shadow: var(--shadow-sm);
+        }
+
+        .cloud-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .cloud-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            padding: 13px 14px;
+
+            border-radius: 12px;
+
+            background: var(--surface-soft);
+        }
+
+        .cloud-type {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .cloud-type i {
+            color: var(--primary);
+        }
+
+        .cloud-height {
+            color: var(--secondary);
+
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .empty {
+            color: var(--muted);
+
+            padding: 20px 0;
+
+            text-align: center;
+
+            font-size: 13px;
+        }
+
+        .taf-box {
+            min-height: 130px;
+
+            padding: 16px;
+
+            border-radius: 13px;
+
+            background: #101828;
+
+            color: #dce5f7;
+
+            font-family: monospace;
+            font-size: 12px;
+            line-height: 1.7;
+
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        /* =========================================================
+           RAW METAR
+        ========================================================= */
+
+        .raw-card {
+            padding: 26px;
+
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+
+            background: white;
+
+            box-shadow: var(--shadow-sm);
+        }
+
+        .raw-metar {
+            margin-top: 15px;
+
+            padding: 18px;
+
+            border-radius: 13px;
+
+            background: #101828;
+
+            color: #e6edf7;
+
+            font-family: monospace;
+            font-size: 13px;
+            line-height: 1.7;
+
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .refresh-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+
+            padding: 9px 12px;
+
+            border: 1px solid var(--border);
+            border-radius: 10px;
+
+            color: var(--secondary);
+            background: white;
+
+            font-size: 12px;
+            font-weight: 700;
+
+            transition: 0.2s ease;
+        }
+
+        .refresh-button:hover {
+            color: var(--primary);
+            border-color: #cfd7ee;
+            background: var(--primary-light);
+        }
+
+        .refresh-button.loading i {
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* =========================================================
            RESPONSIVE
-        ====================================================== */
+        ========================================================= */
 
-        @media (max-width: 1000px) {
+        @media (max-width: 1050px) {
+            .weather-layout {
+                grid-template-columns: 1fr;
+            }
 
+            .metrics {
+                grid-template-columns:
+                    repeat(2, minmax(0, 1fr));
+            }
+
+            .bottom-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 800px) {
             .nav-links {
                 display: none;
             }
 
-            .weather-stats {
-                grid-template-columns:
-                    repeat(2, 1fr);
+            .page-header {
+                align-items: flex-start;
+
+                flex-direction: column;
             }
 
-            .airport-info {
-                grid-template-columns:
-                    repeat(2, 1fr);
+            .temperature-area {
+                margin-top: 35px;
             }
-
         }
 
-
-        @media (max-width: 700px) {
-
+        @media (max-width: 600px) {
             .container {
-
-                width:
-                    calc(100% - 28px);
-
+                padding: 28px 16px 50px;
             }
 
-
-            .page {
-
-                padding:
-                    35px 0 50px;
-
+            .nav-inner {
+                padding: 0 16px;
             }
 
-
-            .page-title {
-
-                font-size:
-                    40px;
-
-                letter-spacing:
-                    -2px;
-
+            .search-row {
+                flex-direction: column;
             }
-
-
-            .search-wrapper {
-
-                flex-direction:
-                    column;
-
-            }
-
 
             .search-button {
-
                 width: 100%;
-
             }
 
-
-            .weather-main {
-
-                padding:
-                    22px;
-
+            .weather-card {
+                padding: 22px;
             }
-
 
             .weather-top {
-
-                flex-direction:
-                    column;
-
+                flex-direction: column;
             }
 
-
-            .condition-row {
-
-                gap: 15px;
-
+            .temperature-area {
+                gap: 18px;
             }
 
-
-            .weather-icon {
-
-                width: 70px;
-                height: 70px;
-
-                font-size: 30px;
-
+            .metrics {
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
             }
 
-
-            .temperature {
-
-                font-size: 46px;
-
+            .metric {
+                padding: 16px;
             }
 
+            .observation {
+                position: static;
 
-            .weather-grid {
-
-                grid-template-columns:
-                    1fr;
-
+                margin-top: 25px;
             }
-
-
-            .weather-stats {
-
-                grid-template-columns:
-                    repeat(2, 1fr);
-
-            }
-
-
-            .wind-content {
-
-                flex-direction:
-                    column;
-
-            }
-
-
-            .wind-compass {
-
-                width: 110px;
-                height: 110px;
-
-            }
-
-
-            .airport-info {
-
-                grid-template-columns:
-                    1fr 1fr;
-
-            }
-
         }
-
-
-        @media (max-width: 430px) {
-
-            .profile-name {
-
-                display: none;
-
-            }
-
-
-            .brand-version {
-
-                display: none;
-
-            }
-
-
-            .weather-stats {
-
-                grid-template-columns:
-                    1fr 1fr;
-
-            }
-
-
-            .stat {
-
-                padding:
-                    12px;
-
-            }
-
-
-            .airport-code {
-
-                font-size:
-                    36px;
-
-            }
-
-        }
-
     </style>
-
 </head>
-
 
 <body>
 
+<!-- =========================================================
+     NAVBAR
+========================================================= -->
 
-    <!-- =========================================================
-         NAVBAR
-    ========================================================== -->
+<nav class="navbar">
+    <div class="nav-inner">
 
-    <nav class="navbar">
+        <a href="index.html" class="brand">
+            <div class="brand-mark">
+                <i class="fa-solid fa-plane"></i>
+            </div>
 
-        <div class="container navbar-inner">
+            Flight App
+        </a>
 
-
-            <a href="/" class="brand">
-
-                <div class="brand-mark">
-
-                    <i class="fa-solid fa-paper-plane"></i>
-
-                </div>
-
-                <div>
-
-                    <span class="brand-name">
-                        Flight App
-                    </span>
-
-                    <span class="brand-version">
-                        V1
-                    </span>
-
-                </div>
-
+        <div class="nav-links">
+            <a href="index.html" class="nav-link">
+                Dashboard
             </a>
 
+            <a href="planner.html" class="nav-link">
+                Flight Planner
+            </a>
 
-            <div class="nav-links">
+            <a href="weather.html" class="nav-link active">
+                Weather
+            </a>
 
-                <a
-                    href="/"
-                    class="nav-link"
+            <a href="simbrief.html" class="nav-link">
+                SimBrief
+            </a>
+
+            <a href="plans.html" class="nav-link">
+                Saved Plans
+            </a>
+        </div>
+
+        <button class="profile-button">
+            <i class="fa-solid fa-user"></i>
+        </button>
+
+    </div>
+</nav>
+
+
+<main class="container">
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <div class="page-header">
+
+        <div>
+            <div class="eyebrow">
+                <i class="fa-solid fa-cloud-sun"></i>
+                Aviation Weather
+            </div>
+
+            <h1>Airport Weather</h1>
+
+            <p>
+                Live METAR, TAF and airport weather information.
+            </p>
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         SEARCH
+    ====================================================== -->
+
+    <section class="search-card">
+
+        <form id="weatherForm">
+
+            <div class="search-row">
+
+                <div class="search-input-wrapper">
+
+                    <i class="fa-solid fa-location-dot"></i>
+
+                    <input
+                        id="icaoInput"
+                        class="search-input"
+                        type="text"
+                        maxlength="4"
+                        placeholder="Enter ICAO code — e.g. EHAM"
+                        value="EHAM"
+                        autocomplete="off"
+                        spellcheck="false"
+                    >
+
+                </div>
+
+                <button
+                    type="submit"
+                    class="search-button"
                 >
-                    Dashboard
-                </a>
-
-                <a
-                    href="/flights.html"
-                    class="nav-link"
-                >
-                    Flights
-                </a>
-
-                <a
-                    href="/weather.html"
-                    class="nav-link active"
-                >
-                    Weather
-                </a>
-
-                <a
-                    href="/simbrief.html"
-                    class="nav-link"
-                >
-                    SimBrief
-                </a>
-
-                <a
-                    href="/plans.html"
-                    class="nav-link"
-                >
-                    Flight Plans
-                </a>
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    Check Weather
+                </button>
 
             </div>
 
-
-            <div class="nav-actions">
-
-                <button
-                    class="icon-button"
-                    title="Notifications"
-                >
-
-                    <i class="fa-regular fa-bell"></i>
-
-                </button>
+        </form>
 
 
-                <button
-                    class="profile-button"
-                >
+        <div class="quick-airports">
 
-                    <div class="profile-avatar">
-                        FA
-                    </div>
+            <span class="quick-label">
+                Popular:
+            </span>
 
-                    <span class="profile-name">
-                        Pilot
-                    </span>
+            <button class="airport-chip" data-icao="EHAM">
+                EHAM
+            </button>
 
-                </button>
+            <button class="airport-chip" data-icao="EGLL">
+                EGLL
+            </button>
 
-            </div>
+            <button class="airport-chip" data-icao="LFPG">
+                LFPG
+            </button>
+
+            <button class="airport-chip" data-icao="EDDF">
+                EDDF
+            </button>
+
+            <button class="airport-chip" data-icao="LIRF">
+                LIRF
+            </button>
+
+            <button class="airport-chip" data-icao="KJFK">
+                KJFK
+            </button>
 
         </div>
 
-    </nav>
+    </section>
 
 
-    <!-- =========================================================
-         PAGE
-    ========================================================== -->
+    <!-- =====================================================
+         STATUS
+    ====================================================== -->
 
-    <main class="page">
+    <div id="status" class="status">
 
-        <div class="container">
+        <i id="statusIcon" class="fa-solid fa-circle-info"></i>
+
+        <span id="statusText"></span>
+
+    </div>
 
 
-            <!-- =================================================
-                 HEADER
-            ================================================== -->
+    <!-- =====================================================
+         MAIN WEATHER
+    ====================================================== -->
 
-            <header class="page-header">
+    <div class="weather-layout">
 
-                <div class="page-badge">
+        <section class="weather-card">
 
-                    <i class="fa-solid fa-cloud-sun"></i>
+            <div class="weather-top">
 
-                    AVIATION WEATHER
+                <div class="airport-title">
+
+                    <div class="airport-icon">
+                        <i class="fa-solid fa-plane-departure"></i>
+                    </div>
+
+                    <div>
+
+                        <h2
+                            id="airportCode"
+                            class="airport-code"
+                        >
+                            EHAM
+                        </h2>
+
+                        <p
+                            id="airportName"
+                            class="airport-name"
+                        >
+                            Loading airport...
+                        </p>
+
+                    </div>
 
                 </div>
 
 
-                <h1 class="page-title">
+                <div
+                    id="flightCategory"
+                    class="category-badge category-unknown"
+                >
+                    <i class="fa-solid fa-circle"></i>
+                    UNKNOWN
+                </div>
 
-                    Weather for your
-                    <span class="gradient">
-                        next flight.
+            </div>
+
+
+            <div class="temperature-area">
+
+                <div class="temperature">
+
+                    <span id="temperature">
+                        --
                     </span>
 
-                </h1>
-
-
-                <p class="page-description">
-
-                    Get live METAR and TAF information for airports
-                    around the world. Search any ICAO code to view
-                    current aviation weather conditions.
-
-                </p>
-
-            </header>
-
-
-            <!-- =================================================
-                 SEARCH
-            ================================================== -->
-
-            <section class="search-card">
-
-                <div class="search-wrapper">
-
-                    <div class="search-input-wrapper">
-
-                        <i class="fa-solid fa-location-dot"></i>
-
-                        <input
-                            id="icaoInput"
-                            class="search-input"
-                            type="text"
-                            maxlength="4"
-                            placeholder="Enter ICAO code — e.g. EHAM"
-                            autocomplete="off"
-                        >
-
-                    </div>
-
-
-                    <button
-                        id="searchButton"
-                        class="search-button"
-                    >
-
-                        <i class="fa-solid fa-magnifying-glass"></i>
-
-                        Search
-
-                    </button>
+                    <span>°C</span>
 
                 </div>
 
-            </section>
 
+                <div class="weather-description">
 
-            <!-- =================================================
-                 MESSAGE
-            ================================================== -->
+                    <strong id="weatherDescription">
+                        Waiting for weather
+                    </strong>
 
-            <div
-                id="errorMessage"
-                class="message error"
-            >
+                    <span id="weatherSummary">
+                        METAR data will appear here.
+                    </span>
 
-                <i class="fa-solid fa-circle-exclamation"></i>
-
-                <span id="errorText">
-                    Weather unavailable.
-                </span>
+                </div>
 
             </div>
 
 
-            <!-- =================================================
-                 LOADING
-            ================================================== -->
-
             <div
-                id="loading"
-                class="loading"
+                id="observation"
+                class="observation"
             >
+                Observation: --
+            </div>
 
-                <div class="spinner"></div>
+        </section>
 
-                Loading aviation weather...
+
+        <!-- AIRPORT INFORMATION -->
+
+        <section class="info-card">
+
+            <div class="card-title">
+
+                <h2>
+                    Airport Information
+                </h2>
+
+                <i class="fa-solid fa-building"></i>
 
             </div>
 
 
-            <!-- =================================================
-                 WEATHER CONTENT
-            ================================================== -->
-
-            <div id="weatherContent">
-
-
-                <!-- =================================================
-                     MAIN WEATHER
-                ================================================== -->
-
-                <section class="weather-main">
-
-                    <div class="weather-top">
-
-                        <div>
-
-                            <div class="airport-label">
-                                CURRENT CONDITIONS
-                            </div>
-
-                            <div
-                                id="airportCode"
-                                class="airport-code"
-                            >
-                                EHAM
-                            </div>
-
-                            <div
-                                id="airportName"
-                                class="airport-name"
-                            >
-                                Amsterdam Airport Schiphol
-                            </div>
-
-                        </div>
-
-
-                        <div class="live-status">
-
-                            <span class="live-dot"></span>
-
-                            Live METAR
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="condition-row">
-
-                        <div
-                            id="weatherIcon"
-                            class="weather-icon"
-                        >
-
-                            <i class="fa-solid fa-cloud"></i>
-
-                        </div>
-
-
-                        <div>
-
-                            <div>
-
-                                <span
-                                    id="temperature"
-                                    class="temperature"
-                                >
-                                    --
-                                </span>
-
-                                <span class="temperature-unit">
-                                    °C
-                                </span>
-
-                            </div>
-
-
-                            <div
-                                id="conditionText"
-                                class="condition-text"
-                            >
-                                Loading conditions...
-                            </div>
-
-
-                            <div
-                                id="flightCategory"
-                                class="flight-category vfr"
-                            >
-                                VFR
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- =============================================
-                         STATS
-                    ============================================== -->
-
-                    <div class="weather-stats">
-
-
-                        <div class="stat">
-
-                            <div class="stat-label">
-
-                                <i class="fa-solid fa-wind"></i>
-
-                                Wind
-
-                            </div>
-
-                            <div
-                                id="windStat"
-                                class="stat-value"
-                            >
-                                --
-                            </div>
-
-                            <div class="stat-sub">
-                                Direction / speed
-                            </div>
-
-                        </div>
-
-
-                        <div class="stat">
-
-                            <div class="stat-label">
-
-                                <i class="fa-solid fa-eye"></i>
-
-                                Visibility
-
-                            </div>
-
-                            <div
-                                id="visibilityStat"
-                                class="stat-value"
-                            >
-                                --
-                            </div>
-
-                            <div class="stat-sub">
-                                Reported visibility
-                            </div>
-
-                        </div>
-
-
-                        <div class="stat">
-
-                            <div class="stat-label">
-
-                                <i class="fa-solid fa-gauge-high"></i>
-
-                                QNH
-
-                            </div>
-
-                            <div
-                                id="qnhStat"
-                                class="stat-value"
-                            >
-                                --
-                            </div>
-
-                            <div class="stat-sub">
-                                Sea level pressure
-                            </div>
-
-                        </div>
-
-
-                        <div class="stat">
-
-                            <div class="stat-label">
-
-                                <i class="fa-solid fa-droplet"></i>
-
-                                Dew Point
-
-                            </div>
-
-                            <div
-                                id="dewStat"
-                                class="stat-value"
-                            >
-                                --
-                            </div>
-
-                            <div class="stat-sub">
-                                Condensation point
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </section>
-
-
-                <!-- =================================================
-                     SECONDARY GRID
-                ================================================== -->
-
-                <div class="weather-grid">
-
-
-                    <!-- =================================================
-                         WIND CARD
-                    ================================================== -->
-
-                    <section class="card">
-
-                        <div class="card-header">
-
-                            <div class="card-title">
-
-                                <i class="fa-solid fa-compass"></i>
-
-                                Wind
-
-                            </div>
-
-                            <span class="card-label">
-                                Surface
-                            </span>
-
-                        </div>
-
-
-                        <div class="wind-content">
-
-                            <div class="wind-compass">
-
-                                <span class="compass-mark compass-n">
-                                    N
-                                </span>
-
-                                <span class="compass-mark compass-e">
-                                    E
-                                </span>
-
-                                <span class="compass-mark compass-s">
-                                    S
-                                </span>
-
-                                <span class="compass-mark compass-w">
-                                    W
-                                </span>
-
-                                <div
-                                    id="windArrow"
-                                    class="wind-arrow"
-                                ></div>
-
-                            </div>
-
-
-                            <div class="wind-details">
-
-                                <div
-                                    id="windSpeed"
-                                    class="wind-speed"
-                                >
-                                    --
-                                </div>
-
-                                <div
-                                    id="windDirection"
-                                    class="wind-direction"
-                                >
-                                    --
-                                </div>
-
-                                <div class="gust">
-
-                                    Gusts:
-
-                                    <strong id="windGust">
-                                        --
-                                    </strong>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    </section>
-
-
-                    <!-- =================================================
-                         CLOUD CARD
-                    ================================================== -->
-
-                    <section class="card">
-
-                        <div class="card-header">
-
-                            <div class="card-title">
-
-                                <i class="fa-solid fa-cloud"></i>
-
-                                Cloud Layers
-
-                            </div>
-
-                            <span class="card-label">
-                                METAR
-                            </span>
-
-                        </div>
-
-
-                        <div
-                            id="cloudList"
-                            class="cloud-list"
-                        >
-
-                            <div class="no-data">
-                                No cloud information
-                            </div>
-
-                        </div>
-
-                    </section>
-
-                </div>
-
-
-                <!-- =================================================
-                     METAR
-                ================================================== -->
-
-                <section class="card full-card">
-
-                    <div class="card-header">
-
-                        <div class="card-title">
-
-                            <i class="fa-solid fa-tower-broadcast"></i>
-
-                            METAR
-
-                        </div>
-
-                        <span class="card-label">
-                            RAW REPORT
-                        </span>
-
-                    </div>
-
-
-                    <div
-                        id="rawMetar"
-                        class="raw-weather"
+            <div class="info-list">
+
+                <div class="info-row">
+                    <span class="info-label">
+                        ICAO
+                    </span>
+
+                    <span
+                        id="infoICAO"
+                        class="info-value"
                     >
                         --
-                    </div>
+                    </span>
+                </div>
 
 
-                    <div class="weather-meta">
+                <div class="info-row">
+                    <span class="info-label">
+                        Airport
+                    </span>
 
-                        <span>
-                            <i class="fa-regular fa-clock"></i>
-                            Report time
-                        </span>
-
-                        <strong id="metarTime">
-                            --
-                        </strong>
-
-                    </div>
-
-                </section>
-
-
-                <!-- =================================================
-                     TAF
-                ================================================== -->
-
-                <section class="card full-card">
-
-                    <div class="card-header">
-
-                        <div class="card-title">
-
-                            <i class="fa-solid fa-calendar-days"></i>
-
-                            TAF Forecast
-
-                        </div>
-
-                        <span class="card-label">
-                            TERMINAL FORECAST
-                        </span>
-
-                    </div>
-
-
-                    <div
-                        id="rawTaf"
-                        class="raw-weather"
+                    <span
+                        id="infoName"
+                        class="info-value"
                     >
-                        Loading TAF...
-                    </div>
-
-                </section>
-
-
-                <!-- =================================================
-                     AIRPORT INFORMATION
-                ================================================== -->
-
-                <section class="card full-card">
-
-                    <div class="card-header">
-
-                        <div class="card-title">
-
-                            <i class="fa-solid fa-plane-departure"></i>
-
-                            Airport Information
-
-                        </div>
-
-                    </div>
+                        --
+                    </span>
+                </div>
 
 
-                    <div
-                        id="airportInfo"
-                        class="airport-info"
+                <div class="info-row">
+                    <span class="info-label">
+                        Elevation
+                    </span>
+
+                    <span
+                        id="infoElevation"
+                        class="info-value"
                     >
-
-                        <div class="airport-info-item">
-
-                            <div class="airport-info-label">
-                                ICAO
-                            </div>
-
-                            <div
-                                id="infoIcao"
-                                class="airport-info-value"
-                            >
-                                --
-                            </div>
-
-                        </div>
+                        --
+                    </span>
+                </div>
 
 
-                        <div class="airport-info-item">
+                <div class="info-row">
+                    <span class="info-label">
+                        Latitude
+                    </span>
 
-                            <div class="airport-info-label">
-                                IATA
-                            </div>
-
-                            <div
-                                id="infoIata"
-                                class="airport-info-value"
-                            >
-                                --
-                            </div>
-
-                        </div>
+                    <span
+                        id="infoLatitude"
+                        class="info-value"
+                    >
+                        --
+                    </span>
+                </div>
 
 
-                        <div class="airport-info-item">
+                <div class="info-row">
+                    <span class="info-label">
+                        Longitude
+                    </span>
 
-                            <div class="airport-info-label">
-                                Location
-                            </div>
+                    <span
+                        id="infoLongitude"
+                        class="info-value"
+                    >
+                        --
+                    </span>
+                </div>
 
-                            <div
-                                id="infoLocation"
-                                class="airport-info-value"
-                            >
-                                --
-                            </div>
+            </div>
 
-                        </div>
+        </section>
+
+    </div>
 
 
-                        <div class="airport-info-item">
+    <!-- =====================================================
+         WEATHER METRICS
+    ====================================================== -->
 
-                            <div class="airport-info-label">
-                                Elevation
-                            </div>
+    <section class="metrics">
 
-                            <div
-                                id="infoElevation"
-                                class="airport-info-value"
-                            >
-                                --
-                            </div>
+        <div class="metric">
 
-                        </div>
+            <div class="metric-icon">
+                <i class="fa-solid fa-wind"></i>
+            </div>
 
-                    </div>
+            <div class="metric-label">
+                Wind
+            </div>
 
-                </section>
-
+            <div
+                id="wind"
+                class="metric-value"
+            >
+                --
             </div>
 
         </div>
 
-    </main>
+
+        <div class="metric">
+
+            <div class="metric-icon">
+                <i class="fa-solid fa-temperature-half"></i>
+            </div>
+
+            <div class="metric-label">
+                Dew Point
+            </div>
+
+            <div
+                id="dewpoint"
+                class="metric-value"
+            >
+                --
+            </div>
+
+        </div>
 
 
-    <!-- =========================================================
-         JAVASCRIPT
-    ========================================================== -->
+        <div class="metric">
 
-    <script>
+            <div class="metric-icon">
+                <i class="fa-solid fa-eye"></i>
+            </div>
+
+            <div class="metric-label">
+                Visibility
+            </div>
+
+            <div
+                id="visibility"
+                class="metric-value"
+            >
+                --
+            </div>
+
+        </div>
+
+
+        <div class="metric">
+
+            <div class="metric-icon">
+                <i class="fa-solid fa-gauge-high"></i>
+            </div>
+
+            <div class="metric-label">
+                QNH
+            </div>
+
+            <div
+                id="qnh"
+                class="metric-value"
+            >
+                --
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         CLOUDS + TAF
+    ====================================================== -->
+
+    <div class="bottom-grid">
+
+        <section class="panel">
+
+            <div class="card-title">
+
+                <h2>
+                    Cloud Layers
+                </h2>
+
+                <i class="fa-solid fa-cloud"></i>
+
+            </div>
+
+
+            <div
+                id="clouds"
+                class="cloud-list"
+            >
+
+                <div class="empty">
+                    No cloud information available.
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <section class="panel">
+
+            <div class="card-title">
+
+                <h2>
+                    TAF Forecast
+                </h2>
+
+                <i class="fa-solid fa-cloud-sun-rain"></i>
+
+            </div>
+
+
+            <div
+                id="taf"
+                class="taf-box"
+            >
+                Loading TAF...
+            </div>
+
+        </section>
+
+    </div>
+
+
+    <!-- =====================================================
+         RAW METAR
+    ====================================================== -->
+
+    <section class="raw-card">
+
+        <div class="card-title">
+
+            <h2>
+                Raw METAR
+            </h2>
+
+            <button
+                id="refreshButton"
+                class="refresh-button"
+            >
+                <i class="fa-solid fa-rotate"></i>
+                Refresh
+            </button>
+
+        </div>
+
+
+        <div
+            id="rawMetar"
+            class="raw-metar"
+        >
+            Waiting for METAR...
+        </div>
+
+    </section>
+
+</main>
+
+
+<script>
+
+/*
+|--------------------------------------------------------------------------
+| API CONFIGURATION
+|--------------------------------------------------------------------------
+|
+| If weather.html is hosted by the SAME Express server:
+|
+|     const API_BASE = "";
+|
+| If your frontend is hosted somewhere else, put the backend URL here:
+|
+|     const API_BASE = "https://your-backend-url.com";
+|
+*/
+
+const API_BASE = "";
+
+
+/*
+|--------------------------------------------------------------------------
+| ELEMENTS
+|--------------------------------------------------------------------------
+*/
+
+const form = document.getElementById("weatherForm");
+const input = document.getElementById("icaoInput");
+
+const status = document.getElementById("status");
+const statusIcon = document.getElementById("statusIcon");
+const statusText = document.getElementById("statusText");
+
+const airportCode = document.getElementById("airportCode");
+const airportName = document.getElementById("airportName");
+
+const flightCategory = document.getElementById("flightCategory");
+
+const temperature = document.getElementById("temperature");
+const weatherDescription =
+    document.getElementById("weatherDescription");
+
+const weatherSummary =
+    document.getElementById("weatherSummary");
+
+const observation =
+    document.getElementById("observation");
+
+const wind =
+    document.getElementById("wind");
+
+const dewpoint =
+    document.getElementById("dewpoint");
+
+const visibility =
+    document.getElementById("visibility");
+
+const qnh =
+    document.getElementById("qnh");
+
+const clouds =
+    document.getElementById("clouds");
+
+const taf =
+    document.getElementById("taf");
+
+const rawMetar =
+    document.getElementById("rawMetar");
+
+const refreshButton =
+    document.getElementById("refreshButton");
+
+
+/*
+|--------------------------------------------------------------------------
+| STATUS
+|--------------------------------------------------------------------------
+*/
+
+function showStatus(message, type = "loading") {
+
+    status.className = `status show ${type}`;
+
+    statusText.textContent = message;
+
+    if (type === "loading") {
+
+        statusIcon.className =
+            "fa-solid fa-spinner fa-spin";
+
+    } else {
+
+        statusIcon.className =
+            "fa-solid fa-triangle-exclamation";
+
+    }
+}
+
+
+function hideStatus() {
+
+    status.className = "status";
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| ICAO
+|--------------------------------------------------------------------------
+*/
+
+function cleanICAO(value) {
+
+    return value
+        .trim()
+        .toUpperCase();
+
+}
+
+
+function validICAO(value) {
+
+    return /^[A-Z]{4}$/.test(value);
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| API REQUEST
+|--------------------------------------------------------------------------
+*/
+
+async function apiRequest(path) {
+
+    const url =
+        `${API_BASE}${path}`;
+
+    const response =
+        await fetch(url, {
+            method: "GET",
+
+            headers: {
+                "Accept": "application/json"
+            }
+        });
+
+    const text =
+        await response.text();
+
+    let data;
+
+    try {
+
+        data = JSON.parse(text);
+
+    } catch {
+
+        throw new Error(
+            `Server returned HTTP ${response.status}`
+        );
+
+    }
+
+    if (!response.ok) {
+
+        throw new Error(
+            data.message ||
+            `Request failed with HTTP ${response.status}`
+        );
+
+    }
+
+    return data;
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| FLIGHT CATEGORY
+|--------------------------------------------------------------------------
+*/
+
+function setFlightCategory(category) {
+
+    const value =
+        String(category || "UNKNOWN").toUpperCase();
+
+    let className =
+        "category-unknown";
+
+    let icon =
+        "fa-circle";
+
+    if (value === "VFR") {
+
+        className = "category-vfr";
+        icon = "fa-circle-check";
+
+    }
+
+    if (value === "MVFR") {
+
+        className = "category-mvfr";
+        icon = "fa-circle-half-stroke";
+
+    }
+
+    if (value === "IFR") {
+
+        className = "category-ifr";
+        icon = "fa-triangle-exclamation";
+
+    }
+
+    if (value === "LIFR") {
+
+        className = "category-lifr";
+        icon = "fa-circle-exclamation";
+
+    }
+
+    flightCategory.className =
+        `category-badge ${className}`;
+
+    flightCategory.innerHTML =
+        `<i class="fa-solid ${icon}"></i> ${value}`;
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| WEATHER DESCRIPTION
+|--------------------------------------------------------------------------
+*/
+
+function getWeatherDescription(metar) {
+
+    const cover =
+        String(metar.cover || "").toUpperCase();
+
+    const category =
+        String(metar.fltCat || "").toUpperCase();
+
+    if (category === "LIFR") {
+        return "Low visibility conditions";
+    }
+
+    if (category === "IFR") {
+        return "Instrument flight conditions";
+    }
+
+    if (category === "MVFR") {
+        return "Marginal VFR conditions";
+    }
+
+    if (cover === "OVC") {
+        return "Overcast skies";
+    }
+
+    if (cover === "BKN") {
+        return "Broken cloud cover";
+    }
+
+    if (cover === "SCT") {
+        return "Scattered clouds";
+    }
+
+    if (cover === "FEW") {
+        return "Few clouds";
+    }
+
+    return "Good flying conditions";
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| DATE
+|--------------------------------------------------------------------------
+*/
+
+function formatObservationTime(metar) {
+
+    if (metar.obsTime) {
+
+        const date =
+            new Date(metar.obsTime * 1000);
+
+        return date.toLocaleString(
+            undefined,
+            {
+                dateStyle: "medium",
+                timeStyle: "short"
+            }
+        );
+    }
+
+    if (metar.reportTime) {
+
+        const date =
+            new Date(metar.reportTime);
+
+        return date.toLocaleString(
+            undefined,
+            {
+                dateStyle: "medium",
+                timeStyle: "short"
+            }
+        );
+    }
+
+    return "--";
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| CLOUDS
+|--------------------------------------------------------------------------
+*/
+
+function cloudName(value) {
+
+    const names = {
+        FEW: "Few",
+        SCT: "Scattered",
+        BKN: "Broken",
+        OVC: "Overcast",
+        VV: "Vertical visibility"
+    };
+
+    return names[value] || value || "Unknown";
+
+}
+
+
+function renderClouds(cloudData) {
+
+    clouds.innerHTML = "";
+
+    if (!Array.isArray(cloudData) ||
+        cloudData.length === 0) {
+
+        clouds.innerHTML = `
+            <div class="empty">
+                No significant cloud layers reported.
+            </div>
+        `;
+
+        return;
+    }
+
+    cloudData.forEach(layer => {
+
+        const row =
+            document.createElement("div");
+
+        row.className = "cloud-row";
+
+        const base =
+            layer.base != null
+                ? `${Number(layer.base).toLocaleString()} ft`
+                : "Unknown height";
+
+        row.innerHTML = `
+            <div class="cloud-type">
+                <i class="fa-solid fa-cloud"></i>
+                ${cloudName(layer.cover)}
+            </div>
+
+            <div class="cloud-height">
+                ${base}
+            </div>
+        `;
+
+        clouds.appendChild(row);
+
+    });
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| RENDER METAR
+|--------------------------------------------------------------------------
+*/
+
+function renderWeather(metar, icao) {
+
+    airportCode.textContent =
+        metar.icaoId ||
+        icao;
+
+    airportName.textContent =
+        metar.name ||
+        "Airport weather";
+
+    temperature.textContent =
+        metar.temp != null
+            ? metar.temp
+            : "--";
+
+    dewpoint.textContent =
+        metar.dewp != null
+            ? `${metar.dewp} °C`
+            : "--";
+
+    /*
+     * AviationWeather.gov reports wind speed
+     * in knots.
+     */
+
+    if (metar.wdir != null &&
+        metar.wspd != null) {
+
+        wind.textContent =
+            `${String(metar.wdir).padStart(3, "0")}° / ${metar.wspd} kt`;
+
+    } else {
+
+        wind.textContent = "--";
+
+    }
+
+    visibility.textContent =
+        metar.visib != null
+            ? metar.visib
+            : "--";
+
+    qnh.textContent =
+        metar.altim != null
+            ? `${metar.altim} hPa`
+            : "--";
+
+    setFlightCategory(
+        metar.fltCat
+    );
+
+    weatherDescription.textContent =
+        getWeatherDescription(metar);
+
+    const temp =
+        metar.temp != null
+            ? `${metar.temp}°C`
+            : "Temperature unavailable";
+
+    const windText =
+        metar.wspd != null
+            ? `${metar.wspd} kt wind`
+            : "Wind unavailable";
+
+    weatherSummary.textContent =
+        `${temp} · ${windText}`;
+
+    observation.textContent =
+        `Observation: ${formatObservationTime(metar)}`;
+
+    rawMetar.textContent =
+        metar.rawOb ||
+        metar.raw_text ||
+        "Raw METAR unavailable.";
+
+    renderClouds(
+        metar.clouds
+    );
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| AIRPORT INFO
+|--------------------------------------------------------------------------
+*/
+
+async function loadAirportInfo(icao) {
+
+    try {
+
+        const data =
+            await apiRequest(
+                `/api/airports/${icao}`
+            );
+
+        const airport =
+            data.airport ||
+            data;
+
+        document.getElementById("infoICAO")
+            .textContent =
+            airport.icao ||
+            airport.icao_code ||
+            icao;
+
+        document.getElementById("infoName")
+            .textContent =
+            airport.name ||
+            airport.airport_name ||
+            "--";
+
+        document.getElementById("infoElevation")
+            .textContent =
+            airport.elevation != null
+                ? `${airport.elevation} ft`
+                : "--";
+
+        document.getElementById("infoLatitude")
+            .textContent =
+            airport.latitude != null
+                ? Number(airport.latitude).toFixed(4)
+                : "--";
+
+        document.getElementById("infoLongitude")
+            .textContent =
+            airport.longitude != null
+                ? Number(airport.longitude).toFixed(4)
+                : "--";
+
+    } catch (error) {
+
+        console.warn(
+            "Airport information unavailable:",
+            error.message
+        );
+
+        document.getElementById("infoICAO")
+            .textContent = icao;
+
+        document.getElementById("infoName")
+            .textContent = "--";
+
+        document.getElementById("infoElevation")
+            .textContent = "--";
+
+        document.getElementById("infoLatitude")
+            .textContent = "--";
+
+        document.getElementById("infoLongitude")
+            .textContent = "--";
+
+    }
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| TAF
+|--------------------------------------------------------------------------
+*/
+
+async function loadTAF(icao) {
+
+    taf.textContent =
+        "Loading TAF...";
+
+    try {
+
+        const data =
+            await apiRequest(
+                `/api/weather/${icao}/taf`
+            );
+
+        if (data.available === false) {
+
+            taf.textContent =
+                data.message ||
+                "TAF unavailable.";
+
+            return;
+
+        }
+
+        const forecast =
+            data.taf;
+
+        if (typeof forecast === "string") {
+
+            taf.textContent =
+                forecast;
+
+            return;
+
+        }
+
+        if (forecast?.rawTAF) {
+
+            taf.textContent =
+                forecast.rawTAF;
+
+            return;
+
+        }
+
+        if (forecast?.raw_text) {
+
+            taf.textContent =
+                forecast.raw_text;
+
+            return;
+
+        }
+
+        if (Array.isArray(forecast) &&
+            forecast.length > 0) {
+
+            taf.textContent =
+                forecast
+                    .map(item =>
+                        item.rawTAF ||
+                        item.raw_text ||
+                        JSON.stringify(item)
+                    )
+                    .join("\n\n");
+
+            return;
+
+        }
+
+        taf.textContent =
+            "TAF unavailable.";
+
+    } catch (error) {
+
+        console.warn(
+            "TAF unavailable:",
+            error.message
+        );
+
+        taf.textContent =
+            "TAF unavailable.";
+
+    }
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| LOAD WEATHER
+|--------------------------------------------------------------------------
+*/
+
+async function loadWeather(icao) {
+
+    icao = cleanICAO(icao);
+
+    if (!validICAO(icao)) {
+
+        showStatus(
+            "Please enter a valid 4-letter ICAO code.",
+            "error"
+        );
+
+        return;
+
+    }
+
+    input.value = icao;
+
+    showStatus(
+        `Loading weather for ${icao}...`,
+        "loading"
+    );
+
+    refreshButton.classList.add("loading");
+
+    try {
 
         /*
-        |--------------------------------------------------------------------------
-        | API BASE
-        |--------------------------------------------------------------------------
-        |
-        | Because weather.html normally runs from the same server as the API,
-        | we can use relative URLs.
-        |
-        */
-
-        const API_BASE = "";
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | DOM
-        |--------------------------------------------------------------------------
-        */
-
-        const icaoInput =
-            document.getElementById("icaoInput");
-
-        const searchButton =
-            document.getElementById("searchButton");
-
-        const loading =
-            document.getElementById("loading");
-
-        const weatherContent =
-            document.getElementById("weatherContent");
-
-        const errorMessage =
-            document.getElementById("errorMessage");
-
-        const errorText =
-            document.getElementById("errorText");
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | HELPERS
-        |--------------------------------------------------------------------------
-        */
-
-        function showLoading() {
-
-            loading.classList.add("show");
-
-            weatherContent.classList.remove("show");
-
-            errorMessage.classList.remove("show");
-
-        }
-
-
-        function hideLoading() {
-
-            loading.classList.remove("show");
-
-        }
-
-
-        function showError(message) {
-
-            hideLoading();
-
-            weatherContent.classList.remove("show");
-
-            errorText.textContent =
-                message;
-
-            errorMessage.classList.add("show");
-
-        }
-
-
-        function showWeather() {
-
-            hideLoading();
-
-            errorMessage.classList.remove("show");
-
-            weatherContent.classList.add("show");
-
-        }
-
-
-        function number(value) {
-
-            if (
-                value === null ||
-                value === undefined ||
-                value === ""
-            ) {
-                return null;
-            }
-
-            const n =
-                Number(value);
-
-            return Number.isFinite(n)
-                ? n
-                : null;
-
-        }
-
-
-        function formatNumber(value, decimals = 0) {
-
-            const n =
-                number(value);
-
-            if (n === null) {
-                return "--";
-            }
-
-            return n.toFixed(decimals);
-
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | WIND DIRECTION
-        |--------------------------------------------------------------------------
-        */
-
-        function degreesToCompass(degrees) {
-
-            if (degrees === null) {
-                return "--";
-            }
-
-            const directions = [
-                "N",
-                "NNE",
-                "NE",
-                "ENE",
-                "E",
-                "ESE",
-                "SE",
-                "SSE",
-                "S",
-                "SSW",
-                "SW",
-                "WSW",
-                "W",
-                "WNW",
-                "NW",
-                "NNW"
-            ];
-
-            return directions[
-                Math.round(degrees / 22.5) % 16
-            ];
-
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | FLIGHT CATEGORY
-        |--------------------------------------------------------------------------
-        */
-
-        function getFlightCategory(metar) {
-
-            /*
-             * If aviationweather.gov provides flight category,
-             * use it directly.
-             */
-
-            if (metar.fltCat) {
-
-                return metar.fltCat
-                    .toUpperCase();
-
-            }
-
-            /*
-             * Otherwise calculate approximately using
-             * visibility and ceiling.
-             */
-
-            const visibility =
-                number(
-                    metar.visib
-                );
-
-            let ceiling = null;
-
-            if (Array.isArray(metar.clouds)) {
-
-                const ceilings =
-                    metar.clouds
-                        .filter(c =>
-                            c &&
-                            (
-                                c.cover === "BKN" ||
-                                c.cover === "OVC"
-                            )
-                        )
-                        .map(c =>
-                            number(c.base)
-                        )
-                        .filter(v =>
-                            v !== null
-                        );
-
-                if (ceilings.length) {
-
-                    ceiling =
-                        Math.min(...ceilings);
-
-                }
-
-            }
-
-
-            if (
-                (visibility !== null && visibility < 1)
-                ||
-                (ceiling !== null && ceiling < 500)
-            ) {
-
-                return "LIFR";
-
-            }
-
-
-            if (
-                (visibility !== null && visibility < 3)
-                ||
-                (ceiling !== null && ceiling < 1000)
-            ) {
-
-                return "IFR";
-
-            }
-
-
-            if (
-                (visibility !== null && visibility < 5)
-                ||
-                (ceiling !== null && ceiling < 3000)
-            ) {
-
-                return "MVFR";
-
-            }
-
-
-            return "VFR";
-
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | CONDITION
-        |--------------------------------------------------------------------------
-        */
-
-        function getCondition(metar) {
-
-            if (
-                metar.wxString
-            ) {
-
-                return metar.wxString;
-
-            }
-
-            if (
-                metar.wx
-            ) {
-
-                if (Array.isArray(metar.wx)) {
-                    return metar.wx.join(", ");
-                }
-
-                return String(metar.wx);
-
-            }
-
-
-            if (
-                metar.rawOb
-            ) {
-
-                const raw =
-                    metar.rawOb.toUpperCase();
-
-                if (raw.includes("TS")) {
-                    return "Thunderstorm";
-                }
-
-                if (
-                    raw.includes("SN")
-                    ||
-                    raw.includes("SG")
-                ) {
-                    return "Snow";
-                }
-
-                if (
-                    raw.includes("RA")
-                    ||
-                    raw.includes("DZ")
-                ) {
-                    return "Rain";
-                }
-
-                if (
-                    raw.includes("FG")
-                    ||
-                    raw.includes("BR")
-                ) {
-                    return "Reduced visibility";
-                }
-
-                if (raw.includes("OVC")) {
-                    return "Overcast";
-                }
-
-                if (raw.includes("BKN")) {
-                    return "Broken clouds";
-                }
-
-                if (raw.includes("SCT")) {
-                    return "Scattered clouds";
-                }
-
-                if (raw.includes("FEW")) {
-                    return "Few clouds";
-                }
-
-                if (raw.includes("CLR")) {
-                    return "Clear skies";
-                }
-
-                if (raw.includes("SKC")) {
-                    return "Clear skies";
-                }
-
-            }
-
-
-            return "Current conditions";
-
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | WEATHER ICON
-        |--------------------------------------------------------------------------
-        */
-
-        function getWeatherIcon(condition, metar) {
-
-            const text =
-                String(condition || "")
-                    .toUpperCase();
-
-            const raw =
-                String(
-                    metar.rawOb || ""
-                ).toUpperCase();
-
-
-            if (
-                text.includes("THUNDER")
-                ||
-                raw.includes("TS")
-            ) {
-
-                return "fa-cloud-bolt";
-
-            }
-
-
-            if (
-                text.includes("SNOW")
-                ||
-                raw.includes("SN")
-            ) {
-
-                return "fa-snowflake";
-
-            }
-
-
-            if (
-                text.includes("RAIN")
-                ||
-                raw.includes("RA")
-            ) {
-
-                return "fa-cloud-rain";
-
-            }
-
-
-            if (
-                text.includes("CLEAR")
-                ||
-                raw.includes("CLR")
-                ||
-                raw.includes("SKC")
-            ) {
-
-                return "fa-sun";
-
-            }
-
-
-            if (
-                text.includes("OVERCAST")
-                ||
-                raw.includes("OVC")
-            ) {
-
-                return "fa-cloud";
-
-            }
-
-
-            return "fa-cloud-sun";
-
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | TEMPERATURE
-        |--------------------------------------------------------------------------
-        */
-
-        function getTemperature(metar) {
-
-            return (
-                number(metar.temp)
-                ??
-                number(metar.tempC)
-                ??
-                number(metar.temperature)
+         * IMPORTANT:
+         *
+         * This calls YOUR backend:
+         *
+         * GET /api/weather/EHAM
+         *
+         * It does NOT call AviationWeather.gov
+         * directly from the browser.
+         */
+
+        const data =
+            await apiRequest(
+                `/api/weather/${icao}`
+            );
+
+        if (!data.available ||
+            !data.metar) {
+
+            throw new Error(
+                data.message ||
+                "No METAR is available for this airport."
             );
 
         }
 
+        renderWeather(
+            data.metar,
+            icao
+        );
 
         /*
-        |--------------------------------------------------------------------------
-        | DEW POINT
-        |--------------------------------------------------------------------------
-        */
+         * These are independent requests.
+         * If one fails, METAR still works.
+         */
 
-        function getDewPoint(metar) {
+        await Promise.allSettled([
+            loadAirportInfo(icao),
+            loadTAF(icao)
+        ]);
 
-            return (
-                number(metar.dewp)
-                ??
-                number(metar.dewpoint)
-                ??
-                number(metar.dewpointC)
-            );
+        hideStatus();
 
-        }
+    } catch (error) {
 
+        console.error(
+            "Weather request failed:",
+            error
+        );
 
-        /*
-        |--------------------------------------------------------------------------
-        | PRESSURE
-        |--------------------------------------------------------------------------
-        */
+        showStatus(
+            `Could not load weather for ${icao}: ${error.message}`,
+            "error"
+        );
 
-        function getPressure(metar) {
+        rawMetar.textContent =
+            "Weather data unavailable.";
 
-            return (
-                number(metar.altim)
-                ??
-                number(metar.altimeter)
-                ??
-                number(metar.qnh)
-            );
+        taf.textContent =
+            "TAF unavailable.";
 
-        }
+    } finally {
 
+        refreshButton.classList.remove(
+            "loading"
+        );
 
-        /*
-        |--------------------------------------------------------------------------
-        | VISIBILITY
-        |--------------------------------------------------------------------------
-        */
+    }
 
-        function getVisibility(metar) {
+}
 
-            const value =
-                number(metar.visib);
 
-            if (value === null) {
-                return null;
-            }
+/*
+|--------------------------------------------------------------------------
+| FORM
+|--------------------------------------------------------------------------
+*/
 
-            return value;
+form.addEventListener(
+    "submit",
+    event => {
 
-        }
+        event.preventDefault();
 
+        loadWeather(
+            input.value
+        );
 
-        /*
-        |--------------------------------------------------------------------------
-        | WIND
-        |--------------------------------------------------------------------------
-        */
+    }
+);
 
-        function getWindDirection(metar) {
 
-            return (
-                number(metar.wdir)
-                ??
-                number(metar.wind_dir)
-            );
+/*
+|--------------------------------------------------------------------------
+| QUICK AIRPORT BUTTONS
+|--------------------------------------------------------------------------
+*/
 
-        }
+document
+    .querySelectorAll(".airport-chip")
+    .forEach(button => {
 
+        button.addEventListener(
+            "click",
+            () => {
 
-        function getWindSpeed(metar) {
+                const icao =
+                    button.dataset.icao;
 
-            return (
-                number(metar.wspd)
-                ??
-                number(metar.wind_speed)
-            );
-
-        }
-
-
-        function getWindGust(metar) {
-
-            return (
-                number(metar.wgst)
-                ??
-                number(metar.wind_gust)
-            );
-
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | CLOUDS
-        |--------------------------------------------------------------------------
-        */
-
-        function renderClouds(metar) {
-
-            const container =
-                document.getElementById(
-                    "cloudList"
-                );
-
-            container.innerHTML = "";
-
-
-            if (
-                !Array.isArray(metar.clouds)
-                ||
-                metar.clouds.length === 0
-            ) {
-
-                container.innerHTML = `
-                    <div class="no-data">
-                        No cloud information reported
-                    </div>
-                `;
-
-                return;
-
-            }
-
-
-            metar.clouds.forEach(cloud => {
-
-                const cover =
-                    cloud.cover ||
-                    cloud.type ||
-                    "--";
-
-                const base =
-                    number(
-                        cloud.base
-                    );
-
-
-                const row =
-                    document.createElement("div");
-
-                row.className =
-                    "cloud-row";
-
-
-                row.innerHTML = `
-
-                    <div class="cloud-type">
-
-                        <i class="fa-solid fa-cloud"></i>
-
-                        ${escapeHTML(cover)}
-
-                    </div>
-
-                    <div class="cloud-altitude">
-
-                        ${
-                            base !== null
-                                ? `${base.toLocaleString()} ft`
-                                : "--"
-                        }
-
-                    </div>
-
-                `;
-
-
-                container.appendChild(row);
-
-            });
-
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | HTML ESCAPE
-        |--------------------------------------------------------------------------
-        */
-
-        function escapeHTML(value) {
-
-            return String(value)
-                .replaceAll("&", "&amp;")
-                .replaceAll("<", "&lt;")
-                .replaceAll(">", "&gt;")
-                .replaceAll('"', "&quot;")
-                .replaceAll("'", "&#039;");
-
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | RENDER METAR
-        |--------------------------------------------------------------------------
-        */
-
-        function renderMetar(metar) {
-
-            const temperature =
-                getTemperature(metar);
-
-            const dewPoint =
-                getDewPoint(metar);
-
-            const pressure =
-                getPressure(metar);
-
-            const visibility =
-                getVisibility(metar);
-
-            const windDirection =
-                getWindDirection(metar);
-
-            const windSpeed =
-                getWindSpeed(metar);
-
-            const windGust =
-                getWindGust(metar);
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | MAIN
-            |--------------------------------------------------------------------------
-            */
-
-            document.getElementById(
-                "temperature"
-            ).textContent =
-                temperature !== null
-                    ? Math.round(temperature)
-                    : "--";
-
-
-            const condition =
-                getCondition(metar);
-
-
-            document.getElementById(
-                "conditionText"
-            ).textContent =
-                condition;
-
-
-            const icon =
-                getWeatherIcon(
-                    condition,
-                    metar
-                );
-
-
-            document.getElementById(
-                "weatherIcon"
-            ).innerHTML =
-                `<i class="fa-solid ${icon}"></i>`;
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | FLIGHT CATEGORY
-            |--------------------------------------------------------------------------
-            */
-
-            const category =
-                getFlightCategory(metar);
-
-
-            const categoryElement =
-                document.getElementById(
-                    "flightCategory"
-                );
-
-
-            categoryElement.textContent =
-                category;
-
-
-            categoryElement.className =
-                "flight-category " +
-                category.toLowerCase();
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | WIND
-            |--------------------------------------------------------------------------
-            */
-
-            document.getElementById(
-                "windStat"
-            ).textContent =
-                windSpeed !== null
-                    ? `${windSpeed} kt`
-                    : "--";
-
-
-            document.getElementById(
-                "windSpeed"
-            ).textContent =
-                windSpeed !== null
-                    ? `${windSpeed} kt`
-                    : "--";
-
-
-            document.getElementById(
-                "windDirection"
-            ).textContent =
-                windDirection !== null
-                    ? `${Math.round(windDirection)}° ${degreesToCompass(windDirection)}`
-                    : "--";
-
-
-            document.getElementById(
-                "windGust"
-            ).textContent =
-                windGust !== null
-                    ? `${windGust} kt`
-                    : "None";
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | WIND ARROW
-            |--------------------------------------------------------------------------
-            */
-
-            if (windDirection !== null) {
-
-                document.getElementById(
-                    "windArrow"
-                ).style.transform =
-                    `rotate(${windDirection}deg)`;
-
-            }
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | VISIBILITY
-            |--------------------------------------------------------------------------
-            */
-
-            document.getElementById(
-                "visibilityStat"
-            ).textContent =
-                visibility !== null
-                    ? `${visibility} SM`
-                    : "--";
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | PRESSURE
-            |--------------------------------------------------------------------------
-            */
-
-            document.getElementById(
-                "qnhStat"
-            ).textContent =
-                pressure !== null
-                    ? `${Math.round(pressure)} hPa`
-                    : "--";
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | DEW POINT
-            |--------------------------------------------------------------------------
-            */
-
-            document.getElementById(
-                "dewStat"
-            ).textContent =
-                dewPoint !== null
-                    ? `${Math.round(dewPoint)} °C`
-                    : "--";
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | RAW METAR
-            |--------------------------------------------------------------------------
-            */
-
-            document.getElementById(
-                "rawMetar"
-            ).textContent =
-                metar.rawOb ||
-                metar.raw_text ||
-                metar.rawText ||
-                "No raw METAR available.";
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | TIME
-            |--------------------------------------------------------------------------
-            */
-
-            const observation =
-                metar.obsTime ||
-                metar.observation_time ||
-                metar.reportTime;
-
-
-            if (observation) {
-
-                const date =
-                    new Date(observation);
-
-
-                if (!Number.isNaN(date.getTime())) {
-
-                    document.getElementById(
-                        "metarTime"
-                    ).textContent =
-                        date.toLocaleString();
-
-                } else {
-
-                    document.getElementById(
-                        "metarTime"
-                    ).textContent =
-                        observation;
-
-                }
-
-            } else {
-
-                document.getElementById(
-                    "metarTime"
-                ).textContent =
-                    "Not available";
-
-            }
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | CLOUDS
-            |--------------------------------------------------------------------------
-            */
-
-            renderClouds(metar);
-
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | LOAD AIRPORT
-        |--------------------------------------------------------------------------
-        */
-
-        async function loadAirport(icao) {
-
-            try {
-
-                const response =
-                    await fetch(
-                        `${API_BASE}/api/airports/${icao}`
-                    );
-
-
-                if (!response.ok) {
-                    return;
-                }
-
-
-                const data =
-                    await response.json();
-
-
-                if (
-                    !data.available ||
-                    !data.airport
-                ) {
-                    return;
-                }
-
-
-                const airport =
-                    data.airport;
-
-
-                const name =
-                    airport.name ||
-                    `${airport.city || ""} Airport`;
-
-
-                document.getElementById(
-                    "airportName"
-                ).textContent =
-                    name;
-
-
-                document.getElementById(
-                    "infoIcao"
-                ).textContent =
-                    airport.icao ||
+                input.value =
                     icao;
 
-
-                document.getElementById(
-                    "infoIata"
-                ).textContent =
-                    airport.iata ||
-                    "--";
-
-
-                const location =
-                    [
-                        airport.city,
-                        airport.country
-                    ]
-                    .filter(Boolean)
-                    .join(", ");
-
-
-                document.getElementById(
-                    "infoLocation"
-                ).textContent =
-                    location ||
-                    "--";
-
-
-                document.getElementById(
-                    "infoElevation"
-                ).textContent =
-                    airport.elevation_ft !== null &&
-                    airport.elevation_ft !== undefined
-                        ? `${Number(airport.elevation_ft).toLocaleString()} ft`
-                        : "--";
-
-            } catch (error) {
-
-                console.error(
-                    "Airport lookup failed:",
-                    error
-                );
-
-            }
-
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | LOAD TAF
-        |--------------------------------------------------------------------------
-        */
-
-        async function loadTAF(icao) {
-
-            const tafElement =
-                document.getElementById(
-                    "rawTaf"
-                );
-
-
-            tafElement.textContent =
-                "Loading TAF...";
-
-
-            try {
-
-                const response =
-                    await fetch(
-                        `${API_BASE}/api/weather/${icao}/taf`
-                    );
-
-
-                if (!response.ok) {
-
-                    tafElement.textContent =
-                        "TAF unavailable.";
-
-                    return;
-
-                }
-
-
-                const data =
-                    await response.json();
-
-
-                if (
-                    !data.available ||
-                    !data.taf
-                ) {
-
-                    tafElement.textContent =
-                        "No TAF available for this airport.";
-
-                    return;
-
-                }
-
-
-                const taf =
-                    data.taf;
-
-
-                tafElement.textContent =
-                    taf.rawTAF ||
-                    taf.raw_text ||
-                    taf.rawText ||
-                    "TAF data unavailable.";
-
-            } catch (error) {
-
-                console.error(
-                    "TAF lookup failed:",
-                    error
-                );
-
-
-                tafElement.textContent =
-                    "TAF unavailable.";
-
-            }
-
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | LOAD WEATHER
-        |--------------------------------------------------------------------------
-        */
-
-        async function loadWeather() {
-
-            const icao =
-                icaoInput.value
-                    .trim()
-                    .toUpperCase();
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | VALIDATE
-            |--------------------------------------------------------------------------
-            */
-
-            if (!/^[A-Z]{4}$/.test(icao)) {
-
-                showError(
-                    "Please enter a valid 4-letter ICAO code, for example EHAM."
-                );
-
-                return;
-
-            }
-
-
-            icaoInput.value =
-                icao;
-
-
-            showLoading();
-
-
-            try {
-
-                const response =
-                    await fetch(
-                        `${API_BASE}/api/weather/${icao}`
-                    );
-
-
-                const data =
-                    await response.json();
-
-
-                if (
-                    !response.ok ||
-                    !data.available ||
-                    !data.metar
-                ) {
-
-                    showError(
-                        `No current METAR is available for ${icao}.`
-                    );
-
-                    return;
-
-                }
-
-
-                /*
-                |--------------------------------------------------------------------------
-                | AIRPORT CODE
-                |--------------------------------------------------------------------------
-                */
-
-                document.getElementById(
-                    "airportCode"
-                ).textContent =
-                    icao;
-
-
-                /*
-                |--------------------------------------------------------------------------
-                | RENDER
-                |--------------------------------------------------------------------------
-                */
-
-                renderMetar(
-                    data.metar
-                );
-
-
-                /*
-                |--------------------------------------------------------------------------
-                | OTHER DATA
-                |--------------------------------------------------------------------------
-                */
-
-                await Promise.all([
-                    loadAirport(icao),
-                    loadTAF(icao)
-                ]);
-
-
-                /*
-                |--------------------------------------------------------------------------
-                | SHOW
-                |--------------------------------------------------------------------------
-                */
-
-                showWeather();
-
-
-                /*
-                |--------------------------------------------------------------------------
-                | URL
-                |--------------------------------------------------------------------------
-                */
-
-                const url =
-                    new URL(
-                        window.location.href
-                    );
-
-
-                url.searchParams.set(
-                    "icao",
+                loadWeather(
                     icao
                 );
 
-
-                window.history.replaceState(
-                    {},
-                    "",
-                    url
-                );
-
-
-            } catch (error) {
-
-                console.error(
-                    "Weather lookup failed:",
-                    error
-                );
-
-
-                showError(
-                    "Could not connect to the Flight App weather service."
-                );
-
-            }
-
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | EVENTS
-        |--------------------------------------------------------------------------
-        */
-
-        searchButton.addEventListener(
-            "click",
-            loadWeather
-        );
-
-
-        icaoInput.addEventListener(
-            "keydown",
-            event => {
-
-                if (
-                    event.key === "Enter"
-                ) {
-
-                    loadWeather();
-
-                }
-
             }
         );
 
+    });
 
-        icaoInput.addEventListener(
-            "input",
-            () => {
 
-                icaoInput.value =
-                    icaoInput.value
-                        .toUpperCase()
-                        .replace(
-                            /[^A-Z]/g,
-                            ""
-                        )
-                        .slice(0, 4);
+/*
+|--------------------------------------------------------------------------
+| REFRESH
+|--------------------------------------------------------------------------
+*/
 
-            }
+refreshButton.addEventListener(
+    "click",
+    () => {
+
+        loadWeather(
+            input.value
         );
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | INITIAL AIRPORT
-        |--------------------------------------------------------------------------
-        */
-
-        const params =
-            new URLSearchParams(
-                window.location.search
-            );
+    }
+);
 
 
-        const initialICAO =
-            params.get("icao");
+/*
+|--------------------------------------------------------------------------
+| INPUT
+|--------------------------------------------------------------------------
+*/
+
+input.addEventListener(
+    "input",
+    () => {
+
+        input.value =
+            input.value
+                .replace(/[^a-zA-Z]/g, "")
+                .toUpperCase()
+                .slice(0, 4);
+
+    }
+);
 
 
-        if (
-            initialICAO &&
-            /^[A-Za-z]{4}$/.test(initialICAO)
-        ) {
+/*
+|--------------------------------------------------------------------------
+| INITIAL WEATHER
+|--------------------------------------------------------------------------
+*/
 
-            icaoInput.value =
-                initialICAO
-                    .toUpperCase();
+loadWeather("EHAM");
 
-            loadWeather();
-
-        }
-
-
-    </script>
+</script>
 
 </body>
-
 </html>
