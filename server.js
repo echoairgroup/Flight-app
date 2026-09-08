@@ -1,23 +1,23 @@
 /*
 |--------------------------------------------------------------------------
-| MSFS 2024 CHARTS BRIDGE
+| ECHO FLIGHT APP
+| MSFS 2024 CHARTS ONLINE BRIDGE
 |--------------------------------------------------------------------------
 |
-| Echo Flight App
+| Architecture:
 |
-| This server acts as a bridge between:
-|
-|   1. charts.html
-|   2. Microsoft Flight Simulator 2024
-|   3. The MSFS 2024 Charts API
-|
-| Browser
-|    ↓ HTTP
-| Bridge
-|    ↓ WebSocket
-| MSFS 2024 Add-on
-|    ↓
-| Charts API
+|   Echo Flight App
+|          |
+|          | HTTPS
+|          v
+|   Render Charts Bridge
+|          |
+|          | WSS
+|          v
+|   MSFS 2024 Charts Add-on
+|          |
+|          v
+|   MSFS Charts API
 |
 |--------------------------------------------------------------------------
 */
@@ -29,16 +29,20 @@ const WebSocket = require("ws");
 
 /*
 |--------------------------------------------------------------------------
-| CONFIG
+| CONFIGURATION
 |--------------------------------------------------------------------------
 */
 
-const HOST = "127.0.0.1";
-const PORT = Number(process.env.PORT || 8765);
+const PORT = Number(process.env.PORT || 10000);
 
-const BRIDGE_VERSION = "1.0.0";
+const HOST = "0.0.0.0";
+
+const VERSION = "1.0.0";
 
 const REQUEST_TIMEOUT = 30000;
+
+const SERVICE_NAME =
+    "Echo Flight App - MSFS 2024 Charts Bridge";
 
 /*
 |--------------------------------------------------------------------------
@@ -51,7 +55,15 @@ const app = express();
 app.use(
     cors({
         origin: true,
-        credentials: false
+        methods: [
+            "GET",
+            "POST",
+            "OPTIONS"
+        ],
+        allowedHeaders: [
+            "Content-Type",
+            "Authorization"
+        ]
     })
 );
 
@@ -67,145 +79,307 @@ app.use(
 |--------------------------------------------------------------------------
 */
 
-let msfsClient = null;
+/*
+ * MSFS clients are stored by connection ID.
+ *
+ * We deliberately support multiple connections here instead of assuming
+ * that only one MSFS installation will ever be connected.
+ *
+ * This also gives us a better architecture for future scaling.
+ */
+
+const msfsClients = new Map();
+
+/*
+ * Every request from the website receives an ID.
+ *
+ * Example:
+ *
+ * Browser
+ *   request 123
+ *
+ * Render
+ *   request 123 -> MSFS
+ *
+ * MSFS
+ *   response 123 -> Render
+ *
+ * Render
+ *   response 123 -> Browser
+ */
 
 let requestCounter = 0;
 
 const pendingRequests = new Map();
 
-let msfsInfo = {
-    connected: false,
-    connectedAt: null,
-    lastMessageAt: null,
-    simulator: "Microsoft Flight Simulator 2024",
-    chartsApi: false
-};
-
 /*
 |--------------------------------------------------------------------------
-| HELPERS
+| CONNECTION INFORMATION
 |--------------------------------------------------------------------------
 */
 
-function nowISO() {
+function createConnectionId() {
+    return (
+        `${Date.now()}-` +
+        `${Math.random().toString(36).slice(2, 10)}`
+    );
+}
+
+/*
+|--------------------------------------------------------------------------
+| TIME
+|--------------------------------------------------------------------------
+*/
+
+function now() {
     return new Date().toISOString();
 }
 
-function normalizeProvider(provider) {
-    const value = String(provider || "")
+/*
+|--------------------------------------------------------------------------
+| ICAO
+|--------------------------------------------------------------------------
+*/
+
+function normalizeICAO(value) {
+
+    return String(value || "")
         .trim()
         .toUpperCase();
+}
 
-    if (value === "LIDO") {
+function isValidICAO(value) {
+
+    return /^[A-Z]{4}$/.test(value);
+}
+
+/*
+|--------------------------------------------------------------------------
+| PROVIDER
+|--------------------------------------------------------------------------
+*/
+
+function normalizeProvider(value) {
+
+    const provider =
+        String(value || "")
+            .trim()
+            .toUpperCase();
+
+    if (provider === "LIDO") {
         return "LIDO";
     }
 
-    if (value === "FAA") {
+    if (provider === "FAA") {
         return "FAA";
     }
 
     return null;
 }
 
-function normalizeICAO(icao) {
-    return String(icao || "")
-        .trim()
-        .toUpperCase();
+/*
+|--------------------------------------------------------------------------
+| GET CONNECTED MSFS CLIENTS
+|--------------------------------------------------------------------------
+*/
+
+function getConnectedClients() {
+
+    return [
+        ...msfsClients.values()
+    ].filter(client => {
+
+        return (
+            client.socket.readyState ===
+            WebSocket.OPEN
+        );
+    });
 }
 
-function isValidICAO(icao) {
-    return /^[A-Z]{4}$/.test(icao);
+/*
+|--------------------------------------------------------------------------
+| SELECT MSFS CLIENT
+|--------------------------------------------------------------------------
+|
+| For now, if multiple MSFS clients are connected, the newest client
+| is used.
+|
+| Later we can add:
+|
+|   user authentication
+|   Discord account linking
+|   pilot IDs
+|   session IDs
+|   browser pairing
+|
+|--------------------------------------------------------------------------
+*/
+
+function getMSFSClient() {
+
+    const clients =
+        getConnectedClients();
+
+    if (clients.length === 0) {
+        return null;
+    }
+
+    clients.sort(
+        (a, b) =>
+            b.connectedAt - a.connectedAt
+    );
+
+    return clients[0];
 }
 
-function sendToMSFS(message) {
-    if (!msfsClient) {
+/*
+|--------------------------------------------------------------------------
+| SEND MESSAGE TO MSFS
+|--------------------------------------------------------------------------
+*/
+
+function sendToMSFS(
+    client,
+    message
+) {
+
+    if (!client) {
+
         throw new Error(
-            "Microsoft Flight Simulator 2024 is not connected."
+            "No Microsoft Flight Simulator 2024 client is connected."
         );
     }
 
-    if (msfsClient.readyState !== WebSocket.OPEN) {
+    if (
+        client.socket.readyState !==
+        WebSocket.OPEN
+    ) {
+
         throw new Error(
-            "MSFS WebSocket is not open."
+            "MSFS WebSocket connection is not open."
         );
     }
 
-    msfsClient.send(
+    client.socket.send(
         JSON.stringify(message)
     );
 }
 
 /*
 |--------------------------------------------------------------------------
-| REQUEST SYSTEM
+| CREATE MSFS REQUEST
 |--------------------------------------------------------------------------
 */
 
-function createMSFSRequest(type, payload = {}) {
-    return new Promise((resolve, reject) => {
+function requestMSFS(
+    type,
+    payload = {}
+) {
 
-        if (!msfsClient) {
-            reject(
-                new Error(
-                    "Microsoft Flight Simulator 2024 is not connected."
-                )
-            );
+    return new Promise(
+        (resolve, reject) => {
 
-            return;
-        }
+            const client =
+                getMSFSClient();
 
-        if (msfsClient.readyState !== WebSocket.OPEN) {
-            reject(
-                new Error(
-                    "MSFS WebSocket connection is not open."
-                )
-            );
+            if (!client) {
 
-            return;
-        }
+                reject(
+                    new Error(
+                        "Microsoft Flight Simulator 2024 is offline."
+                    )
+                );
 
-        const id = ++requestCounter;
+                return;
+            }
 
-        const timeout = setTimeout(() => {
+            const id =
+                ++requestCounter;
 
-            pendingRequests.delete(id);
+            const timeout =
+                setTimeout(
+                    () => {
 
-            reject(
-                new Error(
-                    `MSFS request timed out after ${REQUEST_TIMEOUT / 1000} seconds.`
-                )
-            );
+                        pendingRequests.delete(
+                            id
+                        );
 
-        }, REQUEST_TIMEOUT);
+                        reject(
+                            new Error(
+                                `MSFS request timed out after ${REQUEST_TIMEOUT / 1000} seconds.`
+                            )
+                        );
 
-        pendingRequests.set(id, {
-            resolve,
-            reject,
-            timeout,
-            type,
-            createdAt: Date.now()
-        });
+                    },
+                    REQUEST_TIMEOUT
+                );
 
-        try {
-
-            msfsClient.send(
-                JSON.stringify({
+            pendingRequests.set(
+                id,
+                {
+                    resolve,
+                    reject,
+                    timeout,
+                    clientId:
+                        client.id,
                     type,
-                    id,
-                    ...payload
-                })
+                    createdAt:
+                        Date.now()
+                }
             );
 
-        } catch (error) {
+            try {
 
-            clearTimeout(timeout);
+                sendToMSFS(
+                    client,
+                    {
+                        type,
+                        id,
+                        ...payload
+                    }
+                );
 
-            pendingRequests.delete(id);
+            } catch (error) {
 
-            reject(error);
+                clearTimeout(
+                    timeout
+                );
+
+                pendingRequests.delete(
+                    id
+                );
+
+                reject(error);
+            }
         }
-    });
+    );
 }
+
+/*
+|--------------------------------------------------------------------------
+| HEALTH
+|--------------------------------------------------------------------------
+*/
+
+app.get(
+    "/health",
+    (req, res) => {
+
+        res.status(200).json({
+
+            status: "ok",
+
+            service:
+                SERVICE_NAME,
+
+            version:
+                VERSION,
+
+            time:
+                now()
+        });
+    }
+);
 
 /*
 |--------------------------------------------------------------------------
@@ -213,37 +387,47 @@ function createMSFSRequest(type, payload = {}) {
 |--------------------------------------------------------------------------
 */
 
-app.get("/", (req, res) => {
+app.get(
+    "/",
+    (req, res) => {
 
-    res.json({
-        service: "MSFS 2024 Charts API Bridge",
-        status: "online",
-        version: BRIDGE_VERSION,
+        res.json({
 
-        host: HOST,
-        port: PORT,
+            service:
+                SERVICE_NAME,
 
-        msfsConnected:
-            !!msfsClient &&
-            msfsClient.readyState === WebSocket.OPEN,
+            status:
+                "online",
 
-        chartsApi:
-            msfsInfo.chartsApi,
+            version:
+                VERSION,
 
-        providerSupport: [
-            "LIDO",
-            "FAA"
-        ],
+            msfsClients:
+                getConnectedClients().length,
 
-        endpoints: {
-            status: "/api/status",
-            charts: "/api/charts/:provider/:icao",
-            pages: "/api/charts/pages/:guid",
-            image: "/api/charts/image?url=...",
-            request: "/api/charts/request"
-        }
-    });
-});
+            endpoints: {
+
+                health:
+                    "/health",
+
+                status:
+                    "/api/status",
+
+                charts:
+                    "/api/charts/:provider/:icao",
+
+                pages:
+                    "/api/charts/pages/:guid",
+
+                image:
+                    "/api/charts/image",
+
+                generic:
+                    "/api/charts/request"
+            }
+        });
+    }
+);
 
 /*
 |--------------------------------------------------------------------------
@@ -251,83 +435,72 @@ app.get("/", (req, res) => {
 |--------------------------------------------------------------------------
 */
 
-app.get("/api/status", (req, res) => {
+app.get(
+    "/api/status",
+    (req, res) => {
 
-    const connected =
-        !!msfsClient &&
-        msfsClient.readyState === WebSocket.OPEN;
-
-    res.json({
-
-        available: true,
-
-        bridge: {
-            name: "MSFS 2024 Charts API Bridge",
-            version: BRIDGE_VERSION,
-            online: true
-        },
-
-        msfs: {
-            connected,
-            connectedAt: msfsInfo.connectedAt,
-            lastMessageAt: msfsInfo.lastMessageAt,
-            simulator: msfsInfo.simulator,
-            chartsApi: msfsInfo.chartsApi
-        },
-
-        providers: [
-            {
-                id: "LIDO",
-                name: "LIDO",
-                available: connected
-            },
-            {
-                id: "FAA",
-                name: "FAA",
-                available: connected
-            }
-        ]
-    });
-});
-
-/*
-|--------------------------------------------------------------------------
-| PING MSFS
-|--------------------------------------------------------------------------
-*/
-
-app.get("/api/msfs/ping", async (req, res) => {
-
-    try {
-
-        const result =
-            await createMSFSRequest(
-                "PING_MSFS"
-            );
+        const clients =
+            getConnectedClients();
 
         res.json({
-            available: true,
-            result
-        });
 
-    } catch (error) {
+            available:
+                true,
 
-        res.status(502).json({
-            available: false,
-            error: error.message
+            bridge: {
+
+                online:
+                    true,
+
+                name:
+                    SERVICE_NAME,
+
+                version:
+                    VERSION
+            },
+
+            msfs: {
+
+                connected:
+                    clients.length > 0,
+
+                clients:
+                    clients.length,
+
+                chartsApi:
+                    clients.some(
+                        client =>
+                            client.chartsApi === true
+                    )
+            },
+
+            providers: {
+
+                LIDO:
+                    clients.length > 0,
+
+                FAA:
+                    clients.length > 0
+            },
+
+            timestamp:
+                now()
         });
     }
-});
+);
 
 /*
 |--------------------------------------------------------------------------
 | GET CHART INDEX
 |--------------------------------------------------------------------------
 |
-| Example:
+| GET:
 |
-| GET /api/charts/LIDO/EHAM
+| /api/charts/LIDO/EHAM
 |
+| /api/charts/FAA/KJFK
+|
+|--------------------------------------------------------------------------
 */
 
 app.get(
@@ -347,7 +520,10 @@ app.get(
         if (!provider) {
 
             return res.status(400).json({
-                available: false,
+
+                available:
+                    false,
+
                 error:
                     "Provider must be LIDO or FAA."
             });
@@ -356,9 +532,12 @@ app.get(
         if (!isValidICAO(icao)) {
 
             return res.status(400).json({
-                available: false,
+
+                available:
+                    false,
+
                 error:
-                    "Invalid ICAO. Example: EHAM."
+                    "Invalid ICAO code."
             });
         }
 
@@ -369,7 +548,7 @@ app.get(
             );
 
             const result =
-                await createMSFSRequest(
+                await requestMSFS(
                     "GET_CHART_INDEX",
                     {
                         provider,
@@ -379,31 +558,38 @@ app.get(
 
             res.json({
 
-                available: true,
+                available:
+                    true,
 
                 provider,
 
                 icao,
 
-                index: result
+                index:
+                    result,
+
+                timestamp:
+                    now()
             });
 
         } catch (error) {
 
             console.error(
                 "[CHART INDEX ERROR]",
-                error
+                error.message
             );
 
             res.status(502).json({
 
-                available: false,
+                available:
+                    false,
 
                 provider,
 
                 icao,
 
-                error: error.message
+                error:
+                    error.message
             });
         }
     }
@@ -414,10 +600,11 @@ app.get(
 | GET CHART PAGES
 |--------------------------------------------------------------------------
 |
-| Example:
+| GET:
 |
-| GET /api/charts/pages/GUID
+| /api/charts/pages/<GUID>
 |
+|--------------------------------------------------------------------------
 */
 
 app.get(
@@ -432,7 +619,10 @@ app.get(
         if (!guid) {
 
             return res.status(400).json({
-                available: false,
+
+                available:
+                    false,
+
                 error:
                     "Chart GUID is required."
             });
@@ -445,7 +635,7 @@ app.get(
             );
 
             const result =
-                await createMSFSRequest(
+                await requestMSFS(
                     "GET_CHART_PAGES",
                     {
                         guid
@@ -454,27 +644,34 @@ app.get(
 
             res.json({
 
-                available: true,
+                available:
+                    true,
 
                 guid,
 
-                pages: result
+                pages:
+                    result,
+
+                timestamp:
+                    now()
             });
 
         } catch (error) {
 
             console.error(
                 "[CHART PAGES ERROR]",
-                error
+                error.message
             );
 
             res.status(502).json({
 
-                available: false,
+                available:
+                    false,
 
                 guid,
 
-                error: error.message
+                error:
+                    error.message
             });
         }
     }
@@ -485,9 +682,11 @@ app.get(
 | GET CHART IMAGE
 |--------------------------------------------------------------------------
 |
-| The MSFS-side add-on receives the URL and resolves the chart image
-| using ChartView / the MSFS Charts API.
+| The MSFS add-on resolves the chart image using the MSFS Charts API.
 |
+| The browser does NOT directly access the MSFS chart system.
+|
+|--------------------------------------------------------------------------
 */
 
 app.get(
@@ -502,7 +701,10 @@ app.get(
         if (!url) {
 
             return res.status(400).json({
-                available: false,
+
+                available:
+                    false,
+
                 error:
                     "Chart page URL is required."
             });
@@ -510,12 +712,8 @@ app.get(
 
         try {
 
-            console.log(
-                "[CHART IMAGE]"
-            );
-
             const result =
-                await createMSFSRequest(
+                await requestMSFS(
                     "GET_CHART_IMAGE",
                     {
                         url
@@ -524,23 +722,30 @@ app.get(
 
             res.json({
 
-                available: true,
+                available:
+                    true,
 
-                image: result
+                image:
+                    result,
+
+                timestamp:
+                    now()
             });
 
         } catch (error) {
 
             console.error(
                 "[CHART IMAGE ERROR]",
-                error
+                error.message
             );
 
             res.status(502).json({
 
-                available: false,
+                available:
+                    false,
 
-                error: error.message
+                error:
+                    error.message
             });
         }
     }
@@ -548,85 +753,83 @@ app.get(
 
 /*
 |--------------------------------------------------------------------------
-| GENERIC CHART REQUEST
+| GENERIC MSFS CHART REQUEST
 |--------------------------------------------------------------------------
-|
-| Useful for future features without having to add a new Express route
-| every time.
-|
 */
 
 app.post(
     "/api/charts/request",
     async (req, res) => {
 
-        const {
-            type,
-            provider,
-            icao,
-            guid,
-            url,
-            page
-        } = req.body || {};
+        const body =
+            req.body || {};
+
+        const type =
+            body.type;
 
         if (!type) {
 
             return res.status(400).json({
-                available: false,
+
+                available:
+                    false,
+
                 error:
                     "Request type is required."
             });
         }
 
-        const normalizedProvider =
-            provider
-                ? normalizeProvider(provider)
-                : undefined;
-
-        const normalizedICAO =
-            icao
-                ? normalizeICAO(icao)
-                : undefined;
-
         try {
 
             const result =
-                await createMSFSRequest(
+                await requestMSFS(
                     type,
                     {
                         provider:
-                            normalizedProvider,
+                            body.provider,
 
                         icao:
-                            normalizedICAO,
+                            body.icao,
 
-                        guid,
+                        guid:
+                            body.guid,
 
-                        url,
+                        url:
+                            body.url,
 
-                        page
+                        page:
+                            body.page,
+
+                        airport:
+                            body.airport
                     }
                 );
 
             res.json({
 
-                available: true,
+                available:
+                    true,
 
-                result
+                result,
+
+                timestamp:
+                    now()
             });
 
         } catch (error) {
 
             console.error(
-                "[GENERIC REQUEST ERROR]",
-                error
+                "[CHART REQUEST ERROR]",
+                error.message
             );
 
             res.status(502).json({
 
-                available: false,
+                available:
+                    false,
 
-                error: error.message
+                error:
+                    error.message
             });
         }
     }
@@ -639,7 +842,9 @@ app.post(
 */
 
 const server =
-    http.createServer(app);
+    http.createServer(
+        app
+    );
 
 const websocketServer =
     new WebSocket.Server({
@@ -649,13 +854,48 @@ const websocketServer =
 
 /*
 |--------------------------------------------------------------------------
-| MSFS CONNECTION
+| MSFS WEBSOCKET CONNECTION
 |--------------------------------------------------------------------------
 */
 
 websocketServer.on(
     "connection",
-    socket => {
+    (socket, request) => {
+
+        const id =
+            createConnectionId();
+
+        const client = {
+
+            id,
+
+            socket,
+
+            connectedAt:
+                Date.now(),
+
+            connectedAtISO:
+                now(),
+
+            chartsApi:
+                false,
+
+            simulator:
+                "Microsoft Flight Simulator 2024",
+
+            lastMessageAt:
+                now(),
+
+            ip:
+                request.socket
+                    ?.remoteAddress ||
+                null
+        };
+
+        msfsClients.set(
+            id,
+            client
+        );
 
         console.log("");
         console.log(
@@ -667,77 +907,48 @@ websocketServer.on(
         );
 
         console.log(
+            ` ID: ${id}`
+        );
+
+        console.log(
+            ` Clients: ${msfsClients.size}`
+        );
+
+        console.log(
             "=============================================="
         );
 
         /*
         |--------------------------------------------------------------------------
-        | Replace existing client
+        | HELLO
         |--------------------------------------------------------------------------
         */
 
-        if (msfsClient) {
+        socket.send(
+            JSON.stringify({
 
-            try {
+                type:
+                    "BRIDGE_CONNECTED",
 
-                msfsClient.close(
-                    1000,
-                    "New MSFS client connected."
-                );
+                bridge: {
 
-            } catch (error) {
+                    name:
+                        SERVICE_NAME,
 
-                console.error(
-                    "Could not close old MSFS client:",
-                    error.message
-                );
-            }
-        }
+                    version:
+                        VERSION
+                },
 
-        msfsClient = socket;
+                connectionId:
+                    id,
 
-        msfsInfo.connected = true;
+                serverTime:
+                    now(),
 
-        msfsInfo.connectedAt =
-            nowISO();
-
-        msfsInfo.lastMessageAt =
-            nowISO();
-
-        msfsInfo.chartsApi = false;
-
-        /*
-        |--------------------------------------------------------------------------
-        | Tell MSFS bridge client that connection succeeded
-        |--------------------------------------------------------------------------
-        */
-
-        try {
-
-            socket.send(
-                JSON.stringify({
-                    type: "BRIDGE_CONNECTED",
-
-                    bridge: {
-                        name:
-                            "MSFS 2024 Charts API Bridge",
-
-                        version:
-                            BRIDGE_VERSION
-                    },
-
-                    serverTime:
-                        nowISO()
-                })
-            );
-
-        } catch (error) {
-
-            console.error(
-                "Could not send connection message:",
-                error.message
-            );
-        }
+                protocolVersion:
+                    "1.0"
+            })
+        );
 
         /*
         |--------------------------------------------------------------------------
@@ -749,8 +960,8 @@ websocketServer.on(
             "message",
             raw => {
 
-                msfsInfo.lastMessageAt =
-                    nowISO();
+                client.lastMessageAt =
+                    now();
 
                 let message;
 
@@ -764,7 +975,7 @@ websocketServer.on(
                 } catch (error) {
 
                     console.error(
-                        "Invalid JSON from MSFS:",
+                        "Invalid JSON received from MSFS:",
                         error.message
                     );
 
@@ -790,7 +1001,7 @@ websocketServer.on(
                     if (!request) {
 
                         console.warn(
-                            `Received response for unknown request ${message.id}`
+                            `Unknown request ID: ${message.id}`
                         );
 
                         return;
@@ -817,7 +1028,7 @@ websocketServer.on(
                         request.reject(
                             new Error(
                                 message.error ||
-                                "MSFS Charts API request failed."
+                                "MSFS request failed."
                             )
                         );
                     }
@@ -836,32 +1047,62 @@ websocketServer.on(
                     "MSFS_READY"
                 ) {
 
-                    msfsInfo.chartsApi =
+                    client.chartsApi =
                         true;
 
+                    if (
+                        message.simulator
+                    ) {
+
+                        client.simulator =
+                            message.simulator;
+                    }
+
                     console.log(
-                        "MSFS Charts API is ready."
+                        `[MSFS READY] ${id}`
                     );
 
-                    try {
+                    socket.send(
+                        JSON.stringify({
 
-                        socket.send(
-                            JSON.stringify({
-                                type:
-                                    "BRIDGE_READY",
+                            type:
+                                "BRIDGE_READY",
 
-                                bridgeVersion:
-                                    BRIDGE_VERSION
-                            })
-                        );
+                            connectionId:
+                                id,
 
-                    } catch (error) {
+                            bridgeVersion:
+                                VERSION,
 
-                        console.error(
-                            "Could not send BRIDGE_READY:",
-                            error.message
-                        );
-                    }
+                            timestamp:
+                                now()
+                        })
+                    );
+
+                    return;
+                }
+
+                /*
+                |--------------------------------------------------------------------------
+                | PING
+                |--------------------------------------------------------------------------
+                */
+
+                if (
+                    message.type ===
+                    "PING"
+                ) {
+
+                    socket.send(
+                        JSON.stringify({
+
+                            type:
+                                "PONG",
+
+                            timestamp:
+                                now()
+                        })
+                    );
 
                     return;
                 }
@@ -892,7 +1133,7 @@ websocketServer.on(
                 ) {
 
                     console.log(
-                        "[MSFS]",
+                        `[MSFS ${id}]`,
                         message.message ||
                         ""
                     );
@@ -907,48 +1148,8 @@ websocketServer.on(
                 */
 
                 console.log(
-                    "[MSFS MESSAGE]",
+                    `[MSFS MESSAGE ${id}]`,
                     message
-                );
-            }
-        );
-
-        /*
-        |--------------------------------------------------------------------------
-        | CLOSE
-        |--------------------------------------------------------------------------
-        */
-
-        socket.on(
-            "close",
-            (code, reason) => {
-
-                console.log(
-                    `MSFS client disconnected. Code: ${code}`
-                );
-
-                if (reason) {
-
-                    console.log(
-                        `Reason: ${reason.toString()}`
-                    );
-                }
-
-                if (
-                    msfsClient === socket
-                ) {
-
-                    msfsClient = null;
-
-                    msfsInfo.connected =
-                        false;
-
-                    msfsInfo.chartsApi =
-                        false;
-                }
-
-                rejectPendingRequests(
-                    "MSFS 2024 disconnected."
                 );
             }
         );
@@ -964,8 +1165,73 @@ websocketServer.on(
             error => {
 
                 console.error(
-                    "MSFS WebSocket error:",
+                    `[MSFS ERROR ${id}]`,
                     error.message
+                );
+            }
+        );
+
+        /*
+        |--------------------------------------------------------------------------
+        | CLOSE
+        |--------------------------------------------------------------------------
+        */
+
+        socket.on(
+            "close",
+            (code, reason) => {
+
+                console.log(
+                    `[MSFS DISCONNECTED] ${id}`
+                );
+
+                console.log(
+                    `Code: ${code}`
+                );
+
+                if (reason) {
+
+                    console.log(
+                        `Reason: ${reason.toString()}`
+                    );
+                }
+
+                /*
+                |--------------------------------------------------------------------------
+                | Reject requests belonging to this client
+                |--------------------------------------------------------------------------
+                */
+
+                for (
+                    const [
+                        requestId,
+                        request
+                    ]
+                    of pendingRequests
+                ) {
+
+                    if (
+                        request.clientId === id
+                    ) {
+
+                        clearTimeout(
+                            request.timeout
+                        );
+
+                        request.reject(
+                            new Error(
+                                "MSFS 2024 disconnected."
+                            )
+                        );
+
+                        pendingRequests.delete(
+                            requestId
+                        );
+                    }
+                }
+
+                msfsClients.delete(
+                    id
                 );
             }
         );
@@ -974,16 +1240,74 @@ websocketServer.on(
 
 /*
 |--------------------------------------------------------------------------
-| REJECT PENDING REQUESTS
+| HEARTBEAT
+|--------------------------------------------------------------------------
+|
+| Render recommends keeping WebSocket connections alive and detecting
+| stale connections. We use WebSocket ping frames here.
 |--------------------------------------------------------------------------
 */
 
-function rejectPendingRequests(
-    reason
-) {
+const heartbeatInterval =
+    setInterval(
+        () => {
+
+            for (
+                const [
+                    id,
+                    client
+                ]
+                of msfsClients
+            ) {
+
+                if (
+                    client.socket.readyState !==
+                    WebSocket.OPEN
+                ) {
+
+                    continue;
+                }
+
+                try {
+
+                    client.socket.ping();
+
+                } catch (error) {
+
+                    console.error(
+                        `[HEARTBEAT ERROR ${id}]`,
+                        error.message
+                    );
+                }
+            }
+
+        },
+        30000
+    );
+
+/*
+|--------------------------------------------------------------------------
+| CLEANUP
+|--------------------------------------------------------------------------
+*/
+
+function cleanup() {
+
+    clearInterval(
+        heartbeatInterval
+    );
+
+    /*
+    |--------------------------------------------------------------------------
+    | Reject pending requests
+    |--------------------------------------------------------------------------
+    */
 
     for (
-        const [id, request]
+        const [
+            requestId,
+            request
+        ]
         of pendingRequests
     ) {
 
@@ -992,179 +1316,59 @@ function rejectPendingRequests(
         );
 
         request.reject(
-            new Error(reason)
+            new Error(
+                "Charts bridge shutting down."
+            )
         );
 
         pendingRequests.delete(
-            id
+            requestId
         );
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Close MSFS clients
+    |--------------------------------------------------------------------------
+    */
+
+    for (
+        const client
+        of msfsClients.values()
+    ) {
+
+        try {
+
+            client.socket.close(
+                1001,
+                "Charts bridge shutting down."
+            );
+
+        } catch (error) {
+
+            console.error(
+                "Error closing MSFS socket:",
+                error.message
+            );
+        }
+    }
+
+    msfsClients.clear();
 }
 
 /*
 |--------------------------------------------------------------------------
-| PERIODIC PING
-|--------------------------------------------------------------------------
-*/
-
-setInterval(() => {
-
-    if (
-        !msfsClient ||
-        msfsClient.readyState !== WebSocket.OPEN
-    ) {
-        return;
-    }
-
-    try {
-
-        msfsClient.send(
-            JSON.stringify({
-                type: "PING"
-            })
-        );
-
-    } catch (error) {
-
-        console.error(
-            "MSFS ping failed:",
-            error.message
-        );
-    }
-
-}, 15000);
-
-/*
-|--------------------------------------------------------------------------
-| 404
-|--------------------------------------------------------------------------
-*/
-
-app.use(
-    (req, res) => {
-
-        res.status(404).json({
-
-            available: false,
-
-            error:
-                "MSFS Charts Bridge endpoint not found.",
-
-            path:
-                req.originalUrl
-        });
-    }
-);
-
-/*
-|--------------------------------------------------------------------------
-| ERROR HANDLER
-|--------------------------------------------------------------------------
-*/
-
-app.use(
-    (error, req, res, next) => {
-
-        console.error(
-            "Bridge server error:",
-            error
-        );
-
-        res.status(500).json({
-
-            available: false,
-
-            error:
-                "Internal bridge server error."
-        });
-    }
-);
-
-/*
-|--------------------------------------------------------------------------
-| START SERVER
-|--------------------------------------------------------------------------
-*/
-
-server.listen(
-    PORT,
-    HOST,
-    () => {
-
-        console.log("");
-        console.log(
-            "=================================================="
-        );
-
-        console.log(
-            "       MSFS 2024 CHARTS API BRIDGE"
-        );
-
-        console.log(
-            "=================================================="
-        );
-
-        console.log(
-            ` HTTP:      http://${HOST}:${PORT}`
-        );
-
-        console.log(
-            ` WebSocket: ws://${HOST}:${PORT}/msfs`
-        );
-
-        console.log(
-            " MSFS:      Waiting for connection..."
-        );
-
-        console.log(
-            " Providers: LIDO / FAA"
-        );
-
-        console.log(
-            ` Version:   ${BRIDGE_VERSION}`
-        );
-
-        console.log(
-            "=================================================="
-        );
-
-        console.log("");
-    }
-);
-
-/*
-|--------------------------------------------------------------------------
-| GRACEFUL SHUTDOWN
+| SHUTDOWN
 |--------------------------------------------------------------------------
 */
 
 function shutdown(signal) {
 
     console.log(
-        `Received ${signal}. Shutting down...`
+        `Received ${signal}.`
     );
 
-    rejectPendingRequests(
-        "Bridge shutting down."
-    );
-
-    if (msfsClient) {
-
-        try {
-
-            msfsClient.close(
-                1000,
-                "Bridge shutting down."
-            );
-
-        } catch (error) {
-
-            console.error(
-                "Error closing MSFS connection:",
-                error.message
-            );
-        }
-    }
+    cleanup();
 
     websocketServer.close(
         () => {
@@ -1177,14 +1381,89 @@ function shutdown(signal) {
             );
         }
     );
+
+    /*
+    |--------------------------------------------------------------------------
+    | Safety timeout
+    |--------------------------------------------------------------------------
+    */
+
+    setTimeout(
+        () => {
+
+            process.exit(0);
+
+        },
+        10000
+    ).unref();
 }
+
+process.on(
+    "SIGTERM",
+    () => shutdown("SIGTERM")
+);
 
 process.on(
     "SIGINT",
     () => shutdown("SIGINT")
 );
 
-process.on(
-    "SIGTERM",
-    () => shutdown("SIGTERM")
+/*
+|--------------------------------------------------------------------------
+| START
+|--------------------------------------------------------------------------
+*/
+
+server.listen(
+    PORT,
+    HOST,
+    () => {
+
+        console.log("");
+        console.log(
+            "======================================================"
+        );
+
+        console.log(
+            "       ECHO FLIGHT APP"
+        );
+
+        console.log(
+            "       MSFS 2024 CHARTS ONLINE BRIDGE"
+        );
+
+        console.log(
+            "======================================================"
+        );
+
+        console.log(
+            ` HTTP:      http://0.0.0.0:${PORT}`
+        );
+
+        console.log(
+            ` WebSocket: ws://0.0.0.0:${PORT}/msfs`
+        );
+
+        console.log(
+            " Render:    READY"
+        );
+
+        console.log(
+            " MSFS:      WAITING"
+        );
+
+        console.log(
+            " Providers: LIDO / FAA"
+        );
+
+        console.log(
+            ` Version:   ${VERSION}`
+        );
+
+        console.log(
+            "======================================================"
+        );
+
+        console.log("");
+    }
 );
