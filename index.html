@@ -3526,29 +3526,7 @@
 
         }
 
-    
-        /* SIMBRIEF PLANNER */
-        .simbrief-card { padding: 28px; }
-        .simbrief-heading { display:flex; justify-content:space-between; gap:24px; align-items:flex-start; margin-bottom:22px; }
-        .simbrief-badge { flex-shrink:0; padding:9px 12px; border-radius:10px; background:#eef8f2; color:#21824c; font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:.6px; }
-        .simbrief-controls { display:grid; grid-template-columns:minmax(0,1fr) auto auto; gap:10px; align-items:stretch; }
-        .simbrief-open { display:flex; align-items:center; justify-content:center; gap:8px; min-width:165px; padding:0 18px; border:1px solid var(--border); border-radius:10px; background:white; color:var(--text); font-weight:800; text-decoration:none; }
-        .simbrief-result { margin-top:16px; padding:20px; border:1px solid var(--border); border-radius:16px; background:#f8fafc; }
-        .simbrief-result-header { display:flex; justify-content:space-between; align-items:center; gap:16px; padding-bottom:15px; border-bottom:1px solid var(--border); }
-        .simbrief-result-header span:first-child, .simbrief-grid span, .simbrief-route > span { display:block; color:var(--text-muted); font-size:9px; font-weight:800; text-transform:uppercase; letter-spacing:.6px; }
-        .simbrief-result-header strong { display:block; margin-top:4px; font-size:20px; }
-        .simbrief-status { padding:6px 9px; border-radius:8px; background:#eef8f2; color:#21824c; font-size:9px; font-weight:800; }
-        .simbrief-grid { display:grid; grid-template-columns:repeat(6,1fr); gap:9px; margin-top:15px; }
-        .simbrief-grid > div { min-width:0; padding:11px; border:1px solid var(--border); border-radius:10px; background:white; }
-        .simbrief-grid strong { display:block; margin-top:5px; overflow:hidden; font-size:12px; white-space:nowrap; text-overflow:ellipsis; }
-        .simbrief-route { margin-top:9px; padding:12px; border:1px solid var(--border); border-radius:10px; background:white; }
-        .simbrief-route code { display:block; margin-top:6px; color:var(--text); font-size:11px; line-height:1.6; white-space:pre-wrap; overflow-wrap:anywhere; }
-        .simbrief-actions { display:flex; gap:9px; margin-top:14px; }
-        .simbrief-actions .btn { display:inline-flex; align-items:center; gap:8px; }
-        @media(max-width:900px){ .simbrief-controls{grid-template-columns:1fr;} .simbrief-open{min-height:54px;} .simbrief-grid{grid-template-columns:repeat(3,1fr);} }
-        @media(max-width:650px){ .simbrief-card{padding:18px;} .simbrief-heading,.simbrief-result-header,.simbrief-actions{flex-direction:column;align-items:stretch;} .simbrief-grid{grid-template-columns:1fr 1fr;} }
-
-</style>
+    </style>
 
 </head>
 
@@ -4038,84 +4016,226 @@
 
 
         <!-- =====================================================
-             SIMBRIEF PLANNER
+             QUICK PLANNER
         ====================================================== -->
 
-        <section class="planner-section" id="planner">
+        <section class="planner-section">
+
             <div class="container">
-                <div class="planner-card simbrief-card">
-                    <div class="planner-inner simbrief-inner">
-                        <div class="simbrief-heading">
-                            <div>
-                                <div class="section-eyebrow">Flight planning</div>
-                                <h2 class="section-title">Plan your flight with SimBrief</h2>
-                                <p class="section-description">
-                                    Flight planning is handled through SimBrief. Generate an OFP in SimBrief, then import your latest flight plan here.
-                                </p>
+
+
+                <div class="planner-card">
+
+                    <div class="planner-inner">
+
+
+                        <!-- DEPARTURE -->
+
+                        <div class="planner-field">
+
+                            <div class="planner-field-icon">
+
+                                <i
+                                    class="fa-solid fa-plane-departure"
+                                ></i>
+
                             </div>
-                            <div class="simbrief-badge">
-                                <i class="fa-solid fa-link"></i> SimBrief only
+
+                            <div class="planner-field-content">
+
+                                <label
+                                    class="planner-label"
+                                    for="departureInput"
+                                >
+                                    Departure
+                                </label>
+
+                                <input
+                                    id="departureInput"
+                                    class="planner-input"
+                                    type="text"
+                                    maxlength="4"
+                                    placeholder="ICAO"
+                                    value="EHAM"
+                                >
+
+                                <span
+                                    class="planner-subtext"
+                                    id="departureName"
+                                >
+                                    Amsterdam Schiphol
+                                </span>
+
                             </div>
+
                         </div>
 
-                        <div class="simbrief-controls">
-                            <div class="planner-field simbrief-user-field">
-                                <div class="planner-field-icon">
-                                    <i class="fa-solid fa-user"></i>
-                                </div>
-                                <div class="planner-field-content">
-                                    <label class="planner-label" for="simbriefUsername">SimBrief username</label>
-                                    <input id="simbriefUsername" class="planner-input" type="text" maxlength="80" placeholder="Enter your SimBrief username" autocomplete="username">
-                                    <span class="planner-subtext" id="simbriefStatus">Not available</span>
-                                </div>
+
+                        <!-- ARRIVAL -->
+
+                        <div class="planner-field">
+
+                            <div class="planner-field-icon">
+
+                                <i
+                                    class="fa-solid fa-plane-arrival"
+                                ></i>
+
                             </div>
 
-                            <button class="planner-submit" id="simbriefImportButton" type="button">
-                                <i class="fa-solid fa-cloud-arrow-down"></i>
-                                Import latest OFP
-                            </button>
+                            <div class="planner-field-content">
 
-                            <a class="simbrief-open" href="https://www.simbrief.com/" target="_blank" rel="noopener noreferrer">
-                                <i class="fa-solid fa-up-right-from-square"></i>
-                                Open SimBrief
-                            </a>
+                                <label
+                                    class="planner-label"
+                                    for="arrivalInput"
+                                >
+                                    Arrival
+                                </label>
+
+                                <input
+                                    id="arrivalInput"
+                                    class="planner-input"
+                                    type="text"
+                                    maxlength="4"
+                                    placeholder="ICAO"
+                                    value="LEBL"
+                                >
+
+                                <span
+                                    class="planner-subtext"
+                                    id="arrivalName"
+                                >
+                                    Barcelona El Prat
+                                </span>
+
+                            </div>
+
                         </div>
 
-                        <div class="simbrief-result hidden" id="simbriefResult">
-                            <div class="simbrief-result-header">
-                                <div>
-                                    <span>Latest OFP</span>
-                                    <strong id="simbriefRoute">Not available</strong>
-                                </div>
-                                <span class="simbrief-status" id="simbriefResultStatus">Not available</span>
+
+                        <!-- AIRCRAFT -->
+
+                        <div class="planner-field">
+
+                            <div class="planner-field-icon">
+
+                                <i
+                                    class="fa-solid fa-plane"
+                                ></i>
+
                             </div>
 
-                            <div class="simbrief-grid">
-                                <div><span>Flight</span><strong id="simbriefFlightNumber">Not available</strong></div>
-                                <div><span>Aircraft</span><strong id="simbriefAircraft">Not available</strong></div>
-                                <div><span>Distance</span><strong id="simbriefDistance">Not available</strong></div>
-                                <div><span>Flight time</span><strong id="simbriefTime">Not available</strong></div>
-                                <div><span>Cruise altitude</span><strong id="simbriefAltitude">Not available</strong></div>
-                                <div><span>OFP ID</span><strong id="simbriefOfpId">Not available</strong></div>
+                            <div class="planner-field-content">
+
+                                <label
+                                    class="planner-label"
+                                    for="aircraftInput"
+                                >
+                                    Aircraft
+                                </label>
+
+                                <select
+                                    id="aircraftInput"
+                                    class="planner-select"
+                                >
+
+                                    <option value="A320">
+                                        Airbus A320
+                                    </option>
+
+                                    <option value="A20N">
+                                        Airbus A320neo
+                                    </option>
+
+                                    <option value="A21N">
+                                        Airbus A321neo
+                                    </option>
+
+                                    <option value="A350">
+                                        Airbus A350-900
+                                    </option>
+
+                                    <option value="B738">
+                                        Boeing 737-800
+                                    </option>
+
+                                    <option value="B38M">
+                                        Boeing 737 MAX 8
+                                    </option>
+
+                                </select>
+
+                                <span
+                                    class="planner-subtext"
+                                >
+                                    Select aircraft
+                                </span>
+
                             </div>
 
-                            <div class="simbrief-route">
-                                <span>Route</span>
-                                <code id="simbriefRouteText">Not available</code>
-                            </div>
-
-                            <div class="simbrief-actions">
-                                <button class="btn btn-primary" id="saveSimBriefButton" type="button">
-                                    <i class="fa-solid fa-floppy-disk"></i> Save to Flight App
-                                </button>
-                                <a class="btn btn-secondary" href="https://www.simbrief.com/" target="_blank" rel="noopener noreferrer">
-                                    Open SimBrief
-                                </a>
-                            </div>
                         </div>
+
+
+                        <!-- CRUISE -->
+
+                        <div class="planner-field">
+
+                            <div class="planner-field-icon">
+
+                                <i
+                                    class="fa-solid fa-arrow-up"
+                                ></i>
+
+                            </div>
+
+                            <div class="planner-field-content">
+
+                                <label
+                                    class="planner-label"
+                                    for="altitudeInput"
+                                >
+                                    Cruise altitude
+                                </label>
+
+                                <input
+                                    id="altitudeInput"
+                                    class="planner-input"
+                                    type="number"
+                                    value="35000"
+                                    min="0"
+                                    max="60000"
+                                >
+
+                                <span
+                                    class="planner-subtext"
+                                >
+                                    Feet
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- SUBMIT -->
+
+                        <button
+                            class="planner-submit"
+                            id="plannerSubmit"
+                        >
+
+                            <i class="fa-solid fa-arrow-right"></i>
+
+                            Plan flight
+
+                        </button>
+
                     </div>
+
                 </div>
+
             </div>
+
         </section>
 
 
@@ -4842,30 +4962,7 @@
            FLIGHT APP CORE
         ====================================================== */
 
-        const API_BASE = "https://flight-app-api-g36e.onrender.com";
-
-        async function apiFetch(endpoint, options = {}) {
-            const response = await fetch(`${API_BASE}${endpoint}`, {
-                ...options,
-                headers: {
-                    "Accept": "application/json",
-                    ...(options.headers || {})
-                }
-            });
-
-            let data = null;
-            try { data = await response.json(); } catch { data = null; }
-
-            if (!response.ok) {
-                throw new Error(data?.error || data?.message || `HTTP ${response.status}`);
-            }
-
-            return data;
-        }
-
         const FlightApp = {
-
-            currentSimBriefOFP: null,
 
 
             /* =================================================
@@ -5366,163 +5463,314 @@
             ================================================== */
 
             setupPlanner() {
-                const username = document.getElementById("simbriefUsername");
-                const importButton = document.getElementById("simbriefImportButton");
-                const saveButton = document.getElementById("saveSimBriefButton");
 
-                if (!username || !importButton) return;
+                const departure =
+                    document.getElementById(
+                        "departureInput"
+                    );
 
-                username.value = localStorage.getItem("flightapp_simbrief_username") || "";
+                const arrival =
+                    document.getElementById(
+                        "arrivalInput"
+                    );
 
-                username.addEventListener("input", () => {
-                    localStorage.setItem("flightapp_simbrief_username", username.value.trim());
-                });
-
-                importButton.addEventListener("click", () => this.importSimBriefOFP());
-
-                if (saveButton) {
-                    saveButton.addEventListener("click", () => this.saveSimBriefPlan());
-                }
-            },
-
-            async importSimBriefOFP() {
-                const username = document.getElementById("simbriefUsername")?.value.trim();
-                const status = document.getElementById("simbriefStatus");
-                const result = document.getElementById("simbriefResult");
-                const button = document.getElementById("simbriefImportButton");
-
-                if (!username) {
-                    if (status) status.textContent = "Enter your SimBrief username";
-                    this.toast("SimBrief username required", "Enter your SimBrief username first.", "warning");
-                    return;
-                }
-
-                localStorage.setItem("flightapp_simbrief_username", username);
-                button.disabled = true;
-                if (status) status.textContent = "Loading latest OFP…";
-
-                try {
-                    const data = await apiFetch(`/api/simbrief/latest?username=${encodeURIComponent(username)}`);
-
-                    if (!data?.available || !data.ofp) {
-                        throw new Error(data?.error || "SimBrief data is not available.");
-                    }
-
-                    this.currentSimBriefOFP = data.ofp;
-                    this.renderSimBriefOFP(data.ofp);
-                    result?.classList.remove("hidden");
-                    if (status) status.textContent = "Latest OFP imported";
-                    this.toast("SimBrief imported", "The latest OFP is ready to use.");
-                } catch (error) {
-                    this.currentSimBriefOFP = null;
-                    result?.classList.add("hidden");
-                    if (status) status.textContent = "Not available";
-                    this.toast("SimBrief unavailable", error.message || "No SimBrief data available.", "warning");
-                } finally {
-                    button.disabled = false;
-                }
-            },
-
-            ofpValue(ofp, paths) {
-                for (const path of paths) {
-                    let value = ofp;
-                    for (const key of path.split(".")) {
-                        if (value == null) break;
-                        value = value[key];
-                    }
-                    if (value != null && String(value).trim() !== "") return value;
-                }
-                return null;
-            },
-
-            formatOFPTime(value) {
-                if (value == null || value === "") return "Not available";
-                const n = Number(value);
-                if (Number.isFinite(n) && n > 0) {
-                    const h = Math.floor(n / 60);
-                    const m = n % 60;
-                    return `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}`;
-                }
-                const text = String(value);
-                return /^\d{3,4}$/.test(text) ? `${text.padStart(4,"0").slice(0,-2)}:${text.padStart(4,"0").slice(-2)}` : text;
-            },
-
-            formatDistance(value) {
-                if (value == null || value === "") return "Not available";
-                const n = Number(value);
-                return Number.isFinite(n) ? `${Math.round(n).toLocaleString()} NM` : String(value);
-            },
-
-            renderSimBriefOFP(ofp) {
-                const dep = this.ofpValue(ofp, ["origin.icao_code", "general.origin", "origin"]);
-                const arr = this.ofpValue(ofp, ["destination.icao_code", "general.destination", "destination"]);
-                const flight = this.ofpValue(ofp, ["general.flight_number", "general.flightno", "flight_number"]);
-                const aircraft = this.ofpValue(ofp, ["aircraft.icaocode", "general.type", "aircraft.type"]);
-                const distance = this.ofpValue(ofp, ["general.air_distance", "general.air_distance_nm", "general.distance"]);
-                const time = this.ofpValue(ofp, ["general.enroute_time", "general.air_time", "general.flight_time"]);
-                const altitude = this.ofpValue(ofp, ["general.initial_altitude", "general.cruise_altitude", "general.cruise_alt"]);
-                const ofpId = this.ofpValue(ofp, ["general.ofp_id", "general.release", "ofp_id"]);
-                const route = this.ofpValue(ofp, ["general.route", "route", "navlog.route"]);
-
-                const set = (id, value) => {
-                    const el = document.getElementById(id);
-                    if (el) el.textContent = value == null || String(value).trim() === "" ? "Not available" : String(value);
-                };
-
-                set("simbriefRoute", dep && arr ? `${dep} → ${arr}` : "Not available");
-                set("simbriefFlightNumber", flight);
-                set("simbriefAircraft", aircraft);
-                set("simbriefDistance", this.formatDistance(distance));
-                set("simbriefTime", this.formatOFPTime(time));
-                set("simbriefAltitude", altitude ? `${altitude} ft` : null);
-                set("simbriefOfpId", ofpId);
-                set("simbriefRouteText", route);
-                set("simbriefResultStatus", dep && arr ? "Available" : "Partially available");
-            },
-
-            async saveSimBriefPlan() {
-                const ofp = this.currentSimBriefOFP;
-                if (!ofp) {
-                    this.toast("No OFP loaded", "Import a SimBrief OFP first.", "warning");
-                    return;
-                }
-
-                const departure = this.ofpValue(ofp, ["origin.icao_code", "general.origin", "origin"]);
-                const arrival = this.ofpValue(ofp, ["destination.icao_code", "general.destination", "destination"]);
+                const aircraft =
+                    document.getElementById(
+                        "aircraftInput"
+                    );
 
                 if (!departure || !arrival) {
-                    this.toast("Flight not saved", "Departure or arrival is not available in the OFP.", "warning");
                     return;
                 }
 
-                const payload = {
-                    name: this.ofpValue(ofp, ["general.flight_number", "general.flightno"]) || `${departure} → ${arrival}`,
-                    departure_icao: departure,
-                    arrival_icao: arrival,
-                    aircraft_icao: this.ofpValue(ofp, ["aircraft.icaocode", "general.type", "aircraft.type"]),
-                    cruise_altitude: Number(String(this.ofpValue(ofp, ["general.initial_altitude", "general.cruise_altitude"]) || "").replace(/[^0-9]/g, "")) || null,
-                    route: this.ofpValue(ofp, ["general.route", "route", "navlog.route"]),
-                    distance_nm: Number(this.ofpValue(ofp, ["general.air_distance", "general.air_distance_nm", "general.distance"])) || null,
-                    estimated_minutes: Number(this.ofpValue(ofp, ["general.enroute_time", "general.air_time", "general.flight_time"])) || null,
-                    simbrief_ofp_id: this.ofpValue(ofp, ["general.ofp_id", "general.release", "ofp_id"])
+
+                const update = () => {
+
+                    const dep =
+                        this.lookupAirport(
+                            departure.value
+                        );
+
+                    const arr =
+                        this.lookupAirport(
+                            arrival.value
+                        );
+
+
+                    const depName =
+                        document.getElementById(
+                            "departureName"
+                        );
+
+                    const arrName =
+                        document.getElementById(
+                            "arrivalName"
+                        );
+
+
+                    if (dep) {
+
+                        depName.textContent =
+                            `${dep.name} • ${dep.city}`;
+
+                    } else {
+
+                        depName.textContent =
+                            "Airport not found";
+
+                    }
+
+
+                    if (arr) {
+
+                        arrName.textContent =
+                            `${arr.name} • ${arr.city}`;
+
+                    } else {
+
+                        arrName.textContent =
+                            "Airport not found";
+
+                    }
+
+
+                    if (
+                        dep &&
+                        arr
+                    ) {
+
+                        this.updatePreview();
+
+                    }
+
                 };
 
-                try {
-                    await apiFetch("/api/plans", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify(payload)
-                    });
-                    this.toast("Flight plan saved", `${departure} → ${arrival} was saved to the backend.`);
-                } catch (error) {
-                    this.toast("Save failed", error.message || "The backend could not save the plan.", "warning");
-                }
+
+                departure.addEventListener(
+                    "input",
+                    update
+                );
+
+                arrival.addEventListener(
+                    "input",
+                    update
+                );
+
+                aircraft.addEventListener(
+                    "change",
+                    () => this.updatePreview()
+                );
+
+
+                document
+                    .getElementById(
+                        "altitudeInput"
+                    )
+                    .addEventListener(
+                        "input",
+                        () => this.updatePreview()
+                    );
+
+
+                document
+                    .getElementById(
+                        "plannerSubmit"
+                    )
+                    .addEventListener(
+                        "click",
+                        () => {
+
+                            const dep =
+                                this.lookupAirport(
+                                    departure.value
+                                );
+
+                            const arr =
+                                this.lookupAirport(
+                                    arrival.value
+                                );
+
+                            if (!dep || !arr) {
+
+                                this.toast(
+                                    "Invalid route",
+                                    "Enter valid ICAO airport codes.",
+                                    "warning"
+                                );
+
+                                return;
+
+                            }
+
+
+                            const aircraftCode =
+                                aircraft.value;
+
+                            const distance =
+                                this.distance(
+                                    dep.lat,
+                                    dep.lon,
+                                    arr.lat,
+                                    arr.lon
+                                );
+
+                            const time =
+                                this.calculateFlightTime(
+                                    distance,
+                                    aircraftCode
+                                );
+
+
+                            const flight = {
+
+                                id:
+                                    crypto.randomUUID
+                                    ? crypto.randomUUID()
+                                    : Date.now().toString(),
+
+                                departure:
+                                    dep.icao,
+
+                                arrival:
+                                    arr.icao,
+
+                                aircraft:
+                                    aircraftCode,
+
+                                altitude:
+                                    Number(
+                                        document
+                                            .getElementById(
+                                                "altitudeInput"
+                                            )
+                                            .value
+                                    ),
+
+                                distance:
+                                    Math.round(
+                                        distance
+                                    ),
+
+                                flightTime:
+                                    time.minutes,
+
+                                createdAt:
+                                    new Date()
+                                        .toISOString()
+
+                            };
+
+
+                            this.saveFlight(
+                                flight
+                            );
+
+                            this.renderFlights();
+
+                            this.renderStatistics();
+
+
+                            this.toast(
+                                "Flight saved",
+                                `${dep.icao} → ${arr.icao} has been added to your logbook.`
+                            );
+
+                        }
+                    );
+
             },
 
+
+            /* =================================================
+               PREVIEW
+            ================================================== */
+
             updatePreview() {
-                // Planning is SimBrief-only. No local or estimated flight data is generated.
-                return;
+
+                const depInput =
+                    document.getElementById(
+                        "departureInput"
+                    );
+
+                const arrInput =
+                    document.getElementById(
+                        "arrivalInput"
+                    );
+
+                const aircraftInput =
+                    document.getElementById(
+                        "aircraftInput"
+                    );
+
+
+                if (
+                    !depInput ||
+                    !arrInput
+                ) {
+                    return;
+                }
+
+
+                const dep =
+                    this.lookupAirport(
+                        depInput.value
+                    );
+
+                const arr =
+                    this.lookupAirport(
+                        arrInput.value
+                    );
+
+
+                if (!dep || !arr) {
+                    return;
+                }
+
+
+                const distance =
+                    this.distance(
+                        dep.lat,
+                        dep.lon,
+                        arr.lat,
+                        arr.lon
+                    );
+
+
+                const time =
+                    this.calculateFlightTime(
+                        distance,
+                        aircraftInput.value
+                    );
+
+
+                const distanceElement =
+                    document.getElementById(
+                        "previewDistance"
+                    );
+
+                const timeElement =
+                    document.getElementById(
+                        "previewTime"
+                    );
+
+
+                if (distanceElement) {
+
+                    distanceElement.textContent =
+                        `${Math.round(distance)} NM`;
+
+                }
+
+
+                if (timeElement) {
+
+                    timeElement.textContent =
+                        time.formatted;
+
+                }
+
             },
+
 
             /* =================================================
                RENDER FLIGHTS
