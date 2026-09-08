@@ -52,7 +52,8 @@ function fetchJSON(url) {
             {
                 headers: {
                     "User-Agent":
-                        "Flight-App/1.0 (flight simulator companion application)"
+                        "Flight-App/1.0 (flight simulator companion application)",
+                    Accept: "application/json"
                 }
             },
             response => {
@@ -170,6 +171,12 @@ app.get("/api/simbrief/latest", async (req, res) => {
         req.query.username || ""
     ).trim();
 
+    /*
+    |--------------------------------------------------------------------------
+    | VALIDATE USERNAME
+    |--------------------------------------------------------------------------
+    */
+
     if (!username) {
         return res.status(400).json({
             available: false,
@@ -184,10 +191,30 @@ app.get("/api/simbrief/latest", async (req, res) => {
         });
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | BASIC USERNAME VALIDATION
+    |--------------------------------------------------------------------------
+    */
+
+    if (!/^[a-zA-Z0-9_.-]+$/.test(username)) {
+        return res.status(400).json({
+            available: false,
+            error: "Invalid SimBrief username."
+        });
+    }
+
     try {
+        /*
+        |--------------------------------------------------------------------------
+        | SIMBRIEF API
+        |--------------------------------------------------------------------------
+        */
+
         const url =
             "https://www.simbrief.com/api/xml.fetcher.php" +
-            `?username=${encodeURIComponent(username)}&json=v2`;
+            `?username=${encodeURIComponent(username)}` +
+            "&json=v2";
 
         console.log(
             `Fetching latest SimBrief OFP for: ${username}`
@@ -195,11 +222,33 @@ app.get("/api/simbrief/latest", async (req, res) => {
 
         const data = await fetchJSON(url);
 
+        /*
+        |--------------------------------------------------------------------------
+        | CHECK RESPONSE
+        |--------------------------------------------------------------------------
+        */
+
+        if (!data || typeof data !== "object") {
+            return res.status(502).json({
+                available: false,
+                error:
+                    "SimBrief returned an empty or invalid response."
+            });
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | RETURN OFP
+        |--------------------------------------------------------------------------
+        */
+
         return res.json({
             available: true,
             source: "SimBrief",
+            username,
             ofp: data
         });
+
     } catch (error) {
         console.error(
             "SimBrief OFP fetch failed:",
@@ -559,6 +608,7 @@ app.get("/api/plans", async (req, res) => {
 */
 
 app.post("/api/plans", async (req, res) => {
+
     const {
         name,
         departure_icao,
@@ -571,14 +621,58 @@ app.post("/api/plans", async (req, res) => {
         simbrief_ofp_id
     } = req.body;
 
-    if (!name) {
+    /*
+    |--------------------------------------------------------------------------
+    | VALIDATION
+    |--------------------------------------------------------------------------
+    */
+
+    if (
+        !name ||
+        String(name).trim() === ""
+    ) {
         return res.status(400).json({
             available: false,
             error: "Plan name is required"
         });
     }
 
+    if (
+        departure_icao &&
+        !validICAO(
+            String(departure_icao)
+                .toUpperCase()
+                .trim()
+        )
+    ) {
+        return res.status(400).json({
+            available: false,
+            error: "Invalid departure ICAO"
+        });
+    }
+
+    if (
+        arrival_icao &&
+        !validICAO(
+            String(arrival_icao)
+                .toUpperCase()
+                .trim()
+        )
+    ) {
+        return res.status(400).json({
+            available: false,
+            error: "Invalid arrival ICAO"
+        });
+    }
+
     try {
+
+        /*
+        |--------------------------------------------------------------------------
+        | INSERT PLAN
+        |--------------------------------------------------------------------------
+        */
+
         const result = await pool.query(
             `
             INSERT INTO saved_plans
@@ -608,29 +702,61 @@ app.post("/api/plans", async (req, res) => {
             RETURNING *
             `,
             [
-                name,
-                departure_icao || null,
-                arrival_icao || null,
-                aircraft_icao || null,
-                cruise_altitude || null,
-                route || null,
-                distance_nm || null,
-                estimated_minutes || null,
-                simbrief_ofp_id || null
+                String(name).trim(),
+
+                departure_icao
+                    ? String(departure_icao)
+                        .toUpperCase()
+                        .trim()
+                    : null,
+
+                arrival_icao
+                    ? String(arrival_icao)
+                        .toUpperCase()
+                        .trim()
+                    : null,
+
+                aircraft_icao
+                    ? String(aircraft_icao)
+                        .toUpperCase()
+                        .trim()
+                    : null,
+
+                cruise_altitude
+                    ? Number(cruise_altitude)
+                    : null,
+
+                route
+                    ? String(route).trim()
+                    : null,
+
+                distance_nm
+                    ? Number(distance_nm)
+                    : null,
+
+                estimated_minutes
+                    ? Number(estimated_minutes)
+                    : null,
+
+                simbrief_ofp_id
+                    ? String(simbrief_ofp_id).trim()
+                    : null
             ]
         );
 
-        res.status(201).json({
+        return res.status(201).json({
             available: true,
             plan: result.rows[0]
         });
+
     } catch (error) {
+
         console.error(
             "Could not save plan:",
             error.message
         );
 
-        res.status(500).json({
+        return res.status(500).json({
             available: false,
             error: "Could not save plan"
         });
@@ -644,7 +770,9 @@ app.post("/api/plans", async (req, res) => {
 */
 
 app.delete("/api/plans/:id", async (req, res) => {
-    const id = Number(req.params.id);
+
+    const id =
+        Number(req.params.id);
 
     if (!Number.isInteger(id)) {
         return res.status(400).json({
@@ -654,6 +782,7 @@ app.delete("/api/plans/:id", async (req, res) => {
     }
 
     try {
+
         const result = await pool.query(
             `
             DELETE FROM saved_plans
@@ -664,24 +793,28 @@ app.delete("/api/plans/:id", async (req, res) => {
         );
 
         if (result.rows.length === 0) {
+
             return res.status(404).json({
                 available: false,
                 error: "Plan not found"
             });
+
         }
 
-        res.json({
+        return res.json({
             available: true,
             deleted: true,
             id
         });
+
     } catch (error) {
+
         console.error(
             "Could not delete plan:",
             error.message
         );
 
-        res.status(500).json({
+        return res.status(500).json({
             available: false,
             error: "Could not delete plan"
         });
@@ -695,34 +828,69 @@ app.delete("/api/plans/:id", async (req, res) => {
 */
 
 app.get("/", async (req, res) => {
-    let database = "Unavailable";
+
+    let database =
+        "Unavailable";
 
     try {
+
         await pool.query("SELECT 1");
-        database = "Connected";
+
+        database =
+            "Connected";
+
     } catch (error) {
+
         console.error(
             "Root database check failed:",
             error.message
         );
+
     }
 
     res.json({
-        service: "Flight-app API",
-        status: "Online",
+
+        service:
+            "Flight-app API",
+
+        status:
+            "Online",
+
         database,
-        version: "1.0.0",
+
+        version:
+            "1.1.0",
+
         endpoints: {
-            health: "/api/health",
-            databaseTest: "/api/database/test",
-            simbriefLatest: "/api/simbrief/latest?username=YOUR_USERNAME",
-            weather: "/api/weather/:icao",
-            taf: "/api/weather/:icao/taf",
-            cachedWeather: "/api/weather/:icao/cache",
-            airports: "/api/airports/:icao",
-            plans: "/api/plans"
+
+            health:
+                "/api/health",
+
+            databaseTest:
+                "/api/database/test",
+
+            simbriefLatest:
+                "/api/simbrief/latest?username=YOUR_USERNAME",
+
+            weather:
+                "/api/weather/:icao",
+
+            taf:
+                "/api/weather/:icao/taf",
+
+            cachedWeather:
+                "/api/weather/:icao/cache",
+
+            airports:
+                "/api/airports/:icao",
+
+            plans:
+                "/api/plans"
+
         }
+
     });
+
 });
 
 /*
@@ -732,10 +900,16 @@ app.get("/", async (req, res) => {
 */
 
 app.use((req, res) => {
+
     res.status(404).json({
+
         available: false,
-        error: "Endpoint not found"
+
+        error:
+            "Endpoint not found"
+
     });
+
 });
 
 /*
@@ -744,14 +918,25 @@ app.use((req, res) => {
 |--------------------------------------------------------------------------
 */
 
-app.use((error, req, res, next) => {
-    console.error(error);
+app.use(
+    (error, req, res, next) => {
 
-    res.status(500).json({
-        available: false,
-        error: "Internal server error"
-    });
-});
+        console.error(
+            "Unhandled server error:",
+            error
+        );
+
+        res.status(500).json({
+
+            available: false,
+
+            error:
+                "Internal server error"
+
+        });
+
+    }
+);
 
 /*
 |--------------------------------------------------------------------------
@@ -760,26 +945,39 @@ app.use((error, req, res, next) => {
 */
 
 async function startServer() {
+
     try {
-        await pool.query("SELECT 1");
+
+        await pool.query(
+            "SELECT 1"
+        );
 
         console.log(
             "Successfully connected to Neon PostgreSQL."
         );
 
-        app.listen(PORT, () => {
-            console.log(
-                `Flight-app backend running on port ${PORT}`
-            );
-        });
+        app.listen(
+            PORT,
+            () => {
+
+                console.log(
+                    `Flight-app backend running on port ${PORT}`
+                );
+
+            }
+        );
+
     } catch (error) {
+
         console.error(
             "Could not connect to Neon:",
             error.message
         );
 
         process.exit(1);
+
     }
+
 }
 
 startServer();
@@ -790,18 +988,32 @@ startServer();
 |--------------------------------------------------------------------------
 */
 
-process.on("SIGTERM", async () => {
-    console.log("SIGTERM received.");
+process.on(
+    "SIGTERM",
+    async () => {
 
-    await pool.end();
+        console.log(
+            "SIGTERM received."
+        );
 
-    process.exit(0);
-});
+        await pool.end();
 
-process.on("SIGINT", async () => {
-    console.log("SIGINT received.");
+        process.exit(0);
 
-    await pool.end();
+    }
+);
 
-    process.exit(0);
-});
+process.on(
+    "SIGINT",
+    async () => {
+
+        console.log(
+            "SIGINT received."
+        );
+
+        await pool.end();
+
+        process.exit(0);
+
+    }
+);
