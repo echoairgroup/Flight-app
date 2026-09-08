@@ -373,234 +373,6 @@
                 0 10px 22px rgba(91, 124, 250, 0.27);
         }
 
-        /* =========================================================
-           AIRPORT NAME SEARCH
-        ========================================================= */
-
-        .airport-search-divider {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-
-            margin: 20px 0 14px;
-
-            color: var(--muted);
-
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .airport-search-divider::before,
-        .airport-search-divider::after {
-            content: "";
-
-            height: 1px;
-
-            flex: 1;
-
-            background: var(--border);
-        }
-
-        .airport-search-helper {
-            margin-bottom: 10px;
-
-            color: var(--secondary);
-
-            font-size: 13px;
-        }
-
-        .airport-search-helper strong {
-            color: var(--text);
-        }
-
-        .airport-name-row {
-            display: flex;
-            gap: 12px;
-        }
-
-        .airport-name-input-wrapper {
-            position: relative;
-            flex: 1;
-        }
-
-        .airport-name-input-wrapper i {
-            position: absolute;
-
-            left: 16px;
-            top: 50%;
-
-            transform: translateY(-50%);
-
-            color: var(--muted);
-        }
-
-        .airport-name-input {
-            width: 100%;
-
-            height: 46px;
-
-            padding: 0 18px 0 45px;
-
-            border: 1px solid var(--border);
-            border-radius: 12px;
-
-            outline: none;
-
-            color: var(--text);
-            background: #fbfcfe;
-
-            font-size: 14px;
-
-            transition: 0.2s ease;
-        }
-
-        .airport-name-input:focus {
-            border-color: var(--primary);
-
-            background: white;
-
-            box-shadow:
-                0 0 0 4px rgba(91, 124, 250, 0.10);
-        }
-
-        .airport-name-button {
-            height: 46px;
-
-            padding: 0 18px;
-
-            border: 1px solid var(--border);
-            border-radius: 12px;
-
-            color: var(--text);
-            background: white;
-
-            font-size: 13px;
-            font-weight: 700;
-
-            transition: 0.2s ease;
-        }
-
-        .airport-name-button:hover {
-            color: var(--primary);
-
-            border-color: #cfd7ee;
-            background: var(--primary-light);
-        }
-
-        .airport-results {
-            display: none;
-
-            margin-top: 14px;
-
-            border: 1px solid var(--border);
-            border-radius: 14px;
-
-            overflow: hidden;
-
-            background: var(--surface-soft);
-        }
-
-        .airport-results.show {
-            display: block;
-        }
-
-        .airport-result {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-
-            gap: 15px;
-
-            padding: 14px 16px;
-
-            border-bottom: 1px solid var(--border);
-
-            background: white;
-
-            transition: 0.2s ease;
-        }
-
-        .airport-result:last-child {
-            border-bottom: 0;
-        }
-
-        .airport-result:hover {
-            background: var(--primary-light);
-        }
-
-        .airport-result-info {
-            min-width: 0;
-        }
-
-        .airport-result-name {
-            color: var(--text);
-
-            font-size: 14px;
-            font-weight: 700;
-        }
-
-        .airport-result-details {
-            margin-top: 3px;
-
-            color: var(--secondary);
-
-            font-size: 12px;
-        }
-
-        .airport-result-icao {
-            display: inline-flex;
-            align-items: center;
-
-            padding: 6px 9px;
-
-            margin-right: 6px;
-
-            border-radius: 8px;
-
-            color: var(--primary);
-
-            background: var(--primary-light);
-
-            font-size: 12px;
-            font-weight: 800;
-        }
-
-        .use-airport-button {
-            flex-shrink: 0;
-
-            padding: 8px 11px;
-
-            border: 0;
-            border-radius: 9px;
-
-            color: white;
-            background: var(--primary);
-
-            font-size: 12px;
-            font-weight: 700;
-
-            transition: 0.2s ease;
-        }
-
-        .use-airport-button:hover {
-            background: var(--primary-dark);
-            transform: translateY(-1px);
-        }
-
-        .airport-search-message {
-            padding: 16px;
-
-            color: var(--secondary);
-
-            text-align: center;
-
-            font-size: 13px;
-        }
-
-        /* =========================================================
-           QUICK AIRPORTS
-        ========================================================= */
-
         .quick-airports {
             display: flex;
             align-items: center;
@@ -1272,7 +1044,6 @@
         ========================================================= */
 
         @media (max-width: 1050px) {
-
             .weather-layout {
                 grid-template-columns: 1fr;
             }
@@ -1285,11 +1056,9 @@
             .bottom-grid {
                 grid-template-columns: 1fr;
             }
-
         }
 
         @media (max-width: 800px) {
-
             .nav-links {
                 display: none;
             }
@@ -1303,11 +1072,9 @@
             .temperature-area {
                 margin-top: 35px;
             }
-
         }
 
         @media (max-width: 600px) {
-
             .container {
                 padding: 28px 16px 50px;
             }
@@ -1321,23 +1088,6 @@
             }
 
             .search-button {
-                width: 100%;
-            }
-
-            .airport-name-row {
-                flex-direction: column;
-            }
-
-            .airport-name-button {
-                width: 100%;
-            }
-
-            .airport-result {
-                align-items: flex-start;
-                flex-direction: column;
-            }
-
-            .use-airport-button {
                 width: 100%;
             }
 
@@ -1367,7 +1117,6 @@
 
                 margin-top: 25px;
             }
-
         }
     </style>
 </head>
@@ -1379,19 +1128,15 @@
 ========================================================= -->
 
 <nav class="navbar">
-
     <div class="nav-inner">
 
         <a href="index.html" class="brand">
-
             <div class="brand-mark">
                 <i class="fa-solid fa-plane"></i>
             </div>
 
             Flight App
-
         </a>
-
 
         <div class="nav-links">
 
@@ -1417,13 +1162,11 @@
 
         </div>
 
-
         <button class="profile-button">
             <i class="fa-solid fa-user"></i>
         </button>
 
     </div>
-
 </nav>
 
 
@@ -1461,10 +1204,6 @@
 
     <section class="search-card">
 
-        <!-- =================================================
-             ICAO SEARCH
-        ================================================== -->
-
         <form id="weatherForm">
 
             <div class="search-row">
@@ -1486,16 +1225,12 @@
 
                 </div>
 
-
                 <button
                     type="submit"
                     class="search-button"
                 >
-
                     <i class="fa-solid fa-magnifying-glass"></i>
-
                     Check Weather
-
                 </button>
 
             </div>
@@ -1503,73 +1238,13 @@
         </form>
 
 
-        <!-- =================================================
-             AIRPORT NAME SEARCH
-        ================================================== -->
-
-        <div class="airport-search-divider">
-            Don't know the ICAO?
-        </div>
-
-        <div class="airport-search-helper">
-            <strong>Search for the airport by name</strong>
-            and we'll find its ICAO code for you.
-        </div>
-
-
-        <form id="airportSearchForm">
-
-            <div class="airport-name-row">
-
-                <div class="airport-name-input-wrapper">
-
-                    <i class="fa-solid fa-building"></i>
-
-                    <input
-                        id="airportNameInput"
-                        class="airport-name-input"
-                        type="text"
-                        placeholder="Search airport name — e.g. Samos Airport"
-                        autocomplete="off"
-                    >
-
-                </div>
-
-
-                <button
-                    type="submit"
-                    class="airport-name-button"
-                >
-
-                    <i class="fa-solid fa-magnifying-glass"></i>
-
-                    Find ICAO
-
-                </button>
-
-            </div>
-
-        </form>
-
-
-        <!-- AIRPORT SEARCH RESULTS -->
-
-        <div
-            id="airportResults"
-            class="airport-results"
-        ></div>
-
-
-        <!-- =================================================
-             POPULAR AIRPORTS
-        ================================================== -->
+        <!-- POPULAR AIRPORTS -->
 
         <div class="quick-airports">
 
             <span class="quick-label">
                 Popular:
             </span>
-
 
             <button
                 type="button"
@@ -1579,7 +1254,6 @@
                 EHAM
             </button>
 
-
             <button
                 type="button"
                 class="airport-chip"
@@ -1587,7 +1261,6 @@
             >
                 EGLL
             </button>
-
 
             <button
                 type="button"
@@ -1597,7 +1270,6 @@
                 LFPG
             </button>
 
-
             <button
                 type="button"
                 class="airport-chip"
@@ -1606,7 +1278,6 @@
                 EDDF
             </button>
 
-
             <button
                 type="button"
                 class="airport-chip"
@@ -1614,7 +1285,6 @@
             >
                 LIRF
             </button>
-
 
             <button
                 type="button"
@@ -1627,9 +1297,7 @@
         </div>
 
 
-        <!-- =================================================
-             RECENT WEATHER SEARCHES
-        ================================================== -->
+        <!-- RECENT SEARCHES -->
 
         <div
             id="recentSearchesContainer"
@@ -1640,12 +1308,10 @@
                 Recent:
             </span>
 
-
             <div
                 id="recentSearches"
                 class="recent-search-list"
             ></div>
-
 
             <button
                 type="button"
@@ -1653,9 +1319,7 @@
                 class="clear-recent-button"
                 title="Clear recent searches"
             >
-
                 <i class="fa-solid fa-xmark"></i>
-
             </button>
 
         </div>
@@ -1698,7 +1362,6 @@
                         <i class="fa-solid fa-plane-departure"></i>
                     </div>
 
-
                     <div>
 
                         <h2
@@ -1707,7 +1370,6 @@
                         >
                             EHAM
                         </h2>
-
 
                         <p
                             id="airportName"
@@ -1725,11 +1387,8 @@
                     id="flightCategory"
                     class="category-badge category-unknown"
                 >
-
                     <i class="fa-solid fa-circle"></i>
-
                     UNKNOWN
-
                 </div>
 
             </div>
@@ -1967,41 +1626,6 @@
 
     </section>
 
-     <!-- =====================================================
-         RAW METAR
-    ====================================================== -->
-
-    <section class="raw-card">
-
-        <div class="card-title">
-
-            <h2>
-                Raw METAR
-            </h2>
-
-
-            <button
-                id="refreshButton"
-                class="refresh-button"
-            >
-
-                <i class="fa-solid fa-rotate"></i>
-
-                Refresh
-
-            </button>
-
-        </div>
-
-
-        <div
-            id="rawMetar"
-            class="raw-metar"
-        >
-            Waiting for METAR...
-        </div>
-
-    </section>
 
     <!-- =====================================================
          CLOUDS + TAF
@@ -2059,6 +1683,40 @@
         </section>
 
     </div>
+
+
+    <!-- =====================================================
+         RAW METAR
+    ====================================================== -->
+
+    <section class="raw-card">
+
+        <div class="card-title">
+
+            <h2>
+                Raw METAR
+            </h2>
+
+            <button
+                id="refreshButton"
+                class="refresh-button"
+            >
+                <i class="fa-solid fa-rotate"></i>
+                Refresh
+            </button>
+
+        </div>
+
+
+        <div
+            id="rawMetar"
+            class="raw-metar"
+        >
+            Waiting for METAR...
+        </div>
+
+    </section>
+
 </main>
 
 
@@ -2139,28 +1797,6 @@ const rawMetar =
 
 const refreshButton =
     document.getElementById("refreshButton");
-
-
-/*
-|--------------------------------------------------------------------------
-| AIRPORT NAME SEARCH ELEMENTS
-|--------------------------------------------------------------------------
-*/
-
-const airportSearchForm =
-    document.getElementById(
-        "airportSearchForm"
-    );
-
-const airportNameInput =
-    document.getElementById(
-        "airportNameInput"
-    );
-
-const airportResults =
-    document.getElementById(
-        "airportResults"
-    );
 
 
 /*
@@ -2277,13 +1913,10 @@ async function apiRequest(path) {
             }
         );
 
-
     const text =
         await response.text();
 
-
     let data;
-
 
     try {
 
@@ -2298,7 +1931,6 @@ async function apiRequest(path) {
 
     }
 
-
     if (!response.ok) {
 
         throw new Error(
@@ -2307,7 +1939,6 @@ async function apiRequest(path) {
         );
 
     }
-
 
     return data;
 
@@ -2327,14 +1958,11 @@ function setFlightCategory(category) {
             category || "UNKNOWN"
         ).toUpperCase();
 
-
     let className =
         "category-unknown";
 
-
     let icon =
         "fa-circle";
-
 
     if (value === "VFR") {
 
@@ -2346,7 +1974,6 @@ function setFlightCategory(category) {
 
     }
 
-
     if (value === "MVFR") {
 
         className =
@@ -2356,7 +1983,6 @@ function setFlightCategory(category) {
             "fa-circle-half-stroke";
 
     }
-
 
     if (value === "IFR") {
 
@@ -2368,7 +1994,6 @@ function setFlightCategory(category) {
 
     }
 
-
     if (value === "LIFR") {
 
         className =
@@ -2379,10 +2004,8 @@ function setFlightCategory(category) {
 
     }
 
-
     flightCategory.className =
         `category-badge ${className}`;
-
 
     flightCategory.innerHTML =
         `<i class="fa-solid ${icon}"></i> ${value}`;
@@ -2403,12 +2026,10 @@ function getWeatherDescription(metar) {
             metar.cover || ""
         ).toUpperCase();
 
-
     const category =
         String(
             metar.fltCat || ""
         ).toUpperCase();
-
 
     if (category === "LIFR") {
 
@@ -2416,13 +2037,11 @@ function getWeatherDescription(metar) {
 
     }
 
-
     if (category === "IFR") {
 
         return "Instrument flight conditions";
 
     }
-
 
     if (category === "MVFR") {
 
@@ -2430,13 +2049,11 @@ function getWeatherDescription(metar) {
 
     }
 
-
     if (cover === "OVC") {
 
         return "Overcast skies";
 
     }
-
 
     if (cover === "BKN") {
 
@@ -2444,20 +2061,17 @@ function getWeatherDescription(metar) {
 
     }
 
-
     if (cover === "SCT") {
 
         return "Scattered clouds";
 
     }
 
-
     if (cover === "FEW") {
 
         return "Few clouds";
 
     }
-
 
     return "Good flying conditions";
 
@@ -2479,7 +2093,6 @@ function formatObservationTime(metar) {
                 metar.obsTime * 1000
             );
 
-
         return date.toLocaleString(
             undefined,
             {
@@ -2489,7 +2102,6 @@ function formatObservationTime(metar) {
         );
 
     }
-
 
     if (metar.reportTime) {
 
@@ -2498,7 +2110,6 @@ function formatObservationTime(metar) {
                 metar.reportTime
             );
 
-
         return date.toLocaleString(
             undefined,
             {
@@ -2508,7 +2119,6 @@ function formatObservationTime(metar) {
         );
 
     }
-
 
     return "--";
 
@@ -2537,7 +2147,6 @@ function cloudName(value) {
 
     };
 
-
     return (
         names[value] ||
         value ||
@@ -2551,7 +2160,6 @@ function renderClouds(cloudData) {
 
     clouds.innerHTML =
         "";
-
 
     if (
         !Array.isArray(cloudData) ||
@@ -2568,7 +2176,6 @@ function renderClouds(cloudData) {
 
     }
 
-
     cloudData.forEach(
         layer => {
 
@@ -2577,16 +2184,13 @@ function renderClouds(cloudData) {
                     "div"
                 );
 
-
             row.className =
                 "cloud-row";
-
 
             const base =
                 layer.base != null
                     ? `${Number(layer.base).toLocaleString()} ft`
                     : "Unknown height";
-
 
             row.innerHTML = `
                 <div class="cloud-type">
@@ -2598,7 +2202,6 @@ function renderClouds(cloudData) {
                     ${base}
                 </div>
             `;
-
 
             clouds.appendChild(
                 row
@@ -2625,23 +2228,25 @@ function renderWeather(
         metar.icaoId ||
         icao;
 
-
     airportName.textContent =
         metar.name ||
         "Airport weather";
-
 
     temperature.textContent =
         metar.temp != null
             ? metar.temp
             : "--";
 
-
     dewpoint.textContent =
         metar.dewp != null
             ? `${metar.dewp} °C`
             : "--";
 
+
+    /*
+     * AviationWeather.gov reports
+     * wind speed in knots.
+     */
 
     if (
         metar.wdir != null &&
@@ -2929,7 +2534,6 @@ async function loadTAF(
             error.message
         );
 
-
         taf.textContent =
             "TAF unavailable.";
 
@@ -2983,7 +2587,6 @@ function getRecentSearches() {
             error
         );
 
-
         return [];
 
     }
@@ -3018,6 +2621,11 @@ function saveRecentSearch(
         getRecentSearches();
 
 
+    /*
+     * Remove the airport if it
+     * already exists.
+     */
+
     searches =
         searches.filter(
             item =>
@@ -3025,10 +2633,18 @@ function saveRecentSearch(
         );
 
 
+    /*
+     * Add newest search to front.
+     */
+
     searches.unshift(
         icao
     );
 
+
+    /*
+     * Keep only the latest 5.
+     */
 
     searches =
         searches.slice(
@@ -3121,7 +2737,6 @@ function renderRecentSearches() {
                     input.value =
                         icao;
 
-
                     loadWeather(
                         icao
                     );
@@ -3154,282 +2769,10 @@ clearRecentSearches.addEventListener(
             RECENT_SEARCH_KEY
         );
 
-
         renderRecentSearches();
 
     }
 );
-
-
-/*
-|--------------------------------------------------------------------------
-| AIRPORT NAME SEARCH
-|--------------------------------------------------------------------------
-*/
-
-airportSearchForm.addEventListener(
-    "submit",
-    async event => {
-
-        event.preventDefault();
-
-
-        const query =
-            airportNameInput.value.trim();
-
-
-        if (
-            query.length < 2
-        ) {
-
-            airportResults.className =
-                "airport-results show";
-
-
-            airportResults.innerHTML = `
-                <div class="airport-search-message">
-                    Please enter at least 2 characters.
-                </div>
-            `;
-
-            return;
-
-        }
-
-
-        airportResults.className =
-            "airport-results show";
-
-
-        airportResults.innerHTML = `
-            <div class="airport-search-message">
-                <i class="fa-solid fa-spinner fa-spin"></i>
-                Searching airports...
-            </div>
-        `;
-
-
-        try {
-
-            const data =
-                await apiRequest(
-                    `/api/airports/search?q=${encodeURIComponent(query)}`
-                );
-
-
-            const results =
-                Array.isArray(data)
-                    ? data
-                    : (
-                        data.airports ||
-                        data.results ||
-                        []
-                    );
-
-
-            if (
-                results.length === 0
-            ) {
-
-                airportResults.innerHTML = `
-                    <div class="airport-search-message">
-                        No airports found for
-                        "<strong>${escapeHTML(query)}</strong>".
-                    </div>
-                `;
-
-                return;
-
-            }
-
-
-            airportResults.innerHTML =
-                "";
-
-
-            results
-                .slice(0, 10)
-                .forEach(
-                    airport => {
-
-                        const icao =
-                            airport.icao ||
-                            airport.icao_code ||
-                            airport.icaoId ||
-                            "";
-
-
-                        const name =
-                            airport.name ||
-                            airport.airport_name ||
-                            "Unknown Airport";
-
-
-                        const country =
-                            airport.country ||
-                            airport.country_name ||
-                            "";
-
-
-                        const city =
-                            airport.city ||
-                            airport.municipality ||
-                            "";
-
-
-                        if (
-                            !validICAO(
-                                cleanICAO(icao)
-                            )
-                        ) {
-
-                            return;
-
-                        }
-
-
-                        const result =
-                            document.createElement(
-                                "div"
-                            );
-
-
-                        result.className =
-                            "airport-result";
-
-
-                        const location =
-                            [city, country]
-                                .filter(Boolean)
-                                .join(", ");
-
-
-                        result.innerHTML = `
-                            <div class="airport-result-info">
-
-                                <div class="airport-result-name">
-                                    ${escapeHTML(name)}
-                                </div>
-
-                                <div class="airport-result-details">
-
-                                    <span class="airport-result-icao">
-                                        ${escapeHTML(
-                                            cleanICAO(icao)
-                                        )}
-                                    </span>
-
-                                    ${escapeHTML(location)}
-
-                                </div>
-
-                            </div>
-
-                            <button
-                                type="button"
-                                class="use-airport-button"
-                            >
-                                Use ${escapeHTML(
-                                    cleanICAO(icao)
-                                )}
-                            </button>
-                        `;
-
-
-                        const useButton =
-                            result.querySelector(
-                                ".use-airport-button"
-                            );
-
-
-                        useButton.addEventListener(
-                            "click",
-                            () => {
-
-                                const selectedICAO =
-                                    cleanICAO(icao);
-
-
-                                input.value =
-                                    selectedICAO;
-
-
-                                airportNameInput.value =
-                                    name;
-
-
-                                airportResults.className =
-                                    "airport-results";
-
-
-                                loadWeather(
-                                    selectedICAO
-                                );
-
-                            }
-                        );
-
-
-                        airportResults.appendChild(
-                            result
-                        );
-
-                    }
-                );
-
-
-        } catch (error) {
-
-            console.error(
-                "Airport search failed:",
-                error
-            );
-
-
-            airportResults.innerHTML = `
-                <div class="airport-search-message">
-                    Could not search airports.
-                    ${escapeHTML(error.message)}
-                </div>
-            `;
-
-        }
-
-    }
-);
-
-
-/*
-|--------------------------------------------------------------------------
-| ESCAPE HTML
-|--------------------------------------------------------------------------
-*/
-
-function escapeHTML(value) {
-
-    return String(value)
-        .replace(
-            /&/g,
-            "&amp;"
-        )
-        .replace(
-            /</g,
-            "&lt;"
-        )
-        .replace(
-            />/g,
-            "&gt;"
-        )
-        .replace(
-            /"/g,
-            "&quot;"
-        )
-        .replace(
-            /'/g,
-            "&#039;"
-        );
-
-}
 
 
 /*
@@ -3464,6 +2807,16 @@ async function loadWeather(
         icao;
 
 
+    /*
+     * Save every successful search
+     * attempt to recent searches.
+     */
+
+    saveRecentSearch(
+        icao
+    );
+
+
     showStatus(
         `Loading weather for ${icao}...`,
         "loading"
@@ -3476,6 +2829,16 @@ async function loadWeather(
 
 
     try {
+
+        /*
+         * This calls YOUR backend:
+         *
+         * GET /api/weather/EHAM
+         *
+         * It does NOT call
+         * AviationWeather.gov directly
+         * from the browser.
+         */
 
         const data =
             await apiRequest(
@@ -3503,14 +2866,9 @@ async function loadWeather(
 
 
         /*
-         * Only save the airport after
-         * a successful METAR request.
+         * These are independent requests.
+         * If one fails, METAR still works.
          */
-
-        saveRecentSearch(
-            icao
-        );
-
 
         await Promise.allSettled(
             [
@@ -3558,7 +2916,7 @@ async function loadWeather(
 
 /*
 |--------------------------------------------------------------------------
-| WEATHER FORM
+| FORM
 |--------------------------------------------------------------------------
 */
 
@@ -3567,7 +2925,6 @@ form.addEventListener(
     event => {
 
         event.preventDefault();
-
 
         loadWeather(
             input.value
@@ -3631,7 +2988,7 @@ refreshButton.addEventListener(
 
 /*
 |--------------------------------------------------------------------------
-| ICAO INPUT
+| INPUT
 |--------------------------------------------------------------------------
 */
 
@@ -3650,31 +3007,6 @@ input.addEventListener(
                     0,
                     4
                 );
-
-    }
-);
-
-
-/*
-|--------------------------------------------------------------------------
-| AIRPORT NAME INPUT
-|--------------------------------------------------------------------------
-*/
-
-airportNameInput.addEventListener(
-    "input",
-    () => {
-
-        if (
-            airportResults.classList.contains(
-                "show"
-            )
-        ) {
-
-            airportResults.className =
-                "airport-results";
-
-        }
 
     }
 );
