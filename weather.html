@@ -415,6 +415,85 @@
         }
 
         /* =========================================================
+           RECENT SEARCHES
+        ========================================================= */
+
+        .recent-searches {
+            display: none;
+
+            align-items: center;
+            gap: 8px;
+
+            margin-top: 12px;
+
+            flex-wrap: wrap;
+        }
+
+        .recent-searches.show {
+            display: flex;
+        }
+
+        .recent-search-list {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            flex-wrap: wrap;
+        }
+
+        .recent-search-chip {
+            padding: 7px 11px;
+
+            border: 1px solid var(--border);
+            border-radius: 9px;
+
+            background: var(--surface-soft);
+            color: var(--secondary);
+
+            font-size: 12px;
+            font-weight: 700;
+
+            transition: 0.2s ease;
+        }
+
+        .recent-search-chip:hover {
+            color: var(--primary);
+
+            border-color: #cfd7ee;
+            background: var(--primary-light);
+
+            transform: translateY(-1px);
+        }
+
+        .clear-recent-button {
+            width: 27px;
+            height: 27px;
+
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            padding: 0;
+
+            border: 1px solid var(--border);
+            border-radius: 8px;
+
+            color: var(--muted);
+            background: white;
+
+            font-size: 11px;
+
+            transition: 0.2s ease;
+        }
+
+        .clear-recent-button:hover {
+            color: var(--danger);
+
+            border-color: #f0c9ce;
+            background: #fff0f2;
+        }
+
+        /* =========================================================
            STATUS
         ========================================================= */
 
@@ -1060,6 +1139,7 @@
         </a>
 
         <div class="nav-links">
+
             <a href="index.html" class="nav-link">
                 Dashboard
             </a>
@@ -1079,6 +1159,7 @@
             <a href="plans.html" class="nav-link">
                 Saved Plans
             </a>
+
         </div>
 
         <button class="profile-button">
@@ -1098,16 +1179,20 @@
     <div class="page-header">
 
         <div>
+
             <div class="eyebrow">
                 <i class="fa-solid fa-cloud-sun"></i>
                 Aviation Weather
             </div>
 
-            <h1>Airport Weather</h1>
+            <h1>
+                Airport Weather
+            </h1>
 
             <p>
                 Live METAR, TAF and airport weather information.
             </p>
+
         </div>
 
     </div>
@@ -1153,34 +1238,88 @@
         </form>
 
 
+        <!-- POPULAR AIRPORTS -->
+
         <div class="quick-airports">
 
             <span class="quick-label">
                 Popular:
             </span>
 
-            <button class="airport-chip" data-icao="EHAM">
+            <button
+                type="button"
+                class="airport-chip"
+                data-icao="EHAM"
+            >
                 EHAM
             </button>
 
-            <button class="airport-chip" data-icao="EGLL">
+            <button
+                type="button"
+                class="airport-chip"
+                data-icao="EGLL"
+            >
                 EGLL
             </button>
 
-            <button class="airport-chip" data-icao="LFPG">
+            <button
+                type="button"
+                class="airport-chip"
+                data-icao="LFPG"
+            >
                 LFPG
             </button>
 
-            <button class="airport-chip" data-icao="EDDF">
+            <button
+                type="button"
+                class="airport-chip"
+                data-icao="EDDF"
+            >
                 EDDF
             </button>
 
-            <button class="airport-chip" data-icao="LIRF">
+            <button
+                type="button"
+                class="airport-chip"
+                data-icao="LIRF"
+            >
                 LIRF
             </button>
 
-            <button class="airport-chip" data-icao="KJFK">
+            <button
+                type="button"
+                class="airport-chip"
+                data-icao="KJFK"
+            >
                 KJFK
+            </button>
+
+        </div>
+
+
+        <!-- RECENT SEARCHES -->
+
+        <div
+            id="recentSearchesContainer"
+            class="recent-searches"
+        >
+
+            <span class="quick-label">
+                Recent:
+            </span>
+
+            <div
+                id="recentSearches"
+                class="recent-search-list"
+            ></div>
+
+            <button
+                type="button"
+                id="clearRecentSearches"
+                class="clear-recent-button"
+                title="Clear recent searches"
+            >
+                <i class="fa-solid fa-xmark"></i>
             </button>
 
         </div>
@@ -1192,9 +1331,15 @@
          STATUS
     ====================================================== -->
 
-    <div id="status" class="status">
+    <div
+        id="status"
+        class="status"
+    >
 
-        <i id="statusIcon" class="fa-solid fa-circle-info"></i>
+        <i
+            id="statusIcon"
+            class="fa-solid fa-circle-info"
+        ></i>
 
         <span id="statusText"></span>
 
@@ -1257,7 +1402,9 @@
                         --
                     </span>
 
-                    <span>°C</span>
+                    <span>
+                        °C
+                    </span>
 
                 </div>
 
@@ -1287,7 +1434,9 @@
         </section>
 
 
-        <!-- AIRPORT INFORMATION -->
+        <!-- =================================================
+             AIRPORT INFORMATION
+        ================================================== -->
 
         <section class="info-card">
 
@@ -1305,6 +1454,7 @@
             <div class="info-list">
 
                 <div class="info-row">
+
                     <span class="info-label">
                         ICAO
                     </span>
@@ -1315,10 +1465,12 @@
                     >
                         --
                     </span>
+
                 </div>
 
 
                 <div class="info-row">
+
                     <span class="info-label">
                         Airport
                     </span>
@@ -1329,10 +1481,12 @@
                     >
                         --
                     </span>
+
                 </div>
 
 
                 <div class="info-row">
+
                     <span class="info-label">
                         Elevation
                     </span>
@@ -1343,10 +1497,12 @@
                     >
                         --
                     </span>
+
                 </div>
 
 
                 <div class="info-row">
+
                     <span class="info-label">
                         Latitude
                     </span>
@@ -1357,10 +1513,12 @@
                     >
                         --
                     </span>
+
                 </div>
 
 
                 <div class="info-row">
+
                     <span class="info-label">
                         Longitude
                     </span>
@@ -1371,6 +1529,7 @@
                     >
                         --
                     </span>
+
                 </div>
 
             </div>
@@ -1567,18 +1726,10 @@
 |--------------------------------------------------------------------------
 | API CONFIGURATION
 |--------------------------------------------------------------------------
-|
-| If weather.html is hosted by the SAME Express server:
-|
-|     const API_BASE = "";
-|
-| If your frontend is hosted somewhere else, put the backend URL here:
-|
-|     const API_BASE = "https://your-backend-url.com";
-|
 */
 
-const API_BASE = "https://flight-app-api-g36e.onrender.com";
+const API_BASE =
+    "https://flight-app-api-g36e.onrender.com";
 
 
 /*
@@ -1587,19 +1738,33 @@ const API_BASE = "https://flight-app-api-g36e.onrender.com";
 |--------------------------------------------------------------------------
 */
 
-const form = document.getElementById("weatherForm");
-const input = document.getElementById("icaoInput");
+const form =
+    document.getElementById("weatherForm");
 
-const status = document.getElementById("status");
-const statusIcon = document.getElementById("statusIcon");
-const statusText = document.getElementById("statusText");
+const input =
+    document.getElementById("icaoInput");
 
-const airportCode = document.getElementById("airportCode");
-const airportName = document.getElementById("airportName");
+const status =
+    document.getElementById("status");
 
-const flightCategory = document.getElementById("flightCategory");
+const statusIcon =
+    document.getElementById("statusIcon");
 
-const temperature = document.getElementById("temperature");
+const statusText =
+    document.getElementById("statusText");
+
+const airportCode =
+    document.getElementById("airportCode");
+
+const airportName =
+    document.getElementById("airportName");
+
+const flightCategory =
+    document.getElementById("flightCategory");
+
+const temperature =
+    document.getElementById("temperature");
+
 const weatherDescription =
     document.getElementById("weatherDescription");
 
@@ -1636,15 +1801,48 @@ const refreshButton =
 
 /*
 |--------------------------------------------------------------------------
+| RECENT SEARCH ELEMENTS
+|--------------------------------------------------------------------------
+*/
+
+const recentSearchesContainer =
+    document.getElementById(
+        "recentSearchesContainer"
+    );
+
+const recentSearches =
+    document.getElementById(
+        "recentSearches"
+    );
+
+const clearRecentSearches =
+    document.getElementById(
+        "clearRecentSearches"
+    );
+
+const RECENT_SEARCH_KEY =
+    "flightApp_recentWeatherSearches";
+
+const MAX_RECENT_SEARCHES =
+    5;
+
+
+/*
+|--------------------------------------------------------------------------
 | STATUS
 |--------------------------------------------------------------------------
 */
 
-function showStatus(message, type = "loading") {
+function showStatus(
+    message,
+    type = "loading"
+) {
 
-    status.className = `status show ${type}`;
+    status.className =
+        `status show ${type}`;
 
-    statusText.textContent = message;
+    statusText.textContent =
+        message;
 
     if (type === "loading") {
 
@@ -1657,12 +1855,14 @@ function showStatus(message, type = "loading") {
             "fa-solid fa-triangle-exclamation";
 
     }
+
 }
 
 
 function hideStatus() {
 
-    status.className = "status";
+    status.className =
+        "status";
 
 }
 
@@ -1701,13 +1901,17 @@ async function apiRequest(path) {
         `${API_BASE}${path}`;
 
     const response =
-        await fetch(url, {
-            method: "GET",
+        await fetch(
+            url,
+            {
+                method: "GET",
 
-            headers: {
-                "Accept": "application/json"
+                headers: {
+                    "Accept":
+                        "application/json"
+                }
             }
-        });
+        );
 
     const text =
         await response.text();
@@ -1716,7 +1920,8 @@ async function apiRequest(path) {
 
     try {
 
-        data = JSON.parse(text);
+        data =
+            JSON.parse(text);
 
     } catch {
 
@@ -1749,7 +1954,9 @@ async function apiRequest(path) {
 function setFlightCategory(category) {
 
     const value =
-        String(category || "UNKNOWN").toUpperCase();
+        String(
+            category || "UNKNOWN"
+        ).toUpperCase();
 
     let className =
         "category-unknown";
@@ -1759,29 +1966,41 @@ function setFlightCategory(category) {
 
     if (value === "VFR") {
 
-        className = "category-vfr";
-        icon = "fa-circle-check";
+        className =
+            "category-vfr";
+
+        icon =
+            "fa-circle-check";
 
     }
 
     if (value === "MVFR") {
 
-        className = "category-mvfr";
-        icon = "fa-circle-half-stroke";
+        className =
+            "category-mvfr";
+
+        icon =
+            "fa-circle-half-stroke";
 
     }
 
     if (value === "IFR") {
 
-        className = "category-ifr";
-        icon = "fa-triangle-exclamation";
+        className =
+            "category-ifr";
+
+        icon =
+            "fa-triangle-exclamation";
 
     }
 
     if (value === "LIFR") {
 
-        className = "category-lifr";
-        icon = "fa-circle-exclamation";
+        className =
+            "category-lifr";
+
+        icon =
+            "fa-circle-exclamation";
 
     }
 
@@ -1803,37 +2022,55 @@ function setFlightCategory(category) {
 function getWeatherDescription(metar) {
 
     const cover =
-        String(metar.cover || "").toUpperCase();
+        String(
+            metar.cover || ""
+        ).toUpperCase();
 
     const category =
-        String(metar.fltCat || "").toUpperCase();
+        String(
+            metar.fltCat || ""
+        ).toUpperCase();
 
     if (category === "LIFR") {
+
         return "Low visibility conditions";
+
     }
 
     if (category === "IFR") {
+
         return "Instrument flight conditions";
+
     }
 
     if (category === "MVFR") {
+
         return "Marginal VFR conditions";
+
     }
 
     if (cover === "OVC") {
+
         return "Overcast skies";
+
     }
 
     if (cover === "BKN") {
+
         return "Broken cloud cover";
+
     }
 
     if (cover === "SCT") {
+
         return "Scattered clouds";
+
     }
 
     if (cover === "FEW") {
+
         return "Few clouds";
+
     }
 
     return "Good flying conditions";
@@ -1852,7 +2089,9 @@ function formatObservationTime(metar) {
     if (metar.obsTime) {
 
         const date =
-            new Date(metar.obsTime * 1000);
+            new Date(
+                metar.obsTime * 1000
+            );
 
         return date.toLocaleString(
             undefined,
@@ -1861,12 +2100,15 @@ function formatObservationTime(metar) {
                 timeStyle: "short"
             }
         );
+
     }
 
     if (metar.reportTime) {
 
         const date =
-            new Date(metar.reportTime);
+            new Date(
+                metar.reportTime
+            );
 
         return date.toLocaleString(
             undefined,
@@ -1875,6 +2117,7 @@ function formatObservationTime(metar) {
                 timeStyle: "short"
             }
         );
+
     }
 
     return "--";
@@ -1891,24 +2134,37 @@ function formatObservationTime(metar) {
 function cloudName(value) {
 
     const names = {
+
         FEW: "Few",
+
         SCT: "Scattered",
+
         BKN: "Broken",
+
         OVC: "Overcast",
+
         VV: "Vertical visibility"
+
     };
 
-    return names[value] || value || "Unknown";
+    return (
+        names[value] ||
+        value ||
+        "Unknown"
+    );
 
 }
 
 
 function renderClouds(cloudData) {
 
-    clouds.innerHTML = "";
+    clouds.innerHTML =
+        "";
 
-    if (!Array.isArray(cloudData) ||
-        cloudData.length === 0) {
+    if (
+        !Array.isArray(cloudData) ||
+        cloudData.length === 0
+    ) {
 
         clouds.innerHTML = `
             <div class="empty">
@@ -1917,34 +2173,42 @@ function renderClouds(cloudData) {
         `;
 
         return;
+
     }
 
-    cloudData.forEach(layer => {
+    cloudData.forEach(
+        layer => {
 
-        const row =
-            document.createElement("div");
+            const row =
+                document.createElement(
+                    "div"
+                );
 
-        row.className = "cloud-row";
+            row.className =
+                "cloud-row";
 
-        const base =
-            layer.base != null
-                ? `${Number(layer.base).toLocaleString()} ft`
-                : "Unknown height";
+            const base =
+                layer.base != null
+                    ? `${Number(layer.base).toLocaleString()} ft`
+                    : "Unknown height";
 
-        row.innerHTML = `
-            <div class="cloud-type">
-                <i class="fa-solid fa-cloud"></i>
-                ${cloudName(layer.cover)}
-            </div>
+            row.innerHTML = `
+                <div class="cloud-type">
+                    <i class="fa-solid fa-cloud"></i>
+                    ${cloudName(layer.cover)}
+                </div>
 
-            <div class="cloud-height">
-                ${base}
-            </div>
-        `;
+                <div class="cloud-height">
+                    ${base}
+                </div>
+            `;
 
-        clouds.appendChild(row);
+            clouds.appendChild(
+                row
+            );
 
-    });
+        }
+    );
 
 }
 
@@ -1955,7 +2219,10 @@ function renderClouds(cloudData) {
 |--------------------------------------------------------------------------
 */
 
-function renderWeather(metar, icao) {
+function renderWeather(
+    metar,
+    icao
+) {
 
     airportCode.textContent =
         metar.icaoId ||
@@ -1975,60 +2242,76 @@ function renderWeather(metar, icao) {
             ? `${metar.dewp} °C`
             : "--";
 
+
     /*
-     * AviationWeather.gov reports wind speed
-     * in knots.
+     * AviationWeather.gov reports
+     * wind speed in knots.
      */
 
-    if (metar.wdir != null &&
-        metar.wspd != null) {
+    if (
+        metar.wdir != null &&
+        metar.wspd != null
+    ) {
 
         wind.textContent =
             `${String(metar.wdir).padStart(3, "0")}° / ${metar.wspd} kt`;
 
     } else {
 
-        wind.textContent = "--";
+        wind.textContent =
+            "--";
 
     }
+
 
     visibility.textContent =
         metar.visib != null
             ? metar.visib
             : "--";
 
+
     qnh.textContent =
         metar.altim != null
             ? `${metar.altim} hPa`
             : "--";
 
+
     setFlightCategory(
         metar.fltCat
     );
 
+
     weatherDescription.textContent =
-        getWeatherDescription(metar);
+        getWeatherDescription(
+            metar
+        );
+
 
     const temp =
         metar.temp != null
             ? `${metar.temp}°C`
             : "Temperature unavailable";
 
+
     const windText =
         metar.wspd != null
             ? `${metar.wspd} kt wind`
             : "Wind unavailable";
 
+
     weatherSummary.textContent =
         `${temp} · ${windText}`;
 
+
     observation.textContent =
         `Observation: ${formatObservationTime(metar)}`;
+
 
     rawMetar.textContent =
         metar.rawOb ||
         metar.raw_text ||
         "Raw METAR unavailable.";
+
 
     renderClouds(
         metar.clouds
@@ -2043,7 +2326,9 @@ function renderWeather(metar, icao) {
 |--------------------------------------------------------------------------
 */
 
-async function loadAirportInfo(icao) {
+async function loadAirportInfo(
+    icao
+) {
 
     try {
 
@@ -2052,39 +2337,55 @@ async function loadAirportInfo(icao) {
                 `/api/airports/${icao}`
             );
 
+
         const airport =
             data.airport ||
             data;
 
-        document.getElementById("infoICAO")
-            .textContent =
+
+        document.getElementById(
+            "infoICAO"
+        ).textContent =
             airport.icao ||
             airport.icao_code ||
             icao;
 
-        document.getElementById("infoName")
-            .textContent =
+
+        document.getElementById(
+            "infoName"
+        ).textContent =
             airport.name ||
             airport.airport_name ||
             "--";
 
-        document.getElementById("infoElevation")
-            .textContent =
+
+        document.getElementById(
+            "infoElevation"
+        ).textContent =
             airport.elevation_ft != null
                 ? `${airport.elevation_ft} ft`
                 : "--";
 
-        document.getElementById("infoLatitude")
-            .textContent =
+
+        document.getElementById(
+            "infoLatitude"
+        ).textContent =
             airport.latitude != null
-                ? Number(airport.latitude).toFixed(4)
+                ? Number(
+                    airport.latitude
+                ).toFixed(4)
                 : "--";
 
-        document.getElementById("infoLongitude")
-            .textContent =
+
+        document.getElementById(
+            "infoLongitude"
+        ).textContent =
             airport.longitude != null
-                ? Number(airport.longitude).toFixed(4)
+                ? Number(
+                    airport.longitude
+                ).toFixed(4)
                 : "--";
+
 
     } catch (error) {
 
@@ -2093,35 +2394,54 @@ async function loadAirportInfo(icao) {
             error.message
         );
 
-        document.getElementById("infoICAO")
-            .textContent = icao;
 
-        document.getElementById("infoName")
-            .textContent = "--";
+        document.getElementById(
+            "infoICAO"
+        ).textContent =
+            icao;
 
-        document.getElementById("infoElevation")
-            .textContent = "--";
 
-        document.getElementById("infoLatitude")
-            .textContent = "--";
+        document.getElementById(
+            "infoName"
+        ).textContent =
+            "--";
 
-        document.getElementById("infoLongitude")
-            .textContent = "--";
+
+        document.getElementById(
+            "infoElevation"
+        ).textContent =
+            "--";
+
+
+        document.getElementById(
+            "infoLatitude"
+        ).textContent =
+            "--";
+
+
+        document.getElementById(
+            "infoLongitude"
+        ).textContent =
+            "--";
 
     }
 
 }
-    
+
+
 /*
 |--------------------------------------------------------------------------
 | TAF
 |--------------------------------------------------------------------------
 */
 
-async function loadTAF(icao) {
+async function loadTAF(
+    icao
+) {
 
     taf.textContent =
         "Loading TAF...";
+
 
     try {
 
@@ -2130,7 +2450,10 @@ async function loadTAF(icao) {
                 `/api/weather/${icao}/taf`
             );
 
-        if (data.available === false) {
+
+        if (
+            data.available === false
+        ) {
 
             taf.textContent =
                 data.message ||
@@ -2140,10 +2463,14 @@ async function loadTAF(icao) {
 
         }
 
+
         const forecast =
             data.taf;
 
-        if (typeof forecast === "string") {
+
+        if (
+            typeof forecast === "string"
+        ) {
 
             taf.textContent =
                 forecast;
@@ -2152,7 +2479,10 @@ async function loadTAF(icao) {
 
         }
 
-        if (forecast?.rawTAF) {
+
+        if (
+            forecast?.rawTAF
+        ) {
 
             taf.textContent =
                 forecast.rawTAF;
@@ -2161,7 +2491,10 @@ async function loadTAF(icao) {
 
         }
 
-        if (forecast?.raw_text) {
+
+        if (
+            forecast?.raw_text
+        ) {
 
             taf.textContent =
                 forecast.raw_text;
@@ -2170,21 +2503,26 @@ async function loadTAF(icao) {
 
         }
 
-        if (Array.isArray(forecast) &&
-            forecast.length > 0) {
+
+        if (
+            Array.isArray(forecast) &&
+            forecast.length > 0
+        ) {
 
             taf.textContent =
                 forecast
-                    .map(item =>
-                        item.rawTAF ||
-                        item.raw_text ||
-                        JSON.stringify(item)
+                    .map(
+                        item =>
+                            item.rawTAF ||
+                            item.raw_text ||
+                            JSON.stringify(item)
                     )
                     .join("\n\n");
 
             return;
 
         }
+
 
         taf.textContent =
             "TAF unavailable.";
@@ -2206,15 +2544,254 @@ async function loadTAF(icao) {
 
 /*
 |--------------------------------------------------------------------------
+| RECENT SEARCHES
+|--------------------------------------------------------------------------
+*/
+
+function getRecentSearches() {
+
+    try {
+
+        const saved =
+            localStorage.getItem(
+                RECENT_SEARCH_KEY
+            );
+
+
+        const searches =
+            saved
+                ? JSON.parse(saved)
+                : [];
+
+
+        if (
+            !Array.isArray(searches)
+        ) {
+
+            return [];
+
+        }
+
+
+        return searches
+            .filter(validICAO)
+            .slice(
+                0,
+                MAX_RECENT_SEARCHES
+            );
+
+    } catch (error) {
+
+        console.warn(
+            "Could not load recent searches:",
+            error
+        );
+
+        return [];
+
+    }
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| SAVE RECENT SEARCH
+|--------------------------------------------------------------------------
+*/
+
+function saveRecentSearch(
+    icao
+) {
+
+    icao =
+        cleanICAO(icao);
+
+
+    if (
+        !validICAO(icao)
+    ) {
+
+        return;
+
+    }
+
+
+    let searches =
+        getRecentSearches();
+
+
+    /*
+     * Remove the airport if it
+     * already exists.
+     */
+
+    searches =
+        searches.filter(
+            item =>
+                item !== icao
+        );
+
+
+    /*
+     * Add newest search to front.
+     */
+
+    searches.unshift(
+        icao
+    );
+
+
+    /*
+     * Keep only the latest 5.
+     */
+
+    searches =
+        searches.slice(
+            0,
+            MAX_RECENT_SEARCHES
+        );
+
+
+    try {
+
+        localStorage.setItem(
+            RECENT_SEARCH_KEY,
+            JSON.stringify(searches)
+        );
+
+    } catch (error) {
+
+        console.warn(
+            "Could not save recent search:",
+            error
+        );
+
+    }
+
+
+    renderRecentSearches();
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| RENDER RECENT SEARCHES
+|--------------------------------------------------------------------------
+*/
+
+function renderRecentSearches() {
+
+    const searches =
+        getRecentSearches();
+
+
+    recentSearches.innerHTML =
+        "";
+
+
+    if (
+        searches.length === 0
+    ) {
+
+        recentSearchesContainer.classList.remove(
+            "show"
+        );
+
+        return;
+
+    }
+
+
+    recentSearchesContainer.classList.add(
+        "show"
+    );
+
+
+    searches.forEach(
+        icao => {
+
+            const button =
+                document.createElement(
+                    "button"
+                );
+
+
+            button.type =
+                "button";
+
+
+            button.className =
+                "recent-search-chip";
+
+
+            button.textContent =
+                icao;
+
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    input.value =
+                        icao;
+
+                    loadWeather(
+                        icao
+                    );
+
+                }
+            );
+
+
+            recentSearches.appendChild(
+                button
+            );
+
+        }
+    );
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| CLEAR RECENT SEARCHES
+|--------------------------------------------------------------------------
+*/
+
+clearRecentSearches.addEventListener(
+    "click",
+    () => {
+
+        localStorage.removeItem(
+            RECENT_SEARCH_KEY
+        );
+
+        renderRecentSearches();
+
+    }
+);
+
+
+/*
+|--------------------------------------------------------------------------
 | LOAD WEATHER
 |--------------------------------------------------------------------------
 */
 
-async function loadWeather(icao) {
+async function loadWeather(
+    icao
+) {
 
-    icao = cleanICAO(icao);
+    icao =
+        cleanICAO(icao);
 
-    if (!validICAO(icao)) {
+
+    if (
+        !validICAO(icao)
+    ) {
 
         showStatus(
             "Please enter a valid 4-letter ICAO code.",
@@ -2225,26 +2802,42 @@ async function loadWeather(icao) {
 
     }
 
-    input.value = icao;
+
+    input.value =
+        icao;
+
+
+    /*
+     * Save every successful search
+     * attempt to recent searches.
+     */
+
+    saveRecentSearch(
+        icao
+    );
+
 
     showStatus(
         `Loading weather for ${icao}...`,
         "loading"
     );
 
-    refreshButton.classList.add("loading");
+
+    refreshButton.classList.add(
+        "loading"
+    );
+
 
     try {
 
         /*
-         * IMPORTANT:
-         *
          * This calls YOUR backend:
          *
          * GET /api/weather/EHAM
          *
-         * It does NOT call AviationWeather.gov
-         * directly from the browser.
+         * It does NOT call
+         * AviationWeather.gov directly
+         * from the browser.
          */
 
         const data =
@@ -2252,8 +2845,11 @@ async function loadWeather(icao) {
                 `/api/weather/${icao}`
             );
 
-        if (!data.available ||
-            !data.metar) {
+
+        if (
+            !data.available ||
+            !data.metar
+        ) {
 
             throw new Error(
                 data.message ||
@@ -2262,22 +2858,28 @@ async function loadWeather(icao) {
 
         }
 
+
         renderWeather(
             data.metar,
             icao
         );
+
 
         /*
          * These are independent requests.
          * If one fails, METAR still works.
          */
 
-        await Promise.allSettled([
-            loadAirportInfo(icao),
-            loadTAF(icao)
-        ]);
+        await Promise.allSettled(
+            [
+                loadAirportInfo(icao),
+                loadTAF(icao)
+            ]
+        );
+
 
         hideStatus();
+
 
     } catch (error) {
 
@@ -2286,16 +2888,20 @@ async function loadWeather(icao) {
             error
         );
 
+
         showStatus(
             `Could not load weather for ${icao}: ${error.message}`,
             "error"
         );
 
+
         rawMetar.textContent =
             "Weather data unavailable.";
 
+
         taf.textContent =
             "TAF unavailable.";
+
 
     } finally {
 
@@ -2336,26 +2942,30 @@ form.addEventListener(
 
 document
     .querySelectorAll(".airport-chip")
-    .forEach(button => {
+    .forEach(
+        button => {
 
-        button.addEventListener(
-            "click",
-            () => {
+            button.addEventListener(
+                "click",
+                () => {
 
-                const icao =
-                    button.dataset.icao;
+                    const icao =
+                        button.dataset.icao;
 
-                input.value =
-                    icao;
 
-                loadWeather(
-                    icao
-                );
+                    input.value =
+                        icao;
 
-            }
-        );
 
-    });
+                    loadWeather(
+                        icao
+                    );
+
+                }
+            );
+
+        }
+    );
 
 
 /*
@@ -2388,9 +2998,15 @@ input.addEventListener(
 
         input.value =
             input.value
-                .replace(/[^a-zA-Z]/g, "")
+                .replace(
+                    /[^a-zA-Z]/g,
+                    ""
+                )
                 .toUpperCase()
-                .slice(0, 4);
+                .slice(
+                    0,
+                    4
+                );
 
     }
 );
@@ -2401,6 +3017,8 @@ input.addEventListener(
 | INITIAL WEATHER
 |--------------------------------------------------------------------------
 */
+
+renderRecentSearches();
 
 loadWeather("EHAM");
 
