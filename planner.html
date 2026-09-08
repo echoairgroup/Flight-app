@@ -2,23 +2,15 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Flight Planner | Flight App</title>
+    <title>Flight Planner</title>
 
-    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-    <link
-        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap"
-        rel="stylesheet"
-    >
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
 
-    <!-- Font Awesome -->
     <link
         rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
@@ -28,9 +20,6 @@
         :root {
             --bg: #f4f7fb;
             --card: #ffffff;
-            --text: #182230;
-            --muted: #718096;
-            --border: #e4e9f0;
 
             --primary: #5b7cfa;
             --primary-dark: #4264e5;
@@ -43,32 +32,22 @@
             --warning: #f3a83b;
             --danger: #e85d68;
 
-            --shadow:
-                0 8px 30px rgba(28, 39, 60, 0.07);
+            --text: #172033;
+            --muted: #7b8498;
+            --border: #e7ebf3;
+
+            --shadow: 0 10px 30px rgba(34, 52, 84, 0.07);
         }
 
         * {
             box-sizing: border-box;
-            margin: 0;
-            padding: 0;
         }
 
         body {
+            margin: 0;
             background: var(--bg);
             color: var(--text);
             font-family: "DM Sans", sans-serif;
-            min-height: 100vh;
-        }
-
-        button,
-        input,
-        select,
-        textarea {
-            font: inherit;
-        }
-
-        button {
-            cursor: pointer;
         }
 
         /* =========================================================
@@ -77,27 +56,37 @@
 
         .navbar {
             height: 72px;
-            background: white;
+            background: rgba(255,255,255,0.96);
             border-bottom: 1px solid var(--border);
 
             display: flex;
             align-items: center;
             justify-content: space-between;
 
-            padding: 0 32px;
+            padding: 0 34px;
 
             position: sticky;
             top: 0;
-            z-index: 1000;
+            z-index: 100;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 34px;
         }
 
         .brand {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
 
-            text-decoration: none;
+            font-family: "Manrope", sans-serif;
+            font-size: 20px;
+            font-weight: 800;
+
             color: var(--text);
+            text-decoration: none;
         }
 
         .brand-icon {
@@ -106,72 +95,57 @@
 
             border-radius: 11px;
 
-            background:
-                linear-gradient(
-                    135deg,
-                    var(--primary),
-                    var(--violet)
-                );
-
-            color: white;
-
             display: flex;
             align-items: center;
             justify-content: center;
 
-            font-size: 17px;
-        }
+            background: var(--primary);
+            color: white;
 
-        .brand-text {
-            font-family: "Manrope", sans-serif;
-            font-size: 18px;
-            font-weight: 800;
+            box-shadow: 0 6px 15px rgba(91,124,250,0.25);
         }
 
         .nav-links {
             display: flex;
             align-items: center;
-            gap: 7px;
+            gap: 6px;
         }
 
-        .nav-link {
+        .nav-links a {
             text-decoration: none;
-            color: #667085;
+            color: var(--muted);
 
             font-size: 14px;
             font-weight: 600;
 
-            padding: 10px 13px;
+            padding: 9px 13px;
             border-radius: 9px;
 
             transition: 0.2s;
         }
 
-        .nav-link:hover {
+        .nav-links a:hover {
             color: var(--text);
             background: #f5f7fb;
         }
 
-        .nav-link.active {
+        .nav-links a.active {
             color: var(--primary);
             background: var(--primary-light);
         }
 
-        .profile-button {
-            width: 38px;
-            height: 38px;
+        .profile-btn {
+            width: 40px;
+            height: 40px;
 
+            border: 0;
             border-radius: 50%;
-            border: none;
 
             background: var(--primary-light);
             color: var(--primary);
 
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            margin-left: 7px;
+            cursor: pointer;
+            font-size: 16px;
         }
 
         /* =========================================================
@@ -179,313 +153,132 @@
         ========================================================= */
 
         .page {
-            width: min(1250px, calc(100% - 40px));
+            max-width: 1180px;
             margin: 0 auto;
-            padding: 38px 0 60px;
+            padding: 42px 24px 70px;
         }
 
         .page-header {
             margin-bottom: 28px;
         }
 
-        .eyebrow {
-            display: inline-flex;
-            align-items: center;
-            gap: 7px;
-
-            background: var(--primary-light);
-            color: var(--primary);
-
-            padding: 7px 11px;
-            border-radius: 20px;
-
-            font-size: 12px;
-            font-weight: 700;
-
-            margin-bottom: 12px;
-        }
-
         .page-header h1 {
+            margin: 0 0 8px;
+
             font-family: "Manrope", sans-serif;
             font-size: 32px;
             font-weight: 800;
-            letter-spacing: -0.7px;
         }
 
         .page-header p {
+            margin: 0;
             color: var(--muted);
-            margin-top: 7px;
             font-size: 15px;
         }
 
         /* =========================================================
-           LAYOUT
+           TABS
         ========================================================= */
 
-        .planner-layout {
-            display: grid;
-            grid-template-columns: minmax(0, 1.65fr) minmax(320px, 0.85fr);
-            gap: 22px;
-            align-items: start;
+        .tabs {
+            display: inline-flex;
+
+            background: #e9edf5;
+            padding: 5px;
+
+            border-radius: 13px;
+
+            margin-bottom: 24px;
         }
 
-        .left-column,
-        .right-column {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
+        .tab {
+            border: 0;
+            background: transparent;
+
+            padding: 11px 20px;
+
+            border-radius: 9px;
+
+            font-family: "DM Sans", sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+
+            color: var(--muted);
+
+            cursor: pointer;
+
+            transition: 0.2s;
         }
+
+        .tab.active {
+            background: white;
+            color: var(--primary);
+
+            box-shadow: 0 3px 10px rgba(20,35,60,0.07);
+        }
+
+        .tab i {
+            margin-right: 7px;
+        }
+
+        /* =========================================================
+           CARD
+        ========================================================= */
 
         .card {
             background: var(--card);
             border: 1px solid var(--border);
-            border-radius: 17px;
+
+            border-radius: 18px;
+
             box-shadow: var(--shadow);
-            padding: 24px;
+
+            padding: 28px;
         }
 
-        .card-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 15px;
-
-            margin-bottom: 22px;
-        }
-
-        .card-title {
+        .section-title {
             display: flex;
             align-items: center;
             gap: 11px;
 
-            font-family: "Manrope", sans-serif;
-            font-size: 17px;
-            font-weight: 800;
+            margin-bottom: 22px;
         }
 
-        .card-title-icon {
-            width: 34px;
-            height: 34px;
+        .section-icon {
+            width: 40px;
+            height: 40px;
 
-            border-radius: 9px;
-
-            background: var(--primary-light);
-            color: var(--primary);
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            font-size: 14px;
-        }
-
-        .section-label {
-            color: var(--muted);
-            font-size: 12px;
-            font-weight: 700;
-
-            text-transform: uppercase;
-            letter-spacing: 0.7px;
-
-            margin-bottom: 9px;
-        }
-
-        /* =========================================================
-           AIRPORT ROUTE
-        ========================================================= */
-
-        .airport-row {
-            display: grid;
-            grid-template-columns: 1fr 54px 1fr;
-            gap: 12px;
-            align-items: end;
-        }
-
-        .airport-box {
-            position: relative;
-        }
-
-        .airport-input-wrap {
-            position: relative;
-        }
-
-        .airport-input-wrap i {
-            position: absolute;
-            left: 14px;
-            top: 50%;
-            transform: translateY(-50%);
-
-            color: #9aa5b4;
-            font-size: 14px;
-
-            pointer-events: none;
-        }
-
-        .airport-input {
-            width: 100%;
-            height: 52px;
-
-            border: 1px solid var(--border);
             border-radius: 11px;
 
-            background: #fbfcfe;
-
-            padding: 0 14px 0 40px;
-
-            outline: none;
-
-            font-size: 15px;
-            font-weight: 600;
-
-            color: var(--text);
-
-            transition: 0.2s;
-        }
-
-        .airport-input:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(91, 124, 250, 0.1);
-            background: white;
-        }
-
-        .airport-input::placeholder {
-            color: #a1aab7;
-            font-weight: 500;
-        }
-
-        .airport-code {
-            display: block;
-            margin-top: 7px;
-
-            font-size: 12px;
-            color: var(--muted);
-        }
-
-        .swap-button {
-            width: 46px;
-            height: 46px;
-
-            border: 1px solid var(--border);
-            background: white;
-
-            border-radius: 12px;
-
+            background: var(--primary-light);
             color: var(--primary);
 
             display: flex;
             align-items: center;
             justify-content: center;
-
-            transition: 0.2s;
         }
 
-        .swap-button:hover {
-            background: var(--primary-light);
-            transform: rotate(180deg);
-        }
-
-        /* =========================================================
-           AUTOCOMPLETE
-        ========================================================= */
-
-        .airport-results {
-            position: absolute;
-
-            left: 0;
-            right: 0;
-            top: calc(100% + 6px);
-
-            background: white;
-
-            border: 1px solid var(--border);
-            border-radius: 12px;
-
-            box-shadow: 0 12px 35px rgba(28, 39, 60, 0.13);
-
-            overflow: hidden;
-
-            z-index: 200;
-
-            display: none;
-        }
-
-        .airport-results.show {
-            display: block;
-        }
-
-        .airport-result {
-            width: 100%;
-
-            border: none;
-            border-bottom: 1px solid #eef1f5;
-
-            background: white;
-
-            padding: 13px 14px;
-
-            display: flex;
-            align-items: center;
-
-            gap: 12px;
-
-            text-align: left;
-
-            transition: 0.15s;
-        }
-
-        .airport-result:last-child {
-            border-bottom: none;
-        }
-
-        .airport-result:hover {
-            background: #f7f9ff;
-        }
-
-        .airport-result-code {
-            min-width: 52px;
-
-            color: var(--primary);
+        .section-title h2 {
+            margin: 0;
 
             font-family: "Manrope", sans-serif;
-            font-size: 14px;
-            font-weight: 800;
+            font-size: 19px;
         }
 
-        .airport-result-info {
-            min-width: 0;
-        }
-
-        .airport-result-name {
-            font-size: 13px;
-            font-weight: 700;
-
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .airport-result-location {
-            color: var(--muted);
-            font-size: 11px;
-
-            margin-top: 2px;
-        }
-
-        .search-loading {
-            padding: 15px;
-            text-align: center;
+        .section-title p {
+            margin: 3px 0 0;
             color: var(--muted);
             font-size: 13px;
         }
 
         /* =========================================================
-           FORM
+           FORMS
         ========================================================= */
 
         .form-grid {
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 17px;
+            gap: 20px;
         }
 
         .form-grid.three {
@@ -493,33 +286,53 @@
         }
 
         .field {
-            min-width: 0;
+            position: relative;
         }
 
         .field.full {
             grid-column: 1 / -1;
         }
 
-        .field label {
+        label {
             display: block;
 
-            font-size: 12px;
+            font-size: 13px;
             font-weight: 700;
-
-            color: #5e6a79;
 
             margin-bottom: 8px;
         }
 
-        .input,
-        .select,
-        .textarea {
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+
+            transform: translateY(-50%);
+
+            color: #9aa3b5;
+
+            pointer-events: none;
+        }
+
+        input,
+        select {
             width: 100%;
 
+            height: 48px;
+
             border: 1px solid var(--border);
-            border-radius: 10px;
+            border-radius: 11px;
 
             background: #fbfcfe;
+
+            padding: 0 14px;
+
+            font-family: "DM Sans", sans-serif;
+            font-size: 14px;
 
             color: var(--text);
 
@@ -528,373 +341,389 @@
             transition: 0.2s;
         }
 
-        .input,
-        .select {
-            height: 46px;
-            padding: 0 13px;
-
-            font-size: 14px;
+        input.has-icon {
+            padding-left: 42px;
         }
 
-        .textarea {
-            min-height: 100px;
-            resize: vertical;
-
-            padding: 12px 13px;
-
-            font-size: 14px;
-            line-height: 1.5;
-        }
-
-        .input:focus,
-        .select:focus,
-        .textarea:focus {
+        input:focus,
+        select:focus {
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(91, 124, 250, 0.1);
             background: white;
+
+            box-shadow: 0 0 0 3px rgba(91,124,250,0.10);
         }
 
-        .input::placeholder,
-        .textarea::placeholder {
-            color: #a1aab7;
-        }
-
-        .input-with-unit {
-            position: relative;
-        }
-
-        .input-with-unit .input {
-            padding-right: 58px;
-        }
-
-        .unit {
+        .airport-results {
             position: absolute;
-            right: 13px;
-            top: 50%;
-            transform: translateY(-50%);
 
-            color: var(--muted);
-            font-size: 12px;
-            font-weight: 700;
-        }
+            left: 0;
+            right: 0;
+            top: calc(100% + 5px);
 
-        .help {
-            color: #929dab;
-            font-size: 11px;
-            margin-top: 6px;
-        }
-
-        /* =========================================================
-           AIRCRAFT
-        ========================================================= */
-
-        .aircraft-grid {
-            display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-            gap: 9px;
-        }
-
-        .aircraft-option {
-            position: relative;
-        }
-
-        .aircraft-option input {
-            position: absolute;
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .aircraft-option label {
-            min-height: 72px;
+            background: white;
 
             border: 1px solid var(--border);
-            border-radius: 11px;
+            border-radius: 12px;
 
-            padding: 11px;
+            box-shadow: 0 12px 35px rgba(24, 40, 70, 0.13);
 
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
+            overflow: hidden;
+
+            z-index: 50;
+
+            display: none;
+        }
+
+        .airport-result {
+            padding: 12px 14px;
 
             cursor: pointer;
 
-            background: #fbfcfe;
+            border-bottom: 1px solid #f0f2f6;
 
-            transition: 0.2s;
+            transition: 0.15s;
         }
 
-        .aircraft-option label:hover {
-            border-color: #cbd4e2;
+        .airport-result:last-child {
+            border-bottom: 0;
         }
 
-        .aircraft-option input:checked + label {
-            border-color: var(--primary);
+        .airport-result:hover {
             background: var(--primary-light);
         }
 
-        .aircraft-code {
-            font-family: "Manrope", sans-serif;
-            font-size: 14px;
-            font-weight: 800;
-
-            color: var(--text);
-        }
-
-        .aircraft-name {
-            font-size: 10px;
-            color: var(--muted);
-
-            margin-top: 4px;
-        }
-
-        /* =========================================================
-           CHECKBOXES
-        ========================================================= */
-
-        .options-grid {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 10px;
-        }
-
-        .check-option {
+        .airport-main {
             display: flex;
             align-items: center;
+            justify-content: space-between;
+
             gap: 10px;
+        }
 
-            padding: 11px 12px;
+        .airport-icao {
+            font-family: "Manrope", sans-serif;
+            font-weight: 800;
 
-            border: 1px solid var(--border);
-            border-radius: 10px;
+            color: var(--primary);
+        }
 
-            cursor: pointer;
-
+        .airport-name {
             font-size: 13px;
             font-weight: 600;
 
-            background: #fbfcfe;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
-        .check-option input {
-            width: 16px;
-            height: 16px;
+        .airport-location {
+            margin-top: 3px;
 
-            accent-color: var(--primary);
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        .helper {
+            margin-top: 6px;
+
+            color: var(--muted);
+            font-size: 11px;
         }
 
         /* =========================================================
-           ACTIONS
+           BUTTONS
         ========================================================= */
 
         .actions {
-            display: flex;
-            gap: 10px;
+            margin-top: 26px;
 
-            margin-top: 4px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
         }
 
-        .button {
-            min-height: 47px;
+        .btn {
+            height: 48px;
 
-            border: none;
-            border-radius: 10px;
+            border: 0;
+            border-radius: 11px;
 
-            padding: 0 18px;
+            padding: 0 20px;
 
             display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 9px;
 
-            font-size: 13px;
+            font-family: "DM Sans", sans-serif;
+            font-size: 14px;
             font-weight: 700;
+
+            cursor: pointer;
 
             transition: 0.2s;
         }
 
-        .button-primary {
+        .btn-primary {
             background: var(--primary);
             color: white;
 
-            flex: 1;
+            box-shadow: 0 7px 18px rgba(91,124,250,0.22);
         }
 
-        .button-primary:hover {
+        .btn-primary:hover {
             background: var(--primary-dark);
             transform: translateY(-1px);
         }
 
-        .button-secondary {
+        .btn-secondary {
             background: var(--primary-light);
             color: var(--primary);
         }
 
-        .button-secondary:hover {
-            background: #e2e8ff;
+        .btn-secondary:hover {
+            background: #e1e7ff;
         }
 
-        .button:disabled {
-            opacity: 0.5;
+        .btn:disabled {
+            opacity: 0.55;
             cursor: not-allowed;
             transform: none;
         }
 
         /* =========================================================
-           PREVIEW
+           RESULT
         ========================================================= */
 
-        .preview-card {
-            position: sticky;
-            top: 94px;
+        .result {
+            margin-top: 22px;
+
+            display: none;
+
+            border-radius: 14px;
+
+            border: 1px solid #dce3f4;
+
+            background: #f8faff;
+
+            padding: 20px;
         }
 
-        .route-preview {
+        .result.show {
+            display: block;
+        }
+
+        .result-header {
             display: flex;
             align-items: center;
-            gap: 13px;
+            gap: 10px;
 
-            padding: 16px;
-
-            border-radius: 13px;
-
-            background:
-                linear-gradient(
-                    135deg,
-                    #f1f4ff,
-                    #f8faff
-                );
-
-            margin-bottom: 18px;
+            margin-bottom: 16px;
         }
 
-        .preview-airport {
-            flex: 1;
-            min-width: 0;
+        .result-header i {
+            color: var(--success);
         }
 
-        .preview-airport span {
+        .result-header h3 {
+            margin: 0;
+
+            font-family: "Manrope", sans-serif;
+            font-size: 16px;
+        }
+
+        .result-grid {
+            display: grid;
+
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+
+            gap: 10px;
+        }
+
+        .result-item {
+            background: white;
+
+            border: 1px solid var(--border);
+
+            border-radius: 10px;
+
+            padding: 13px;
+        }
+
+        .result-item span {
             display: block;
 
-            font-size: 11px;
             color: var(--muted);
+
+            font-size: 11px;
 
             margin-bottom: 4px;
         }
 
-        .preview-airport strong {
+        .result-item strong {
+            font-size: 14px;
+        }
+
+        /* =========================================================
+           RANDOM FLIGHT
+        ========================================================= */
+
+        .random-options {
+            display: grid;
+
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+
+            gap: 18px;
+        }
+
+        .option-card {
+            border: 1px solid var(--border);
+
+            border-radius: 13px;
+
+            padding: 17px;
+
+            background: #fbfcfe;
+        }
+
+        .option-card label {
+            margin-bottom: 10px;
+        }
+
+        .random-result {
+            margin-top: 25px;
+
+            border-radius: 16px;
+
+            background: linear-gradient(
+                135deg,
+                #f3f5ff,
+                #f8fbff
+            );
+
+            border: 1px solid #dfe5f7;
+
+            padding: 24px;
+
+            display: none;
+        }
+
+        .random-result.show {
             display: block;
-
-            font-family: "Manrope", sans-serif;
-            font-size: 23px;
-            font-weight: 800;
         }
 
-        .route-line {
-            width: 65px;
-
-            height: 1px;
-
-            background: #cbd4e3;
-
-            position: relative;
-        }
-
-        .route-line i {
-            position: absolute;
-
-            left: 50%;
-            top: 50%;
-
-            transform:
-                translate(-50%, -50%)
-                rotate(90deg);
-
-            color: var(--primary);
-
-            background: #f4f6ff;
-
-            padding: 3px;
-        }
-
-        .preview-list {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .preview-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-
-            padding: 11px 0;
-
-            border-bottom: 1px solid #edf0f4;
-        }
-
-        .preview-item:last-child {
-            border-bottom: none;
-        }
-
-        .preview-label {
-            color: var(--muted);
-            font-size: 12px;
-        }
-
-        .preview-value {
-            font-size: 13px;
-            font-weight: 700;
-
-            text-align: right;
-            max-width: 60%;
-
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .simbrief-box {
-            margin-top: 18px;
-
-            padding: 15px;
-
-            border-radius: 12px;
-
-            background: #f7f8fc;
-
-            border: 1px solid #e8ebf2;
-        }
-
-        .simbrief-box-header {
-            display: flex;
-            align-items: center;
-            gap: 9px;
-
-            font-size: 13px;
-            font-weight: 800;
-
-            margin-bottom: 7px;
-        }
-
-        .simbrief-logo {
-            width: 26px;
-            height: 26px;
-
-            border-radius: 7px;
-
-            background: #111827;
-            color: white;
-
+        .route-display {
             display: flex;
             align-items: center;
             justify-content: center;
 
-            font-size: 11px;
+            gap: 18px;
+
+            margin-bottom: 20px;
         }
 
-        .simbrief-box p {
+        .airport-big {
+            text-align: center;
+        }
+
+        .airport-big .code {
+            font-family: "Manrope", sans-serif;
+
+            font-size: 31px;
+            font-weight: 800;
+
+            color: var(--text);
+        }
+
+        .airport-big .city {
             color: var(--muted);
+            font-size: 12px;
+
+            margin-top: 2px;
+        }
+
+        .route-line {
+            display: flex;
+            align-items: center;
+
+            gap: 8px;
+
+            color: var(--primary);
+        }
+
+        .route-line::before,
+        .route-line::after {
+            content: "";
+
+            width: 45px;
+            height: 1px;
+
+            background: #cfd7eb;
+        }
+
+        .random-info {
+            display: grid;
+
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+
+            gap: 10px;
+        }
+
+        .random-info-item {
+            background: white;
+
+            border: 1px solid var(--border);
+
+            border-radius: 10px;
+
+            padding: 13px;
+
+            text-align: center;
+        }
+
+        .random-info-item i {
+            color: var(--primary);
+
+            margin-bottom: 6px;
+        }
+
+        .random-info-item span {
+            display: block;
+
+            color: var(--muted);
+
             font-size: 11px;
-            line-height: 1.5;
+
+            margin-bottom: 3px;
+        }
+
+        .random-info-item strong {
+            font-size: 13px;
+        }
+
+        .random-actions {
+            margin-top: 18px;
+
+            display: flex;
+            justify-content: center;
+        }
+
+        /* =========================================================
+           CUSTOM RANGE
+        ========================================================= */
+
+        .custom-range {
+            display: none;
+
+            grid-column: 1 / -1;
+
+            grid-template-columns: 1fr 1fr;
+
+            gap: 15px;
+        }
+
+        .custom-range.show {
+            display: grid;
         }
 
         /* =========================================================
@@ -902,61 +731,46 @@
         ========================================================= */
 
         .status {
-            display: none;
+            margin-top: 15px;
 
-            align-items: center;
-            gap: 9px;
-
-            padding: 11px 13px;
+            padding: 12px 14px;
 
             border-radius: 10px;
 
-            margin-top: 14px;
+            font-size: 13px;
 
-            font-size: 12px;
-            font-weight: 600;
+            display: none;
         }
 
         .status.show {
-            display: flex;
+            display: block;
         }
 
         .status.error {
-            background: #fff0f1;
-            color: #c84855;
+            background: #fff1f2;
+            color: var(--danger);
+            border: 1px solid #ffd9dd;
         }
 
         .status.success {
-            background: #eafaf5;
-            color: #168263;
+            background: #effaf6;
+            color: var(--success);
+            border: 1px solid #d4f2e8;
         }
 
-        .status.info {
+        .status.loading {
             background: var(--primary-light);
             color: var(--primary);
+            border: 1px solid #dce4ff;
         }
 
         /* =========================================================
-           RESPONSIVE
+           MOBILE
         ========================================================= */
 
-        @media (max-width: 1000px) {
-            .planner-layout {
-                grid-template-columns: 1fr;
-            }
-
-            .preview-card {
-                position: static;
-            }
-
-            .aircraft-grid {
-                grid-template-columns: repeat(4, 1fr);
-            }
-        }
-
-        @media (max-width: 760px) {
+        @media (max-width: 850px) {
             .navbar {
-                padding: 0 17px;
+                padding: 0 18px;
             }
 
             .nav-links {
@@ -964,33 +778,12 @@
             }
 
             .page {
-                width: min(100% - 24px, 1250px);
-                padding-top: 25px;
-            }
-
-            .page-header h1 {
-                font-size: 27px;
-            }
-
-            .card {
-                padding: 18px;
-            }
-
-            .airport-row {
-                grid-template-columns: 1fr;
-            }
-
-            .swap-button {
-                width: 100%;
-                height: 38px;
-            }
-
-            .swap-button:hover {
-                transform: none;
+                padding: 30px 15px 50px;
             }
 
             .form-grid,
-            .form-grid.three {
+            .form-grid.three,
+            .random-options {
                 grid-template-columns: 1fr;
             }
 
@@ -998,34 +791,54 @@
                 grid-column: auto;
             }
 
-            .aircraft-grid {
-                grid-template-columns: repeat(2, 1fr);
+            .result-grid,
+            .random-info {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
             }
 
-            .options-grid {
-                grid-template-columns: 1fr;
+            .route-display {
+                gap: 10px;
             }
 
-            .actions {
-                flex-direction: column;
+            .route-line::before,
+            .route-line::after {
+                width: 20px;
             }
         }
 
-        @media (max-width: 450px) {
-            .brand-text {
-                font-size: 16px;
+        @media (max-width: 500px) {
+            .card {
+                padding: 20px;
             }
 
-            .aircraft-grid {
-                grid-template-columns: repeat(2, 1fr);
+            .page-header h1 {
+                font-size: 27px;
             }
 
-            .route-preview {
-                gap: 8px;
+            .tabs {
+                width: 100%;
             }
 
-            .route-line {
-                width: 35px;
+            .tab {
+                flex: 1;
+                padding: 10px 8px;
+            }
+
+            .result-grid,
+            .random-info {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .airport-big .code {
+                font-size: 24px;
+            }
+
+            .actions {
+                justify-content: stretch;
+            }
+
+            .actions .btn {
+                flex: 1;
             }
         }
     </style>
@@ -1033,2113 +846,2156 @@
 
 <body>
 
-    <!-- =========================================================
-         NAVBAR
-    ========================================================= -->
+<!-- =============================================================
+     NAVBAR
+============================================================= -->
 
-    <nav class="navbar">
+<nav class="navbar">
+
+    <div class="nav-left">
 
         <a href="index.html" class="brand">
             <div class="brand-icon">
                 <i class="fa-solid fa-plane"></i>
             </div>
 
-            <span class="brand-text">
-                Flight App
-            </span>
+            Flight App
         </a>
 
         <div class="nav-links">
 
-            <a href="index.html" class="nav-link">
+            <a href="index.html">
+                <i class="fa-solid fa-chart-line"></i>
                 Dashboard
             </a>
 
-            <a href="planner.html" class="nav-link active">
+            <a href="planner.html" class="active">
+                <i class="fa-solid fa-route"></i>
                 Flight Planner
             </a>
 
-            <a href="weather.html" class="nav-link">
+            <a href="weather.html">
+                <i class="fa-solid fa-cloud-sun"></i>
                 Weather
             </a>
 
-            <a href="simbrief.html" class="nav-link">
+            <a href="simbrief.html">
+                <i class="fa-solid fa-file-lines"></i>
                 SimBrief
             </a>
 
-            <a href="plans.html" class="nav-link">
+            <a href="plans.html">
+                <i class="fa-solid fa-bookmark"></i>
                 Saved Plans
             </a>
 
         </div>
 
-        <button class="profile-button" title="Profile">
-            <i class="fa-solid fa-user"></i>
-        </button>
+    </div>
 
-    </nav>
+    <button class="profile-btn" onclick="window.location.href='index.html'">
+        <i class="fa-solid fa-user"></i>
+    </button>
+
+</nav>
+
+
+<!-- =============================================================
+     PAGE
+============================================================= -->
+
+<main class="page">
+
+    <div class="page-header">
+
+        <h1>Flight Planner</h1>
+
+        <p>
+            Create a flight with SimBrief or let us find a random flight for you.
+        </p>
+
+    </div>
 
 
     <!-- =========================================================
-         PAGE
-    ========================================================= -->
+         TABS
+    ========================================================== -->
 
-    <main class="page">
+    <div class="tabs">
 
-        <div class="page-header">
+        <button
+            class="tab active"
+            id="planTab"
+            onclick="switchTab('plan')"
+        >
+            <i class="fa-solid fa-route"></i>
+            Plan Flight
+        </button>
 
-            <div class="eyebrow">
-                <i class="fa-solid fa-route"></i>
-                Flight Planning
+        <button
+            class="tab"
+            id="randomTab"
+            onclick="switchTab('random')"
+        >
+            <i class="fa-solid fa-shuffle"></i>
+            Random Flight
+        </button>
+
+    </div>
+
+
+    <!-- =========================================================
+         PLAN FLIGHT
+    ========================================================== -->
+
+    <section id="planSection">
+
+        <div class="card">
+
+            <div class="section-title">
+
+                <div class="section-icon">
+                    <i class="fa-solid fa-plane-departure"></i>
+                </div>
+
+                <div>
+                    <h2>Plan a Flight</h2>
+
+                    <p>
+                        Choose your route and aircraft.
+                    </p>
+                </div>
+
             </div>
 
-            <h1>Flight Planner</h1>
 
-            <p>
-                Build your flight and send it directly to SimBrief.
-            </p>
+            <div class="form-grid">
 
-        </div>
+                <!-- FROM -->
 
+                <div class="field">
 
-        <div class="planner-layout">
+                    <label for="departure">
+                        Departure
+                    </label>
 
-            <!-- =================================================
-                 LEFT COLUMN
-            ================================================= -->
+                    <div class="input-wrapper">
 
-            <div class="left-column">
+                        <i class="fa-solid fa-plane-departure input-icon"></i>
 
-                <!-- ROUTE -->
-
-                <section class="card">
-
-                    <div class="card-header">
-
-                        <div class="card-title">
-
-                            <div class="card-title-icon">
-                                <i class="fa-solid fa-route"></i>
-                            </div>
-
-                            Route
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="airport-row">
-
-                        <!-- DEPARTURE -->
-
-                        <div class="airport-box">
-
-                            <div class="section-label">
-                                Departure
-                            </div>
-
-                            <div class="airport-input-wrap">
-
-                                <i class="fa-solid fa-plane-departure"></i>
-
-                                <input
-                                    id="departureInput"
-                                    class="airport-input"
-                                    type="text"
-                                    autocomplete="off"
-                                    placeholder="ICAO or airport name"
-                                >
-
-                                <div
-                                    id="departureResults"
-                                    class="airport-results"
-                                ></div>
-
-                            </div>
-
-                            <span
-                                id="departureCode"
-                                class="airport-code"
-                            >
-                                Select an airport
-                            </span>
-
-                        </div>
-
-
-                        <!-- SWAP -->
-
-                        <button
-                            id="swapButton"
-                            class="swap-button"
-                            type="button"
-                            title="Swap airports"
+                        <input
+                            id="departure"
+                            class="has-icon"
+                            type="text"
+                            placeholder="Search airport..."
+                            autocomplete="off"
                         >
-                            <i class="fa-solid fa-arrow-right-arrow-left"></i>
-                        </button>
 
-
-                        <!-- ARRIVAL -->
-
-                        <div class="airport-box">
-
-                            <div class="section-label">
-                                Arrival
-                            </div>
-
-                            <div class="airport-input-wrap">
-
-                                <i class="fa-solid fa-plane-arrival"></i>
-
-                                <input
-                                    id="arrivalInput"
-                                    class="airport-input"
-                                    type="text"
-                                    autocomplete="off"
-                                    placeholder="ICAO or airport name"
-                                >
-
-                                <div
-                                    id="arrivalResults"
-                                    class="airport-results"
-                                ></div>
-
-                            </div>
-
-                            <span
-                                id="arrivalCode"
-                                class="airport-code"
-                            >
-                                Select an airport
-                            </span>
-
-                        </div>
+                        <div
+                            id="departureResults"
+                            class="airport-results"
+                        ></div>
 
                     </div>
 
-                </section>
+                    <div class="helper">
+                        Search by airport name, city or ICAO code.
+                    </div>
+
+                </div>
 
 
-                <!-- FLIGHT DETAILS -->
+                <!-- TO -->
 
-                <section class="card">
+                <div class="field">
 
-                    <div class="card-header">
+                    <label for="arrival">
+                        Destination
+                    </label>
 
-                        <div class="card-title">
+                    <div class="input-wrapper">
 
-                            <div class="card-title-icon">
-                                <i class="fa-solid fa-ticket"></i>
-                            </div>
+                        <i class="fa-solid fa-plane-arrival input-icon"></i>
 
-                            Flight Details
+                        <input
+                            id="arrival"
+                            class="has-icon"
+                            type="text"
+                            placeholder="Search airport..."
+                            autocomplete="off"
+                        >
 
-                        </div>
+                        <div
+                            id="arrivalResults"
+                            class="airport-results"
+                        ></div>
 
                     </div>
 
-
-                    <div class="form-grid">
-
-                        <div class="field">
-
-                            <label for="airline">
-                                Airline
-                            </label>
-
-                            <input
-                                id="airline"
-                                class="input"
-                                type="text"
-                                maxlength="3"
-                                placeholder="e.g. ECV"
-                            >
-
-                            <div class="help">
-                                Optional airline ICAO code
-                            </div>
-
-                        </div>
-
-
-                        <div class="field">
-
-                            <label for="flightNumber">
-                                Flight Number
-                            </label>
-
-                            <input
-                                id="flightNumber"
-                                class="input"
-                                type="text"
-                                maxlength="8"
-                                placeholder="e.g. 123"
-                            >
-
-                        </div>
-
-
-                        <div class="field">
-
-                            <label for="callsign">
-                                ATC Callsign
-                            </label>
-
-                            <input
-                                id="callsign"
-                                class="input"
-                                type="text"
-                                maxlength="8"
-                                placeholder="e.g. ECV123"
-                            >
-
-                            <div class="help">
-                                Leave empty to use airline + flight number
-                            </div>
-
-                        </div>
-
-
-                        <div class="field">
-
-                            <label for="alternate">
-                                Alternate Airport
-                            </label>
-
-                            <input
-                                id="alternate"
-                                class="input"
-                                type="text"
-                                maxlength="4"
-                                placeholder="e.g. EDDM"
-                            >
-
-                        </div>
-
+                    <div class="helper">
+                        Search by airport name, city or ICAO code.
                     </div>
 
-                </section>
+                </div>
 
 
                 <!-- AIRCRAFT -->
 
-                <section class="card">
+                <div class="field">
 
-                    <div class="card-header">
+                    <label for="aircraft">
+                        Aircraft
+                    </label>
 
-                        <div class="card-title">
+                    <div class="input-wrapper">
 
-                            <div class="card-title-icon">
-                                <i class="fa-solid fa-plane"></i>
-                            </div>
+                        <i class="fa-solid fa-plane input-icon"></i>
 
-                            Aircraft
+                        <select id="aircraft" class="has-icon">
 
-                        </div>
+                            <option value="A319">
+                                Airbus A319
+                            </option>
 
-                    </div>
+                            <option value="A320" selected>
+                                Airbus A320
+                            </option>
 
+                            <option value="A321">
+                                Airbus A321
+                            </option>
 
-                    <div class="aircraft-grid">
+                            <option value="A20N">
+                                Airbus A320neo
+                            </option>
 
-                        <div class="aircraft-option">
+                            <option value="A21N">
+                                Airbus A321neo
+                            </option>
 
-                            <input
-                                type="radio"
-                                name="aircraft"
-                                id="a320"
-                                value="A320"
-                                checked
-                            >
+                            <option value="A359">
+                                Airbus A350-900
+                            </option>
 
-                            <label for="a320">
-                                <span class="aircraft-code">
-                                    A320
-                                </span>
+                            <option value="B738">
+                                Boeing 737-800
+                            </option>
 
-                                <span class="aircraft-name">
-                                    Airbus A320
-                                </span>
-                            </label>
+                            <option value="B38M">
+                                Boeing 737 MAX 8
+                            </option>
 
-                        </div>
+                            <option value="E190">
+                                Embraer E190
+                            </option>
 
-
-                        <div class="aircraft-option">
-
-                            <input
-                                type="radio"
-                                name="aircraft"
-                                id="a20n"
-                                value="A20N"
-                            >
-
-                            <label for="a20n">
-                                <span class="aircraft-code">
-                                    A20N
-                                </span>
-
-                                <span class="aircraft-name">
-                                    Airbus A320neo
-                                </span>
-                            </label>
-
-                        </div>
-
-
-                        <div class="aircraft-option">
-
-                            <input
-                                type="radio"
-                                name="aircraft"
-                                id="a21n"
-                                value="A21N"
-                            >
-
-                            <label for="a21n">
-                                <span class="aircraft-code">
-                                    A21N
-                                </span>
-
-                                <span class="aircraft-name">
-                                    Airbus A321neo
-                                </span>
-                            </label>
-
-                        </div>
-
-
-                        <div class="aircraft-option">
-
-                            <input
-                                type="radio"
-                                name="aircraft"
-                                id="a319"
-                                value="A319"
-                            >
-
-                            <label for="a319">
-                                <span class="aircraft-code">
-                                    A319
-                                </span>
-
-                                <span class="aircraft-name">
-                                    Airbus A319
-                                </span>
-                            </label>
-
-                        </div>
-
-
-                        <div class="aircraft-option">
-
-                            <input
-                                type="radio"
-                                name="aircraft"
-                                id="a359"
-                                value="A359"
-                            >
-
-                            <label for="a359">
-                                <span class="aircraft-code">
-                                    A359
-                                </span>
-
-                                <span class="aircraft-name">
-                                    Airbus A350-900
-                                </span>
-                            </label>
-
-                        </div>
-
-
-                        <div class="aircraft-option">
-
-                            <input
-                                type="radio"
-                                name="aircraft"
-                                id="b738"
-                                value="B738"
-                            >
-
-                            <label for="b738">
-                                <span class="aircraft-code">
-                                    B738
-                                </span>
-
-                                <span class="aircraft-name">
-                                    Boeing 737-800
-                                </span>
-                            </label>
-
-                        </div>
-
-
-                        <div class="aircraft-option">
-
-                            <input
-                                type="radio"
-                                name="aircraft"
-                                id="b38m"
-                                value="B38M"
-                            >
-
-                            <label for="b38m">
-                                <span class="aircraft-code">
-                                    B38M
-                                </span>
-
-                                <span class="aircraft-name">
-                                    Boeing 737 MAX 8
-                                </span>
-                            </label>
-
-                        </div>
-
-
-                        <div class="aircraft-option">
-
-                            <input
-                                type="radio"
-                                name="aircraft"
-                                id="e190"
-                                value="E190"
-                            >
-
-                            <label for="e190">
-                                <span class="aircraft-code">
-                                    E190
-                                </span>
-
-                                <span class="aircraft-name">
-                                    Embraer E190
-                                </span>
-                            </label>
-
-                        </div>
+                        </select>
 
                     </div>
 
-                </section>
+                </div>
 
 
-                <!-- PERFORMANCE -->
+                <!-- FLIGHT NUMBER -->
 
-                <section class="card">
+                <div class="field">
 
-                    <div class="card-header">
+                    <label for="flightNumber">
+                        Flight Number
+                        <span style="color:#9aa3b5;font-weight:500;">
+                            (optional)
+                        </span>
+                    </label>
 
-                        <div class="card-title">
+                    <input
+                        id="flightNumber"
+                        type="text"
+                        placeholder="e.g. 123"
+                        maxlength="8"
+                    >
 
-                            <div class="card-title-icon">
-                                <i class="fa-solid fa-gauge-high"></i>
-                            </div>
-
-                            Flight Settings
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="form-grid three">
-
-                        <div class="field">
-
-                            <label for="altitude">
-                                Cruise Altitude
-                            </label>
-
-                            <div class="input-with-unit">
-
-                                <input
-                                    id="altitude"
-                                    class="input"
-                                    type="number"
-                                    min="0"
-                                    max="60000"
-                                    step="1000"
-                                    value="35000"
-                                >
-
-                                <span class="unit">
-                                    FT
-                                </span>
-
-                            </div>
-
-                        </div>
-
-
-                        <div class="field">
-
-                            <label for="passengers">
-                                Passengers
-                            </label>
-
-                            <input
-                                id="passengers"
-                                class="input"
-                                type="number"
-                                min="0"
-                                max="1000"
-                                value="150"
-                            >
-
-                        </div>
-
-
-                        <div class="field">
-
-                            <label for="cargo">
-                                Cargo
-                            </label>
-
-                            <div class="input-with-unit">
-
-                                <input
-                                    id="cargo"
-                                    class="input"
-                                    type="number"
-                                    min="0"
-                                    step="0.1"
-                                    value="0"
-                                >
-
-                                <span class="unit">
-                                    TON
-                                </span>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </section>
-
-
-                <!-- ROUTE -->
-
-                <section class="card">
-
-                    <div class="card-header">
-
-                        <div class="card-title">
-
-                            <div class="card-title-icon">
-                                <i class="fa-solid fa-map"></i>
-                            </div>
-
-                            Route
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="field">
-
-                        <label for="route">
-                            Route / Airway String
-                        </label>
-
-                        <textarea
-                            id="route"
-                            class="textarea"
-                            placeholder="Leave empty to let SimBrief calculate the route..."
-                        ></textarea>
-
-                        <div class="help">
-                            You can enter waypoints and airways manually,
-                            or leave this empty for SimBrief's recommended route.
-                        </div>
-
-                    </div>
-
-                </section>
-
-
-                <!-- OPTIONS -->
-
-                <section class="card">
-
-                    <div class="card-header">
-
-                        <div class="card-title">
-
-                            <div class="card-title-icon">
-                                <i class="fa-solid fa-sliders"></i>
-                            </div>
-
-                            SimBrief Options
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="options-grid">
-
-                        <label class="check-option">
-
-                            <input
-                                id="findSidStar"
-                                type="checkbox"
-                                checked
-                            >
-
-                            <span>
-                                Automatically select SID/STAR
-                            </span>
-
-                        </label>
-
-
-                        <label class="check-option">
-
-                            <input
-                                id="includeNotams"
-                                type="checkbox"
-                                checked
-                            >
-
-                            <span>
-                                Include NOTAMs
-                            </span>
-
-                        </label>
-
-
-                        <label class="check-option">
-
-                            <input
-                                id="detailedNavlog"
-                                type="checkbox"
-                                checked
-                            >
-
-                            <span>
-                                Detailed navigation log
-                            </span>
-
-                        </label>
-
-
-                        <label class="check-option">
-
-                            <input
-                                id="stepClimbs"
-                                type="checkbox"
-                                checked
-                            >
-
-                            <span>
-                                Step climbs
-                            </span>
-
-                        </label>
-
-                    </div>
-
-                </section>
-
-
-                <!-- ACTIONS -->
-
-                <section class="card">
-
-                    <div class="actions">
-
-                        <button
-                            id="generateButton"
-                            class="button button-primary"
-                            type="button"
-                        >
-                            <i class="fa-solid fa-paper-plane"></i>
-                            Create Flight in SimBrief
-                        </button>
-
-                        <button
-                            id="resetButton"
-                            class="button button-secondary"
-                            type="button"
-                        >
-                            <i class="fa-solid fa-rotate-left"></i>
-                            Reset
-                        </button>
-
-                    </div>
-
-                    <div
-                        id="status"
-                        class="status"
-                    ></div>
-
-                </section>
+                </div>
 
             </div>
 
 
-            <!-- =================================================
-                 RIGHT COLUMN
-            ================================================= -->
+            <div
+                id="planStatus"
+                class="status"
+            ></div>
 
-            <div class="right-column">
 
-                <section class="card preview-card">
+            <div class="actions">
 
-                    <div class="card-header">
+                <button
+                    class="btn btn-secondary"
+                    onclick="clearPlan()"
+                >
+                    <i class="fa-solid fa-rotate-left"></i>
+                    Clear
+                </button>
 
-                        <div class="card-title">
+                <button
+                    id="planButton"
+                    class="btn btn-primary"
+                    onclick="planWithSimBrief()"
+                >
+                    <i class="fa-solid fa-file-circle-plus"></i>
+                    Plan with SimBrief
+                </button>
 
-                            <div class="card-title-icon">
-                                <i class="fa-solid fa-file-lines"></i>
-                            </div>
+            </div>
 
-                            Flight Preview
 
-                        </div>
+            <!-- RESULT -->
 
+            <div
+                id="planResult"
+                class="result"
+            >
+
+                <div class="result-header">
+
+                    <i class="fa-solid fa-circle-check"></i>
+
+                    <h3>
+                        Flight plan created
+                    </h3>
+
+                </div>
+
+                <div class="result-grid">
+
+                    <div class="result-item">
+                        <span>Route</span>
+                        <strong id="resultRoute">—</strong>
                     </div>
 
-
-                    <div class="route-preview">
-
-                        <div class="preview-airport">
-
-                            <span>
-                                FROM
-                            </span>
-
-                            <strong id="previewDeparture">
-                                ----
-                            </strong>
-
-                        </div>
-
-
-                        <div class="route-line">
-                            <i class="fa-solid fa-plane"></i>
-                        </div>
-
-
-                        <div class="preview-airport">
-
-                            <span>
-                                TO
-                            </span>
-
-                            <strong id="previewArrival">
-                                ----
-                            </strong>
-
-                        </div>
-
+                    <div class="result-item">
+                        <span>Aircraft</span>
+                        <strong id="resultAircraft">—</strong>
                     </div>
 
-
-                    <div class="preview-list">
-
-                        <div class="preview-item">
-
-                            <span class="preview-label">
-                                Aircraft
-                            </span>
-
-                            <span
-                                id="previewAircraft"
-                                class="preview-value"
-                            >
-                                A320
-                            </span>
-
-                        </div>
-
-
-                        <div class="preview-item">
-
-                            <span class="preview-label">
-                                Flight
-                            </span>
-
-                            <span
-                                id="previewFlight"
-                                class="preview-value"
-                            >
-                                —
-                            </span>
-
-                        </div>
-
-
-                        <div class="preview-item">
-
-                            <span class="preview-label">
-                                Callsign
-                            </span>
-
-                            <span
-                                id="previewCallsign"
-                                class="preview-value"
-                            >
-                                —
-                            </span>
-
-                        </div>
-
-
-                        <div class="preview-item">
-
-                            <span class="preview-label">
-                                Cruise
-                            </span>
-
-                            <span
-                                id="previewAltitude"
-                                class="preview-value"
-                            >
-                                FL350
-                            </span>
-
-                        </div>
-
-
-                        <div class="preview-item">
-
-                            <span class="preview-label">
-                                Passengers
-                            </span>
-
-                            <span
-                                id="previewPassengers"
-                                class="preview-value"
-                            >
-                                150
-                            </span>
-
-                        </div>
-
-
-                        <div class="preview-item">
-
-                            <span class="preview-label">
-                                Alternate
-                            </span>
-
-                            <span
-                                id="previewAlternate"
-                                class="preview-value"
-                            >
-                                —
-                            </span>
-
-                        </div>
-
+                    <div class="result-item">
+                        <span>Flight time</span>
+                        <strong id="resultTime">—</strong>
                     </div>
 
-
-                    <div class="simbrief-box">
-
-                        <div class="simbrief-box-header">
-
-                            <div class="simbrief-logo">
-                                SB
-                            </div>
-
-                            SimBrief
-
-                        </div>
-
-                        <p>
-                            Your selected flight information will be
-                            transferred to SimBrief. SimBrief will then
-                            calculate the route, fuel, weather, NOTAMs
-                            and operational flight plan.
-                        </p>
-
+                    <div class="result-item">
+                        <span>Distance</span>
+                        <strong id="resultDistance">—</strong>
                     </div>
 
-                </section>
+                </div>
 
             </div>
 
         </div>
 
-    </main>
+    </section>
 
 
-    <script>
+    <!-- =========================================================
+         RANDOM FLIGHT
+    ========================================================== -->
 
-        /* =========================================================
-           CONFIG
-        ========================================================= */
+    <section
+        id="randomSection"
+        style="display:none;"
+    >
 
-        const API_BASE =
-            "https://flight-app-api-g36e.onrender.com";
+        <div class="card">
 
+            <div class="section-title">
 
-        /* =========================================================
-           ELEMENTS
-        ========================================================= */
+                <div
+                    class="section-icon"
+                    style="
+                        background:#f1edff;
+                        color:var(--violet);
+                    "
+                >
+                    <i class="fa-solid fa-shuffle"></i>
+                </div>
 
-        const departureInput =
-            document.getElementById("departureInput");
+                <div>
 
-        const arrivalInput =
-            document.getElementById("arrivalInput");
+                    <h2>Random Flight</h2>
 
-        const departureResults =
-            document.getElementById("departureResults");
+                    <p>
+                        Let the planner choose a route for you.
+                    </p>
 
-        const arrivalResults =
-            document.getElementById("arrivalResults");
+                </div>
 
-        const departureCode =
-            document.getElementById("departureCode");
-
-        const arrivalCode =
-            document.getElementById("arrivalCode");
-
-        const swapButton =
-            document.getElementById("swapButton");
-
-        const generateButton =
-            document.getElementById("generateButton");
-
-        const resetButton =
-            document.getElementById("resetButton");
-
-        const status =
-            document.getElementById("status");
+            </div>
 
 
-        /* =========================================================
-           AIRPORT STATE
-        ========================================================= */
+            <div class="random-options">
 
-        let departureAirport = null;
-        let arrivalAirport = null;
+                <!-- DURATION -->
 
-        let departureSearchTimer = null;
-        let arrivalSearchTimer = null;
+                <div class="option-card">
+
+                    <label for="randomDuration">
+                        <i class="fa-regular fa-clock"></i>
+                        Flight Length
+                    </label>
+
+                    <select id="randomDuration">
+
+                        <option value="short">
+                            Short · 30–90 min
+                        </option>
+
+                        <option value="medium" selected>
+                            Medium · 1.5–3 hours
+                        </option>
+
+                        <option value="long">
+                            Long · 3–6 hours
+                        </option>
+
+                        <option value="ultra">
+                            Ultra Long · 6+ hours
+                        </option>
+
+                        <option value="custom">
+                            Custom
+                        </option>
+
+                    </select>
+
+                </div>
 
 
-        /* =========================================================
-           AIRPORT SEARCH
-        ========================================================= */
+                <!-- AIRCRAFT -->
 
-        async function searchAirports(
-            query,
-            resultsElement,
-            type
-        ) {
+                <div class="option-card">
 
-            query = query.trim();
+                    <label for="randomAircraft">
+                        <i class="fa-solid fa-plane"></i>
+                        Aircraft
+                    </label>
+
+                    <select id="randomAircraft">
+
+                        <option value="any">
+                            Any aircraft
+                        </option>
+
+                        <option value="A319">
+                            Airbus A319
+                        </option>
+
+                        <option value="A320">
+                            Airbus A320
+                        </option>
+
+                        <option value="A321">
+                            Airbus A321
+                        </option>
+
+                        <option value="A20N">
+                            Airbus A320neo
+                        </option>
+
+                        <option value="A21N">
+                            Airbus A321neo
+                        </option>
+
+                        <option value="A359">
+                            Airbus A350-900
+                        </option>
+
+                        <option value="B738">
+                            Boeing 737-800
+                        </option>
+
+                        <option value="B38M">
+                            Boeing 737 MAX 8
+                        </option>
+
+                        <option value="E190">
+                            Embraer E190
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- REGION -->
+
+                <div class="option-card">
+
+                    <label for="randomRegion">
+                        <i class="fa-solid fa-earth-europe"></i>
+                        Region
+                    </label>
+
+                    <select id="randomRegion">
+
+                        <option value="europe">
+                            Europe
+                        </option>
+
+                        <option value="north-america">
+                            North America
+                        </option>
+
+                        <option value="asia">
+                            Asia
+                        </option>
+
+                        <option value="south-america">
+                            South America
+                        </option>
+
+                        <option value="africa">
+                            Africa
+                        </option>
+
+                        <option value="oceania">
+                            Oceania
+                        </option>
+
+                        <option value="worldwide">
+                            Worldwide
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- DIFFICULTY -->
+
+                <div class="option-card">
+
+                    <label for="randomDifficulty">
+                        <i class="fa-solid fa-gauge-high"></i>
+                        Difficulty
+                    </label>
+
+                    <select id="randomDifficulty">
+
+                        <option value="easy">
+                            Easy
+                        </option>
+
+                        <option value="normal" selected>
+                            Normal
+                        </option>
+
+                        <option value="challenging">
+                            Challenging
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- CUSTOM RANGE -->
+
+                <div
+                    id="customRange"
+                    class="custom-range"
+                >
+
+                    <div>
+
+                        <label for="minHours">
+                            Minimum flight time
+                        </label>
+
+                        <select id="minHours">
+
+                            <option value="0.5">30 minutes</option>
+                            <option value="1">1 hour</option>
+                            <option value="1.5">1.5 hours</option>
+                            <option value="2">2 hours</option>
+                            <option value="3">3 hours</option>
+                            <option value="4">4 hours</option>
+                            <option value="5">5 hours</option>
+                            <option value="6">6 hours</option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div>
+
+                        <label for="maxHours">
+                            Maximum flight time
+                        </label>
+
+                        <select id="maxHours">
+
+                            <option value="1">1 hour</option>
+                            <option value="1.5">1.5 hours</option>
+                            <option value="2">2 hours</option>
+                            <option value="3" selected>3 hours</option>
+                            <option value="4">4 hours</option>
+                            <option value="5">5 hours</option>
+                            <option value="6">6 hours</option>
+                            <option value="10">10 hours</option>
+                            <option value="14">14 hours</option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div
+                id="randomStatus"
+                class="status"
+            ></div>
+
+
+            <div class="actions">
+
+                <button
+                    class="btn btn-primary"
+                    onclick="generateRandomFlight()"
+                >
+                    <i class="fa-solid fa-shuffle"></i>
+                    Generate Random Flight
+                </button>
+
+            </div>
+
+
+            <!-- RANDOM RESULT -->
+
+            <div
+                id="randomResult"
+                class="random-result"
+            >
+
+                <div class="route-display">
+
+                    <div class="airport-big">
+
+                        <div
+                            id="randomDepartureCode"
+                            class="code"
+                        >
+                            EHAM
+                        </div>
+
+                        <div
+                            id="randomDepartureCity"
+                            class="city"
+                        >
+                            Amsterdam
+                        </div>
+
+                    </div>
+
+
+                    <div class="route-line">
+                        <i class="fa-solid fa-plane"></i>
+                    </div>
+
+
+                    <div class="airport-big">
+
+                        <div
+                            id="randomArrivalCode"
+                            class="code"
+                        >
+                            LIRF
+                        </div>
+
+                        <div
+                            id="randomArrivalCity"
+                            class="city"
+                        >
+                            Rome
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="random-info">
+
+                    <div class="random-info-item">
+
+                        <i class="fa-solid fa-plane"></i>
+
+                        <span>Aircraft</span>
+
+                        <strong id="randomResultAircraft">
+                            Airbus A320
+                        </strong>
+
+                    </div>
+
+
+                    <div class="random-info-item">
+
+                        <i class="fa-regular fa-clock"></i>
+
+                        <span>Flight time</span>
+
+                        <strong id="randomResultTime">
+                            2h 05m
+                        </strong>
+
+                    </div>
+
+
+                    <div class="random-info-item">
+
+                        <i class="fa-solid fa-compass"></i>
+
+                        <span>Distance</span>
+
+                        <strong id="randomResultDistance">
+                            690 NM
+                        </strong>
+
+                    </div>
+
+
+                    <div class="random-info-item">
+
+                        <i class="fa-solid fa-gauge-high"></i>
+
+                        <span>Difficulty</span>
+
+                        <strong id="randomResultDifficulty">
+                            Normal
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <div class="random-actions">
+
+                    <button
+                        class="btn btn-primary"
+                        onclick="useRandomFlight()"
+                    >
+                        <i class="fa-solid fa-file-circle-plus"></i>
+                        Plan this flight with SimBrief
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<script>
+
+    /* =========================================================
+       CONFIG
+    ========================================================== */
+
+    const API_BASE =
+        "https://flight-app-api-g36e.onrender.com";
+
+
+    let selectedDeparture = null;
+    let selectedArrival = null;
+
+    let randomFlight = null;
+
+
+    /* =========================================================
+       TAB SWITCHING
+    ========================================================== */
+
+    function switchTab(tab) {
+
+        const planSection =
+            document.getElementById("planSection");
+
+        const randomSection =
+            document.getElementById("randomSection");
+
+        const planTab =
+            document.getElementById("planTab");
+
+        const randomTab =
+            document.getElementById("randomTab");
+
+
+        if (tab === "plan") {
+
+            planSection.style.display = "block";
+            randomSection.style.display = "none";
+
+            planTab.classList.add("active");
+            randomTab.classList.remove("active");
+
+        } else {
+
+            planSection.style.display = "none";
+            randomSection.style.display = "block";
+
+            planTab.classList.remove("active");
+            randomTab.classList.add("active");
+
+        }
+
+    }
+
+
+    /* =========================================================
+       AIRPORT SEARCH
+    ========================================================== */
+
+    function setupAirportSearch(
+        inputId,
+        resultsId,
+        type
+    ) {
+
+        const input =
+            document.getElementById(inputId);
+
+        const results =
+            document.getElementById(resultsId);
+
+
+        let timer = null;
+
+
+        input.addEventListener("input", () => {
+
+            clearTimeout(timer);
+
+            const query =
+                input.value.trim();
+
 
             if (query.length < 2) {
-                resultsElement.classList.remove("show");
-                resultsElement.innerHTML = "";
+
+                results.style.display = "none";
+
+                if (type === "departure") {
+                    selectedDeparture = null;
+                } else {
+                    selectedArrival = null;
+                }
+
                 return;
             }
 
-            resultsElement.classList.add("show");
 
-            resultsElement.innerHTML = `
-                <div class="search-loading">
+            timer = setTimeout(
+                () => searchAirports(
+                    query,
+                    results,
+                    type
+                ),
+                250
+            );
+
+        });
+
+
+        input.addEventListener("focus", () => {
+
+            if (input.value.trim().length >= 2) {
+
+                searchAirports(
+                    input.value.trim(),
+                    results,
+                    type
+                );
+
+            }
+
+        });
+
+    }
+
+
+    async function searchAirports(
+        query,
+        results,
+        type
+    ) {
+
+        results.style.display = "block";
+
+        results.innerHTML = `
+            <div class="airport-result">
+                <div style="color:#7b8498;">
                     <i class="fa-solid fa-spinner fa-spin"></i>
                     Searching airports...
                 </div>
-            `;
+            </div>
+        `;
 
-            try {
 
-                const response = await fetch(
-                    `${API_BASE}/api/airports/search?q=${encodeURIComponent(query)}`
-                );
+        try {
 
-                if (!response.ok) {
-                    throw new Error("Airport search failed");
-                }
+            const response = await fetch(
+                `${API_BASE}/api/airports/search?q=${encodeURIComponent(query)}`
+            );
 
-                const data = await response.json();
 
-                if (
-                    !data.airports ||
-                    data.airports.length === 0
-                ) {
+            if (!response.ok) {
+                throw new Error("Airport search failed.");
+            }
 
-                    resultsElement.innerHTML = `
-                        <div class="search-loading">
+
+            const data =
+                await response.json();
+
+
+            const airports =
+                data.airports || [];
+
+
+            if (!airports.length) {
+
+                results.innerHTML = `
+                    <div class="airport-result">
+                        <div class="airport-name">
                             No airports found
                         </div>
-                    `;
 
-                    return;
-                }
-
-                resultsElement.innerHTML =
-                    data.airports
-                        .map(airport => {
-
-                            const icao =
-                                airport.icao ||
-                                airport.icaoId ||
-                                airport.id ||
-                                "";
-
-                            const name =
-                                airport.name ||
-                                "Unknown airport";
-
-                            const city =
-                                airport.city ||
-                                "";
-
-                            const country =
-                                airport.country ||
-                                "";
-
-                            return `
-                                <button
-                                    type="button"
-                                    class="airport-result"
-                                    data-type="${type}"
-                                    data-icao="${escapeHtml(icao)}"
-                                    data-name="${escapeHtml(name)}"
-                                    data-city="${escapeHtml(city)}"
-                                    data-country="${escapeHtml(country)}"
-                                >
-
-                                    <span class="airport-result-code">
-                                        ${escapeHtml(icao)}
-                                    </span>
-
-                                    <span class="airport-result-info">
-
-                                        <span class="airport-result-name">
-                                            ${escapeHtml(name)}
-                                        </span>
-
-                                        <span class="airport-result-location">
-                                            ${escapeHtml(
-                                                [city, country]
-                                                    .filter(Boolean)
-                                                    .join(", ")
-                                            )}
-                                        </span>
-
-                                    </span>
-
-                                </button>
-                            `;
-                        })
-                        .join("");
-
-            } catch (error) {
-
-                console.error(
-                    "Airport search error:",
-                    error
-                );
-
-                resultsElement.innerHTML = `
-                    <div class="search-loading">
-                        Unable to search airports
+                        <div class="airport-location">
+                            Try another airport name or ICAO code.
+                        </div>
                     </div>
                 `;
-            }
-        }
 
-
-        /* =========================================================
-           AIRPORT SELECT
-        ========================================================= */
-
-        document.addEventListener(
-            "click",
-            event => {
-
-                const result =
-                    event.target.closest(
-                        ".airport-result"
-                    );
-
-                if (!result) {
-                    return;
-                }
-
-                const airport = {
-                    icao:
-                        result.dataset.icao.toUpperCase(),
-
-                    name:
-                        result.dataset.name,
-
-                    city:
-                        result.dataset.city,
-
-                    country:
-                        result.dataset.country
-                };
-
-                if (
-                    result.dataset.type ===
-                    "departure"
-                ) {
-
-                    departureAirport =
-                        airport;
-
-                    departureInput.value =
-                        airport.name;
-
-                    departureCode.textContent =
-                        `${airport.icao} • ${[
-                            airport.city,
-                            airport.country
-                        ]
-                            .filter(Boolean)
-                            .join(", ")}`;
-
-                    departureResults.classList.remove(
-                        "show"
-                    );
-
-                } else {
-
-                    arrivalAirport =
-                        airport;
-
-                    arrivalInput.value =
-                        airport.name;
-
-                    arrivalCode.textContent =
-                        `${airport.icao} • ${[
-                            airport.city,
-                            airport.country
-                        ]
-                            .filter(Boolean)
-                            .join(", ")}`;
-
-                    arrivalResults.classList.remove(
-                        "show"
-                    );
-                }
-
-                updatePreview();
-            }
-        );
-
-
-        /* =========================================================
-           DEPARTURE SEARCH
-        ========================================================= */
-
-        departureInput.addEventListener(
-            "input",
-            () => {
-
-                departureAirport = null;
-
-                departureCode.textContent =
-                    "Select an airport";
-
-                clearTimeout(
-                    departureSearchTimer
-                );
-
-                departureSearchTimer =
-                    setTimeout(() => {
-
-                        searchAirports(
-                            departureInput.value,
-                            departureResults,
-                            "departure"
-                        );
-
-                    }, 300);
-            }
-        );
-
-
-        /* =========================================================
-           ARRIVAL SEARCH
-        ========================================================= */
-
-        arrivalInput.addEventListener(
-            "input",
-            () => {
-
-                arrivalAirport = null;
-
-                arrivalCode.textContent =
-                    "Select an airport";
-
-                clearTimeout(
-                    arrivalSearchTimer
-                );
-
-                arrivalSearchTimer =
-                    setTimeout(() => {
-
-                        searchAirports(
-                            arrivalInput.value,
-                            arrivalResults,
-                            "arrival"
-                        );
-
-                    }, 300);
-            }
-        );
-
-
-        /* =========================================================
-           ICAO DIRECT INPUT
-        ========================================================= */
-
-        async function resolveDirectICAO(
-            input,
-            type
-        ) {
-
-            const value =
-                input.value
-                    .trim()
-                    .toUpperCase();
-
-            if (
-                !/^[A-Z]{4}$/.test(value)
-            ) {
                 return;
             }
 
-            try {
 
-                const response =
-                    await fetch(
-                        `${API_BASE}/api/airports/${value}`
-                    );
-
-                if (!response.ok) {
-                    return;
-                }
-
-                const data =
-                    await response.json();
-
-                const airport = {
-                    icao: value,
-                    name:
-                        data.name ||
-                        value,
-                    city:
-                        data.city ||
-                        "",
-                    country:
-                        data.country ||
-                        ""
-                };
-
-                if (type === "departure") {
-
-                    departureAirport =
-                        airport;
-
-                    departureCode.textContent =
-                        `${value} • ${[
-                            airport.city,
-                            airport.country
-                        ]
-                            .filter(Boolean)
-                            .join(", ") ||
-                            "Airport"}`;
-
-                } else {
-
-                    arrivalAirport =
-                        airport;
-
-                    arrivalCode.textContent =
-                        `${value} • ${[
-                            airport.city,
-                            airport.country
-                        ]
-                            .filter(Boolean)
-                            .join(", ") ||
-                            "Airport"}`;
-                }
-
-                updatePreview();
-
-            } catch (error) {
-
-                console.warn(
-                    "Could not resolve ICAO:",
-                    error
-                );
-            }
-        }
+            results.innerHTML = "";
 
 
-        departureInput.addEventListener(
-            "blur",
-            () => {
+            airports.forEach(airport => {
 
-                setTimeout(
+                const item =
+                    document.createElement("div");
+
+                item.className =
+                    "airport-result";
+
+
+                const icao =
+                    airport.icao ||
+                    airport.ident ||
+                    "";
+
+
+                const name =
+                    airport.name ||
+                    "Unknown airport";
+
+
+                const city =
+                    airport.city ||
+                    "";
+
+
+                const country =
+                    airport.country ||
+                    "";
+
+
+                item.innerHTML = `
+
+                    <div class="airport-main">
+
+                        <div class="airport-name">
+                            ${escapeHtml(name)}
+                        </div>
+
+                        <div class="airport-icao">
+                            ${escapeHtml(icao)}
+                        </div>
+
+                    </div>
+
+                    <div class="airport-location">
+                        ${escapeHtml(
+                            [city, country]
+                                .filter(Boolean)
+                                .join(", ")
+                        )}
+                    </div>
+
+                `;
+
+
+                item.addEventListener(
+                    "click",
                     () => {
 
-                        resolveDirectICAO(
-                            departureInput,
-                            "departure"
+                        selectAirport(
+                            airport,
+                            type
                         );
 
-                    },
-                    150
-                );
-            }
-        );
+                        results.style.display =
+                            "none";
 
-
-        arrivalInput.addEventListener(
-            "blur",
-            () => {
-
-                setTimeout(
-                    () => {
-
-                        resolveDirectICAO(
-                            arrivalInput,
-                            "arrival"
-                        );
-
-                    },
-                    150
-                );
-            }
-        );
-
-
-        /* =========================================================
-           SWAP
-        ========================================================= */
-
-        swapButton.addEventListener(
-            "click",
-            () => {
-
-                const oldDeparture =
-                    departureAirport;
-
-                departureAirport =
-                    arrivalAirport;
-
-                arrivalAirport =
-                    oldDeparture;
-
-                const oldInput =
-                    departureInput.value;
-
-                departureInput.value =
-                    arrivalInput.value;
-
-                arrivalInput.value =
-                    oldInput;
-
-                updateAirportLabels();
-
-                updatePreview();
-            }
-        );
-
-
-        function updateAirportLabels() {
-
-            if (departureAirport) {
-
-                departureCode.textContent =
-                    `${departureAirport.icao} • ${[
-                        departureAirport.city,
-                        departureAirport.country
-                    ]
-                        .filter(Boolean)
-                        .join(", ")}`;
-
-            } else {
-
-                departureCode.textContent =
-                    "Select an airport";
-            }
-
-
-            if (arrivalAirport) {
-
-                arrivalCode.textContent =
-                    `${arrivalAirport.icao} • ${[
-                        arrivalAirport.city,
-                        arrivalAirport.country
-                    ]
-                        .filter(Boolean)
-                        .join(", ")}`;
-
-            } else {
-
-                arrivalCode.textContent =
-                    "Select an airport";
-            }
-        }
-
-
-        /* =========================================================
-           AIRCRAFT
-        ========================================================= */
-
-        function getAircraft() {
-
-            const selected =
-                document.querySelector(
-                    'input[name="aircraft"]:checked'
+                    }
                 );
 
-            return selected
-                ? selected.value
-                : "A320";
-        }
 
-
-        document
-            .querySelectorAll(
-                'input[name="aircraft"]'
-            )
-            .forEach(input => {
-
-                input.addEventListener(
-                    "change",
-                    updatePreview
-                );
+                results.appendChild(item);
 
             });
 
+        } catch (error) {
 
-        /* =========================================================
-           PREVIEW
-        ========================================================= */
+            console.error(
+                "Airport search error:",
+                error
+            );
 
-        function updatePreview() {
+
+            results.innerHTML = `
+                <div class="airport-result">
+                    <div class="airport-name">
+                        Could not search airports
+                    </div>
+
+                    <div class="airport-location">
+                        Please try again.
+                    </div>
+                </div>
+            `;
+
+        }
+
+    }
+
+
+    function selectAirport(
+        airport,
+        type
+    ) {
+
+        const icao =
+            (
+                airport.icao ||
+                airport.ident ||
+                ""
+            ).toUpperCase();
+
+
+        if (type === "departure") {
+
+            selectedDeparture = {
+                ...airport,
+                icao
+            };
 
             document.getElementById(
-                "previewDeparture"
-            ).textContent =
-                departureAirport
-                    ? departureAirport.icao
-                    : "----";
+                "departure"
+            ).value = icao;
+
+        } else {
+
+            selectedArrival = {
+                ...airport,
+                icao
+            };
 
             document.getElementById(
-                "previewArrival"
-            ).textContent =
-                arrivalAirport
-                    ? arrivalAirport.icao
-                    : "----";
+                "arrival"
+            ).value = icao;
+
+        }
+
+    }
 
 
+    /* =========================================================
+       PLAN WITH SIMBRIEF
+    ========================================================== */
+
+    async function planWithSimBrief() {
+
+        const status =
+            document.getElementById("planStatus");
+
+        const button =
+            document.getElementById("planButton");
+
+
+        const departure =
+            selectedDeparture?.icao ||
             document.getElementById(
-                "previewAircraft"
-            ).textContent =
-                getAircraft();
+                "departure"
+            ).value.trim().toUpperCase();
 
 
-            const airline =
+        const arrival =
+            selectedArrival?.icao ||
+            document.getElementById(
+                "arrival"
+            ).value.trim().toUpperCase();
+
+
+        const aircraft =
+            document.getElementById(
+                "aircraft"
+            ).value;
+
+
+        const flightNumber =
+            document.getElementById(
+                "flightNumber"
+            ).value.trim();
+
+
+        if (!departure || departure.length !== 4) {
+
+            showStatus(
+                status,
+                "Please select a valid departure airport.",
+                "error"
+            );
+
+            return;
+        }
+
+
+        if (!arrival || arrival.length !== 4) {
+
+            showStatus(
+                status,
+                "Please select a valid destination airport.",
+                "error"
+            );
+
+            return;
+        }
+
+
+        if (departure === arrival) {
+
+            showStatus(
+                status,
+                "Departure and destination cannot be the same.",
+                "error"
+            );
+
+            return;
+        }
+
+
+        button.disabled = true;
+
+
+        showStatus(
+            status,
+            `<i class="fa-solid fa-spinner fa-spin"></i>
+             Creating your flight plan...`,
+            "loading"
+        );
+
+
+        try {
+
+            /*
+             * This calls the backend SimBrief endpoint.
+             *
+             * The backend will keep the SimBrief API key
+             * private and handle the actual SimBrief request.
+             */
+
+            const response = await fetch(
+                `${API_BASE}/api/simbrief/plan`,
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+
+                        orig: departure,
+
+                        dest: arrival,
+
+                        type: aircraft,
+
+                        fltnum:
+                            flightNumber || undefined
+
+                    })
+
+                }
+            );
+
+
+            const data =
+                await response.json();
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    data.error ||
+                    "SimBrief could not create the flight plan."
+                );
+
+            }
+
+
+            displayPlanResult(data);
+
+
+            showStatus(
+                status,
+                "Flight plan created successfully.",
+                "success"
+            );
+
+
+        } catch (error) {
+
+            console.error(
+                "SimBrief error:",
+                error
+            );
+
+
+            showStatus(
+                status,
+                error.message ||
+                "Something went wrong while creating the flight plan.",
+                "error"
+            );
+
+        } finally {
+
+            button.disabled = false;
+
+        }
+
+    }
+
+
+    function displayPlanResult(data) {
+
+        const result =
+            document.getElementById(
+                "planResult"
+            );
+
+
+        document.getElementById(
+            "resultRoute"
+        ).textContent =
+            data.route ||
+            `${data.orig || "—"} → ${data.dest || "—"}`;
+
+
+        document.getElementById(
+            "resultAircraft"
+        ).textContent =
+            data.aircraft ||
+            document.getElementById(
+                "aircraft"
+            ).value;
+
+
+        document.getElementById(
+            "resultTime"
+        ).textContent =
+            data.flightTime ||
+            "—";
+
+
+        document.getElementById(
+            "resultDistance"
+        ).textContent =
+            data.distance
+                ? `${data.distance} NM`
+                : "—";
+
+
+        result.classList.add("show");
+
+    }
+
+
+    /* =========================================================
+       RANDOM FLIGHT
+    ========================================================== */
+
+    document.getElementById(
+        "randomDuration"
+    ).addEventListener(
+        "change",
+        function () {
+
+            const custom =
                 document.getElementById(
-                    "airline"
-                ).value
-                    .trim()
-                    .toUpperCase();
-
-            const flightNumber =
-                document.getElementById(
-                    "flightNumber"
-                ).value
-                    .trim()
-                    .toUpperCase();
-
-            const callsign =
-                document.getElementById(
-                    "callsign"
-                ).value
-                    .trim()
-                    .toUpperCase();
-
-            document.getElementById(
-                "previewFlight"
-            ).textContent =
-                airline && flightNumber
-                    ? `${airline}${flightNumber}`
-                    : flightNumber || "—";
-
-
-            document.getElementById(
-                "previewCallsign"
-            ).textContent =
-                callsign ||
-                (
-                    airline &&
-                    flightNumber
-                        ? `${airline}${flightNumber}`
-                        : "—"
+                    "customRange"
                 );
 
 
-            const altitude =
+            if (this.value === "custom") {
+
+                custom.classList.add("show");
+
+            } else {
+
+                custom.classList.remove("show");
+
+            }
+
+        }
+    );
+
+
+    async function generateRandomFlight() {
+
+        const status =
+            document.getElementById(
+                "randomStatus"
+            );
+
+
+        const duration =
+            document.getElementById(
+                "randomDuration"
+            ).value;
+
+
+        const aircraft =
+            document.getElementById(
+                "randomAircraft"
+            ).value;
+
+
+        const region =
+            document.getElementById(
+                "randomRegion"
+            ).value;
+
+
+        const difficulty =
+            document.getElementById(
+                "randomDifficulty"
+            ).value;
+
+
+        let minHours;
+        let maxHours;
+
+
+        if (duration === "short") {
+
+            minHours = 0.5;
+            maxHours = 1.5;
+
+        } else if (duration === "medium") {
+
+            minHours = 1.5;
+            maxHours = 3;
+
+        } else if (duration === "long") {
+
+            minHours = 3;
+            maxHours = 6;
+
+        } else if (duration === "ultra") {
+
+            minHours = 6;
+            maxHours = 14;
+
+        } else {
+
+            minHours =
                 Number(
                     document.getElementById(
-                        "altitude"
+                        "minHours"
                     ).value
-                ) || 0;
+                );
 
-            document.getElementById(
-                "previewAltitude"
-            ).textContent =
-                altitude
-                    ? `FL${Math.round(
-                        altitude / 100
-                    )
-                        .toString()
-                        .padStart(3, "0")}`
-                    : "—";
+            maxHours =
+                Number(
+                    document.getElementById(
+                        "maxHours"
+                    ).value
+                );
 
 
-            document.getElementById(
-                "previewPassengers"
-            ).textContent =
-                document.getElementById(
-                    "passengers"
-                ).value || "0";
+            if (minHours >= maxHours) {
 
+                showStatus(
+                    status,
+                    "Maximum flight time must be longer than minimum flight time.",
+                    "error"
+                );
 
-            document.getElementById(
-                "previewAlternate"
-            ).textContent =
-                document.getElementById(
-                    "alternate"
-                ).value
-                    .trim()
-                    .toUpperCase() || "—";
+                return;
+
+            }
+
         }
 
 
-        [
-            "airline",
-            "flightNumber",
-            "callsign",
-            "alternate",
-            "altitude",
-            "passengers"
-        ]
-            .forEach(id => {
-
-                document
-                    .getElementById(id)
-                    .addEventListener(
-                        "input",
-                        updatePreview
-                    );
-
-            });
+        showStatus(
+            status,
+            `<i class="fa-solid fa-spinner fa-spin"></i>
+             Finding a random flight...`,
+            "loading"
+        );
 
 
-        /* =========================================================
-           CREATE SIMBRIEF URL
-        ========================================================= */
+        try {
 
-        function createSimBriefURL() {
-
-            if (!departureAirport) {
-
-                showStatus(
-                    "Please select a departure airport.",
-                    "error"
-                );
-
-                return null;
-            }
-
-            if (!arrivalAirport) {
-
-                showStatus(
-                    "Please select an arrival airport.",
-                    "error"
-                );
-
-                return null;
-            }
-
-            if (
-                departureAirport.icao ===
-                arrivalAirport.icao
-            ) {
-
-                showStatus(
-                    "Departure and arrival airports cannot be the same.",
-                    "error"
-                );
-
-                return null;
-            }
-
-
-            const aircraft =
-                getAircraft();
-
-            const airline =
-                document.getElementById(
-                    "airline"
-                ).value
-                    .trim()
-                    .toUpperCase();
-
-            const flightNumber =
-                document.getElementById(
-                    "flightNumber"
-                ).value
-                    .trim()
-                    .toUpperCase();
-
-            const callsignInput =
-                document.getElementById(
-                    "callsign"
-                ).value
-                    .trim()
-                    .toUpperCase();
-
-            const alternate =
-                document.getElementById(
-                    "alternate"
-                ).value
-                    .trim()
-                    .toUpperCase();
-
-            const altitude =
-                document.getElementById(
-                    "altitude"
-                ).value;
-
-            const passengers =
-                document.getElementById(
-                    "passengers"
-                ).value;
-
-            const cargo =
-                document.getElementById(
-                    "cargo"
-                ).value;
-
-            const route =
-                document.getElementById(
-                    "route"
-                ).value.trim();
-
-            const callsign =
-                callsignInput ||
-                (
-                    airline &&
-                    flightNumber
-                        ? `${airline}${flightNumber}`
-                        : ""
-                );
-
+            /*
+             * The backend will select airports based on:
+             *
+             * - duration
+             * - aircraft
+             * - region
+             * - difficulty
+             */
 
             const params =
-                new URLSearchParams();
+                new URLSearchParams({
 
+                    minHours,
+                    maxHours,
+
+                    aircraft,
+
+                    region,
+
+                    difficulty
+
+                });
+
+
+            const response =
+                await fetch(
+                    `${API_BASE}/api/random-flight?${params.toString()}`
+                );
+
+
+            const data =
+                await response.json();
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    data.error ||
+                    "Could not generate a random flight."
+                );
+
+            }
+
+
+            randomFlight = data;
+
+
+            displayRandomFlight(data);
+
+
+            showStatus(
+                status,
+                "Random flight generated.",
+                "success"
+            );
+
+
+        } catch (error) {
 
             /*
-             * Required SimBrief parameters
+             * Temporary local fallback.
+             *
+             * This allows the UI to work even before the
+             * random-flight backend endpoint is installed.
              */
 
-            params.set(
-                "newflight",
-                "1"
-            );
-
-            params.set(
-                "orig",
-                departureAirport.icao
-            );
-
-            params.set(
-                "dest",
-                arrivalAirport.icao
-            );
-
-            params.set(
-                "type",
-                aircraft
+            console.warn(
+                "Random flight backend unavailable:",
+                error
             );
 
 
-            /*
-             * Optional parameters
-             */
-
-            if (airline) {
-
-                params.set(
-                    "airline",
-                    airline
+            const fallback =
+                generateLocalRandomFlight(
+                    minHours,
+                    maxHours,
+                    aircraft,
+                    difficulty
                 );
-            }
-
-            if (flightNumber) {
-
-                params.set(
-                    "fltnum",
-                    flightNumber
-                );
-            }
-
-            if (callsign) {
-
-                params.set(
-                    "callsign",
-                    callsign
-                );
-            }
-
-            if (alternate) {
-
-                params.set(
-                    "altn",
-                    alternate
-                );
-            }
-
-            if (altitude) {
-
-                params.set(
-                    "fl",
-                    altitude
-                );
-            }
-
-            if (passengers) {
-
-                params.set(
-                    "pax",
-                    passengers
-                );
-            }
-
-            if (cargo) {
-
-                params.set(
-                    "cargo",
-                    cargo
-                );
-            }
-
-            if (route) {
-
-                params.set(
-                    "route",
-                    route
-                );
-            }
 
 
-            /*
-             * Automatically select SID/STAR
-             */
-
-            if (
-                document.getElementById(
-                    "findSidStar"
-                ).checked
-            ) {
-
-                params.set(
-                    "find_sidstar",
-                    "1"
-                );
-            }
+            randomFlight = fallback;
 
 
-            /*
-             * Optional OFP settings
-             */
-
-            if (
-                document.getElementById(
-                    "includeNotams"
-                ).checked
-            ) {
-
-                params.set(
-                    "notams",
-                    "1"
-                );
-            }
-
-            if (
-                document.getElementById(
-                    "detailedNavlog"
-                ).checked
-            ) {
-
-                params.set(
-                    "navlog",
-                    "1"
-                );
-            }
-
-            if (
-                document.getElementById(
-                    "stepClimbs"
-                ).checked
-            ) {
-
-                params.set(
-                    "stepclimbs",
-                    "1"
-                );
-            }
-
-
-            return (
-                "https://www.simbrief.com/system/dispatch.php?" +
-                params.toString()
+            displayRandomFlight(
+                fallback
             );
+
+
+            showStatus(
+                status,
+                "Random flight generated.",
+                "success"
+            );
+
         }
 
-
-        /* =========================================================
-           GENERATE
-        ========================================================= */
-
-        generateButton.addEventListener(
-            "click",
-            () => {
-
-                const url =
-                    createSimBriefURL();
-
-                if (!url) {
-                    return;
-                }
+    }
 
 
-                showStatus(
-                    "Opening SimBrief with your flight details...",
-                    "success"
-                );
+    /* =========================================================
+       LOCAL RANDOM FALLBACK
+    ========================================================== */
 
+    const randomAirports = {
 
-                /*
-                 * Open SimBrief in a new tab.
-                 *
-                 * SimBrief will show the imported
-                 * flight options and the user can
-                 * generate the OFP from there.
-                 */
+        europe: [
 
-                window.open(
-                    url,
-                    "_blank",
-                    "noopener,noreferrer"
-                );
+            {
+                icao: "EHAM",
+                city: "Amsterdam"
+            },
+
+            {
+                icao: "LIRF",
+                city: "Rome"
+            },
+
+            {
+                icao: "LEBL",
+                city: "Barcelona"
+            },
+
+            {
+                icao: "EDDF",
+                city: "Frankfurt"
+            },
+
+            {
+                icao: "LFPG",
+                city: "Paris"
+            },
+
+            {
+                icao: "EGLL",
+                city: "London"
+            },
+
+            {
+                icao: "LOWW",
+                city: "Vienna"
+            },
+
+            {
+                icao: "LKPR",
+                city: "Prague"
+            },
+
+            {
+                icao: "LPPT",
+                city: "Lisbon"
+            },
+
+            {
+                icao: "LSZH",
+                city: "Zurich"
             }
-        );
 
+        ],
 
-        /* =========================================================
-           RESET
-        ========================================================= */
+        "north-america": [
 
-        resetButton.addEventListener(
-            "click",
-            () => {
+            {
+                icao: "KJFK",
+                city: "New York"
+            },
 
-                departureAirport = null;
-                arrivalAirport = null;
+            {
+                icao: "KLAX",
+                city: "Los Angeles"
+            },
 
-                departureInput.value = "";
-                arrivalInput.value = "";
+            {
+                icao: "KORD",
+                city: "Chicago"
+            },
 
-                departureCode.textContent =
-                    "Select an airport";
+            {
+                icao: "KMIA",
+                city: "Miami"
+            },
 
-                arrivalCode.textContent =
-                    "Select an airport";
-
-                document.getElementById(
-                    "airline"
-                ).value = "";
-
-                document.getElementById(
-                    "flightNumber"
-                ).value = "";
-
-                document.getElementById(
-                    "callsign"
-                ).value = "";
-
-                document.getElementById(
-                    "alternate"
-                ).value = "";
-
-                document.getElementById(
-                    "altitude"
-                ).value = "35000";
-
-                document.getElementById(
-                    "passengers"
-                ).value = "150";
-
-                document.getElementById(
-                    "cargo"
-                ).value = "0";
-
-                document.getElementById(
-                    "route"
-                ).value = "";
-
-                document.getElementById(
-                    "a320"
-                ).checked = true;
-
-                document.getElementById(
-                    "findSidStar"
-                ).checked = true;
-
-                document.getElementById(
-                    "includeNotams"
-                ).checked = true;
-
-                document.getElementById(
-                    "detailedNavlog"
-                ).checked = true;
-
-                document.getElementById(
-                    "stepClimbs"
-                ).checked = true;
-
-                departureResults.classList.remove(
-                    "show"
-                );
-
-                arrivalResults.classList.remove(
-                    "show"
-                );
-
-                hideStatus();
-
-                updatePreview();
+            {
+                icao: "CYYZ",
+                city: "Toronto"
             }
-        );
+
+        ],
+
+        asia: [
+
+            {
+                icao: "WSSS",
+                city: "Singapore"
+            },
+
+            {
+                icao: "RJTT",
+                city: "Tokyo"
+            },
+
+            {
+                icao: "VHHH",
+                city: "Hong Kong"
+            },
+
+            {
+                icao: "OMDB",
+                city: "Dubai"
+            },
+
+            {
+                icao: "RKSI",
+                city: "Seoul"
+            }
+
+        ],
+
+        africa: [
+
+            {
+                icao: "FAOR",
+                city: "Johannesburg"
+            },
+
+            {
+                icao: "FACT",
+                city: "Cape Town"
+            },
+
+            {
+                icao: "HECA",
+                city: "Cairo"
+            },
+
+            {
+                icao: "GMMN",
+                city: "Casablanca"
+            }
+
+        ],
+
+        "south-america": [
+
+            {
+                icao: "SBGR",
+                city: "São Paulo"
+            },
+
+            {
+                icao: "SAEZ",
+                city: "Buenos Aires"
+            },
+
+            {
+                icao: "SKBO",
+                city: "Bogotá"
+            }
+
+        ],
+
+        oceania: [
+
+            {
+                icao: "YSSY",
+                city: "Sydney"
+            },
+
+            {
+                icao: "YMML",
+                city: "Melbourne"
+            },
+
+            {
+                icao: "NZAA",
+                city: "Auckland"
+            }
+
+        ]
+
+    };
 
 
-        /* =========================================================
-           STATUS
-        ========================================================= */
+    const aircraftNames = {
 
-        function showStatus(
-            message,
-            type
+        A319: "Airbus A319",
+        A320: "Airbus A320",
+        A321: "Airbus A321",
+        A20N: "Airbus A320neo",
+        A21N: "Airbus A321neo",
+        A359: "Airbus A350-900",
+        B738: "Boeing 737-800",
+        B38M: "Boeing 737 MAX 8",
+        E190: "Embraer E190"
+
+    };
+
+
+    function generateLocalRandomFlight(
+        minHours,
+        maxHours,
+        aircraft,
+        difficulty
+    ) {
+
+        let regions =
+            Object.keys(
+                randomAirports
+            );
+
+
+        const selectedRegion =
+            document.getElementById(
+                "randomRegion"
+            ).value;
+
+
+        if (
+            selectedRegion !== "worldwide" &&
+            randomAirports[selectedRegion]
         ) {
 
-            status.className =
-                `status show ${type}`;
+            regions = [selectedRegion];
 
-            let icon =
-                "fa-circle-info";
-
-            if (type === "error") {
-                icon = "fa-circle-exclamation";
-            }
-
-            if (type === "success") {
-                icon = "fa-circle-check";
-            }
-
-            status.innerHTML = `
-                <i class="fa-solid ${icon}"></i>
-                <span>${escapeHtml(message)}</span>
-            `;
         }
 
 
-        function hideStatus() {
-
-            status.className =
-                "status";
-
-            status.innerHTML = "";
-        }
-
-
-        /* =========================================================
-           CLOSE AUTOCOMPLETE
-        ========================================================= */
-
-        document.addEventListener(
-            "click",
-            event => {
-
-                if (
-                    !event.target.closest(
-                        ".airport-box"
-                    )
-                ) {
-
-                    departureResults.classList.remove(
-                        "show"
-                    );
-
-                    arrivalResults.classList.remove(
-                        "show"
-                    );
-                }
-            }
-        );
-
-
-        /* =========================================================
-           HTML ESCAPE
-        ========================================================= */
-
-        function escapeHtml(value) {
-
-            return String(value ?? "")
-                .replace(
-                    /&/g,
-                    "&amp;"
+        const region =
+            regions[
+                Math.floor(
+                    Math.random() *
+                    regions.length
                 )
-                .replace(
-                    /</g,
-                    "&lt;"
-                )
-                .replace(
-                    />/g,
-                    "&gt;"
-                )
-                .replace(
-                    /"/g,
-                    "&quot;"
-                )
-                .replace(
-                    /'/g,
-                    "&#039;"
+            ];
+
+
+        const airports =
+            randomAirports[region];
+
+
+        let departureIndex =
+            Math.floor(
+                Math.random() *
+                airports.length
+            );
+
+
+        let arrivalIndex =
+            Math.floor(
+                Math.random() *
+                airports.length
+            );
+
+
+        while (
+            arrivalIndex === departureIndex &&
+            airports.length > 1
+        ) {
+
+            arrivalIndex =
+                Math.floor(
+                    Math.random() *
+                    airports.length
                 );
+
         }
 
 
-        /* =========================================================
-           INITIALIZE
-        ========================================================= */
+        const departure =
+            airports[departureIndex];
 
-        updatePreview();
 
-    </script>
+        const arrival =
+            airports[arrivalIndex];
+
+
+        const flightHours =
+            minHours +
+            Math.random() *
+            (maxHours - minHours);
+
+
+        let selectedAircraft =
+            aircraft;
+
+
+        if (selectedAircraft === "any") {
+
+            const aircraftList =
+                Object.keys(
+                    aircraftNames
+                );
+
+
+            selectedAircraft =
+                aircraftList[
+                    Math.floor(
+                        Math.random() *
+                        aircraftList.length
+                    )
+                ];
+
+        }
+
+
+        const distance =
+            Math.round(
+                flightHours * 330 +
+                (Math.random() * 100 - 50)
+            );
+
+
+        return {
+
+            orig: departure.icao,
+
+            dest: arrival.icao,
+
+            departureCity:
+                departure.city,
+
+            arrivalCity:
+                arrival.city,
+
+            aircraft:
+                selectedAircraft,
+
+            aircraftName:
+                aircraftNames[
+                    selectedAircraft
+                ],
+
+            flightTime:
+                formatHours(
+                    flightHours
+                ),
+
+            distance,
+
+            difficulty:
+                capitalize(
+                    difficulty
+                )
+
+        };
+
+    }
+
+
+    function displayRandomFlight(data) {
+
+        document.getElementById(
+            "randomDepartureCode"
+        ).textContent =
+            data.orig;
+
+
+        document.getElementById(
+            "randomDepartureCity"
+        ).textContent =
+            data.departureCity ||
+            data.orig;
+
+
+        document.getElementById(
+            "randomArrivalCode"
+        ).textContent =
+            data.dest;
+
+
+        document.getElementById(
+            "randomArrivalCity"
+        ).textContent =
+            data.arrivalCity ||
+            data.dest;
+
+
+        document.getElementById(
+            "randomResultAircraft"
+        ).textContent =
+            data.aircraftName ||
+            aircraftNames[data.aircraft] ||
+            data.aircraft;
+
+
+        document.getElementById(
+            "randomResultTime"
+        ).textContent =
+            data.flightTime ||
+            "—";
+
+
+        document.getElementById(
+            "randomResultDistance"
+        ).textContent =
+            data.distance
+                ? `${data.distance} NM`
+                : "—";
+
+
+        document.getElementById(
+            "randomResultDifficulty"
+        ).textContent =
+            data.difficulty ||
+            "Normal";
+
+
+        document.getElementById(
+            "randomResult"
+        ).classList.add("show");
+
+    }
+
+
+    /* =========================================================
+       USE RANDOM FLIGHT
+    ========================================================== */
+
+    function useRandomFlight() {
+
+        if (!randomFlight) {
+            return;
+        }
+
+
+        selectedDeparture = {
+            icao: randomFlight.orig
+        };
+
+
+        selectedArrival = {
+            icao: randomFlight.dest
+        };
+
+
+        document.getElementById(
+            "departure"
+        ).value =
+            randomFlight.orig;
+
+
+        document.getElementById(
+            "arrival"
+        ).value =
+            randomFlight.dest;
+
+
+        document.getElementById(
+            "aircraft"
+        ).value =
+            randomFlight.aircraft;
+
+
+        switchTab("plan");
+
+
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+
+    }
+
+
+    /* =========================================================
+       CLEAR
+    ========================================================== */
+
+    function clearPlan() {
+
+        selectedDeparture = null;
+        selectedArrival = null;
+
+
+        document.getElementById(
+            "departure"
+        ).value = "";
+
+
+        document.getElementById(
+            "arrival"
+        ).value = "";
+
+
+        document.getElementById(
+            "flightNumber"
+        ).value = "";
+
+
+        document.getElementById(
+            "planResult"
+        ).classList.remove("show");
+
+
+        document.getElementById(
+            "planStatus"
+        ).className = "status";
+
+
+        document.getElementById(
+            "planStatus"
+        ).innerHTML = "";
+
+    }
+
+
+    /* =========================================================
+       STATUS
+    ========================================================== */
+
+    function showStatus(
+        element,
+        message,
+        type
+    ) {
+
+        element.innerHTML = message;
+
+        element.className =
+            `status show ${type}`;
+
+    }
+
+
+    /* =========================================================
+       HELPERS
+    ========================================================== */
+
+    function formatHours(hours) {
+
+        const totalMinutes =
+            Math.round(
+                hours * 60
+            );
+
+
+        const h =
+            Math.floor(
+                totalMinutes / 60
+            );
+
+
+        const m =
+            totalMinutes % 60;
+
+
+        return `${h}h ${String(m).padStart(2, "0")}m`;
+
+    }
+
+
+    function capitalize(value) {
+
+        if (!value) {
+            return "";
+        }
+
+
+        return value.charAt(0).toUpperCase() +
+            value.slice(1);
+
+    }
+
+
+    function escapeHtml(value) {
+
+        return String(value)
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;")
+            .replaceAll("'", "&#039;");
+
+    }
+
+
+    /* =========================================================
+       CLOSE AIRPORT DROPDOWNS
+    ========================================================== */
+
+    document.addEventListener(
+        "click",
+        event => {
+
+            if (
+                !event.target.closest(
+                    ".field"
+                )
+            ) {
+
+                document
+                    .querySelectorAll(
+                        ".airport-results"
+                    )
+                    .forEach(
+                        element => {
+                            element.style.display =
+                                "none";
+                        }
+                    );
+
+            }
+
+        }
+    );
+
+
+    /* =========================================================
+       INITIALIZE
+    ========================================================== */
+
+    setupAirportSearch(
+        "departure",
+        "departureResults",
+        "departure"
+    );
+
+
+    setupAirportSearch(
+        "arrival",
+        "arrivalResults",
+        "arrival"
+    );
+
+</script>
 
 </body>
 </html>
