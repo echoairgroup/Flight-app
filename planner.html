@@ -1,617 +1,6604 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#1769ff">
-<meta name="description" content="Flight-app flight planner — plan, calculate and save your simulator flights.">
-<title>Flight Planner — Flight-app</title>
 
-<style>
-:root{
-    --blue:#1769ff;
-    --blue-2:#0b4dcc;
-    --blue-3:#eaf2ff;
-    --ink:#122033;
-    --muted:#6d7b8e;
-    --line:#dfe7f2;
-    --bg:#f5f8fc;
-    --white:#fff;
-    --success:#16885b;
-    --danger:#c83c3c;
-    --shadow:0 18px 55px rgba(26,61,110,.10);
-    --shadow-sm:0 8px 28px rgba(26,61,110,.08);
-}
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{
-    margin:0;
-    color:var(--ink);
-    background:
-        radial-gradient(circle at 8% 0%,rgba(23,105,255,.10),transparent 28rem),
-        radial-gradient(circle at 100% 15%,rgba(71,145,255,.07),transparent 30rem),
-        var(--bg);
-    font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-}
-button,input,select{font:inherit}
-button{cursor:pointer}
-a{text-decoration:none;color:inherit}
+    <!-- =========================================================
+         META
+    ========================================================== -->
 
-.header{
-    position:sticky;top:0;z-index:20;
-    height:74px;
-    display:flex;align-items:center;justify-content:space-between;
-    padding:0 clamp(20px,5vw,72px);
-    background:rgba(255,255,255,.88);
-    backdrop-filter:blur(18px);
-    border-bottom:1px solid rgba(215,225,239,.8);
-}
-.brand{display:flex;align-items:center;gap:12px;font-weight:850;letter-spacing:-.03em}
-.logo{
-    width:39px;height:39px;border-radius:12px;
-    display:grid;place-items:center;
-    color:white;background:linear-gradient(145deg,#3282ff,#0955d9);
-    box-shadow:0 8px 22px rgba(23,105,255,.28);
-}
-.logo svg{width:21px;height:21px}
-.nav{display:flex;align-items:center;gap:7px}
-.nav a{
-    padding:10px 13px;border-radius:10px;
-    color:#66758a;font-size:14px;font-weight:700;
-}
-.nav a:hover{background:#f0f5fc;color:var(--ink)}
-.nav a.active{background:var(--blue-3);color:var(--blue)}
-.nav-toggle{display:none;border:0;background:none;font-size:25px}
+    <meta charset="UTF-8">
 
-.wrap{width:min(1240px,calc(100% - 40px));margin:auto}
-.page-head{padding:58px 0 30px}
-.eyebrow{
-    display:inline-flex;align-items:center;gap:8px;
-    color:var(--blue);font-size:12px;font-weight:850;
-    text-transform:uppercase;letter-spacing:.13em;
-}
-.dot{width:7px;height:7px;border-radius:50%;background:var(--blue)}
-h1{margin:11px 0 10px;font-size:clamp(36px,5vw,58px);line-height:.98;letter-spacing:-.055em}
-.page-head p{margin:0;max-width:680px;color:var(--muted);font-size:16px;line-height:1.7}
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-.grid{
-    display:grid;grid-template-columns:minmax(0,1.6fr) minmax(310px,.9fr);
-    gap:22px;align-items:start;padding-bottom:70px;
-}
-.card{
-    background:rgba(255,255,255,.92);
-    border:1px solid var(--line);
-    border-radius:22px;
-    box-shadow:var(--shadow-sm);
-}
-.card-head{padding:25px 27px 20px;border-bottom:1px solid var(--line)}
-.card-head h2{margin:0 0 6px;font-size:19px;letter-spacing:-.025em}
-.card-head p{margin:0;color:var(--muted);font-size:13px;line-height:1.5}
-.card-body{padding:26px 27px}
+    <meta
+        name="theme-color"
+        content="#f5f8fc"
+    >
 
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:17px}
-.field{display:flex;flex-direction:column;gap:7px}
-.field.full{grid-column:1/-1}
-label{font-size:12px;font-weight:800;color:#526175}
-input,select{
-    width:100%;height:48px;border:1px solid #d7e1ee;border-radius:12px;
-    padding:0 14px;background:#fff;color:var(--ink);outline:none;
-    transition:.18s ease;
-}
-input:focus,select:focus{
-    border-color:#70a1ff;
-    box-shadow:0 0 0 4px rgba(23,105,255,.09);
-}
-.input-wrap{position:relative}
-.input-wrap input{padding-right:58px}
-.suffix{position:absolute;right:14px;top:50%;transform:translateY(-50%);color:#8794a6;font-size:12px;font-weight:700}
+    <meta
+        name="description"
+        content="Flight App — Your all-in-one companion for Microsoft Flight Simulator."
+    >
 
-.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
-.btn{
-    min-height:46px;padding:0 17px;border-radius:11px;border:1px solid var(--line);
-    background:#fff;color:#425268;font-weight:800;font-size:13px;
-}
-.btn:hover{transform:translateY(-1px);box-shadow:0 7px 18px rgba(20,54,100,.08)}
-.btn.primary{
-    color:#fff;border-color:var(--blue);
-    background:linear-gradient(135deg,#2d7aff,#0e59df);
-    box-shadow:0 10px 22px rgba(23,105,255,.22);
-}
-.btn.primary:hover{box-shadow:0 13px 27px rgba(23,105,255,.29)}
-.btn.danger{color:var(--danger)}
+    <title>Flight App — Flight Simulator Companion</title>
 
-.route-card{margin-top:20px;overflow:hidden}
-.route-top{
-    display:flex;align-items:center;justify-content:space-between;gap:15px;
-    padding:18px 22px;border-bottom:1px solid var(--line);
-}
-.route-top strong{font-size:14px}
-.status{
-    display:inline-flex;align-items:center;gap:7px;
-    padding:7px 10px;border-radius:999px;background:#f1f4f8;color:#718096;
-    font-size:11px;font-weight:800;
-}
-.status.ready{background:#eaf8f1;color:var(--success)}
-.status .sdot{width:6px;height:6px;border-radius:50%;background:currentColor}
-.route-display{padding:27px 22px}
-.route-line{display:grid;grid-template-columns:1fr 80px 1fr;align-items:center;gap:12px}
-.airport{text-align:center}
-.airport .icao{font-size:31px;font-weight:900;letter-spacing:-.045em}
-.airport .city{margin-top:4px;color:var(--muted);font-size:12px}
-.connector{position:relative;height:34px}
-.connector:before{
-    content:"";position:absolute;left:5px;right:5px;top:50%;
-    height:1px;background:#c8d6e8;
-}
-.plane{
-    position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
-    width:35px;height:35px;border-radius:50%;display:grid;place-items:center;
-    background:#fff;border:1px solid #d7e3f1;color:var(--blue);
-    box-shadow:0 5px 15px rgba(24,61,108,.10);
-}
-.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:25px}
-.metric{padding:15px;background:#f7faff;border:1px solid #e5edf7;border-radius:13px}
-.metric span{display:block;color:var(--muted);font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
-.metric strong{display:block;margin-top:5px;font-size:17px}
 
-.side-stack{display:grid;gap:20px}
-.saved-list{padding:12px}
-.saved-empty{text-align:center;padding:34px 18px;color:var(--muted);font-size:13px}
-.saved-item{
-    padding:14px;border:1px solid transparent;border-radius:14px;
-    display:flex;justify-content:space-between;gap:12px;
-}
-.saved-item:hover{background:#f6f9fd;border-color:#e4ebf4}
-.saved-route{font-weight:850;font-size:14px}
-.saved-meta{margin-top:4px;color:var(--muted);font-size:11px}
-.icon-btn{border:0;background:none;color:#8996a7;font-size:17px}
-.info{
-    padding:17px 19px;background:#f5f9ff;border:1px solid #dce9fb;
-    border-radius:15px;color:#607087;font-size:12px;line-height:1.65;
-}
-.info strong{display:block;color:#26374c;margin-bottom:4px}
+    <!-- =========================================================
+         FONTS
+    ========================================================== -->
 
-.toast{
-    position:fixed;right:22px;bottom:22px;z-index:50;
-    max-width:360px;padding:14px 17px;border-radius:13px;
-    background:#13243a;color:#fff;box-shadow:0 15px 45px rgba(0,0,0,.18);
-    font-size:13px;font-weight:700;transform:translateY(20px);opacity:0;pointer-events:none;transition:.25s;
-}
-.toast.show{transform:none;opacity:1}
-.toast.error{background:#a92f36}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
 
-.footer{
-    padding:28px 0 42px;border-top:1px solid var(--line);
-    color:#8793a3;font-size:12px;
-}
-.footer-inner{display:flex;justify-content:space-between;gap:20px}
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
 
-@media(max-width:900px){
-    .grid{grid-template-columns:1fr}
-}
-@media(max-width:720px){
-    .nav{display:none}
-    .nav.open{
-        display:flex;position:absolute;left:15px;right:15px;top:68px;
-        flex-direction:column;align-items:stretch;padding:10px;
-        background:#fff;border:1px solid var(--line);border-radius:15px;box-shadow:var(--shadow);
-    }
-    .nav a{padding:13px}
-    .nav-toggle{display:block}
-    .form-grid{grid-template-columns:1fr}
-    .field.full{grid-column:auto}
-    .route-line{grid-template-columns:1fr 50px 1fr}
-    .airport .icao{font-size:24px}
-    .metrics{grid-template-columns:1fr}
-    .wrap{width:min(100% - 28px,1240px)}
-    .page-head{padding-top:40px}
-}
-@media(prefers-reduced-motion:no-preference){
-    .card{animation:rise .45s ease both}
-    @keyframes rise{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
-}
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+
+    <!-- =========================================================
+         ICONS
+    ========================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+    >
+
+
+    <!-- =========================================================
+         FAVICON
+    ========================================================== -->
+
+    <link
+        rel="icon"
+        href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='25' fill='%235b7cfa'/%3E%3Cpath d='M21 55L78 22L65 78L51 58L21 55Z' fill='white'/%3E%3C/svg%3E"
+    >
+
+
+    <!-- =========================================================
+         GLOBAL CSS
+    ========================================================== -->
+
+    <style>
+
+        /* =====================================================
+           ROOT
+        ====================================================== */
+
+        :root {
+
+            --background: #f4f7fb;
+
+            --surface: #ffffff;
+            --surface-2: #f8faff;
+            --surface-3: #eef3f9;
+
+            --text: #101828;
+            --text-secondary: #667085;
+            --text-muted: #98a2b3;
+
+            --border: #e4e9f0;
+
+            --primary: #5b7cfa;
+            --primary-dark: #4264e5;
+            --primary-light: #edf1ff;
+
+            --cyan: #4cc9e8;
+            --violet: #8b72f7;
+
+            --success: #1daf86;
+            --success-light: #eafaf5;
+
+            --warning: #f3a83b;
+            --warning-light: #fff6e8;
+
+            --danger: #e85d68;
+            --danger-light: #fff0f1;
+
+            --shadow-xs:
+                0 2px 8px rgba(16, 24, 40, 0.04);
+
+            --shadow-sm:
+                0 8px 25px rgba(16, 24, 40, 0.055);
+
+            --shadow-md:
+                0 18px 50px rgba(16, 24, 40, 0.09);
+
+            --shadow-lg:
+                0 30px 80px rgba(16, 24, 40, 0.13);
+
+            --radius-sm: 10px;
+            --radius-md: 15px;
+            --radius-lg: 22px;
+            --radius-xl: 30px;
+
+            --nav-height: 76px;
+
+            --content-width: 1400px;
+
+            --transition:
+                180ms cubic-bezier(.4,0,.2,1);
+
+        }
+
+
+        /* =====================================================
+           RESET
+        ====================================================== */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+
+        body {
+
+            min-height: 100vh;
+
+            font-family:
+                "DM Sans",
+                sans-serif;
+
+            color: var(--text);
+
+            background:
+                radial-gradient(
+                    circle at 10% 0%,
+                    rgba(91, 124, 250, .08),
+                    transparent 30%
+                ),
+                radial-gradient(
+                    circle at 90% 5%,
+                    rgba(76, 201, 232, .07),
+                    transparent 28%
+                ),
+                var(--background);
+
+            overflow-x: hidden;
+
+        }
+
+
+        body.modal-open {
+            overflow: hidden;
+        }
+
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+
+        button,
+        input,
+        select {
+            font: inherit;
+        }
+
+
+        button {
+            border: 0;
+            cursor: pointer;
+        }
+
+
+        input,
+        select {
+            outline: none;
+        }
+
+
+        img {
+            max-width: 100%;
+            display: block;
+        }
+
+
+        /* =====================================================
+           SCROLLBAR
+        ====================================================== */
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+
+        ::-webkit-scrollbar-thumb {
+            background: #ccd5e2;
+            border-radius: 50px;
+        }
+
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #b8c4d4;
+        }
+
+
+        /* =====================================================
+           UTILITY
+        ====================================================== */
+
+        .container {
+
+            width:
+                min(
+                    var(--content-width),
+                    calc(100% - 48px)
+                );
+
+            margin: 0 auto;
+
+        }
+
+
+        .hidden {
+            display: none !important;
+        }
+
+
+        /* =====================================================
+           NAVBAR
+        ====================================================== */
+
+        .navbar {
+
+            position: sticky;
+
+            top: 0;
+
+            z-index: 1000;
+
+            height: var(--nav-height);
+
+            background:
+                rgba(255, 255, 255, .84);
+
+            backdrop-filter:
+                blur(22px);
+
+            -webkit-backdrop-filter:
+                blur(22px);
+
+            border-bottom:
+                1px solid
+                rgba(228, 233, 240, .82);
+
+        }
+
+
+        .navbar-inner {
+
+            height: 100%;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            gap: 25px;
+
+        }
+
+
+        /* =====================================================
+           BRAND
+        ====================================================== */
+
+        .brand {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 12px;
+
+            flex-shrink: 0;
+
+        }
+
+
+        .brand-mark {
+
+            width: 42px;
+            height: 42px;
+
+            display: grid;
+
+            place-items: center;
+
+            border-radius: 13px;
+
+            color: #fff;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--primary),
+                    var(--violet)
+                );
+
+            box-shadow:
+                0 9px 25px
+                rgba(91, 124, 250, .27);
+
+        }
+
+
+        .brand-mark i {
+            font-size: 17px;
+            transform: rotate(-12deg);
+        }
+
+
+        .brand-name {
+
+            font-family:
+                "Manrope",
+                sans-serif;
+
+            font-size: 18px;
+
+            font-weight: 800;
+
+            letter-spacing: -.5px;
+
+        }
+
+
+        .brand-version {
+
+            margin-left: 4px;
+
+            padding: 3px 7px;
+
+            border-radius: 6px;
+
+            color: var(--primary);
+
+            background: var(--primary-light);
+
+            font-size: 9px;
+
+            font-weight: 700;
+
+            letter-spacing: .5px;
+
+        }
+
+
+        /* =====================================================
+           NAV LINKS
+        ====================================================== */
+
+        .nav-links {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 3px;
+
+            margin-left: auto;
+
+        }
+
+
+        .nav-link {
+
+            position: relative;
+
+            padding: 9px 13px;
+
+            border-radius: 10px;
+
+            color: var(--text-secondary);
+
+            font-size: 13px;
+
+            font-weight: 600;
+
+            transition:
+                color var(--transition),
+                background var(--transition);
+
+        }
+
+
+        .nav-link:hover {
+
+            color: var(--primary);
+
+            background:
+                var(--primary-light);
+
+        }
+
+
+        .nav-link.active {
+
+            color: var(--primary);
+
+            background:
+                var(--primary-light);
+
+        }
+
+
+        /* =====================================================
+           NAV ACTIONS
+        ====================================================== */
+
+        .nav-actions {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 9px;
+
+        }
+
+
+        .icon-button {
+
+            position: relative;
+
+            width: 40px;
+            height: 40px;
+
+            display: grid;
+
+            place-items: center;
+
+            border:
+                1px solid
+                var(--border);
+
+            border-radius: 11px;
+
+            color: var(--text-secondary);
+
+            background: var(--surface);
+
+            transition:
+                transform var(--transition),
+                border-color var(--transition),
+                color var(--transition),
+                box-shadow var(--transition);
+
+        }
+
+
+        .icon-button:hover {
+
+            color: var(--primary);
+
+            border-color:
+                #cbd5ff;
+
+            transform:
+                translateY(-2px);
+
+            box-shadow:
+                var(--shadow-xs);
+
+        }
+
+
+        .notification-dot {
+
+            position: absolute;
+
+            top: 8px;
+            right: 8px;
+
+            width: 6px;
+            height: 6px;
+
+            border-radius: 50%;
+
+            background:
+                var(--danger);
+
+            border:
+                1px solid white;
+
+        }
+
+
+        .profile-button {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 9px;
+
+            padding:
+                4px 10px 4px 5px;
+
+            border:
+                1px solid
+                var(--border);
+
+            border-radius: 30px;
+
+            color: var(--text);
+
+            background: white;
+
+            transition:
+                box-shadow var(--transition),
+                transform var(--transition);
+
+        }
+
+
+        .profile-button:hover {
+
+            transform:
+                translateY(-1px);
+
+            box-shadow:
+                var(--shadow-xs);
+
+        }
+
+
+        .profile-avatar {
+
+            width: 32px;
+            height: 32px;
+
+            display: grid;
+
+            place-items: center;
+
+            border-radius: 50%;
+
+            color: white;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--primary),
+                    var(--cyan)
+                );
+
+            font-size: 10px;
+
+            font-weight: 800;
+
+        }
+
+
+        .profile-name {
+
+            font-size: 12px;
+
+            font-weight: 700;
+
+        }
+
+
+        .mobile-menu {
+
+            display: none;
+
+        }
+
+
+        /* =====================================================
+           HERO
+        ====================================================== */
+
+        .hero {
+
+            position: relative;
+
+            padding:
+                70px 0 45px;
+
+        }
+
+
+        .hero-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                minmax(0, 1.05fr)
+                minmax(450px, .95fr);
+
+            align-items: center;
+
+            gap: 60px;
+
+        }
+
+
+        /* =====================================================
+           HERO COPY
+        ====================================================== */
+
+        .hero-copy {
+
+            position: relative;
+
+            z-index: 2;
+
+        }
+
+
+        .hero-badge {
+
+            display: inline-flex;
+
+            align-items: center;
+
+            gap: 8px;
+
+            padding:
+                7px 11px;
+
+            margin-bottom: 20px;
+
+            border:
+                1px solid
+                #dbe3f0;
+
+            border-radius: 50px;
+
+            color: var(--primary);
+
+            background:
+                rgba(255,255,255,.78);
+
+            font-size: 11px;
+
+            font-weight: 700;
+
+            box-shadow:
+                var(--shadow-xs);
+
+        }
+
+
+        .hero-badge-dot {
+
+            width: 7px;
+            height: 7px;
+
+            border-radius: 50%;
+
+            background:
+                var(--success);
+
+            box-shadow:
+                0 0 0 5px
+                rgba(29,175,134,.09);
+
+        }
+
+
+        .hero-title {
+
+            max-width: 720px;
+
+            font-family:
+                "Manrope",
+                sans-serif;
+
+            font-size:
+                clamp(
+                    42px,
+                    5.4vw,
+                    76px
+                );
+
+            line-height:
+                1.02;
+
+            letter-spacing:
+                -3.6px;
+
+            font-weight:
+                800;
+
+        }
+
+
+        .hero-title .gradient {
+
+            color: transparent;
+
+            background:
+                linear-gradient(
+                    110deg,
+                    var(--primary),
+                    var(--violet) 55%,
+                    var(--cyan)
+                );
+
+            -webkit-background-clip:
+                text;
+
+            background-clip:
+                text;
+
+        }
+
+
+        .hero-description {
+
+            max-width: 620px;
+
+            margin-top: 21px;
+
+            color:
+                var(--text-secondary);
+
+            font-size: 16px;
+
+            line-height: 1.75;
+
+        }
+
+
+        .hero-actions {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 11px;
+
+            margin-top: 28px;
+
+        }
+
+
+        .button {
+
+            min-height: 46px;
+
+            display: inline-flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            gap: 9px;
+
+            padding:
+                0 17px;
+
+            border:
+                1px solid
+                var(--border);
+
+            border-radius: 12px;
+
+            color: var(--text);
+
+            background: white;
+
+            font-size: 13px;
+
+            font-weight: 700;
+
+            transition:
+                transform var(--transition),
+                box-shadow var(--transition),
+                border-color var(--transition);
+
+        }
+
+
+        .button:hover {
+
+            transform:
+                translateY(-2px);
+
+            box-shadow:
+                var(--shadow-sm);
+
+        }
+
+
+        .button-primary {
+
+            border-color:
+                transparent;
+
+            color: white;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--primary),
+                    var(--primary-dark)
+                );
+
+            box-shadow:
+                0 12px 28px
+                rgba(91,124,250,.22);
+
+        }
+
+
+        .button-primary:hover {
+
+            box-shadow:
+                0 16px 34px
+                rgba(91,124,250,.30);
+
+        }
+
+
+        .button-large {
+
+            min-height: 52px;
+
+            padding:
+                0 21px;
+
+            border-radius: 14px;
+
+        }
+
+
+        /* =====================================================
+           HERO TRUST
+        ====================================================== */
+
+        .hero-trust {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 14px;
+
+            margin-top: 28px;
+
+        }
+
+
+        .trust-avatars {
+
+            display: flex;
+
+            align-items: center;
+
+        }
+
+
+        .trust-avatar {
+
+            width: 27px;
+            height: 27px;
+
+            display: grid;
+
+            place-items: center;
+
+            margin-left: -6px;
+
+            border:
+                2px solid
+                var(--background);
+
+            border-radius: 50%;
+
+            color: white;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #5b7cfa,
+                    #8b72f7
+                );
+
+            font-size: 8px;
+
+            font-weight: 800;
+
+        }
+
+
+        .trust-avatar:first-child {
+            margin-left: 0;
+        }
+
+
+        .trust-text {
+
+            color:
+                var(--text-muted);
+
+            font-size: 11px;
+
+            line-height: 1.5;
+
+        }
+
+
+        .trust-text strong {
+
+            color:
+                var(--text-secondary);
+
+        }
+
+
+        /* =====================================================
+           HERO VISUAL
+        ====================================================== */
+
+        .hero-visual {
+
+            position: relative;
+
+            min-height: 475px;
+
+        }
+
+
+        .visual-glow {
+
+            position: absolute;
+
+            width: 330px;
+            height: 330px;
+
+            top: 35px;
+            right: 50px;
+
+            border-radius: 50%;
+
+            background:
+                radial-gradient(
+                    circle,
+                    rgba(91,124,250,.17),
+                    transparent 68%
+                );
+
+            filter:
+                blur(5px);
+
+        }
+
+
+        .flight-preview {
+
+            position: absolute;
+
+            width: 100%;
+
+            max-width: 550px;
+
+            right: 0;
+
+            top: 18px;
+
+            padding: 22px;
+
+            border:
+                1px solid
+                rgba(255,255,255,.9);
+
+            border-radius:
+                var(--radius-xl);
+
+            background:
+                rgba(255,255,255,.88);
+
+            backdrop-filter:
+                blur(20px);
+
+            box-shadow:
+                var(--shadow-lg);
+
+            transform:
+                perspective(1000px)
+                rotateY(-4deg)
+                rotateX(2deg);
+
+        }
+
+
+        .preview-top {
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+        }
+
+
+        .preview-label {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 8px;
+
+            color:
+                var(--text-muted);
+
+            font-size: 10px;
+
+            font-weight: 700;
+
+            text-transform:
+                uppercase;
+
+            letter-spacing:
+                1px;
+
+        }
+
+
+        .preview-live {
+
+            display: inline-flex;
+
+            align-items: center;
+
+            gap: 6px;
+
+            padding:
+                5px 8px;
+
+            border-radius: 7px;
+
+            color:
+                var(--success);
+
+            background:
+                var(--success-light);
+
+            font-size: 9px;
+
+            font-weight: 800;
+
+        }
+
+
+        .preview-live-dot {
+
+            width: 5px;
+            height: 5px;
+
+            border-radius: 50%;
+
+            background:
+                var(--success);
+
+            animation:
+                pulse 1.8s infinite;
+
+        }
+
+
+        @keyframes pulse {
+
+            0%,100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: .35;
+            }
+
+        }
+
+
+        /* =====================================================
+           ROUTE VISUAL
+        ====================================================== */
+
+        .preview-route {
+
+            position: relative;
+
+            display: grid;
+
+            grid-template-columns:
+                1fr
+                1.5fr
+                1fr;
+
+            align-items: center;
+
+            gap: 15px;
+
+            margin-top: 28px;
+
+        }
+
+
+        .preview-airport {
+
+            position: relative;
+
+            z-index: 3;
+
+        }
+
+
+        .preview-airport:last-child {
+
+            text-align: right;
+
+        }
+
+
+        .preview-icao {
+
+            font-family:
+                "Manrope",
+                sans-serif;
+
+            font-size: 31px;
+
+            font-weight: 800;
+
+            letter-spacing:
+                -1.5px;
+
+        }
+
+
+        .preview-city {
+
+            margin-top: 2px;
+
+            color:
+                var(--text-secondary);
+
+            font-size: 10px;
+
+        }
+
+
+        .preview-time {
+
+            margin-top: 8px;
+
+            color:
+                var(--text-muted);
+
+            font-size: 9px;
+
+            font-weight: 600;
+
+        }
+
+
+        .preview-line {
+
+            position: relative;
+
+            height: 2px;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    #d8e0ea,
+                    var(--primary),
+                    #d8e0ea
+                );
+
+        }
+
+
+        .preview-line::before,
+        .preview-line::after {
+
+            content: "";
+
+            position: absolute;
+
+            top: 50%;
+
+            width: 8px;
+            height: 8px;
+
+            transform:
+                translateY(-50%);
+
+            border:
+                2px solid
+                var(--primary);
+
+            border-radius: 50%;
+
+            background: white;
+
+        }
+
+
+        .preview-line::before {
+            left: 0;
+        }
+
+
+        .preview-line::after {
+            right: 0;
+        }
+
+
+        .preview-plane {
+
+            position: absolute;
+
+            left: 50%;
+            top: 50%;
+
+            width: 34px;
+            height: 34px;
+
+            display: grid;
+
+            place-items: center;
+
+            transform:
+                translate(-50%,-50%)
+                rotate(90deg);
+
+            border-radius: 50%;
+
+            color: white;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--primary),
+                    var(--violet)
+                );
+
+            box-shadow:
+                0 8px 18px
+                rgba(91,124,250,.28);
+
+        }
+
+
+        .preview-plane i {
+            font-size: 12px;
+        }
+
+
+        /* =====================================================
+           PREVIEW INFO
+        ====================================================== */
+
+        .preview-info {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(4,1fr);
+
+            gap: 8px;
+
+            margin-top: 27px;
+
+        }
+
+
+        .preview-stat {
+
+            padding:
+                11px;
+
+            border:
+                1px solid
+                var(--border);
+
+            border-radius: 11px;
+
+            background:
+                var(--surface-2);
+
+        }
+
+
+        .preview-stat-label {
+
+            color:
+                var(--text-muted);
+
+            font-size: 8px;
+
+            font-weight: 700;
+
+            text-transform:
+                uppercase;
+
+            letter-spacing:
+                .5px;
+
+        }
+
+
+        .preview-stat-value {
+
+            margin-top: 4px;
+
+            font-family:
+                "Manrope",
+                sans-serif;
+
+            font-size: 13px;
+
+            font-weight: 800;
+
+        }
+
+
+        /* =====================================================
+           MINI WEATHER
+        ====================================================== */
+
+        .weather-float {
+
+            position: absolute;
+
+            left: -35px;
+
+            bottom: 48px;
+
+            width: 205px;
+
+            padding: 15px;
+
+            border:
+                1px solid
+                rgba(255,255,255,.9);
+
+            border-radius: 18px;
+
+            background:
+                rgba(255,255,255,.91);
+
+            backdrop-filter:
+                blur(18px);
+
+            box-shadow:
+                var(--shadow-md);
+
+            animation:
+                floatingCard 4s ease-in-out infinite;
+
+        }
+
+
+        @keyframes floatingCard {
+
+            0%,100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-7px);
+            }
+
+        }
+
+
+        .weather-header {
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+        }
+
+
+        .weather-location {
+
+            color:
+                var(--text-muted);
+
+            font-size: 9px;
+
+            font-weight: 700;
+
+        }
+
+
+        .weather-icon {
+
+            color:
+                #4b9fe8;
+
+            font-size: 18px;
+
+        }
+
+
+        .weather-temp {
+
+            margin-top: 8px;
+
+            font-family:
+                "Manrope",
+                sans-serif;
+
+            font-size: 28px;
+
+            font-weight: 800;
+
+        }
+
+
+        .weather-condition {
+
+            margin-top: -2px;
+
+            color:
+                var(--text-secondary);
+
+            font-size: 9px;
+
+        }
+
+
+        .weather-bottom {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            margin-top: 11px;
+
+            padding-top: 10px;
+
+            border-top:
+                1px solid
+                var(--border);
+
+            color:
+                var(--text-muted);
+
+            font-size: 8px;
+
+        }
+
+
+        /* =====================================================
+           FLIGHT SEARCH
+        ====================================================== */
+
+        .planner-section {
+
+            position: relative;
+
+            z-index: 10;
+
+            margin-top: 15px;
+
+        }
+
+
+        .planner-card {
+
+            padding: 7px;
+
+            border:
+                1px solid
+                rgba(228,233,240,.95);
+
+            border-radius: 20px;
+
+            background:
+                rgba(255,255,255,.95);
+
+            box-shadow:
+                var(--shadow-md);
+
+        }
+
+
+        .planner-inner {
+
+            display: grid;
+
+            grid-template-columns:
+                1fr
+                1fr
+                1fr
+                1fr
+                auto;
+
+            gap: 7px;
+
+        }
+
+
+        .planner-field {
+
+            min-height: 66px;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 11px;
+
+            padding:
+                0 13px;
+
+            border:
+                1px solid
+                transparent;
+
+            border-radius: 14px;
+
+            background:
+                var(--surface-2);
+
+            transition:
+                border-color var(--transition),
+                background var(--transition);
+
+        }
+
+
+        .planner-field:focus-within {
+
+            border-color:
+                #cdd8ff;
+
+            background:
+                white;
+
+        }
+
+
+        .planner-field-icon {
+
+            width: 33px;
+            height: 33px;
+
+            display: grid;
+
+            place-items: center;
+
+            flex-shrink: 0;
+
+            border-radius: 9px;
+
+            color:
+                var(--primary);
+
+            background:
+                var(--primary-light);
+
+        }
+
+
+        .planner-field-content {
+            min-width: 0;
+            flex: 1;
+        }
+
+
+        .planner-label {
+
+            display: block;
+
+            margin-bottom: 3px;
+
+            color:
+                var(--text-muted);
+
+            font-size: 8px;
+
+            font-weight: 800;
+
+            text-transform:
+                uppercase;
+
+            letter-spacing:
+                .8px;
+
+        }
+
+
+        .planner-input {
+
+            width: 100%;
+
+            border: 0;
+
+            background:
+                transparent;
+
+            color:
+                var(--text);
+
+            font-family:
+                "Manrope",
+                sans-serif;
+
+            font-size: 17px;
+
+            font-weight: 800;
+
+            text-transform:
+                uppercase;
+
+        }
+
+
+        .planner-input::placeholder {
+            color: #c3cbd6;
+        }
+
+
+        .planner-subtext {
+
+            display: block;
+
+            margin-top: 1px;
+
+            overflow: hidden;
+
+            color:
+                var(--text-muted);
+
+            font-size: 8px;
+
+            white-space: nowrap;
+
+            text-overflow: ellipsis;
+
+        }
+
+
+        .planner-select {
+
+            width: 100%;
+
+            border: 0;
+
+            background:
+                transparent;
+
+            color:
+                var(--text);
+
+            font-size: 11px;
+
+            font-weight: 700;
+
+            cursor: pointer;
+
+        }
+
+
+        .planner-submit {
+
+            min-width: 125px;
+
+            border-radius: 14px;
+
+            color: white;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--primary),
+                    var(--primary-dark)
+                );
+
+            box-shadow:
+                0 8px 20px
+                rgba(91,124,250,.18);
+
+            transition:
+                transform var(--transition),
+                box-shadow var(--transition);
+
+        }
+
+
+        .planner-submit:hover {
+
+            transform:
+                translateY(-2px);
+
+            box-shadow:
+                0 13px 27px
+                rgba(91,124,250,.28);
+
+        }
+
+
+        /* =====================================================
+           SECTION
+        ====================================================== */
+
+        .section {
+
+            padding-top: 85px;
+
+        }
+
+
+        .section-header {
+
+            display: flex;
+
+            align-items: flex-end;
+
+            justify-content: space-between;
+
+            margin-bottom: 23px;
+
+        }
+
+
+        .section-eyebrow {
+
+            margin-bottom: 7px;
+
+            color:
+                var(--primary);
+
+            font-size: 10px;
+
+            font-weight: 800;
+
+            text-transform:
+                uppercase;
+
+            letter-spacing:
+                1.4px;
+
+        }
+
+
+        .section-title {
+
+            font-family:
+                "Manrope",
+                sans-serif;
+
+            font-size: 27px;
+
+            font-weight: 800;
+
+            letter-spacing:
+                -1px;
+
+        }
+
+
+        .section-description {
+
+            max-width: 550px;
+
+            margin-top: 7px;
+
+            color:
+                var(--text-secondary);
+
+            font-size: 12px;
+
+            line-height: 1.6;
+
+        }
+
+
+        .section-link {
+
+            display: inline-flex;
+
+            align-items: center;
+
+            gap: 7px;
+
+            color:
+                var(--primary);
+
+            font-size: 11px;
+
+            font-weight: 700;
+
+        }
+
+
+        .section-link i {
+            transition:
+                transform var(--transition);
+        }
+
+
+        .section-link:hover i {
+            transform: translateX(3px);
+        }
+
+
+        /* =====================================================
+           FEATURE GRID
+        ====================================================== */
+
+        .feature-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(4,1fr);
+
+            gap: 13px;
+
+        }
+
+
+        .feature-card {
+
+            position: relative;
+
+            min-height: 185px;
+
+            padding: 21px;
+
+            overflow: hidden;
+
+            border:
+                1px solid
+                var(--border);
+
+            border-radius:
+                var(--radius-lg);
+
+            background:
+                rgba(255,255,255,.82);
+
+            transition:
+                transform var(--transition),
+                box-shadow var(--transition),
+                border-color var(--transition);
+
+        }
+
+
+        .feature-card:hover {
+
+            transform:
+                translateY(-5px);
+
+            border-color:
+                #d2dcfa;
+
+            box-shadow:
+                var(--shadow-md);
+
+        }
+
+
+        .feature-icon {
+
+            width: 41px;
+            height: 41px;
+
+            display: grid;
+
+            place-items: center;
+
+            border-radius: 12px;
+
+            color:
+                var(--primary);
+
+            background:
+                var(--primary-light);
+
+        }
+
+
+        .feature-card:nth-child(2)
+        .feature-icon {
+
+            color:
+                var(--cyan);
+
+            background:
+                rgba(76,201,232,.11);
+
+        }
+
+
+        .feature-card:nth-child(3)
+        .feature-icon {
+
+            color:
+                var(--violet);
+
+            background:
+                rgba(139,114,247,.11);
+
+        }
+
+
+        .feature-card:nth-child(4)
+        .feature-icon {
+
+            color:
+                var(--success);
+
+            background:
+                var(--success-light);
+
+        }
+
+
+        .feature-title {
+
+            margin-top: 17px;
+
+            font-family:
+                "Manrope",
+                sans-serif;
+
+            font-size: 15px;
+
+            font-weight: 800;
+
+        }
+
+
+        .feature-description {
+
+            margin-top: 7px;
+
+            color:
+                var(--text-secondary);
+
+            font-size: 10px;
+
+            line-height: 1.6;
+
+        }
+
+
+        .feature-arrow {
+
+            position: absolute;
+
+            right: 18px;
+            bottom: 18px;
+
+            color:
+                #c3ccd9;
+
+            transition:
+                color var(--transition),
+                transform var(--transition);
+
+        }
+
+
+        .feature-card:hover
+        .feature-arrow {
+
+            color:
+                var(--primary);
+
+            transform:
+                translateX(3px);
+
+        }
+
+
+        /* =====================================================
+           DASHBOARD GRID
+        ====================================================== */
+
+        .dashboard-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                1.25fr
+                .75fr;
+
+            gap: 15px;
+
+        }
+
+
+        .dashboard-card {
+
+            border:
+                1px solid
+                var(--border);
+
+            border-radius:
+                var(--radius-lg);
+
+            background:
+                rgba(255,255,255,.88);
+
+            box-shadow:
+                var(--shadow-xs);
+
+        }
+
+
+        .dashboard-card-header {
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            padding:
+                19px 20px 0;
+
+        }
+
+
+        .dashboard-title {
+
+            font-family:
+                "Manrope",
+                sans-serif;
+
+            font-size: 14px;
+
+            font-weight: 800;
+
+        }
+
+
+        .dashboard-subtitle {
+
+            margin-top: 3px;
+
+            color:
+                var(--text-muted);
+
+            font-size: 9px;
+
+        }
+
+
+        .dashboard-icon {
+
+            width: 32px;
+            height: 32px;
+
+            display: grid;
+
+            place-items: center;
+
+            border-radius: 9px;
+
+            color:
+                var(--primary);
+
+            background:
+                var(--primary-light);
+
+            font-size: 12px;
+
+        }
+
+
+        /* =====================================================
+           RECENT FLIGHTS
+        ====================================================== */
+
+        .flight-list {
+
+            padding:
+                15px 20px 20px;
+
+        }
+
+
+        .flight-row {
+
+            display: grid;
+
+            grid-template-columns:
+                40px
+                1fr
+                105px
+                85px
+                auto;
+
+            align-items: center;
+
+            gap: 13px;
+
+            padding:
+                11px 0;
+
+            border-bottom:
+                1px solid
+                var(--border);
+
+        }
+
+
+        .flight-row:last-child {
+            border-bottom: 0;
+        }
+
+
+        .flight-aircraft {
+
+            width: 38px;
+            height: 38px;
+
+            display: grid;
+
+            place-items: center;
+
+            border-radius: 10px;
+
+            color:
+                var(--primary);
+
+            background:
+                var(--primary-light);
+
+        }
+
+
+        .flight-route-small {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 7px;
+
+            font-family:
+                "Manrope",
+                sans-serif;
+
+            font-size: 11px;
+
+            font-weight: 800;
+
+        }
+
+
+        .flight-route-small i {
+
+            color:
+                var(--text-muted);
+
+            font-size: 8px;
+
+        }
+
+
+        .flight-date {
+
+            margin-top: 3px;
+
+            color:
+                var(--text-muted);
+
+            font-size: 8px;
+
+        }
+
+
+        .flight-detail {
+
+            color:
+                var(--text-secondary);
+
+            font-size: 9px;
+
+            font-weight: 600;
+
+        }
+
+
+        .flight-status {
+
+            display: inline-flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            padding:
+                5px 8px;
+
+            border-radius: 7px;
+
+            color:
+                var(--success);
+
+            background:
+                var(--success-light);
+
+            font-size: 8px;
+
+            font-weight: 800;
+
+        }
+
+
+        .empty-state {
+
+            padding:
+                35px 20px;
+
+            text-align: center;
+
+            color:
+                var(--text-muted);
+
+        }
+
+
+        .empty-state i {
+
+            font-size: 25px;
+
+            margin-bottom: 9px;
+
+        }
+
+
+        .empty-state strong {
+
+            display: block;
+
+            color:
+                var(--text-secondary);
+
+            font-size: 11px;
+
+        }
+
+
+        .empty-state span {
+
+            display: block;
+
+            margin-top: 3px;
+
+            font-size: 9px;
+
+        }
+
+
+        /* =====================================================
+           STATISTICS
+        ====================================================== */
+
+        .statistics-content {
+
+            padding:
+                18px 20px 20px;
+
+        }
+
+
+        .main-stat {
+
+            display: flex;
+
+            align-items: flex-end;
+
+            justify-content: space-between;
+
+            padding-bottom:
+                17px;
+
+            border-bottom:
+                1px solid
+                var(--border);
+
+        }
+
+
+        .main-stat-label {
+
+            color:
+                var(--text-muted);
+
+            font-size: 9px;
+
+            font-weight: 700;
+
+        }
+
+
+        .main-stat-value {
+
+            margin-top: 4px;
+
+            font-family:
+                "Manrope",
+                sans-serif;
+
+            font-size: 33px;
+
+            line-height: 1;
+
+            font-weight: 800;
+
+            letter-spacing:
+                -1.5px;
+
+        }
+
+
+        .main-stat-badge {
+
+            padding:
+                5px 7px;
+
+            border-radius: 7px;
+
+            color:
+                var(--success);
+
+            background:
+                var(--success-light);
+
+            font-size: 8px;
+
+            font-weight: 800;
+
+        }
+
+
+        .stat-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                1fr 1fr;
+
+            gap: 10px;
+
+            margin-top: 15px;
+
+        }
+
+
+        .small-stat {
+
+            padding:
+                12px;
+
+            border:
+                1px solid
+                var(--border);
+
+            border-radius: 11px;
+
+            background:
+                var(--surface-2);
+
+        }
+
+
+        .small-stat-label {
+
+            color:
+                var(--text-muted);
+
+            font-size: 8px;
+
+        }
+
+
+        .small-stat-value {
+
+            margin-top: 5px;
+
+            font-family:
+                "Manrope",
+                sans-serif;
+
+            font-size: 15px;
+
+            font-weight: 800;
+
+        }
+
+
+        /* =====================================================
+           TOOLS
+        ====================================================== */
+
+        .tools-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(6,1fr);
+
+            gap: 11px;
+
+        }
+
+
+        .tool-card {
+
+            min-height: 125px;
+
+            padding: 16px;
+
+            border:
+                1px solid
+                var(--border);
+
+            border-radius: 16px;
+
+            background:
+                white;
+
+            transition:
+                transform var(--transition),
+                box-shadow var(--transition),
+                border-color var(--transition);
+
+        }
+
+
+        .tool-card:hover {
+
+            transform:
+                translateY(-4px);
+
+            border-color:
+                #d2dcfa;
+
+            box-shadow:
+                var(--shadow-sm);
+
+        }
+
+
+        .tool-icon {
+
+            width: 35px;
+            height: 35px;
+
+            display: grid;
+
+            place-items: center;
+
+            border-radius: 9px;
+
+            color:
+                var(--primary);
+
+            background:
+                var(--primary-light);
+
+            font-size: 12px;
+
+        }
+
+
+        .tool-title {
+
+            margin-top: 12px;
+
+            font-size: 11px;
+
+            font-weight: 800;
+
+        }
+
+
+        .tool-description {
+
+            margin-top: 3px;
+
+            color:
+                var(--text-muted);
+
+            font-size: 8px;
+
+            line-height: 1.5;
+
+        }
+
+
+        /* =====================================================
+           CTA
+        ====================================================== */
+
+        .cta {
+
+            position: relative;
+
+            overflow: hidden;
+
+            margin-top: 85px;
+
+            padding:
+                46px;
+
+            border-radius:
+                var(--radius-xl);
+
+            color:
+                white;
+
+            background:
+                linear-gradient(
+                    120deg,
+                    #17213b,
+                    #253c70 55%,
+                    #344e9a
+                );
+
+            box-shadow:
+                var(--shadow-lg);
+
+        }
+
+
+        .cta::before {
+
+            content: "";
+
+            position: absolute;
+
+            width: 400px;
+            height: 400px;
+
+            right: -130px;
+            top: -210px;
+
+            border-radius: 50%;
+
+            background:
+                radial-gradient(
+                    circle,
+                    rgba(76,201,232,.23),
+                    transparent 68%
+                );
+
+        }
+
+
+        .cta::after {
+
+            content: "";
+
+            position: absolute;
+
+            width: 350px;
+            height: 350px;
+
+            left: 35%;
+            bottom: -280px;
+
+            border-radius: 50%;
+
+            background:
+                radial-gradient(
+                    circle,
+                    rgba(139,114,247,.25),
+                    transparent 68%
+                );
+
+        }
+
+
+        .cta-content {
+
+            position: relative;
+
+            z-index: 2;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            gap: 30px;
+
+        }
+
+
+        .cta-title {
+
+            font-family:
+                "Manrope",
+                sans-serif;
+
+            font-size: 29px;
+
+            font-weight: 800;
+
+            letter-spacing:
+                -1.1px;
+
+        }
+
+
+        .cta-description {
+
+            max-width: 600px;
+
+            margin-top: 7px;
+
+            color:
+                rgba(255,255,255,.68);
+
+            font-size: 11px;
+
+            line-height: 1.7;
+
+        }
+
+
+        .cta .button {
+
+            flex-shrink: 0;
+
+            color:
+                var(--text);
+
+            background:
+                white;
+
+            border-color:
+                white;
+
+        }
+
+
+        /* =====================================================
+           FOOTER
+        ====================================================== */
+
+        .footer {
+
+            padding:
+                45px 0 35px;
+
+        }
+
+
+        .footer-inner {
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            gap: 20px;
+
+            padding-top:
+                23px;
+
+            border-top:
+                1px solid
+                var(--border);
+
+        }
+
+
+        .footer-brand {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 8px;
+
+            font-family:
+                "Manrope",
+                sans-serif;
+
+            font-size: 12px;
+
+            font-weight: 800;
+
+        }
+
+
+        .footer-brand-mark {
+
+            width: 27px;
+            height: 27px;
+
+            display: grid;
+
+            place-items: center;
+
+            border-radius: 8px;
+
+            color: white;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--primary),
+                    var(--violet)
+                );
+
+            font-size: 10px;
+
+        }
+
+
+        .footer-text {
+
+            color:
+                var(--text-muted);
+
+            font-size: 9px;
+
+        }
+
+
+        .footer-links {
+
+            display: flex;
+
+            gap: 17px;
+
+        }
+
+
+        .footer-link {
+
+            color:
+                var(--text-muted);
+
+            font-size: 9px;
+
+            transition:
+                color var(--transition);
+
+        }
+
+
+        .footer-link:hover {
+
+            color:
+                var(--primary);
+
+        }
+
+
+        /* =====================================================
+           SEARCH MODAL
+        ====================================================== */
+
+        .modal-backdrop {
+
+            position: fixed;
+
+            inset: 0;
+
+            z-index: 5000;
+
+            display: none;
+
+            align-items: flex-start;
+
+            justify-content: center;
+
+            padding-top: 100px;
+
+            background:
+                rgba(16,24,40,.35);
+
+            backdrop-filter:
+                blur(5px);
+
+        }
+
+
+        .modal-backdrop.open {
+            display: flex;
+        }
+
+
+        .search-modal {
+
+            width:
+                min(
+                    600px,
+                    calc(100% - 30px)
+                );
+
+            overflow: hidden;
+
+            border:
+                1px solid
+                var(--border);
+
+            border-radius:
+                20px;
+
+            background:
+                white;
+
+            box-shadow:
+                var(--shadow-lg);
+
+            animation:
+                modalIn .2s ease;
+
+        }
+
+
+        @keyframes modalIn {
+
+            from {
+
+                opacity: 0;
+
+                transform:
+                    translateY(-10px)
+                    scale(.98);
+
+            }
+
+            to {
+
+                opacity: 1;
+
+                transform:
+                    translateY(0)
+                    scale(1);
+
+            }
+
+        }
+
+
+        .search-input-wrapper {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 11px;
+
+            padding:
+                15px 17px;
+
+            border-bottom:
+                1px solid
+                var(--border);
+
+        }
+
+
+        .search-input-wrapper i {
+
+            color:
+                var(--text-muted);
+
+        }
+
+
+        .search-input {
+
+            width: 100%;
+
+            border: 0;
+
+            font-size: 14px;
+
+        }
+
+
+        .search-results {
+
+            max-height:
+                350px;
+
+            overflow-y: auto;
+
+            padding: 8px;
+
+        }
+
+
+        .search-result {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 11px;
+
+            width: 100%;
+
+            padding:
+                11px;
+
+            border-radius: 11px;
+
+            text-align: left;
+
+            background: transparent;
+
+            transition:
+                background var(--transition);
+
+        }
+
+
+        .search-result:hover {
+
+            background:
+                var(--surface-2);
+
+        }
+
+
+        .search-result-icon {
+
+            width: 34px;
+            height: 34px;
+
+            display: grid;
+
+            place-items: center;
+
+            flex-shrink: 0;
+
+            border-radius: 9px;
+
+            color:
+                var(--primary);
+
+            background:
+                var(--primary-light);
+
+        }
+
+
+        .search-result strong {
+
+            display: block;
+
+            font-size: 11px;
+
+        }
+
+
+        .search-result span {
+
+            display: block;
+
+            margin-top: 2px;
+
+            color:
+                var(--text-muted);
+
+            font-size: 8px;
+
+        }
+
+
+        .search-empty {
+
+            padding:
+                30px;
+
+            text-align: center;
+
+            color:
+                var(--text-muted);
+
+            font-size: 10px;
+
+        }
+
+
+        /* =====================================================
+           TOAST
+        ====================================================== */
+
+        .toast-container {
+
+            position: fixed;
+
+            right: 20px;
+            bottom: 20px;
+
+            z-index: 7000;
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 8px;
+
+        }
+
+
+        .toast {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 10px;
+
+            min-width: 260px;
+
+            max-width: 350px;
+
+            padding:
+                12px 14px;
+
+            border:
+                1px solid
+                var(--border);
+
+            border-radius: 13px;
+
+            background:
+                white;
+
+            box-shadow:
+                var(--shadow-lg);
+
+            animation:
+                toastIn .25s ease;
+
+        }
+
+
+        @keyframes toastIn {
+
+            from {
+
+                opacity: 0;
+
+                transform:
+                    translateY(10px);
+
+            }
+
+            to {
+
+                opacity: 1;
+
+                transform:
+                    translateY(0);
+
+            }
+
+        }
+
+
+        .toast-icon {
+
+            width: 31px;
+            height: 31px;
+
+            display: grid;
+
+            place-items: center;
+
+            flex-shrink: 0;
+
+            border-radius: 9px;
+
+            color:
+                var(--success);
+
+            background:
+                var(--success-light);
+
+        }
+
+
+        .toast.warning
+        .toast-icon {
+
+            color:
+                var(--warning);
+
+            background:
+                var(--warning-light);
+
+        }
+
+
+        .toast-title {
+
+            display: block;
+
+            font-size: 10px;
+
+            font-weight: 800;
+
+        }
+
+
+        .toast-message {
+
+            display: block;
+
+            margin-top: 2px;
+
+            color:
+                var(--text-muted);
+
+            font-size: 8px;
+
+        }
+
+
+        /* =====================================================
+           MOBILE
+        ====================================================== */
+
+        @media (max-width: 1180px) {
+
+            .nav-links {
+                display: none;
+            }
+
+            .mobile-menu {
+                display: grid;
+            }
+
+            .hero-grid {
+
+                grid-template-columns:
+                    1fr;
+
+                gap: 30px;
+
+            }
+
+            .hero-copy {
+                max-width: 800px;
+            }
+
+            .hero-visual {
+
+                min-height: 440px;
+
+                width:
+                    min(
+                        100%,
+                        700px
+                    );
+
+                margin: auto;
+
+            }
+
+            .feature-grid {
+
+                grid-template-columns:
+                    repeat(2,1fr);
+
+            }
+
+            .tools-grid {
+
+                grid-template-columns:
+                    repeat(3,1fr);
+
+            }
+
+        }
+
+
+        @media (max-width: 900px) {
+
+            .planner-inner {
+
+                grid-template-columns:
+                    1fr 1fr;
+
+            }
+
+            .planner-submit {
+
+                min-height: 55px;
+
+            }
+
+            .dashboard-grid {
+
+                grid-template-columns:
+                    1fr;
+
+            }
+
+            .cta-content {
+
+                align-items: flex-start;
+
+                flex-direction: column;
+
+            }
+
+        }
+
+
+        @media (max-width: 650px) {
+
+            .container {
+
+                width:
+                    calc(100% - 28px);
+
+            }
+
+            .navbar {
+
+                height: 68px;
+
+            }
+
+            .brand-name {
+                font-size: 16px;
+            }
+
+            .brand-version {
+                display: none;
+            }
+
+            .profile-name {
+                display: none;
+            }
+
+            .hero {
+
+                padding-top:
+                    45px;
+
+            }
+
+            .hero-title {
+
+                font-size:
+                    clamp(
+                        38px,
+                        12vw,
+                        56px
+                    );
+
+                letter-spacing:
+                    -2.5px;
+
+            }
+
+            .hero-description {
+
+                font-size:
+                    14px;
+
+            }
+
+            .hero-actions {
+
+                align-items:
+                    stretch;
+
+                flex-direction:
+                    column;
+
+            }
+
+            .hero-actions .button {
+
+                width: 100%;
+
+            }
+
+            .hero-visual {
+
+                min-height:
+                    380px;
+
+            }
+
+            .flight-preview {
+
+                padding:
+                    16px;
+
+                transform:
+                    none;
+
+            }
+
+            .weather-float {
+
+                left:
+                    -5px;
+
+                bottom:
+                    12px;
+
+            }
+
+            .preview-info {
+
+                grid-template-columns:
+                    repeat(2,1fr);
+
+            }
+
+            .planner-inner {
+
+                grid-template-columns:
+                    1fr;
+
+            }
+
+            .planner-submit {
+
+                min-height:
+                    52px;
+
+            }
+
+            .feature-grid {
+
+                grid-template-columns:
+                    1fr;
+
+            }
+
+            .tools-grid {
+
+                grid-template-columns:
+                    repeat(2,1fr);
+
+            }
+
+            .flight-row {
+
+                grid-template-columns:
+                    38px
+                    1fr
+                    auto;
+
+            }
+
+            .flight-row
+            .flight-detail {
+
+                display: none;
+
+            }
+
+            .flight-status {
+
+                display: none;
+
+            }
+
+            .section {
+
+                padding-top:
+                    60px;
+
+            }
+
+            .section-header {
+
+                align-items:
+                    flex-start;
+
+                flex-direction:
+                    column;
+
+                gap:
+                    10px;
+
+            }
+
+            .cta {
+
+                padding:
+                    30px 22px;
+
+            }
+
+            .cta-title {
+
+                font-size:
+                    23px;
+
+            }
+
+            .footer-inner {
+
+                align-items:
+                    flex-start;
+
+                flex-direction:
+                    column;
+
+            }
+
+        }
+
+
+        @media (max-width: 430px) {
+
+            .nav-actions {
+
+                gap:
+                    5px;
+
+            }
+
+            .nav-actions
+            .icon-button:nth-child(1) {
+
+                display:
+                    none;
+
+            }
+
+            .hero-trust {
+
+                align-items:
+                    flex-start;
+
+                flex-direction:
+                    column;
+
+            }
+
+            .preview-route {
+
+                gap:
+                    7px;
+
+            }
+
+            .preview-icao {
+
+                font-size:
+                    24px;
+
+            }
+
+            .preview-city,
+            .preview-time {
+
+                font-size:
+                    8px;
+
+            }
+
+            .tools-grid {
+
+                grid-template-columns:
+                    1fr 1fr;
+
+            }
+
+        }
+
+    
+        /* SIMBRIEF PLANNER */
+        .simbrief-card { padding: 28px; }
+        .simbrief-heading { display:flex; justify-content:space-between; gap:24px; align-items:flex-start; margin-bottom:22px; }
+        .simbrief-badge { flex-shrink:0; padding:9px 12px; border-radius:10px; background:#eef8f2; color:#21824c; font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:.6px; }
+        .simbrief-controls { display:grid; grid-template-columns:minmax(0,1fr) auto auto; gap:10px; align-items:stretch; }
+        .simbrief-open { display:flex; align-items:center; justify-content:center; gap:8px; min-width:165px; padding:0 18px; border:1px solid var(--border); border-radius:10px; background:white; color:var(--text); font-weight:800; text-decoration:none; }
+        .simbrief-result { margin-top:16px; padding:20px; border:1px solid var(--border); border-radius:16px; background:#f8fafc; }
+        .simbrief-result-header { display:flex; justify-content:space-between; align-items:center; gap:16px; padding-bottom:15px; border-bottom:1px solid var(--border); }
+        .simbrief-result-header span:first-child, .simbrief-grid span, .simbrief-route > span { display:block; color:var(--text-muted); font-size:9px; font-weight:800; text-transform:uppercase; letter-spacing:.6px; }
+        .simbrief-result-header strong { display:block; margin-top:4px; font-size:20px; }
+        .simbrief-status { padding:6px 9px; border-radius:8px; background:#eef8f2; color:#21824c; font-size:9px; font-weight:800; }
+        .simbrief-grid { display:grid; grid-template-columns:repeat(6,1fr); gap:9px; margin-top:15px; }
+        .simbrief-grid > div { min-width:0; padding:11px; border:1px solid var(--border); border-radius:10px; background:white; }
+        .simbrief-grid strong { display:block; margin-top:5px; overflow:hidden; font-size:12px; white-space:nowrap; text-overflow:ellipsis; }
+        .simbrief-route { margin-top:9px; padding:12px; border:1px solid var(--border); border-radius:10px; background:white; }
+        .simbrief-route code { display:block; margin-top:6px; color:var(--text); font-size:11px; line-height:1.6; white-space:pre-wrap; overflow-wrap:anywhere; }
+        .simbrief-actions { display:flex; gap:9px; margin-top:14px; }
+        .simbrief-actions .btn { display:inline-flex; align-items:center; gap:8px; }
+        @media(max-width:900px){ .simbrief-controls{grid-template-columns:1fr;} .simbrief-open{min-height:54px;} .simbrief-grid{grid-template-columns:repeat(3,1fr);} }
+        @media(max-width:650px){ .simbrief-card{padding:18px;} .simbrief-heading,.simbrief-result-header,.simbrief-actions{flex-direction:column;align-items:stretch;} .simbrief-grid{grid-template-columns:1fr 1fr;} }
+
 </style>
+
 </head>
 
+
 <body>
-<header class="header">
-    <a class="brand" href="index.html">
-        <span class="logo" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none">
-                <path d="M3 14.2 21 5l-5.1 7.1 5.1 2.1-1.3 2.1-6.2-1.5-3.3 4.4-1.9-.8 1.5-5.1-6.8-1.8L3 14.2Z" fill="currentColor"/>
-            </svg>
-        </span>
-        <span>Flight-app</span>
-    </a>
-    <nav class="nav" id="nav">
-        <a href="index.html">Home</a>
-        <a class="active" href="planner.html">Planner</a>
-        <a href="weather.html">Weather</a>
-        <a href="airports.html">Airports</a>
-        <a href="flights.html">Flights</a>
-        <a href="logbook.html">Logbook</a>
-        <a href="statistics.html">Statistics</a>
-    </nav>
-    <button class="nav-toggle" id="navToggle" aria-label="Open navigation">☰</button>
-</header>
 
-<main class="wrap">
-    <section class="page-head">
-        <div class="eyebrow"><span class="dot"></span> Flight planning</div>
-        <h1>Plan the flight.<br>Then fly it.</h1>
-        <p>
-            Build a clean flight plan for your simulator, calculate the great-circle distance
-            and estimated flight time, and save plans to your Flight-app account.
-        </p>
-    </section>
 
-    <section class="grid">
-        <div>
-            <article class="card">
-                <div class="card-head">
-                    <h2>Flight details</h2>
-                    <p>Enter the airports and aircraft you intend to use.</p>
+    <!-- =========================================================
+         NAVBAR
+    ========================================================== -->
+
+    <nav class="navbar">
+
+        <div class="container navbar-inner">
+
+
+            <!-- BRAND -->
+
+            <a
+                href="index.html"
+                class="brand"
+            >
+
+                <div class="brand-mark">
+
+                    <i class="fa-solid fa-plane"></i>
+
                 </div>
-                <div class="card-body">
-                    <form id="plannerForm">
-                        <div class="form-grid">
-                            <div class="field">
-                                <label for="departure">Departure ICAO</label>
-                                <input id="departure" name="departure" maxlength="4" placeholder="EHAM" autocomplete="off" spellcheck="false" required>
+
+                <span class="brand-name">
+                    Flight App
+                </span>
+
+                <span class="brand-version">
+                    BETA
+                </span>
+
+            </a>
+
+
+            <!-- NAVIGATION -->
+
+            <div class="nav-links">
+
+                <a
+                    href="index.html"
+                    class="nav-link active"
+                >
+                    Home
+                </a>
+
+                <a
+                    href="planner.html"
+                    class="nav-link"
+                >
+                    Planner
+                </a>
+
+                <a
+                    href="weather.html"
+                    class="nav-link"
+                >
+                    Weather
+                </a>
+
+                <a
+                    href="airports.html"
+                    class="nav-link"
+                >
+                    Airports
+                </a>
+
+                <a
+                    href="aircraft.html"
+                    class="nav-link"
+                >
+                    Aircraft
+                </a>
+
+                <a
+                    href="logbook.html"
+                    class="nav-link"
+                >
+                    Logbook
+                </a>
+
+            </div>
+
+
+            <!-- ACTIONS -->
+
+            <div class="nav-actions">
+
+
+                <button
+                    class="icon-button"
+                    id="searchButton"
+                    title="Search"
+                >
+
+                    <i class="fa-solid fa-magnifying-glass"></i>
+
+                </button>
+
+
+                <button
+                    class="icon-button"
+                    id="themeButton"
+                    title="Toggle appearance"
+                >
+
+                    <i class="fa-solid fa-moon"></i>
+
+                </button>
+
+
+                <button
+                    class="icon-button"
+                    id="notificationButton"
+                    title="Notifications"
+                >
+
+                    <i class="fa-regular fa-bell"></i>
+
+                    <span
+                        class="notification-dot"
+                        id="notificationDot"
+                    ></span>
+
+                </button>
+
+
+                <button
+                    class="profile-button"
+                    id="profileButton"
+                >
+
+                    <div class="profile-avatar">
+                        P
+                    </div>
+
+                    <span class="profile-name">
+                        Pilot
+                    </span>
+
+                </button>
+
+
+                <button
+                    class="icon-button mobile-menu"
+                    id="mobileMenuButton"
+                >
+
+                    <i class="fa-solid fa-bars"></i>
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </nav>
+
+
+    <!-- =========================================================
+         MAIN
+    ========================================================== -->
+
+    <main>
+
+
+        <!-- =====================================================
+             HERO
+        ====================================================== -->
+
+        <section class="hero">
+
+            <div class="container hero-grid">
+
+
+                <!-- HERO TEXT -->
+
+                <div class="hero-copy">
+
+
+                    <div class="hero-badge">
+
+                        <span class="hero-badge-dot"></span>
+
+                        Flight operations platform
+
+                    </div>
+
+
+                    <h1 class="hero-title">
+
+                        Everything you need
+                        <br>
+
+                        <span class="gradient">
+                            before you fly.
+                        </span>
+
+                    </h1>
+
+
+                    <p class="hero-description">
+
+                        Plan flights, check weather, explore airports,
+                        manage your aircraft and keep track of every
+                        flight — all from one beautiful workspace built
+                        for flight simulation.
+
+                    </p>
+
+
+                    <div class="hero-actions">
+
+                        <a
+                            href="planner.html"
+                            class="button button-primary button-large"
+                        >
+
+                            <i class="fa-solid fa-route"></i>
+
+                            Plan a flight
+
+                        </a>
+
+
+                        <button
+                            class="button button-large"
+                            id="exploreButton"
+                        >
+
+                            <i class="fa-solid fa-compass"></i>
+
+                            Explore Flight App
+
+                        </button>
+
+                    </div>
+
+
+                    <div class="hero-trust">
+
+                        <div class="trust-avatars">
+
+                            <div class="trust-avatar">
+                                A
                             </div>
 
-                            <div class="field">
-                                <label for="arrival">Arrival ICAO</label>
-                                <input id="arrival" name="arrival" maxlength="4" placeholder="EGLL" autocomplete="off" spellcheck="false" required>
+                            <div class="trust-avatar">
+                                M
                             </div>
 
-                            <div class="field">
-                                <label for="aircraft">Aircraft ICAO</label>
-                                <input id="aircraft" name="aircraft" maxlength="8" placeholder="A320" autocomplete="off" spellcheck="false">
+                            <div class="trust-avatar">
+                                J
                             </div>
 
-                            <div class="field">
-                                <label for="altitude">Cruise altitude</label>
-                                <div class="input-wrap">
-                                    <input id="altitude" name="altitude" type="number" min="0" max="60000" step="100" placeholder="36000">
-                                    <span class="suffix">FT</span>
+                            <div class="trust-avatar">
+                                K
+                            </div>
+
+                        </div>
+
+
+                        <div class="trust-text">
+
+                            <strong>
+                                Built for sim pilots.
+                            </strong>
+
+                            <br>
+
+                            Designed around the way you actually fly.
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- HERO VISUAL -->
+
+                <div class="hero-visual">
+
+                    <div class="visual-glow"></div>
+
+
+                    <!-- FLIGHT PREVIEW -->
+
+                    <div class="flight-preview">
+
+
+                        <div class="preview-top">
+
+                            <div class="preview-label">
+
+                                <i class="fa-solid fa-chart-line"></i>
+
+                                Flight overview
+
+                            </div>
+
+
+                            <div class="preview-live">
+
+                                <span
+                                    class="preview-live-dot"
+                                ></span>
+
+                                LIVE
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- ROUTE -->
+
+                        <div class="preview-route">
+
+
+                            <div class="preview-airport">
+
+                                <div class="preview-icao">
+                                    EHAM
+                                </div>
+
+                                <div class="preview-city">
+                                    Amsterdam
+                                </div>
+
+                                <div class="preview-time">
+                                    14:20 UTC
+                                </div>
+
+                            </div>
+
+
+                            <div class="preview-line">
+
+                                <div class="preview-plane">
+
+                                    <i class="fa-solid fa-plane"></i>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="preview-airport">
+
+                                <div class="preview-icao">
+                                    LEBL
+                                </div>
+
+                                <div class="preview-city">
+                                    Barcelona
+                                </div>
+
+                                <div class="preview-time">
+                                    16:39 UTC
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- INFO -->
+
+                        <div class="preview-info">
+
+
+                            <div class="preview-stat">
+
+                                <div class="preview-stat-label">
+                                    Distance
+                                </div>
+
+                                <div
+                                    class="preview-stat-value"
+                                    id="previewDistance"
+                                >
+                                    646 NM
+                                </div>
+
+                            </div>
+
+
+                            <div class="preview-stat">
+
+                                <div class="preview-stat-label">
+                                    Flight time
+                                </div>
+
+                                <div
+                                    class="preview-stat-value"
+                                    id="previewTime"
+                                >
+                                    01:28
+                                </div>
+
+                            </div>
+
+
+                            <div class="preview-stat">
+
+                                <div class="preview-stat-label">
+                                    Aircraft
+                                </div>
+
+                                <div class="preview-stat-value">
+                                    A320
+                                </div>
+
+                            </div>
+
+
+                            <div class="preview-stat">
+
+                                <div class="preview-stat-label">
+                                    Cruise
+                                </div>
+
+                                <div class="preview-stat-value">
+                                    FL350
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- WEATHER FLOAT -->
+
+                    <div class="weather-float">
+
+
+                        <div class="weather-header">
+
+                            <span class="weather-location">
+                                EHAM • NOW
+                            </span>
+
+                            <i
+                                class="fa-solid fa-cloud-sun weather-icon"
+                            ></i>
+
+                        </div>
+
+
+                        <div class="weather-temp">
+                            17°
+                        </div>
+
+
+                        <div class="weather-condition">
+                            Partly cloudy
+                        </div>
+
+
+                        <div class="weather-bottom">
+
+                            <span>
+                                Wind 240° / 12kt
+                            </span>
+
+                            <span>
+                                10 km+
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             SIMBRIEF PLANNER
+        ====================================================== -->
+
+        <section class="planner-section" id="planner">
+            <div class="container">
+                <div class="planner-card simbrief-card">
+                    <div class="planner-inner simbrief-inner">
+                        <div class="simbrief-heading">
+                            <div>
+                                <div class="section-eyebrow">Flight planning</div>
+                                <h2 class="section-title">Plan your flight with SimBrief</h2>
+                                <p class="section-description">
+                                    Flight planning is handled through SimBrief. Generate an OFP in SimBrief, then import your latest flight plan here.
+                                </p>
+                            </div>
+                            <div class="simbrief-badge">
+                                <i class="fa-solid fa-link"></i> SimBrief only
+                            </div>
+                        </div>
+
+                        <div class="simbrief-controls">
+                            <div class="planner-field simbrief-user-field">
+                                <div class="planner-field-icon">
+                                    <i class="fa-solid fa-user"></i>
+                                </div>
+                                <div class="planner-field-content">
+                                    <label class="planner-label" for="simbriefUsername">SimBrief username</label>
+                                    <input id="simbriefUsername" class="planner-input" type="text" maxlength="80" placeholder="Enter your SimBrief username" autocomplete="username">
+                                    <span class="planner-subtext" id="simbriefStatus">Not available</span>
                                 </div>
                             </div>
 
-                            <div class="field full">
-                                <label for="route">Route</label>
-                                <input id="route" name="route" placeholder="Optional — e.g. SID DCT waypoint STAR">
+                            <button class="planner-submit" id="simbriefImportButton" type="button">
+                                <i class="fa-solid fa-cloud-arrow-down"></i>
+                                Import latest OFP
+                            </button>
+
+                            <a class="simbrief-open" href="https://www.simbrief.com/" target="_blank" rel="noopener noreferrer">
+                                <i class="fa-solid fa-up-right-from-square"></i>
+                                Open SimBrief
+                            </a>
+                        </div>
+
+                        <div class="simbrief-result hidden" id="simbriefResult">
+                            <div class="simbrief-result-header">
+                                <div>
+                                    <span>Latest OFP</span>
+                                    <strong id="simbriefRoute">Not available</strong>
+                                </div>
+                                <span class="simbrief-status" id="simbriefResultStatus">Not available</span>
                             </div>
 
-                            <div class="field full">
-                                <label for="planName">Plan name</label>
-                                <input id="planName" name="planName" maxlength="150" placeholder="Optional — e.g. Amsterdam to London">
+                            <div class="simbrief-grid">
+                                <div><span>Flight</span><strong id="simbriefFlightNumber">Not available</strong></div>
+                                <div><span>Aircraft</span><strong id="simbriefAircraft">Not available</strong></div>
+                                <div><span>Distance</span><strong id="simbriefDistance">Not available</strong></div>
+                                <div><span>Flight time</span><strong id="simbriefTime">Not available</strong></div>
+                                <div><span>Cruise altitude</span><strong id="simbriefAltitude">Not available</strong></div>
+                                <div><span>OFP ID</span><strong id="simbriefOfpId">Not available</strong></div>
+                            </div>
+
+                            <div class="simbrief-route">
+                                <span>Route</span>
+                                <code id="simbriefRouteText">Not available</code>
+                            </div>
+
+                            <div class="simbrief-actions">
+                                <button class="btn btn-primary" id="saveSimBriefButton" type="button">
+                                    <i class="fa-solid fa-floppy-disk"></i> Save to Flight App
+                                </button>
+                                <a class="btn btn-secondary" href="https://www.simbrief.com/" target="_blank" rel="noopener noreferrer">
+                                    Open SimBrief
+                                </a>
                             </div>
                         </div>
-
-                        <div class="actions">
-                            <button class="btn primary" type="submit">Calculate route</button>
-                            <button class="btn" type="button" id="swapBtn">Swap airports</button>
-                            <button class="btn" type="button" id="clearBtn">Clear</button>
-                        </div>
-                    </form>
+                    </div>
                 </div>
-            </article>
+            </div>
+        </section>
 
-            <article class="card route-card">
-                <div class="route-top">
-                    <strong>Route overview</strong>
-                    <span class="status" id="routeStatus"><span class="sdot"></span> Waiting for route</span>
-                </div>
-                <div class="route-display">
-                    <div class="route-line">
-                        <div class="airport">
-                            <div class="icao" id="depDisplay">----</div>
-                            <div class="city" id="depCity">Departure</div>
+
+        <!-- =====================================================
+             FEATURES
+        ====================================================== -->
+
+        <section
+            class="section"
+            id="features"
+        >
+
+            <div class="container">
+
+
+                <div class="section-header">
+
+                    <div>
+
+                        <div class="section-eyebrow">
+                            One workspace
                         </div>
-                        <div class="connector">
-                            <div class="plane">
-                                <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
-                                    <path d="M3 14.2 21 5l-5.1 7.1 5.1 2.1-1.3 2.1-6.2-1.5-3.3 4.4-1.9-.8 1.5-5.1-6.8-1.8L3 14.2Z" fill="currentColor"/>
-                                </svg>
+
+                        <h2 class="section-title">
+                            Your flight, completely covered.
+                        </h2>
+
+                        <p class="section-description">
+
+                            Everything is connected so you can go from
+                            planning to takeoff without jumping between
+                            dozens of different tools.
+
+                        </p>
+
+                    </div>
+
+
+                    <a
+                        href="planner.html"
+                        class="section-link"
+                    >
+
+                        View all tools
+
+                        <i class="fa-solid fa-arrow-right"></i>
+
+                    </a>
+
+                </div>
+
+
+                <div class="feature-grid">
+
+
+                    <!-- FEATURE 1 -->
+
+                    <a
+                        href="planner.html"
+                        class="feature-card"
+                    >
+
+                        <div class="feature-icon">
+
+                            <i class="fa-solid fa-route"></i>
+
+                        </div>
+
+                        <div class="feature-title">
+                            Flight Planner
+                        </div>
+
+                        <div class="feature-description">
+
+                            Build your route, calculate distance,
+                            estimate flight time and prepare your
+                            aircraft before departure.
+
+                        </div>
+
+                        <i
+                            class="fa-solid fa-arrow-right feature-arrow"
+                        ></i>
+
+                    </a>
+
+
+                    <!-- FEATURE 2 -->
+
+                    <a
+                        href="weather.html"
+                        class="feature-card"
+                    >
+
+                        <div class="feature-icon">
+
+                            <i class="fa-solid fa-cloud-sun"></i>
+
+                        </div>
+
+                        <div class="feature-title">
+                            Aviation Weather
+                        </div>
+
+                        <div class="feature-description">
+
+                            Access METAR, TAF, wind, visibility,
+                            pressure and other information for your
+                            airports.
+
+                        </div>
+
+                        <i
+                            class="fa-solid fa-arrow-right feature-arrow"
+                        ></i>
+
+                    </a>
+
+
+                    <!-- FEATURE 3 -->
+
+                    <a
+                        href="airports.html"
+                        class="feature-card"
+                    >
+
+                        <div class="feature-icon">
+
+                            <i class="fa-solid fa-earth-europe"></i>
+
+                        </div>
+
+                        <div class="feature-title">
+                            Airport Explorer
+                        </div>
+
+                        <div class="feature-description">
+
+                            Search airports, discover runways,
+                            frequencies, locations and useful
+                            operational information.
+
+                        </div>
+
+                        <i
+                            class="fa-solid fa-arrow-right feature-arrow"
+                        ></i>
+
+                    </a>
+
+
+                    <!-- FEATURE 4 -->
+
+                    <a
+                        href="logbook.html"
+                        class="feature-card"
+                    >
+
+                        <div class="feature-icon">
+
+                            <i class="fa-solid fa-book"></i>
+
+                        </div>
+
+                        <div class="feature-title">
+                            Pilot Logbook
+                        </div>
+
+                        <div class="feature-description">
+
+                            Record every flight and build a complete
+                            history of your simulator career.
+
+                        </div>
+
+                        <i
+                            class="fa-solid fa-arrow-right feature-arrow"
+                        ></i>
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             DASHBOARD
+        ====================================================== -->
+
+        <section class="section">
+
+            <div class="container dashboard-grid">
+
+
+                <!-- RECENT FLIGHTS -->
+
+                <div class="dashboard-card">
+
+
+                    <div class="dashboard-card-header">
+
+                        <div>
+
+                            <div class="dashboard-title">
+                                Recent flights
                             </div>
+
+                            <div class="dashboard-subtitle">
+                                Your latest simulator activity
+                            </div>
+
                         </div>
-                        <div class="airport">
-                            <div class="icao" id="arrDisplay">----</div>
-                            <div class="city" id="arrCity">Arrival</div>
+
+                        <div class="dashboard-icon">
+
+                            <i class="fa-solid fa-plane"></i>
+
                         </div>
+
                     </div>
 
-                    <div class="metrics">
-                        <div class="metric">
-                            <span>Distance</span>
-                            <strong id="distance">—</strong>
-                        </div>
-                        <div class="metric">
-                            <span>Estimated time</span>
-                            <strong id="duration">—</strong>
-                        </div>
-                        <div class="metric">
-                            <span>Aircraft</span>
-                            <strong id="aircraftDisplay">—</strong>
-                        </div>
+
+                    <div
+                        class="flight-list"
+                        id="flightList"
+                    >
+
+                        <!-- JavaScript inserts flights -->
+
                     </div>
 
-                    <div class="actions">
-                        <button class="btn primary" id="saveBtn" type="button" disabled>Save plan</button>
-                    </div>
                 </div>
-            </article>
+
+
+                <!-- STATISTICS -->
+
+                <div class="dashboard-card">
+
+
+                    <div class="dashboard-card-header">
+
+                        <div>
+
+                            <div class="dashboard-title">
+                                Flight statistics
+                            </div>
+
+                            <div class="dashboard-subtitle">
+                                Your simulator overview
+                            </div>
+
+                        </div>
+
+                        <div class="dashboard-icon">
+
+                            <i class="fa-solid fa-chart-simple"></i>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="statistics-content">
+
+
+                        <div class="main-stat">
+
+                            <div>
+
+                                <div class="main-stat-label">
+                                    Total flights
+                                </div>
+
+                                <div
+                                    class="main-stat-value"
+                                    id="totalFlights"
+                                >
+                                    0
+                                </div>
+
+                            </div>
+
+
+                            <div
+                                class="main-stat-badge"
+                                id="flightGrowth"
+                            >
+                                Getting started
+                            </div>
+
+                        </div>
+
+
+                        <div class="stat-grid">
+
+
+                            <div class="small-stat">
+
+                                <div class="small-stat-label">
+                                    Total distance
+                                </div>
+
+                                <div
+                                    class="small-stat-value"
+                                    id="totalDistance"
+                                >
+                                    0 NM
+                                </div>
+
+                            </div>
+
+
+                            <div class="small-stat">
+
+                                <div class="small-stat-label">
+                                    Flight time
+                                </div>
+
+                                <div
+                                    class="small-stat-value"
+                                    id="totalTime"
+                                >
+                                    0h
+                                </div>
+
+                            </div>
+
+
+                            <div class="small-stat">
+
+                                <div class="small-stat-label">
+                                    Airports
+                                </div>
+
+                                <div
+                                    class="small-stat-value"
+                                    id="uniqueAirports"
+                                >
+                                    0
+                                </div>
+
+                            </div>
+
+
+                            <div class="small-stat">
+
+                                <div class="small-stat-label">
+                                    Aircraft
+                                </div>
+
+                                <div
+                                    class="small-stat-value"
+                                    id="uniqueAircraft"
+                                >
+                                    0
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             TOOLS
+        ====================================================== -->
+
+        <section class="section">
+
+            <div class="container">
+
+
+                <div class="section-header">
+
+                    <div>
+
+                        <div class="section-eyebrow">
+                            Flight toolkit
+                        </div>
+
+                        <h2 class="section-title">
+                            Built for the details.
+                        </h2>
+
+                        <p class="section-description">
+
+                            Small tools that make a big difference
+                            when you're preparing or flying a route.
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="tools-grid">
+
+
+                    <a
+                        href="performance.html"
+                        class="tool-card"
+                    >
+
+                        <div class="tool-icon">
+                            <i class="fa-solid fa-gauge-high"></i>
+                        </div>
+
+                        <div class="tool-title">
+                            Performance
+                        </div>
+
+                        <div class="tool-description">
+                            Takeoff, landing and aircraft calculations.
+                        </div>
+
+                    </a>
+
+
+                    <a
+                        href="navigation.html"
+                        class="tool-card"
+                    >
+
+                        <div class="tool-icon">
+                            <i class="fa-solid fa-compass"></i>
+                        </div>
+
+                        <div class="tool-title">
+                            Navigation
+                        </div>
+
+                        <div class="tool-description">
+                            Heading, bearing, coordinates and distances.
+                        </div>
+
+                    </a>
+
+
+                    <a
+                        href="aircraft.html"
+                        class="tool-card"
+                    >
+
+                        <div class="tool-icon">
+                            <i class="fa-solid fa-plane-up"></i>
+                        </div>
+
+                        <div class="tool-title">
+                            Aircraft
+                        </div>
+
+                        <div class="tool-description">
+                            Explore aircraft specifications and data.
+                        </div>
+
+                    </a>
+
+
+                    <a
+                        href="airports.html"
+                        class="tool-card"
+                    >
+
+                        <div class="tool-icon">
+                            <i class="fa-solid fa-tower-broadcast"></i>
+                        </div>
+
+                        <div class="tool-title">
+                            Airport Data
+                        </div>
+
+                        <div class="tool-description">
+                            Runways, elevation and airport information.
+                        </div>
+
+                    </a>
+
+
+                    <a
+                        href="logbook.html"
+                        class="tool-card"
+                    >
+
+                        <div class="tool-icon">
+                            <i class="fa-solid fa-book-open"></i>
+                        </div>
+
+                        <div class="tool-title">
+                            Logbook
+                        </div>
+
+                        <div class="tool-description">
+                            Keep your complete simulator flight history.
+                        </div>
+
+                    </a>
+
+
+                    <a
+                        href="settings.html"
+                        class="tool-card"
+                    >
+
+                        <div class="tool-icon">
+                            <i class="fa-solid fa-sliders"></i>
+                        </div>
+
+                        <div class="tool-title">
+                            Settings
+                        </div>
+
+                        <div class="tool-description">
+                            Customize your Flight App experience.
+                        </div>
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             CTA
+        ====================================================== -->
+
+        <section class="container">
+
+            <div class="cta">
+
+
+                <div class="cta-content">
+
+                    <div>
+
+                        <div class="cta-title">
+                            Ready for your next flight?
+                        </div>
+
+                        <div class="cta-description">
+
+                            Start with a route, choose your aircraft
+                            and let Flight App handle the preparation.
+
+                        </div>
+
+                    </div>
+
+
+                    <a
+                        href="planner.html"
+                        class="button"
+                    >
+
+                        Start planning
+
+                        <i class="fa-solid fa-arrow-right"></i>
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+
+    <!-- =========================================================
+         FOOTER
+    ========================================================== -->
+
+    <footer class="footer">
+
+        <div class="container footer-inner">
+
+
+            <div>
+
+                <div class="footer-brand">
+
+                    <div class="footer-brand-mark">
+
+                        <i class="fa-solid fa-plane"></i>
+
+                    </div>
+
+                    Flight App
+
+                </div>
+
+                <div class="footer-text">
+
+                    Your flight simulator companion.
+
+                </div>
+
+            </div>
+
+
+            <div class="footer-links">
+
+                <a
+                    href="index.html"
+                    class="footer-link"
+                >
+                    Home
+                </a>
+
+                <a
+                    href="planner.html"
+                    class="footer-link"
+                >
+                    Planner
+                </a>
+
+                <a
+                    href="weather.html"
+                    class="footer-link"
+                >
+                    Weather
+                </a>
+
+                <a
+                    href="settings.html"
+                    class="footer-link"
+                >
+                    Settings
+                </a>
+
+            </div>
+
+
+            <div class="footer-text">
+
+                Flight App •
+                <span id="footerYear"></span>
+
+            </div>
+
         </div>
 
-        <aside class="side-stack">
-            <article class="card">
-                <div class="card-head">
-                    <h2>Saved plans</h2>
-                    <p>Plans stored in the Flight-app backend.</p>
-                </div>
-                <div class="saved-list" id="savedPlans">
-                    <div class="saved-empty">Loading saved plans…</div>
-                </div>
-            </article>
+    </footer>
 
-            <div class="info">
-                <strong>About the calculation</strong>
-                Distance is calculated as great-circle distance between the airport coordinates.
-                Estimated time is an approximation based on the selected aircraft's cruise-speed
-                assumption where available. It is not an operational dispatch calculation.
+
+    <!-- =========================================================
+         SEARCH MODAL
+    ========================================================== -->
+
+    <div
+        class="modal-backdrop"
+        id="searchModal"
+    >
+
+        <div class="search-modal">
+
+
+            <div class="search-input-wrapper">
+
+                <i class="fa-solid fa-magnifying-glass"></i>
+
+                <input
+                    type="text"
+                    class="search-input"
+                    id="globalSearch"
+                    placeholder="Search airports, tools or pages..."
+                    autocomplete="off"
+                >
+
+                <button
+                    class="icon-button"
+                    id="closeSearch"
+                >
+
+                    <i class="fa-solid fa-xmark"></i>
+
+                </button>
+
             </div>
-        </aside>
-    </section>
-</main>
 
-<footer class="footer">
-    <div class="wrap footer-inner">
-        <span>Flight-app</span>
-        <span>Built for flight simulation</span>
+
+            <div
+                class="search-results"
+                id="searchResults"
+            ></div>
+
+        </div>
+
     </div>
-</footer>
 
-<div class="toast" id="toast"></div>
 
-<script>
-const API_BASE = "https://flight-app-api-g36e.onrender.com";
+    <!-- =========================================================
+         TOAST CONTAINER
+    ========================================================== -->
 
-const AIRPORTS = {
-    EHAM:{city:"Amsterdam",name:"Amsterdam Airport Schiphol",lat:52.3086,lon:4.7639},
-    EGLL:{city:"London",name:"London Heathrow",lat:51.4700,lon:-0.4543},
-    LFPG:{city:"Paris",name:"Paris Charles de Gaulle",lat:49.0097,lon:2.5479},
-    EDDF:{city:"Frankfurt",name:"Frankfurt Airport",lat:50.0379,lon:8.5622},
-    LIRF:{city:"Rome",name:"Rome Fiumicino",lat:41.8003,lon:12.2389},
-    LEBL:{city:"Barcelona",name:"Barcelona–El Prat",lat:41.2974,lon:2.0833},
-    EIDW:{city:"Dublin",name:"Dublin Airport",lat:53.4213,lon:-6.2701},
-    EKCH:{city:"Copenhagen",name:"Copenhagen Airport",lat:55.6181,lon:12.6560},
-    ESSA:{city:"Stockholm",name:"Stockholm Arlanda",lat:59.6519,lon:17.9186},
-    ENGM:{city:"Oslo",name:"Oslo Airport",lat:60.1976,lon:11.1004},
-    LPPT:{city:"Lisbon",name:"Humberto Delgado Airport",lat:38.7742,lon:-9.1342},
-    KJFK:{city:"New York",name:"John F. Kennedy International",lat:40.6413,lon:-73.7781},
-    KLAX:{city:"Los Angeles",name:"Los Angeles International",lat:33.9416,lon:-118.4085},
-    KORD:{city:"Chicago",name:"Chicago O'Hare",lat:41.9742,lon:-87.9073},
-    RJTT:{city:"Tokyo",name:"Tokyo Haneda",lat:35.5494,lon:139.7798},
-    OMDB:{city:"Dubai",name:"Dubai International",lat:25.2532,lon:55.3657}
-};
+    <div
+        class="toast-container"
+        id="toastContainer"
+    ></div>
 
-const SPEEDS = {
-    A319:450,A320:450,A20N:450,A321:450,A21N:450,
-    A332:470,A333:470,A339:470,A359:480,A35K:480,
-    B737:450,B737NG:450,B738:450,B38M:450,B739:450,
-    B744:490,B748:490,B772:490,B773:490,B77W:490,B789:490,B78X:490,
-    E170:430,E175:430,E190:430,E195:430
-};
 
-let currentPlan = null;
+    <!-- =========================================================
+         JAVASCRIPT
+    ========================================================== -->
 
-const $ = id => document.getElementById(id);
+    <script>
 
-function toast(message, error=false){
-    const el=$("toast");
-    el.textContent=message;
-    el.className="toast show"+(error?" error":"");
-    clearTimeout(window.toastTimer);
-    window.toastTimer=setTimeout(()=>el.className="toast",3200);
-}
+        /* =====================================================
+           FLIGHT APP CORE
+        ====================================================== */
 
-function normalizeICAO(value){
-    return value.trim().toUpperCase();
-}
+        const API_BASE = "https://flight-app-api-g36e.onrender.com";
 
-function haversineNM(a,b){
-    const R=3440.065;
-    const rad=x=>x*Math.PI/180;
-    const dLat=rad(b.lat-a.lat);
-    const dLon=rad(b.lon-a.lon);
-    const x=Math.sin(dLat/2)**2+
-        Math.cos(rad(a.lat))*Math.cos(rad(b.lat))*Math.sin(dLon/2)**2;
-    return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));
-}
+        async function apiFetch(endpoint, options = {}) {
+            const response = await fetch(`${API_BASE}${endpoint}`, {
+                ...options,
+                headers: {
+                    "Accept": "application/json",
+                    ...(options.headers || {})
+                }
+            });
 
-function formatDuration(minutes){
-    if(!Number.isFinite(minutes)) return "—";
-    const h=Math.floor(minutes/60);
-    const m=Math.round(minutes%60);
-    return h ? `${h}h ${String(m).padStart(2,"0")}m` : `${m}m`;
-}
+            let data = null;
+            try { data = await response.json(); } catch { data = null; }
 
-function setRouteStatus(text, ready=false){
-    $("routeStatus").className="status"+(ready?" ready":"");
-    $("routeStatus").innerHTML=`<span class="sdot"></span> ${text}`;
-}
+            if (!response.ok) {
+                throw new Error(data?.error || data?.message || `HTTP ${response.status}`);
+            }
 
-async function calculateRoute(){
-    const dep=normalizeICAO($("departure").value);
-    const arr=normalizeICAO($("arrival").value);
-    const aircraft=normalizeICAO($("aircraft").value);
-
-    $("departure").value=dep;
-    $("arrival").value=arr;
-    $("aircraft").value=aircraft;
-
-    if(!dep || !arr){
-        toast("Enter both departure and arrival ICAO codes.",true);
-        return;
-    }
-    if(dep===arr){
-        toast("Departure and arrival cannot be the same airport.",true);
-        return;
-    }
-
-    setRouteStatus("Calculating…");
-    const depData=AIRPORTS[dep];
-    const arrData=AIRPORTS[arr];
-
-    if(!depData || !arrData){
-        $("depDisplay").textContent=dep;
-        $("arrDisplay").textContent=arr;
-        $("depCity").textContent=depData?.city || "Unavailable";
-        $("arrCity").textContent=arrData?.city || "Unavailable";
-        $("distance").textContent="Unavailable";
-        $("duration").textContent="Unavailable";
-        $("aircraftDisplay").textContent=aircraft || "—";
-        $("saveBtn").disabled=true;
-        setRouteStatus("Airport data unavailable");
-        toast("This planner currently has no coordinate data for one or both airports.",true);
-        currentPlan=null;
-        return;
-    }
-
-    const distance=haversineNM(depData,arrData);
-    const speed=SPEEDS[aircraft];
-    const minutes=speed ? (distance/speed)*60+30 : null;
-
-    $("depDisplay").textContent=dep;
-    $("arrDisplay").textContent=arr;
-    $("depCity").textContent=depData.city;
-    $("arrCity").textContent=arrData.city;
-    $("distance").textContent=`${Math.round(distance).toLocaleString()} NM`;
-    $("duration").textContent=minutes ? formatDuration(minutes) : "Unavailable";
-    $("aircraftDisplay").textContent=aircraft || "Not selected";
-
-    currentPlan={
-        departure_icao:dep,
-        arrival_icao:arr,
-        aircraft_icao:aircraft || null,
-        cruise_altitude:$("altitude").value ? Number($("altitude").value) : null,
-        route:$("route").value.trim() || null,
-        distance_nm:Number(distance.toFixed(2)),
-        estimated_minutes:minutes ? Math.round(minutes) : null
-    };
-
-    $("saveBtn").disabled=false;
-    setRouteStatus("Route calculated",true);
-}
-
-async function savePlan(){
-    if(!currentPlan) return;
-
-    const name=$("planName").value.trim() ||
-        `${currentPlan.departure_icao} → ${currentPlan.arrival_icao}`;
-
-    try{
-        $("saveBtn").disabled=true;
-        const response=await fetch(`${API_BASE}/api/plans`,{
-            method:"POST",
-            headers:{"Content-Type":"application/json"},
-            body:JSON.stringify({...currentPlan,name})
-        });
-
-        const data=await response.json();
-        if(!response.ok) throw new Error(data.error || "Could not save plan.");
-
-        toast("Flight plan saved.");
-        await loadPlans();
-    }catch(error){
-        console.error(error);
-        toast(error.message || "Could not save the plan.",true);
-    }finally{
-        $("saveBtn").disabled=false;
-    }
-}
-
-async function loadPlans(){
-    const list=$("savedPlans");
-    try{
-        const response=await fetch(`${API_BASE}/api/plans`);
-        const data=await response.json();
-        if(!response.ok) throw new Error(data.error || "Request failed.");
-
-        const plans=Array.isArray(data) ? data : (data.plans || []);
-        if(!plans.length){
-            list.innerHTML='<div class="saved-empty">No saved plans yet.</div>';
-            return;
+            return data;
         }
 
-        list.innerHTML=plans.map(plan=>`
-            <div class="saved-item">
-                <div>
-                    <div class="saved-route">${escapeHTML(plan.departure_icao || "----")} → ${escapeHTML(plan.arrival_icao || "----")}</div>
-                    <div class="saved-meta">
-                        ${escapeHTML(plan.name || "Unnamed plan")}
-                        ${plan.distance_nm ? ` · ${Math.round(Number(plan.distance_nm))} NM` : ""}
+        const FlightApp = {
+
+            currentSimBriefOFP: null,
+
+
+            /* =================================================
+               STORAGE KEYS
+            ================================================== */
+
+            keys: {
+
+                flights:
+                    "flightapp_flights",
+
+                settings:
+                    "flightapp_settings",
+
+                theme:
+                    "flightapp_theme"
+
+            },
+
+
+            /* =================================================
+               AIRPORT DATABASE
+            ================================================== */
+
+            airports: {
+
+                EHAM: {
+                    icao: "EHAM",
+                    name: "Amsterdam Schiphol",
+                    city: "Amsterdam",
+                    country: "Netherlands",
+                    lat: 52.3086,
+                    lon: 4.7639
+                },
+
+                LEBL: {
+                    icao: "LEBL",
+                    name: "Barcelona El Prat",
+                    city: "Barcelona",
+                    country: "Spain",
+                    lat: 41.2974,
+                    lon: 2.0833
+                },
+
+                EGLL: {
+                    icao: "EGLL",
+                    name: "London Heathrow",
+                    city: "London",
+                    country: "United Kingdom",
+                    lat: 51.4700,
+                    lon: -0.4543
+                },
+
+                LFPG: {
+                    icao: "LFPG",
+                    name: "Paris Charles de Gaulle",
+                    city: "Paris",
+                    country: "France",
+                    lat: 49.0097,
+                    lon: 2.5479
+                },
+
+                EDDF: {
+                    icao: "EDDF",
+                    name: "Frankfurt Airport",
+                    city: "Frankfurt",
+                    country: "Germany",
+                    lat: 50.0379,
+                    lon: 8.5622
+                },
+
+                LOWW: {
+                    icao: "LOWW",
+                    name: "Vienna International",
+                    city: "Vienna",
+                    country: "Austria",
+                    lat: 48.1103,
+                    lon: 16.5697
+                },
+
+                LIRF: {
+                    icao: "LIRF",
+                    name: "Rome Fiumicino",
+                    city: "Rome",
+                    country: "Italy",
+                    lat: 41.8003,
+                    lon: 12.2389
+                },
+
+                ESSA: {
+                    icao: "ESSA",
+                    name: "Stockholm Arlanda",
+                    city: "Stockholm",
+                    country: "Sweden",
+                    lat: 59.6519,
+                    lon: 17.9186
+                },
+
+                LPPT: {
+                    icao: "LPPT",
+                    name: "Lisbon Airport",
+                    city: "Lisbon",
+                    country: "Portugal",
+                    lat: 38.7742,
+                    lon: -9.1342
+                },
+
+                KJFK: {
+                    icao: "KJFK",
+                    name: "John F. Kennedy International",
+                    city: "New York",
+                    country: "United States",
+                    lat: 40.6413,
+                    lon: -73.7781
+                },
+
+                KLAX: {
+                    icao: "KLAX",
+                    name: "Los Angeles International",
+                    city: "Los Angeles",
+                    country: "United States",
+                    lat: 33.9416,
+                    lon: -118.4085
+                },
+
+                KSEA: {
+                    icao: "KSEA",
+                    name: "Seattle-Tacoma International",
+                    city: "Seattle",
+                    country: "United States",
+                    lat: 47.4502,
+                    lon: -122.3088
+                },
+
+                RJTT: {
+                    icao: "RJTT",
+                    name: "Tokyo Haneda",
+                    city: "Tokyo",
+                    country: "Japan",
+                    lat: 35.5494,
+                    lon: 139.7798
+                },
+
+                YSSY: {
+                    icao: "YSSY",
+                    name: "Sydney Kingsford Smith",
+                    city: "Sydney",
+                    country: "Australia",
+                    lat: -33.9399,
+                    lon: 151.1753
+                },
+
+                OMDB: {
+                    icao: "OMDB",
+                    name: "Dubai International",
+                    city: "Dubai",
+                    country: "United Arab Emirates",
+                    lat: 25.2532,
+                    lon: 55.3657
+                },
+
+                CYYZ: {
+                    icao: "CYYZ",
+                    name: "Toronto Pearson",
+                    city: "Toronto",
+                    country: "Canada",
+                    lat: 43.6777,
+                    lon: -79.6248
+                },
+
+                EDDM: {
+                    icao: "EDDM",
+                    name: "Munich Airport",
+                    city: "Munich",
+                    country: "Germany",
+                    lat: 48.3538,
+                    lon: 11.7861
+                },
+
+                ENGM: {
+                    icao: "ENGM",
+                    name: "Oslo Gardermoen",
+                    city: "Oslo",
+                    country: "Norway",
+                    lat: 60.1976,
+                    lon: 11.1004
+                },
+
+                EKCH: {
+                    icao: "EKCH",
+                    name: "Copenhagen Airport",
+                    city: "Copenhagen",
+                    country: "Denmark",
+                    lat: 55.6180,
+                    lon: 12.6508
+                }
+
+            },
+
+
+            /* =================================================
+               AIRCRAFT
+            ================================================== */
+
+            aircraft: {
+
+                A320: {
+                    name: "Airbus A320",
+                    cruise: 440,
+                    burn: 2.5
+                },
+
+                A20N: {
+                    name: "Airbus A320neo",
+                    cruise: 450,
+                    burn: 2.35
+                },
+
+                A21N: {
+                    name: "Airbus A321neo",
+                    cruise: 450,
+                    burn: 2.65
+                },
+
+                A350: {
+                    name: "Airbus A350-900",
+                    cruise: 480,
+                    burn: 5.4
+                },
+
+                B738: {
+                    name: "Boeing 737-800",
+                    cruise: 440,
+                    burn: 2.55
+                },
+
+                B38M: {
+                    name: "Boeing 737 MAX 8",
+                    cruise: 455,
+                    burn: 2.35
+                }
+
+            },
+
+
+            /* =================================================
+               INITIALIZE
+            ================================================== */
+
+            init() {
+
+                this.ensureStorage();
+
+                this.setupPlanner();
+
+                this.setupNavigation();
+
+                this.setupSearch();
+
+                this.setupTheme();
+
+                this.setupButtons();
+
+                this.renderFlights();
+
+                this.renderStatistics();
+
+                this.updateFooter();
+
+                this.updatePreview();
+
+            },
+
+
+            /* =================================================
+               STORAGE
+            ================================================== */
+
+            ensureStorage() {
+
+                if (
+                    !localStorage.getItem(
+                        this.keys.flights
+                    )
+                ) {
+
+                    localStorage.setItem(
+                        this.keys.flights,
+                        JSON.stringify([])
+                    );
+
+                }
+
+            },
+
+
+            getFlights() {
+
+                try {
+
+                    return JSON.parse(
+                        localStorage.getItem(
+                            this.keys.flights
+                        )
+                    ) || [];
+
+                } catch {
+
+                    return [];
+
+                }
+
+            },
+
+
+            saveFlight(flight) {
+
+                const flights =
+                    this.getFlights();
+
+                flights.unshift(flight);
+
+                localStorage.setItem(
+                    this.keys.flights,
+                    JSON.stringify(flights)
+                );
+
+            },
+
+
+            /* =================================================
+               GEO
+            ================================================== */
+
+            radians(value) {
+
+                return value *
+                    Math.PI /
+                    180;
+
+            },
+
+
+            distance(
+                lat1,
+                lon1,
+                lat2,
+                lon2
+            ) {
+
+                const radius =
+                    6371;
+
+                const dLat =
+                    this.radians(
+                        lat2 - lat1
+                    );
+
+                const dLon =
+                    this.radians(
+                        lon2 - lon1
+                    );
+
+                const a =
+                    Math.sin(dLat / 2) ** 2 +
+                    Math.cos(
+                        this.radians(lat1)
+                    ) *
+                    Math.cos(
+                        this.radians(lat2)
+                    ) *
+                    Math.sin(dLon / 2) ** 2;
+
+                const c =
+                    2 *
+                    Math.atan2(
+                        Math.sqrt(a),
+                        Math.sqrt(1 - a)
+                    );
+
+                const km =
+                    radius * c;
+
+                return km * 0.539957;
+
+            },
+
+
+            bearing(
+                lat1,
+                lon1,
+                lat2,
+                lon2
+            ) {
+
+                const phi1 =
+                    this.radians(lat1);
+
+                const phi2 =
+                    this.radians(lat2);
+
+                const delta =
+                    this.radians(
+                        lon2 - lon1
+                    );
+
+                const y =
+                    Math.sin(delta) *
+                    Math.cos(phi2);
+
+                const x =
+                    Math.cos(phi1) *
+                    Math.sin(phi2) -
+                    Math.sin(phi1) *
+                    Math.cos(phi2) *
+                    Math.cos(delta);
+
+                return (
+                    Math.atan2(y, x) *
+                    180 /
+                    Math.PI +
+                    360
+                ) % 360;
+
+            },
+
+
+            /* =================================================
+               TIME
+            ================================================== */
+
+            calculateFlightTime(
+                distance,
+                aircraftCode
+            ) {
+
+                const aircraft =
+                    this.aircraft[
+                        aircraftCode
+                    ];
+
+                const speed =
+                    aircraft
+                        ? aircraft.cruise
+                        : 440;
+
+                const minutes =
+                    Math.round(
+                        distance /
+                        speed *
+                        60
+                    );
+
+                const hours =
+                    Math.floor(
+                        minutes / 60
+                    );
+
+                const remaining =
+                    minutes % 60;
+
+                return {
+
+                    minutes,
+
+                    formatted:
+                        String(hours)
+                            .padStart(2, "0")
+                        + ":" +
+                        String(remaining)
+                            .padStart(2, "0"),
+
+                    readable:
+                        `${hours}h ${String(remaining).padStart(2,"0")}m`
+
+                };
+
+            },
+
+
+            /* =================================================
+               AIRPORT LOOKUP
+            ================================================== */
+
+            lookupAirport(code) {
+
+                return this.airports[
+                    code
+                        .trim()
+                        .toUpperCase()
+                ];
+
+            },
+
+
+            /* =================================================
+               PLANNER
+            ================================================== */
+
+            setupPlanner() {
+                const username = document.getElementById("simbriefUsername");
+                const importButton = document.getElementById("simbriefImportButton");
+                const saveButton = document.getElementById("saveSimBriefButton");
+
+                if (!username || !importButton) return;
+
+                username.value = localStorage.getItem("flightapp_simbrief_username") || "";
+
+                username.addEventListener("input", () => {
+                    localStorage.setItem("flightapp_simbrief_username", username.value.trim());
+                });
+
+                importButton.addEventListener("click", () => this.importSimBriefOFP());
+
+                if (saveButton) {
+                    saveButton.addEventListener("click", () => this.saveSimBriefPlan());
+                }
+            },
+
+            async importSimBriefOFP() {
+                const username = document.getElementById("simbriefUsername")?.value.trim();
+                const status = document.getElementById("simbriefStatus");
+                const result = document.getElementById("simbriefResult");
+                const button = document.getElementById("simbriefImportButton");
+
+                if (!username) {
+                    if (status) status.textContent = "Enter your SimBrief username";
+                    this.toast("SimBrief username required", "Enter your SimBrief username first.", "warning");
+                    return;
+                }
+
+                localStorage.setItem("flightapp_simbrief_username", username);
+                button.disabled = true;
+                if (status) status.textContent = "Loading latest OFP…";
+
+                try {
+                    const data = await apiFetch(`/api/simbrief/latest?username=${encodeURIComponent(username)}`);
+
+                    if (!data?.available || !data.ofp) {
+                        throw new Error(data?.error || "SimBrief data is not available.");
+                    }
+
+                    this.currentSimBriefOFP = data.ofp;
+                    this.renderSimBriefOFP(data.ofp);
+                    result?.classList.remove("hidden");
+                    if (status) status.textContent = "Latest OFP imported";
+                    this.toast("SimBrief imported", "The latest OFP is ready to use.");
+                } catch (error) {
+                    this.currentSimBriefOFP = null;
+                    result?.classList.add("hidden");
+                    if (status) status.textContent = "Not available";
+                    this.toast("SimBrief unavailable", error.message || "No SimBrief data available.", "warning");
+                } finally {
+                    button.disabled = false;
+                }
+            },
+
+            ofpValue(ofp, paths) {
+                for (const path of paths) {
+                    let value = ofp;
+                    for (const key of path.split(".")) {
+                        if (value == null) break;
+                        value = value[key];
+                    }
+                    if (value != null && String(value).trim() !== "") return value;
+                }
+                return null;
+            },
+
+            formatOFPTime(value) {
+                if (value == null || value === "") return "Not available";
+                const n = Number(value);
+                if (Number.isFinite(n) && n > 0) {
+                    const h = Math.floor(n / 60);
+                    const m = n % 60;
+                    return `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}`;
+                }
+                const text = String(value);
+                return /^\d{3,4}$/.test(text) ? `${text.padStart(4,"0").slice(0,-2)}:${text.padStart(4,"0").slice(-2)}` : text;
+            },
+
+            formatDistance(value) {
+                if (value == null || value === "") return "Not available";
+                const n = Number(value);
+                return Number.isFinite(n) ? `${Math.round(n).toLocaleString()} NM` : String(value);
+            },
+
+            renderSimBriefOFP(ofp) {
+                const dep = this.ofpValue(ofp, ["origin.icao_code", "general.origin", "origin"]);
+                const arr = this.ofpValue(ofp, ["destination.icao_code", "general.destination", "destination"]);
+                const flight = this.ofpValue(ofp, ["general.flight_number", "general.flightno", "flight_number"]);
+                const aircraft = this.ofpValue(ofp, ["aircraft.icaocode", "general.type", "aircraft.type"]);
+                const distance = this.ofpValue(ofp, ["general.air_distance", "general.air_distance_nm", "general.distance"]);
+                const time = this.ofpValue(ofp, ["general.enroute_time", "general.air_time", "general.flight_time"]);
+                const altitude = this.ofpValue(ofp, ["general.initial_altitude", "general.cruise_altitude", "general.cruise_alt"]);
+                const ofpId = this.ofpValue(ofp, ["general.ofp_id", "general.release", "ofp_id"]);
+                const route = this.ofpValue(ofp, ["general.route", "route", "navlog.route"]);
+
+                const set = (id, value) => {
+                    const el = document.getElementById(id);
+                    if (el) el.textContent = value == null || String(value).trim() === "" ? "Not available" : String(value);
+                };
+
+                set("simbriefRoute", dep && arr ? `${dep} → ${arr}` : "Not available");
+                set("simbriefFlightNumber", flight);
+                set("simbriefAircraft", aircraft);
+                set("simbriefDistance", this.formatDistance(distance));
+                set("simbriefTime", this.formatOFPTime(time));
+                set("simbriefAltitude", altitude ? `${altitude} ft` : null);
+                set("simbriefOfpId", ofpId);
+                set("simbriefRouteText", route);
+                set("simbriefResultStatus", dep && arr ? "Available" : "Partially available");
+            },
+
+            async saveSimBriefPlan() {
+                const ofp = this.currentSimBriefOFP;
+                if (!ofp) {
+                    this.toast("No OFP loaded", "Import a SimBrief OFP first.", "warning");
+                    return;
+                }
+
+                const departure = this.ofpValue(ofp, ["origin.icao_code", "general.origin", "origin"]);
+                const arrival = this.ofpValue(ofp, ["destination.icao_code", "general.destination", "destination"]);
+
+                if (!departure || !arrival) {
+                    this.toast("Flight not saved", "Departure or arrival is not available in the OFP.", "warning");
+                    return;
+                }
+
+                const payload = {
+                    name: this.ofpValue(ofp, ["general.flight_number", "general.flightno"]) || `${departure} → ${arrival}`,
+                    departure_icao: departure,
+                    arrival_icao: arrival,
+                    aircraft_icao: this.ofpValue(ofp, ["aircraft.icaocode", "general.type", "aircraft.type"]),
+                    cruise_altitude: Number(String(this.ofpValue(ofp, ["general.initial_altitude", "general.cruise_altitude"]) || "").replace(/[^0-9]/g, "")) || null,
+                    route: this.ofpValue(ofp, ["general.route", "route", "navlog.route"]),
+                    distance_nm: Number(this.ofpValue(ofp, ["general.air_distance", "general.air_distance_nm", "general.distance"])) || null,
+                    estimated_minutes: Number(this.ofpValue(ofp, ["general.enroute_time", "general.air_time", "general.flight_time"])) || null,
+                    simbrief_ofp_id: this.ofpValue(ofp, ["general.ofp_id", "general.release", "ofp_id"])
+                };
+
+                try {
+                    await apiFetch("/api/plans", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(payload)
+                    });
+                    this.toast("Flight plan saved", `${departure} → ${arrival} was saved to the backend.`);
+                } catch (error) {
+                    this.toast("Save failed", error.message || "The backend could not save the plan.", "warning");
+                }
+            },
+
+            updatePreview() {
+                // Planning is SimBrief-only. No local or estimated flight data is generated.
+                return;
+            },
+
+            /* =================================================
+               RENDER FLIGHTS
+            ================================================== */
+
+            renderFlights() {
+
+                const container =
+                    document.getElementById(
+                        "flightList"
+                    );
+
+                if (!container) {
+                    return;
+                }
+
+
+                const flights =
+                    this.getFlights();
+
+
+                if (!flights.length) {
+
+                    container.innerHTML = `
+
+                        <div class="empty-state">
+
+                            <i class="fa-solid fa-plane"></i>
+
+                            <strong>
+                                No flights yet
+                            </strong>
+
+                            <span>
+                                Plan your first flight above to start your logbook.
+                            </span>
+
+                        </div>
+
+                    `;
+
+                    return;
+
+                }
+
+
+                container.innerHTML =
+                    flights
+                        .slice(0, 5)
+                        .map(
+                            flight => {
+
+                                const date =
+                                    new Date(
+                                        flight.createdAt
+                                    );
+
+
+                                return `
+
+                                    <div class="flight-row">
+
+                                        <div class="flight-aircraft">
+
+                                            <i class="fa-solid fa-plane"></i>
+
+                                        </div>
+
+
+                                        <div>
+
+                                            <div class="flight-route-small">
+
+                                                ${this.escape(
+                                                    flight.departure
+                                                )}
+
+                                                <i class="fa-solid fa-arrow-right"></i>
+
+                                                ${this.escape(
+                                                    flight.arrival
+                                                )}
+
+                                            </div>
+
+                                            <div class="flight-date">
+
+                                                ${date.toLocaleDateString(
+                                                    undefined,
+                                                    {
+                                                        day: "numeric",
+                                                        month: "short",
+                                                        year: "numeric"
+                                                    }
+                                                )}
+
+                                            </div>
+
+                                        </div>
+
+
+                                        <div class="flight-detail">
+
+                                            ${this.escape(
+                                                flight.aircraft
+                                            )}
+
+                                        </div>
+
+
+                                        <div class="flight-detail">
+
+                                            ${this.formatMinutes(
+                                                flight.flightTime
+                                            )}
+
+                                        </div>
+
+
+                                        <div>
+
+                                            <span class="flight-status">
+                                                Planned
+                                            </span>
+
+                                        </div>
+
+                                    </div>
+
+                                `;
+
+                            }
+                        )
+                        .join("");
+
+            },
+
+
+            /* =================================================
+               STATISTICS
+            ================================================== */
+
+            renderStatistics() {
+
+                const flights =
+                    this.getFlights();
+
+
+                const totalFlights =
+                    flights.length;
+
+
+                const totalDistance =
+                    flights.reduce(
+                        (
+                            total,
+                            flight
+                        ) =>
+                            total +
+                            Number(
+                                flight.distance ||
+                                0
+                            ),
+                        0
+                    );
+
+
+                const totalTime =
+                    flights.reduce(
+                        (
+                            total,
+                            flight
+                        ) =>
+                            total +
+                            Number(
+                                flight.flightTime ||
+                                0
+                            ),
+                        0
+                    );
+
+
+                const airports =
+                    new Set();
+
+
+                const aircraft =
+                    new Set();
+
+
+                flights.forEach(
+                    flight => {
+
+                        if (
+                            flight.departure
+                        ) {
+
+                            airports.add(
+                                flight.departure
+                            );
+
+                        }
+
+                        if (
+                            flight.arrival
+                        ) {
+
+                            airports.add(
+                                flight.arrival
+                            );
+
+                        }
+
+                        if (
+                            flight.aircraft
+                        ) {
+
+                            aircraft.add(
+                                flight.aircraft
+                            );
+
+                        }
+
+                    }
+                );
+
+
+                document.getElementById(
+                    "totalFlights"
+                ).textContent =
+                    totalFlights;
+
+
+                document.getElementById(
+                    "totalDistance"
+                ).textContent =
+                    `${Math.round(totalDistance).toLocaleString()} NM`;
+
+
+                document.getElementById(
+                    "totalTime"
+                ).textContent =
+                    this.formatHours(
+                        totalTime
+                    );
+
+
+                document.getElementById(
+                    "uniqueAirports"
+                ).textContent =
+                    airports.size;
+
+
+                document.getElementById(
+                    "uniqueAircraft"
+                ).textContent =
+                    aircraft.size;
+
+
+                const growth =
+                    document.getElementById(
+                        "flightGrowth"
+                    );
+
+
+                if (totalFlights === 0) {
+
+                    growth.textContent =
+                        "Getting started";
+
+                } else if (
+                    totalFlights === 1
+                ) {
+
+                    growth.textContent =
+                        "1 flight logged";
+
+                } else {
+
+                    growth.textContent =
+                        `${totalFlights} flights logged`;
+
+                }
+
+            },
+
+
+            /* =================================================
+               NAVIGATION
+            ================================================== */
+
+            setupNavigation() {
+
+                const mobileButton =
+                    document.getElementById(
+                        "mobileMenuButton"
+                    );
+
+
+                if (!mobileButton) {
+                    return;
+                }
+
+
+                mobileButton.addEventListener(
+                    "click",
+                    () => {
+
+                        const links =
+                            document.querySelector(
+                                ".nav-links"
+                            );
+
+
+                        if (
+                            links.style.display ===
+                            "flex"
+                        ) {
+
+                            links.style.display =
+                                "";
+
+                        } else {
+
+                            links.style.display =
+                                "flex";
+
+                            links.style.position =
+                                "absolute";
+
+                            links.style.top =
+                                "68px";
+
+                            links.style.left =
+                                "14px";
+
+                            links.style.right =
+                                "14px";
+
+                            links.style.padding =
+                                "10px";
+
+                            links.style.flexDirection =
+                                "column";
+
+                            links.style.alignItems =
+                                "stretch";
+
+                            links.style.background =
+                                "white";
+
+                            links.style.border =
+                                "1px solid var(--border)";
+
+                            links.style.borderRadius =
+                                "15px";
+
+                            links.style.boxShadow =
+                                "var(--shadow-md)";
+
+                        }
+
+                    }
+                );
+
+            },
+
+
+            /* =================================================
+               SEARCH
+            ================================================== */
+
+            setupSearch() {
+
+                const modal =
+                    document.getElementById(
+                        "searchModal"
+                    );
+
+                const input =
+                    document.getElementById(
+                        "globalSearch"
+                    );
+
+                const button =
+                    document.getElementById(
+                        "searchButton"
+                    );
+
+                const close =
+                    document.getElementById(
+                        "closeSearch"
+                    );
+
+                const results =
+                    document.getElementById(
+                        "searchResults"
+                    );
+
+
+                const searchable = [
+
+                    {
+                        title: "Flight Planner",
+                        description:
+                            "Create and calculate a flight route.",
+                        icon:
+                            "fa-route",
+                        url:
+                            "planner.html"
+                    },
+
+                    {
+                        title: "Weather",
+                        description:
+                            "METAR, TAF and aviation weather.",
+                        icon:
+                            "fa-cloud-sun",
+                        url:
+                            "weather.html"
+                    },
+
+                    {
+                        title: "Airport Explorer",
+                        description:
+                            "Search airports and operational data.",
+                        icon:
+                            "fa-earth-europe",
+                        url:
+                            "airports.html"
+                    },
+
+                    {
+                        title: "Aircraft",
+                        description:
+                            "Aircraft specifications and information.",
+                        icon:
+                            "fa-plane",
+                        url:
+                            "aircraft.html"
+                    },
+
+                    {
+                        title: "Pilot Logbook",
+                        description:
+                            "View and manage your flights.",
+                        icon:
+                            "fa-book",
+                        url:
+                            "logbook.html"
+                    },
+
+                    {
+                        title: "Performance",
+                        description:
+                            "Aircraft performance calculations.",
+                        icon:
+                            "fa-gauge-high",
+                        url:
+                            "performance.html"
+                    },
+
+                    {
+                        title: "Navigation",
+                        description:
+                            "Navigation and heading tools.",
+                        icon:
+                            "fa-compass",
+                        url:
+                            "navigation.html"
+                    },
+
+                    {
+                        title: "Settings",
+                        description:
+                            "Configure Flight App.",
+                        icon:
+                            "fa-sliders",
+                        url:
+                            "settings.html"
+                    }
+
+                ];
+
+
+                const open = () => {
+
+                    modal.classList.add(
+                        "open"
+                    );
+
+                    document.body.classList.add(
+                        "modal-open"
+                    );
+
+                    input.focus();
+
+                    render(
+                        input.value
+                    );
+
+                };
+
+
+                const closeModal = () => {
+
+                    modal.classList.remove(
+                        "open"
+                    );
+
+                    document.body.classList.remove(
+                        "modal-open"
+                    );
+
+                };
+
+
+                const render = query => {
+
+                    const normalized =
+                        query
+                            .trim()
+                            .toLowerCase();
+
+
+                    const filtered =
+                        searchable.filter(
+                            item =>
+                                !normalized ||
+                                item.title
+                                    .toLowerCase()
+                                    .includes(
+                                        normalized
+                                    ) ||
+                                item.description
+                                    .toLowerCase()
+                                    .includes(
+                                        normalized
+                                    )
+                        );
+
+
+                    if (!filtered.length) {
+
+                        results.innerHTML = `
+
+                            <div class="search-empty">
+
+                                No results found.
+
+                            </div>
+
+                        `;
+
+                        return;
+
+                    }
+
+
+                    results.innerHTML =
+                        filtered
+                            .map(
+                                item => `
+
+                                    <a
+                                        href="${item.url}"
+                                        class="search-result"
+                                    >
+
+                                        <div class="search-result-icon">
+
+                                            <i class="fa-solid ${item.icon}"></i>
+
+                                        </div>
+
+                                        <div>
+
+                                            <strong>
+                                                ${this.escape(
+                                                    item.title
+                                                )}
+                                            </strong>
+
+                                            <span>
+                                                ${this.escape(
+                                                    item.description
+                                                )}
+                                            </span>
+
+                                        </div>
+
+                                    </a>
+
+                                `
+                            )
+                            .join("");
+
+                };
+
+
+                button.addEventListener(
+                    "click",
+                    open
+                );
+
+
+                close.addEventListener(
+                    "click",
+                    closeModal
+                );
+
+
+                modal.addEventListener(
+                    "click",
+                    event => {
+
+                        if (
+                            event.target ===
+                            modal
+                        ) {
+
+                            closeModal();
+
+                        }
+
+                    }
+                );
+
+
+                input.addEventListener(
+                    "input",
+                    () => {
+
+                        render(
+                            input.value
+                        );
+
+                    }
+                );
+
+
+                document.addEventListener(
+                    "keydown",
+                    event => {
+
+                        if (
+                            event.key ===
+                            "/" &&
+                            document.activeElement !==
+                            input
+                        ) {
+
+                            event.preventDefault();
+
+                            open();
+
+                        }
+
+
+                        if (
+                            event.key ===
+                            "Escape"
+                        ) {
+
+                            closeModal();
+
+                        }
+
+                    }
+                );
+
+            },
+
+
+            /* =================================================
+               THEME
+            ================================================== */
+
+            setupTheme() {
+
+                const button =
+                    document.getElementById(
+                        "themeButton"
+                    );
+
+
+                const saved =
+                    localStorage.getItem(
+                        this.keys.theme
+                    );
+
+
+                if (
+                    saved ===
+                    "dark"
+                ) {
+
+                    this.enableDarkTheme();
+
+                }
+
+
+                button.addEventListener(
+                    "click",
+                    () => {
+
+                        const current =
+                            localStorage.getItem(
+                                this.keys.theme
+                            );
+
+
+                        if (
+                            current ===
+                            "dark"
+                        ) {
+
+                            this.disableDarkTheme();
+
+                        } else {
+
+                            this.enableDarkTheme();
+
+                        }
+
+                    }
+                );
+
+            },
+
+
+            enableDarkTheme() {
+
+                document.documentElement
+                    .style
+                    .setProperty(
+                        "--background",
+                        "#0d1424"
+                    );
+
+                document.documentElement
+                    .style
+                    .setProperty(
+                        "--surface",
+                        "#131d31"
+                    );
+
+                document.documentElement
+                    .style
+                    .setProperty(
+                        "--surface-2",
+                        "#172238"
+                    );
+
+                document.documentElement
+                    .style
+                    .setProperty(
+                        "--surface-3",
+                        "#1d2941"
+                    );
+
+                document.documentElement
+                    .style
+                    .setProperty(
+                        "--text",
+                        "#f4f7fb"
+                    );
+
+                document.documentElement
+                    .style
+                    .setProperty(
+                        "--text-secondary",
+                        "#aab6c8"
+                    );
+
+                document.documentElement
+                    .style
+                    .setProperty(
+                        "--text-muted",
+                        "#718097"
+                    );
+
+                document.documentElement
+                    .style
+                    .setProperty(
+                        "--border",
+                        "#25334b"
+                    );
+
+
+                document
+                    .getElementById(
+                        "themeButton"
+                    )
+                    .innerHTML =
+                    `<i class="fa-solid fa-sun"></i>`;
+
+
+                localStorage.setItem(
+                    this.keys.theme,
+                    "dark"
+                );
+
+            },
+
+
+            disableDarkTheme() {
+
+                location.reload();
+
+                localStorage.removeItem(
+                    this.keys.theme
+                );
+
+            },
+
+
+            /* =================================================
+               BUTTONS
+            ================================================== */
+
+            setupButtons() {
+
+                const explore =
+                    document.getElementById(
+                        "exploreButton"
+                    );
+
+
+                explore.addEventListener(
+                    "click",
+                    () => {
+
+                        document
+                            .getElementById(
+                                "features"
+                            )
+                            .scrollIntoView({
+                                behavior:
+                                    "smooth"
+                            });
+
+                    }
+                );
+
+
+                document
+                    .getElementById(
+                        "notificationButton"
+                    )
+                    .addEventListener(
+                        "click",
+                        () => {
+
+                            document
+                                .getElementById(
+                                    "notificationDot"
+                                )
+                                .style.display =
+                                "none";
+
+
+                            this.toast(
+                                "All caught up",
+                                "There are no new notifications."
+                            );
+
+                        }
+                    );
+
+
+                document
+                    .getElementById(
+                        "profileButton"
+                    )
+                    .addEventListener(
+                        "click",
+                        () => {
+
+                            this.toast(
+                                "Pilot profile",
+                                "Profile management will be available through Settings."
+                            );
+
+                        }
+                    );
+
+            },
+
+
+            /* =================================================
+               TOAST
+            ================================================== */
+
+            toast(
+                title,
+                message,
+                type = "success"
+            ) {
+
+                const container =
+                    document.getElementById(
+                        "toastContainer"
+                    );
+
+
+                const toast =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                toast.className =
+                    `toast ${
+                        type === "warning"
+                            ? "warning"
+                            : ""
+                    }`;
+
+
+                toast.innerHTML = `
+
+                    <div class="toast-icon">
+
+                        <i class="fa-solid ${
+                            type === "warning"
+                                ? "fa-triangle-exclamation"
+                                : "fa-check"
+                        }"></i>
+
                     </div>
-                </div>
-                <button class="icon-btn" title="Delete plan" onclick="deletePlan(${Number(plan.id)})">×</button>
-            </div>
-        `).join("");
-    }catch(error){
-        console.error(error);
-        list.innerHTML='<div class="saved-empty">Saved plans unavailable.</div>';
-    }
-}
 
-async function deletePlan(id){
-    if(!confirm("Delete this saved plan?")) return;
-    try{
-        const response=await fetch(`${API_BASE}/api/plans/${encodeURIComponent(id)}`,{method:"DELETE"});
-        const data=await response.json().catch(()=>({}));
-        if(!response.ok) throw new Error(data.error || "Could not delete plan.");
-        toast("Plan deleted.");
-        loadPlans();
-    }catch(error){
-        toast(error.message || "Could not delete plan.",true);
-    }
-}
+                    <div>
 
-function escapeHTML(value){
-    return String(value).replace(/[&<>"']/g,char=>({
-        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
-    }[char]));
-}
+                        <span class="toast-title">
+                            ${this.escape(title)}
+                        </span>
 
-$("plannerForm").addEventListener("submit",event=>{
-    event.preventDefault();
-    calculateRoute();
-});
+                        <span class="toast-message">
+                            ${this.escape(message)}
+                        </span>
 
-$("saveBtn").addEventListener("click",savePlan);
+                    </div>
 
-$("swapBtn").addEventListener("click",()=>{
-    const dep=$("departure").value;
-    $("departure").value=$("arrival").value;
-    $("arrival").value=dep;
-    if($("departure").value && $("arrival").value) calculateRoute();
-});
+                `;
 
-$("clearBtn").addEventListener("click",()=>{
-    $("plannerForm").reset();
-    ["depDisplay","arrDisplay"].forEach(id=>$(id).textContent="----");
-    $("depCity").textContent="Departure";
-    $("arrCity").textContent="Arrival";
-    $("distance").textContent="—";
-    $("duration").textContent="—";
-    $("aircraftDisplay").textContent="—";
-    $("saveBtn").disabled=true;
-    currentPlan=null;
-    setRouteStatus("Waiting for route");
-});
 
-$("navToggle").addEventListener("click",()=>$("nav").classList.toggle("open"));
+                container.appendChild(
+                    toast
+                );
 
-loadPlans();
-</script>
+
+                setTimeout(
+                    () => {
+
+                        toast.style.opacity =
+                            "0";
+
+                        toast.style.transform =
+                            "translateY(10px)";
+
+                        setTimeout(
+                            () =>
+                                toast.remove(),
+                            250
+                        );
+
+                    },
+                    3500
+                );
+
+            },
+
+
+            /* =================================================
+               FOOTER
+            ================================================== */
+
+            updateFooter() {
+
+                document.getElementById(
+                    "footerYear"
+                ).textContent =
+                    new Date()
+                        .getFullYear();
+
+            },
+
+
+            /* =================================================
+               FORMATTING
+            ================================================== */
+
+            formatMinutes(minutes) {
+
+                const h =
+                    Math.floor(
+                        minutes / 60
+                    );
+
+                const m =
+                    minutes % 60;
+
+                return `${h}h ${String(m).padStart(2,"0")}m`;
+
+            },
+
+
+            formatHours(minutes) {
+
+                const h =
+                    Math.floor(
+                        minutes / 60
+                    );
+
+                const m =
+                    minutes % 60;
+
+
+                if (!h && !m) {
+                    return "0h";
+                }
+
+
+                if (!m) {
+                    return `${h}h`;
+                }
+
+
+                return `${h}h ${m}m`;
+
+            },
+
+
+            /* =================================================
+               ESCAPE HTML
+            ================================================== */
+
+            escape(value) {
+
+                return String(value)
+                    .replace(
+                        /[&<>"']/g,
+                        char => ({
+                            "&":
+                                "&amp;",
+                            "<":
+                                "&lt;",
+                            ">":
+                                "&gt;",
+                            '"':
+                                "&quot;",
+                            "'":
+                                "&#039;"
+                        }[char])
+                    );
+
+            }
+
+        };
+
+
+        /* =====================================================
+           START APPLICATION
+        ====================================================== */
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            () => {
+
+                FlightApp.init();
+
+            }
+        );
+
+    </script>
+
 </body>
 </html>
