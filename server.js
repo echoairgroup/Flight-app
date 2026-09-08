@@ -161,6 +161,61 @@ app.get("/api/database/test", async (req, res) => {
 
 /*
 |--------------------------------------------------------------------------
+| SIMBRIEF - LATEST OFP
+|--------------------------------------------------------------------------
+*/
+
+app.get("/api/simbrief/latest", async (req, res) => {
+    const username = String(
+        req.query.username || ""
+    ).trim();
+
+    if (!username) {
+        return res.status(400).json({
+            available: false,
+            error: "SimBrief username is required."
+        });
+    }
+
+    if (username.length > 80) {
+        return res.status(400).json({
+            available: false,
+            error: "Invalid SimBrief username."
+        });
+    }
+
+    try {
+        const url =
+            "https://www.simbrief.com/api/xml.fetcher.php" +
+            `?username=${encodeURIComponent(username)}&json=v2`;
+
+        console.log(
+            `Fetching latest SimBrief OFP for: ${username}`
+        );
+
+        const data = await fetchJSON(url);
+
+        return res.json({
+            available: true,
+            source: "SimBrief",
+            ofp: data
+        });
+    } catch (error) {
+        console.error(
+            "SimBrief OFP fetch failed:",
+            error.message
+        );
+
+        return res.status(502).json({
+            available: false,
+            error:
+                "SimBrief did not return a valid latest OFP."
+        });
+    }
+});
+
+/*
+|--------------------------------------------------------------------------
 | WEATHER - METAR
 |--------------------------------------------------------------------------
 */
@@ -217,7 +272,9 @@ app.get("/api/weather/:icao", async (req, res) => {
                 `,
                 [
                     icao,
-                    metar.rawOb || metar.raw_text || null,
+                    metar.rawOb ||
+                        metar.raw_text ||
+                        null,
                     JSON.stringify(metar)
                 ]
             );
@@ -305,7 +362,9 @@ app.get("/api/weather/:icao/taf", async (req, res) => {
                 `,
                 [
                     icao,
-                    taf.rawTAF || taf.raw_text || null,
+                    taf.rawTAF ||
+                        taf.raw_text ||
+                        null,
                     JSON.stringify(taf)
                 ]
             );
@@ -508,7 +567,8 @@ app.post("/api/plans", async (req, res) => {
         cruise_altitude,
         route,
         distance_nm,
-        estimated_minutes
+        estimated_minutes,
+        simbrief_ofp_id
     } = req.body;
 
     if (!name) {
@@ -530,7 +590,8 @@ app.post("/api/plans", async (req, res) => {
                 cruise_altitude,
                 route,
                 distance_nm,
-                estimated_minutes
+                estimated_minutes,
+                simbrief_ofp_id
             )
             VALUES
             (
@@ -541,7 +602,8 @@ app.post("/api/plans", async (req, res) => {
                 $5,
                 $6,
                 $7,
-                $8
+                $8,
+                $9
             )
             RETURNING *
             `,
@@ -553,7 +615,8 @@ app.post("/api/plans", async (req, res) => {
                 cruise_altitude || null,
                 route || null,
                 distance_nm || null,
-                estimated_minutes || null
+                estimated_minutes || null,
+                simbrief_ofp_id || null
             ]
         );
 
@@ -623,6 +686,43 @@ app.delete("/api/plans/:id", async (req, res) => {
             error: "Could not delete plan"
         });
     }
+});
+
+/*
+|--------------------------------------------------------------------------
+| ROOT
+|--------------------------------------------------------------------------
+*/
+
+app.get("/", async (req, res) => {
+    let database = "Unavailable";
+
+    try {
+        await pool.query("SELECT 1");
+        database = "Connected";
+    } catch (error) {
+        console.error(
+            "Root database check failed:",
+            error.message
+        );
+    }
+
+    res.json({
+        service: "Flight-app API",
+        status: "Online",
+        database,
+        version: "1.0.0",
+        endpoints: {
+            health: "/api/health",
+            databaseTest: "/api/database/test",
+            simbriefLatest: "/api/simbrief/latest?username=YOUR_USERNAME",
+            weather: "/api/weather/:icao",
+            taf: "/api/weather/:icao/taf",
+            cachedWeather: "/api/weather/:icao/cache",
+            airports: "/api/airports/:icao",
+            plans: "/api/plans"
+        }
+    });
 });
 
 /*
