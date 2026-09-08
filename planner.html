@@ -2,15 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Flight App</title>
-
     <meta
-        name="description"
-        content="Flight App - Your personal flight simulator companion."
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
     >
 
+    <title>Flight Planner | Flight App</title>
+
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
@@ -19,37 +18,33 @@
         rel="stylesheet"
     >
 
+    <!-- Font Awesome -->
     <link
         rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
     >
 
     <style>
         :root {
-            --background: #f4f7fb;
-            --surface: #ffffff;
-            --surface-soft: #f8fafc;
+            --bg: #f4f7fb;
+            --card: #ffffff;
             --text: #182230;
-            --text-muted: #6d7888;
-            --border: #e3e8ef;
+            --muted: #718096;
+            --border: #e4e9f0;
 
             --primary: #5b7cfa;
             --primary-dark: #4264e5;
+            --primary-light: #edf1ff;
 
-            --success: #21824c;
-            --danger: #c23d4b;
-            --warning: #b7791f;
+            --cyan: #4cc9e8;
+            --violet: #8b72f7;
 
-            --shadow-sm:
-                0 4px 14px rgba(25, 39, 63, 0.05);
+            --success: #1daf86;
+            --warning: #f3a83b;
+            --danger: #e85d68;
 
             --shadow:
-                0 14px 40px rgba(25, 39, 63, 0.08);
-
-            --radius: 16px;
-            --radius-lg: 22px;
-
-            --nav-height: 74px;
+                0 8px 30px rgba(28, 39, 60, 0.07);
         }
 
         * {
@@ -58,15 +53,11 @@
             padding: 0;
         }
 
-        html {
-            scroll-behavior: smooth;
-        }
-
         body {
-            font-family: "DM Sans", sans-serif;
-            background: var(--background);
+            background: var(--bg);
             color: var(--text);
-            line-height: 1.5;
+            font-family: "DM Sans", sans-serif;
+            min-height: 100vh;
         }
 
         button,
@@ -76,1064 +67,965 @@
             font: inherit;
         }
 
-        button,
-        a {
-            -webkit-tap-highlight-color: transparent;
-        }
-
         button {
             cursor: pointer;
         }
 
-        a {
-            color: inherit;
-            text-decoration: none;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        .container {
-            width: min(1180px, calc(100% - 40px));
-            margin: 0 auto;
-        }
-
-        /* ------------------------------------------------
+        /* =========================================================
            NAVBAR
-        ------------------------------------------------ */
+        ========================================================= */
 
         .navbar {
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            height: var(--nav-height);
-            background: rgba(255, 255, 255, 0.94);
-            backdrop-filter: blur(18px);
+            height: 72px;
+            background: white;
             border-bottom: 1px solid var(--border);
-        }
 
-        .nav-inner {
-            height: 100%;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 30px;
+
+            padding: 0 32px;
+
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
 
         .brand {
             display: flex;
             align-items: center;
-            gap: 11px;
-            font-family: "Manrope", sans-serif;
-            font-size: 19px;
-            font-weight: 800;
+            gap: 12px;
+
+            text-decoration: none;
+            color: var(--text);
         }
 
         .brand-icon {
             width: 38px;
             height: 38px;
-            display: grid;
-            place-items: center;
+
             border-radius: 11px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--primary),
+                    var(--violet)
+                );
+
             color: white;
-            background: var(--primary);
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 17px;
+        }
+
+        .brand-text {
+            font-family: "Manrope", sans-serif;
+            font-size: 18px;
+            font-weight: 800;
         }
 
         .nav-links {
             display: flex;
             align-items: center;
-            gap: 28px;
+            gap: 7px;
         }
 
-        .nav-links a {
-            color: var(--text-muted);
-            font-size: 13px;
-            font-weight: 700;
-            transition: color 0.2s ease;
+        .nav-link {
+            text-decoration: none;
+            color: #667085;
+
+            font-size: 14px;
+            font-weight: 600;
+
+            padding: 10px 13px;
+            border-radius: 9px;
+
+            transition: 0.2s;
         }
 
-        .nav-links a:hover,
-        .nav-links a.active {
+        .nav-link:hover {
             color: var(--text);
+            background: #f5f7fb;
         }
 
-        .nav-actions {
+        .nav-link.active {
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .profile-button {
+            width: 38px;
+            height: 38px;
+
+            border-radius: 50%;
+            border: none;
+
+            background: var(--primary-light);
+            color: var(--primary);
+
             display: flex;
-            align-items: center;
-            gap: 9px;
-        }
-
-        .nav-button {
-            width: 39px;
-            height: 39px;
-            display: grid;
-            place-items: center;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            background: var(--surface);
-            color: var(--text-muted);
-        }
-
-        .nav-button:hover {
-            color: var(--text);
-            border-color: #ccd4df;
-        }
-
-        /* ------------------------------------------------
-           BUTTONS
-        ------------------------------------------------ */
-
-        .btn {
-            min-height: 44px;
-            padding: 0 17px;
-            display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            border: 1px solid transparent;
-            border-radius: 10px;
+
+            margin-left: 7px;
+        }
+
+        /* =========================================================
+           PAGE
+        ========================================================= */
+
+        .page {
+            width: min(1250px, calc(100% - 40px));
+            margin: 0 auto;
+            padding: 38px 0 60px;
+        }
+
+        .page-header {
+            margin-bottom: 28px;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+
+            background: var(--primary-light);
+            color: var(--primary);
+
+            padding: 7px 11px;
+            border-radius: 20px;
+
             font-size: 12px;
+            font-weight: 700;
+
+            margin-bottom: 12px;
+        }
+
+        .page-header h1 {
+            font-family: "Manrope", sans-serif;
+            font-size: 32px;
             font-weight: 800;
-            transition:
-                transform 0.2s ease,
-                box-shadow 0.2s ease,
-                background 0.2s ease;
+            letter-spacing: -0.7px;
         }
 
-        .btn:hover {
-            transform: translateY(-1px);
+        .page-header p {
+            color: var(--muted);
+            margin-top: 7px;
+            font-size: 15px;
         }
 
-        .btn-primary {
-            color: white;
-            background: var(--primary);
-            box-shadow: 0 7px 18px rgba(91, 124, 250, 0.2);
-        }
+        /* =========================================================
+           LAYOUT
+        ========================================================= */
 
-        .btn-primary:hover {
-            background: var(--primary-dark);
-        }
-
-        .btn-secondary {
-            color: var(--text);
-            background: white;
-            border-color: var(--border);
-        }
-
-        .btn-secondary:hover {
-            background: var(--surface-soft);
-        }
-
-        /* ------------------------------------------------
-           HERO
-        ------------------------------------------------ */
-
-        .hero {
-            padding: 86px 0 70px;
-            background:
-                radial-gradient(
-                    circle at 85% 15%,
-                    rgba(91, 124, 250, 0.12),
-                    transparent 35%
-                ),
-                var(--background);
-        }
-
-        .hero-grid {
+        .planner-layout {
             display: grid;
-            grid-template-columns: 1.05fr 0.95fr;
-            align-items: center;
-            gap: 70px;
+            grid-template-columns: minmax(0, 1.65fr) minmax(320px, 0.85fr);
+            gap: 22px;
+            align-items: start;
         }
 
-        .hero-eyebrow,
-        .section-eyebrow {
-            margin-bottom: 13px;
-            color: var(--primary);
-            font-size: 10px;
-            font-weight: 800;
-            letter-spacing: 1.2px;
-            text-transform: uppercase;
-        }
-
-        .hero h1 {
-            max-width: 650px;
-            margin-bottom: 20px;
-            font-family: "Manrope", sans-serif;
-            font-size: clamp(42px, 5vw, 68px);
-            line-height: 1.04;
-            letter-spacing: -2.6px;
-        }
-
-        .hero-description {
-            max-width: 570px;
-            margin-bottom: 28px;
-            color: var(--text-muted);
-            font-size: 16px;
-        }
-
-        .hero-actions {
+        .left-column,
+        .right-column {
             display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
+            flex-direction: column;
+            gap: 20px;
         }
 
-        .hero-preview {
-            padding: 22px;
+        .card {
+            background: var(--card);
             border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
-            background: white;
+            border-radius: 17px;
             box-shadow: var(--shadow);
+            padding: 24px;
         }
 
-        .preview-header {
+        .card-header {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .preview-title {
-            font-size: 11px;
-            font-weight: 800;
-        }
-
-        .preview-status {
-            padding: 6px 9px;
-            border-radius: 8px;
-            color: var(--success);
-            background: #eef8f2;
-            font-size: 9px;
-            font-weight: 800;
-        }
-
-        .preview-route {
-            display: grid;
-            grid-template-columns: 1fr auto 1fr;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .airport {
-            padding: 15px;
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            background: var(--surface-soft);
-        }
-
-        .airport:last-child {
-            text-align: right;
-        }
-
-        .airport-code {
-            font-family: "Manrope", sans-serif;
-            font-size: 27px;
-            font-weight: 800;
-        }
-
-        .airport-name {
-            color: var(--text-muted);
-            font-size: 10px;
-        }
-
-        .preview-arrow {
-            color: var(--primary);
-        }
-
-        /* ------------------------------------------------
-           SECTIONS
-        ------------------------------------------------ */
-
-        section {
-            scroll-margin-top: 95px;
-        }
-
-        .section {
-            padding: 76px 0;
-        }
-
-        .section-header {
-            max-width: 650px;
-            margin-bottom: 28px;
-        }
-
-        .section-title {
-            margin-bottom: 8px;
-            font-family: "Manrope", sans-serif;
-            font-size: 30px;
-            letter-spacing: -0.8px;
-        }
-
-        .section-description {
-            color: var(--text-muted);
-            font-size: 13px;
-        }
-
-        /* ------------------------------------------------
-           PLANNER
-        ------------------------------------------------ */
-
-        .planner-section {
-            padding: 15px 0 75px;
-        }
-
-        .planner-card {
-            border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
-            background: white;
-            box-shadow: var(--shadow);
-        }
-
-        .planner-inner {
-            padding: 28px;
-        }
-
-        .simbrief-card {
-            padding: 0;
-        }
-
-        .simbrief-heading {
-            display: flex;
             justify-content: space-between;
-            align-items: flex-start;
-            gap: 24px;
+            gap: 15px;
+
             margin-bottom: 22px;
         }
 
-        .simbrief-badge {
-            flex-shrink: 0;
-            padding: 9px 12px;
-            border-radius: 10px;
-            background: #edf1ff;
-            color: var(--primary);
-            font-size: 10px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.6px;
-            transition: 0.2s ease;
-        }
-
-        .simbrief-badge.connected {
-            background: #eef8f2;
-            color: #21824c;
-        }
-
-        .simbrief-badge.disconnected {
-            background: #fff1f2;
-            color: #c23d4b;
-        }
-
-        .simbrief-badge.connecting {
-            background: #edf1ff;
-            color: var(--primary);
-        }
-
-        .simbrief-controls {
-            display: grid;
-            grid-template-columns: minmax(0, 1fr) auto auto;
-            gap: 10px;
-            align-items: stretch;
-        }
-
-        .planner-field {
-            min-height: 70px;
+        .card-title {
             display: flex;
             align-items: center;
-            gap: 13px;
-            padding: 12px 14px;
+            gap: 11px;
+
+            font-family: "Manrope", sans-serif;
+            font-size: 17px;
+            font-weight: 800;
+        }
+
+        .card-title-icon {
+            width: 34px;
+            height: 34px;
+
+            border-radius: 9px;
+
+            background: var(--primary-light);
+            color: var(--primary);
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 14px;
+        }
+
+        .section-label {
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 700;
+
+            text-transform: uppercase;
+            letter-spacing: 0.7px;
+
+            margin-bottom: 9px;
+        }
+
+        /* =========================================================
+           AIRPORT ROUTE
+        ========================================================= */
+
+        .airport-row {
+            display: grid;
+            grid-template-columns: 1fr 54px 1fr;
+            gap: 12px;
+            align-items: end;
+        }
+
+        .airport-box {
+            position: relative;
+        }
+
+        .airport-input-wrap {
+            position: relative;
+        }
+
+        .airport-input-wrap i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+
+            color: #9aa5b4;
+            font-size: 14px;
+
+            pointer-events: none;
+        }
+
+        .airport-input {
+            width: 100%;
+            height: 52px;
+
             border: 1px solid var(--border);
-            border-radius: 12px;
+            border-radius: 11px;
+
+            background: #fbfcfe;
+
+            padding: 0 14px 0 40px;
+
+            outline: none;
+
+            font-size: 15px;
+            font-weight: 600;
+
+            color: var(--text);
+
+            transition: 0.2s;
+        }
+
+        .airport-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(91, 124, 250, 0.1);
             background: white;
         }
 
-        .planner-field-icon {
-            width: 39px;
-            height: 39px;
-            flex-shrink: 0;
-            display: grid;
-            place-items: center;
-            border-radius: 10px;
-            color: var(--primary);
-            background: #edf1ff;
-        }
-
-        .planner-field-content {
-            min-width: 0;
-            flex: 1;
-        }
-
-        .planner-label {
-            display: block;
-            margin-bottom: 2px;
-            color: var(--text-muted);
-            font-size: 9px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .planner-input {
-            width: 100%;
-            border: 0;
-            outline: 0;
-            background: transparent;
-            color: var(--text);
-            font-size: 13px;
-            font-weight: 700;
-        }
-
-        .planner-input::placeholder {
-            color: #a6afbc;
+        .airport-input::placeholder {
+            color: #a1aab7;
             font-weight: 500;
         }
 
-        .planner-subtext {
+        .airport-code {
             display: block;
-            margin-top: 2px;
-            color: var(--text-muted);
-            font-size: 9px;
+            margin-top: 7px;
+
+            font-size: 12px;
+            color: var(--muted);
         }
 
-        .planner-submit {
-            min-width: 175px;
-            padding: 0 18px;
-            border: 0;
+        .swap-button {
+            width: 46px;
+            height: 46px;
+
+            border: 1px solid var(--border);
+            background: white;
+
             border-radius: 12px;
-            color: white;
-            background: var(--primary);
-            font-size: 11px;
-            font-weight: 800;
-            box-shadow: 0 8px 18px rgba(91, 124, 250, 0.18);
-            transition: 0.2s ease;
+
+            color: var(--primary);
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            transition: 0.2s;
         }
 
-        .planner-submit:hover {
+        .swap-button:hover {
+            background: var(--primary-light);
+            transform: rotate(180deg);
+        }
+
+        /* =========================================================
+           AUTOCOMPLETE
+        ========================================================= */
+
+        .airport-results {
+            position: absolute;
+
+            left: 0;
+            right: 0;
+            top: calc(100% + 6px);
+
+            background: white;
+
+            border: 1px solid var(--border);
+            border-radius: 12px;
+
+            box-shadow: 0 12px 35px rgba(28, 39, 60, 0.13);
+
+            overflow: hidden;
+
+            z-index: 200;
+
+            display: none;
+        }
+
+        .airport-results.show {
+            display: block;
+        }
+
+        .airport-result {
+            width: 100%;
+
+            border: none;
+            border-bottom: 1px solid #eef1f5;
+
+            background: white;
+
+            padding: 13px 14px;
+
+            display: flex;
+            align-items: center;
+
+            gap: 12px;
+
+            text-align: left;
+
+            transition: 0.15s;
+        }
+
+        .airport-result:last-child {
+            border-bottom: none;
+        }
+
+        .airport-result:hover {
+            background: #f7f9ff;
+        }
+
+        .airport-result-code {
+            min-width: 52px;
+
+            color: var(--primary);
+
+            font-family: "Manrope", sans-serif;
+            font-size: 14px;
+            font-weight: 800;
+        }
+
+        .airport-result-info {
+            min-width: 0;
+        }
+
+        .airport-result-name {
+            font-size: 13px;
+            font-weight: 700;
+
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .airport-result-location {
+            color: var(--muted);
+            font-size: 11px;
+
+            margin-top: 2px;
+        }
+
+        .search-loading {
+            padding: 15px;
+            text-align: center;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        /* =========================================================
+           FORM
+        ========================================================= */
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 17px;
+        }
+
+        .form-grid.three {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        .field {
+            min-width: 0;
+        }
+
+        .field.full {
+            grid-column: 1 / -1;
+        }
+
+        .field label {
+            display: block;
+
+            font-size: 12px;
+            font-weight: 700;
+
+            color: #5e6a79;
+
+            margin-bottom: 8px;
+        }
+
+        .input,
+        .select,
+        .textarea {
+            width: 100%;
+
+            border: 1px solid var(--border);
+            border-radius: 10px;
+
+            background: #fbfcfe;
+
+            color: var(--text);
+
+            outline: none;
+
+            transition: 0.2s;
+        }
+
+        .input,
+        .select {
+            height: 46px;
+            padding: 0 13px;
+
+            font-size: 14px;
+        }
+
+        .textarea {
+            min-height: 100px;
+            resize: vertical;
+
+            padding: 12px 13px;
+
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .input:focus,
+        .select:focus,
+        .textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(91, 124, 250, 0.1);
+            background: white;
+        }
+
+        .input::placeholder,
+        .textarea::placeholder {
+            color: #a1aab7;
+        }
+
+        .input-with-unit {
+            position: relative;
+        }
+
+        .input-with-unit .input {
+            padding-right: 58px;
+        }
+
+        .unit {
+            position: absolute;
+            right: 13px;
+            top: 50%;
+            transform: translateY(-50%);
+
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .help {
+            color: #929dab;
+            font-size: 11px;
+            margin-top: 6px;
+        }
+
+        /* =========================================================
+           AIRCRAFT
+        ========================================================= */
+
+        .aircraft-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 9px;
+        }
+
+        .aircraft-option {
+            position: relative;
+        }
+
+        .aircraft-option input {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .aircraft-option label {
+            min-height: 72px;
+
+            border: 1px solid var(--border);
+            border-radius: 11px;
+
+            padding: 11px;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+
+            cursor: pointer;
+
+            background: #fbfcfe;
+
+            transition: 0.2s;
+        }
+
+        .aircraft-option label:hover {
+            border-color: #cbd4e2;
+        }
+
+        .aircraft-option input:checked + label {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .aircraft-code {
+            font-family: "Manrope", sans-serif;
+            font-size: 14px;
+            font-weight: 800;
+
+            color: var(--text);
+        }
+
+        .aircraft-name {
+            font-size: 10px;
+            color: var(--muted);
+
+            margin-top: 4px;
+        }
+
+        /* =========================================================
+           CHECKBOXES
+        ========================================================= */
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .check-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            padding: 11px 12px;
+
+            border: 1px solid var(--border);
+            border-radius: 10px;
+
+            cursor: pointer;
+
+            font-size: 13px;
+            font-weight: 600;
+
+            background: #fbfcfe;
+        }
+
+        .check-option input {
+            width: 16px;
+            height: 16px;
+
+            accent-color: var(--primary);
+        }
+
+        /* =========================================================
+           ACTIONS
+        ========================================================= */
+
+        .actions {
+            display: flex;
+            gap: 10px;
+
+            margin-top: 4px;
+        }
+
+        .button {
+            min-height: 47px;
+
+            border: none;
+            border-radius: 10px;
+
+            padding: 0 18px;
+
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+
+            font-size: 13px;
+            font-weight: 700;
+
+            transition: 0.2s;
+        }
+
+        .button-primary {
+            background: var(--primary);
+            color: white;
+
+            flex: 1;
+        }
+
+        .button-primary:hover {
             background: var(--primary-dark);
             transform: translateY(-1px);
         }
 
-        .planner-submit:disabled {
-            opacity: 0.65;
+        .button-secondary {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .button-secondary:hover {
+            background: #e2e8ff;
+        }
+
+        .button:disabled {
+            opacity: 0.5;
             cursor: not-allowed;
             transform: none;
         }
 
-        .simbrief-open {
+        /* =========================================================
+           PREVIEW
+        ========================================================= */
+
+        .preview-card {
+            position: sticky;
+            top: 94px;
+        }
+
+        .route-preview {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+
+            padding: 16px;
+
+            border-radius: 13px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #f1f4ff,
+                    #f8faff
+                );
+
+            margin-bottom: 18px;
+        }
+
+        .preview-airport {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .preview-airport span {
+            display: block;
+
+            font-size: 11px;
+            color: var(--muted);
+
+            margin-bottom: 4px;
+        }
+
+        .preview-airport strong {
+            display: block;
+
+            font-family: "Manrope", sans-serif;
+            font-size: 23px;
+            font-weight: 800;
+        }
+
+        .route-line {
+            width: 65px;
+
+            height: 1px;
+
+            background: #cbd4e3;
+
+            position: relative;
+        }
+
+        .route-line i {
+            position: absolute;
+
+            left: 50%;
+            top: 50%;
+
+            transform:
+                translate(-50%, -50%)
+                rotate(90deg);
+
+            color: var(--primary);
+
+            background: #f4f6ff;
+
+            padding: 3px;
+        }
+
+        .preview-list {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .preview-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            padding: 11px 0;
+
+            border-bottom: 1px solid #edf0f4;
+        }
+
+        .preview-item:last-child {
+            border-bottom: none;
+        }
+
+        .preview-label {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .preview-value {
+            font-size: 13px;
+            font-weight: 700;
+
+            text-align: right;
+            max-width: 60%;
+
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .simbrief-box {
+            margin-top: 18px;
+
+            padding: 15px;
+
+            border-radius: 12px;
+
+            background: #f7f8fc;
+
+            border: 1px solid #e8ebf2;
+        }
+
+        .simbrief-box-header {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+
+            font-size: 13px;
+            font-weight: 800;
+
+            margin-bottom: 7px;
+        }
+
+        .simbrief-logo {
+            width: 26px;
+            height: 26px;
+
+            border-radius: 7px;
+
+            background: #111827;
+            color: white;
+
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            min-width: 165px;
-            padding: 0 18px;
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            background: white;
-            color: var(--text);
+
             font-size: 11px;
-            font-weight: 800;
         }
 
-        .simbrief-open:hover {
-            background: var(--surface-soft);
+        .simbrief-box p {
+            color: var(--muted);
+            font-size: 11px;
+            line-height: 1.5;
         }
 
-        .simbrief-result {
-            margin-top: 16px;
-            padding: 20px;
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            background: #f8fafc;
-            animation: simbriefResultIn 0.25s ease;
-        }
+        /* =========================================================
+           STATUS
+        ========================================================= */
 
-        @keyframes simbriefResultIn {
-            from {
-                opacity: 0;
-                transform: translateY(8px);
-            }
+        .status {
+            display: none;
 
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .simbrief-result-header {
-            display: flex;
-            justify-content: space-between;
             align-items: center;
-            gap: 16px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .simbrief-result-header span:first-child,
-        .simbrief-grid span,
-        .simbrief-route > span {
-            display: block;
-            color: var(--text-muted);
-            font-size: 9px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.6px;
-        }
-
-        .simbrief-result-header strong {
-            display: block;
-            margin-top: 4px;
-            font-family: "Manrope", sans-serif;
-            font-size: 20px;
-        }
-
-        .simbrief-status {
-            padding: 6px 9px;
-            border-radius: 8px;
-            background: #eef8f2;
-            color: #21824c;
-            font-size: 9px;
-            font-weight: 800;
-        }
-
-        .simbrief-grid {
-            display: grid;
-            grid-template-columns: repeat(6, 1fr);
             gap: 9px;
-            margin-top: 15px;
-        }
 
-        .simbrief-grid > div {
-            min-width: 0;
-            padding: 11px;
-            border: 1px solid var(--border);
+            padding: 11px 13px;
+
             border-radius: 10px;
-            background: white;
-        }
 
-        .simbrief-grid strong {
-            display: block;
-            margin-top: 5px;
-            overflow: hidden;
-            font-size: 12px;
-            white-space: nowrap;
-            text-overflow: ellipsis;
-        }
-
-        .simbrief-route {
-            margin-top: 9px;
-            padding: 12px;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            background: white;
-        }
-
-        .simbrief-route code {
-            display: block;
-            margin-top: 6px;
-            color: var(--text);
-            font-family: "DM Sans", sans-serif;
-            font-size: 11px;
-            line-height: 1.6;
-            white-space: pre-wrap;
-            overflow-wrap: anywhere;
-        }
-
-        .simbrief-actions {
-            display: flex;
-            gap: 9px;
             margin-top: 14px;
+
+            font-size: 12px;
+            font-weight: 600;
         }
 
-        .simbrief-actions .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
+        .status.show {
+            display: flex;
         }
 
-        /* ------------------------------------------------
-           FEATURES
-        ------------------------------------------------ */
-
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 14px;
+        .status.error {
+            background: #fff0f1;
+            color: #c84855;
         }
 
-        .feature-card {
-            padding: 24px;
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            background: white;
+        .status.success {
+            background: #eafaf5;
+            color: #168263;
         }
 
-        .feature-icon {
-            width: 44px;
-            height: 44px;
-            display: grid;
-            place-items: center;
-            margin-bottom: 18px;
-            border-radius: 12px;
+        .status.info {
+            background: var(--primary-light);
             color: var(--primary);
-            background: #edf1ff;
         }
 
-        .feature-card h3 {
-            margin-bottom: 7px;
-            font-family: "Manrope", sans-serif;
-            font-size: 15px;
-        }
-
-        .feature-card p {
-            color: var(--text-muted);
-            font-size: 12px;
-        }
-
-        /* ------------------------------------------------
-           DASHBOARD
-        ------------------------------------------------ */
-
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: 1.25fr 0.75fr;
-            gap: 15px;
-        }
-
-        .dashboard-card {
-            padding: 24px;
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            background: white;
-        }
-
-        .dashboard-card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 18px;
-        }
-
-        .dashboard-card-header h3 {
-            font-family: "Manrope", sans-serif;
-            font-size: 15px;
-        }
-
-        .dashboard-card-header span {
-            color: var(--text-muted);
-            font-size: 10px;
-        }
-
-        .flight-list {
-            display: flex;
-            flex-direction: column;
-            gap: 9px;
-        }
-
-        .flight-item {
-            display: grid;
-            grid-template-columns: 1fr auto;
-            align-items: center;
-            gap: 15px;
-            padding: 13px;
-            border: 1px solid var(--border);
-            border-radius: 11px;
-        }
-
-        .flight-main {
-            min-width: 0;
-        }
-
-        .flight-route {
-            font-family: "Manrope", sans-serif;
-            font-size: 13px;
-            font-weight: 800;
-        }
-
-        .flight-meta {
-            margin-top: 2px;
-            color: var(--text-muted);
-            font-size: 9px;
-        }
-
-        .flight-status {
-            padding: 6px 8px;
-            border-radius: 7px;
-            color: var(--success);
-            background: #eef8f2;
-            font-size: 8px;
-            font-weight: 800;
-            text-transform: uppercase;
-        }
-
-        .empty-state {
-            padding: 28px;
-            border: 1px dashed var(--border);
-            border-radius: 11px;
-            text-align: center;
-            color: var(--text-muted);
-            font-size: 11px;
-        }
-
-        .statistics {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-        }
-
-        .stat-card {
-            padding: 15px;
-            border: 1px solid var(--border);
-            border-radius: 11px;
-            background: var(--surface-soft);
-        }
-
-        .stat-label {
-            color: var(--text-muted);
-            font-size: 9px;
-            font-weight: 800;
-            text-transform: uppercase;
-        }
-
-        .stat-value {
-            margin-top: 4px;
-            font-family: "Manrope", sans-serif;
-            font-size: 22px;
-            font-weight: 800;
-        }
-
-        /* ------------------------------------------------
-           TOOLS
-        ------------------------------------------------ */
-
-        .tools-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
-        }
-
-        .tool-card {
-            padding: 20px;
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            background: white;
-            transition: 0.2s ease;
-        }
-
-        .tool-card:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-sm);
-        }
-
-        .tool-card i {
-            margin-bottom: 16px;
-            color: var(--primary);
-            font-size: 18px;
-        }
-
-        .tool-card h3 {
-            margin-bottom: 4px;
-            font-family: "Manrope", sans-serif;
-            font-size: 13px;
-        }
-
-        .tool-card p {
-            color: var(--text-muted);
-            font-size: 10px;
-        }
-
-        /* ------------------------------------------------
-           CTA
-        ------------------------------------------------ */
-
-        .cta {
-            padding: 20px 0 80px;
-        }
-
-        .cta-card {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 25px;
-            padding: 35px;
-            border-radius: var(--radius-lg);
-            color: white;
-            background: #182230;
-        }
-
-        .cta-card h2 {
-            margin-bottom: 5px;
-            font-family: "Manrope", sans-serif;
-            font-size: 27px;
-        }
-
-        .cta-card p {
-            color: #aeb8c6;
-            font-size: 12px;
-        }
-
-        /* ------------------------------------------------
-           FOOTER
-        ------------------------------------------------ */
-
-        footer {
-            padding: 28px 0;
-            border-top: 1px solid var(--border);
-            background: white;
-        }
-
-        .footer-inner {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .footer-copy {
-            color: var(--text-muted);
-            font-size: 10px;
-        }
-
-        .footer-links {
-            display: flex;
-            gap: 18px;
-        }
-
-        .footer-links a {
-            color: var(--text-muted);
-            font-size: 10px;
-            font-weight: 700;
-        }
-
-        .footer-links a:hover {
-            color: var(--text);
-        }
-
-        /* ------------------------------------------------
-           SEARCH
-        ------------------------------------------------ */
-
-        .search-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 3000;
-            display: grid;
-            place-items: start center;
-            padding-top: 100px;
-            background: rgba(17, 25, 39, 0.35);
-            backdrop-filter: blur(7px);
-        }
-
-        .search-modal {
-            width: min(620px, calc(100% - 30px));
-            padding: 20px;
-            border-radius: 17px;
-            background: white;
-            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.2);
-        }
-
-        .search-box {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 0 13px;
-            border: 1px solid var(--border);
-            border-radius: 11px;
-        }
-
-        .search-box i {
-            color: var(--text-muted);
-        }
-
-        .search-input {
-            width: 100%;
-            height: 48px;
-            border: 0;
-            outline: 0;
-        }
-
-        .search-results {
-            margin-top: 10px;
-        }
-
-        .search-result {
-            padding: 12px;
-            border-radius: 9px;
-        }
-
-        .search-result:hover {
-            background: var(--surface-soft);
-        }
-
-        /* ------------------------------------------------
-           TOAST
-        ------------------------------------------------ */
-
-        .toast-container {
-            position: fixed;
-            right: 20px;
-            bottom: 20px;
-            z-index: 4000;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .toast {
-            width: min(360px, calc(100vw - 40px));
-            padding: 15px 16px;
-            border: 1px solid var(--border);
-            border-radius: 13px;
-            background: white;
-            box-shadow: var(--shadow);
-            animation: toastIn 0.25s ease;
-        }
-
-        .toast-title {
-            margin-bottom: 3px;
-            font-family: "Manrope", sans-serif;
-            font-size: 12px;
-            font-weight: 800;
-        }
-
-        .toast-message {
-            color: var(--text-muted);
-            font-size: 10px;
-        }
-
-        .toast.warning {
-            border-left: 4px solid var(--warning);
-        }
-
-        .toast.success {
-            border-left: 4px solid var(--success);
-        }
-
-        @keyframes toastIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* ------------------------------------------------
+        /* =========================================================
            RESPONSIVE
-        ------------------------------------------------ */
+        ========================================================= */
 
         @media (max-width: 1000px) {
-            .hero-grid {
+            .planner-layout {
                 grid-template-columns: 1fr;
-                gap: 35px;
             }
 
-            .features-grid {
-                grid-template-columns: 1fr 1fr;
+            .preview-card {
+                position: static;
             }
 
-            .tools-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-
-            .dashboard-grid {
-                grid-template-columns: 1fr;
+            .aircraft-grid {
+                grid-template-columns: repeat(4, 1fr);
             }
         }
 
-        @media (max-width: 900px) {
+        @media (max-width: 760px) {
+            .navbar {
+                padding: 0 17px;
+            }
+
             .nav-links {
                 display: none;
             }
 
-            .simbrief-controls {
-                grid-template-columns: 1fr;
+            .page {
+                width: min(100% - 24px, 1250px);
+                padding-top: 25px;
             }
 
-            .simbrief-open {
-                min-height: 54px;
+            .page-header h1 {
+                font-size: 27px;
             }
 
-            .simbrief-grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
-
-        @media (max-width: 650px) {
-            .container {
-                width: min(100% - 28px, 1180px);
-            }
-
-            .hero {
-                padding: 55px 0 45px;
-            }
-
-            .hero h1 {
-                letter-spacing: -1.8px;
-            }
-
-            .hero-preview {
-                padding: 15px;
-            }
-
-            .section {
-                padding: 55px 0;
-            }
-
-            .planner-section {
-                padding-bottom: 55px;
-            }
-
-            .planner-inner,
-            .simbrief-card {
-                padding: 0;
-            }
-
-            .simbrief-card .planner-inner {
+            .card {
                 padding: 18px;
             }
 
-            .simbrief-heading,
-            .simbrief-result-header,
-            .simbrief-actions {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .simbrief-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-
-            .features-grid,
-            .tools-grid {
+            .airport-row {
                 grid-template-columns: 1fr;
             }
 
-            .cta-card {
-                flex-direction: column;
-                align-items: stretch;
-                padding: 26px;
+            .swap-button {
+                width: 100%;
+                height: 38px;
             }
 
-            .footer-inner {
-                flex-direction: column;
-                align-items: flex-start;
+            .swap-button:hover {
+                transform: none;
             }
 
-            .preview-route {
+            .form-grid,
+            .form-grid.three {
                 grid-template-columns: 1fr;
             }
 
-            .airport:last-child {
-                text-align: left;
+            .field.full {
+                grid-column: auto;
             }
 
-            .preview-arrow {
-                display: none;
+            .aircraft-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 450px) {
+            .brand-text {
+                font-size: 16px;
+            }
+
+            .aircraft-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .route-preview {
+                gap: 8px;
+            }
+
+            .route-line {
+                width: 35px;
             }
         }
     </style>
@@ -1143,3027 +1035,2109 @@
 
     <!-- =========================================================
          NAVBAR
-    ========================================================== -->
+    ========================================================= -->
 
     <nav class="navbar">
-        <div class="container nav-inner">
 
-            <a href="#" class="brand">
-                <span class="brand-icon">
-                    <i class="fa-solid fa-plane"></i>
-                </span>
-                <span>Flight App</span>
+        <a href="index.html" class="brand">
+            <div class="brand-icon">
+                <i class="fa-solid fa-plane"></i>
+            </div>
+
+            <span class="brand-text">
+                Flight App
+            </span>
+        </a>
+
+        <div class="nav-links">
+
+            <a href="index.html" class="nav-link">
+                Dashboard
             </a>
 
-            <div class="nav-links">
-                <a href="#planner">Planner</a>
-                <a href="#features">Features</a>
-                <a href="#dashboard">Dashboard</a>
-                <a href="#tools">Tools</a>
-            </div>
+            <a href="planner.html" class="nav-link active">
+                Flight Planner
+            </a>
 
-            <div class="nav-actions">
-                <button
-                    class="nav-button"
-                    id="searchButton"
-                    type="button"
-                    aria-label="Search"
-                >
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                </button>
+            <a href="weather.html" class="nav-link">
+                Weather
+            </a>
 
-                <button
-                    class="nav-button"
-                    id="themeButton"
-                    type="button"
-                    aria-label="Toggle theme"
-                >
-                    <i class="fa-solid fa-moon"></i>
-                </button>
-            </div>
+            <a href="simbrief.html" class="nav-link">
+                SimBrief
+            </a>
+
+            <a href="plans.html" class="nav-link">
+                Saved Plans
+            </a>
 
         </div>
+
+        <button class="profile-button" title="Profile">
+            <i class="fa-solid fa-user"></i>
+        </button>
+
     </nav>
 
 
     <!-- =========================================================
-         HERO
-    ========================================================== -->
+         PAGE
+    ========================================================= -->
 
-    <header class="hero">
-        <div class="container hero-grid">
+    <main class="page">
 
-            <div>
-                <div class="hero-eyebrow">
-                    Flight simulator companion
-                </div>
+        <div class="page-header">
 
-                <h1>
-                    Plan, track and fly with confidence.
-                </h1>
-
-                <p class="hero-description">
-                    Flight App brings your simulator planning, flight history
-                    and aviation tools together in one simple dashboard.
-                </p>
-
-                <div class="hero-actions">
-                    <a href="#planner" class="btn btn-primary">
-                        <i class="fa-solid fa-route"></i>
-                        Plan a flight
-                    </a>
-
-                    <a href="#dashboard" class="btn btn-secondary">
-                        <i class="fa-solid fa-chart-simple"></i>
-                        View dashboard
-                    </a>
-                </div>
+            <div class="eyebrow">
+                <i class="fa-solid fa-route"></i>
+                Flight Planning
             </div>
 
-            <div class="hero-preview">
+            <h1>Flight Planner</h1>
 
-                <div class="preview-header">
-                    <span class="preview-title">
-                        Flight preview
-                    </span>
-
-                    <span class="preview-status">
-                        Ready
-                    </span>
-                </div>
-
-                <div class="preview-route">
-
-                    <div class="airport">
-                        <div class="airport-code">EHAM</div>
-                        <div class="airport-name">
-                            Amsterdam Schiphol
-                        </div>
-                    </div>
-
-                    <div class="preview-arrow">
-                        <i class="fa-solid fa-arrow-right"></i>
-                    </div>
-
-                    <div class="airport">
-                        <div class="airport-code">LEBL</div>
-                        <div class="airport-name">
-                            Barcelona El Prat
-                        </div>
-                    </div>
-
-                </div>
-
-            </div>
+            <p>
+                Build your flight and send it directly to SimBrief.
+            </p>
 
         </div>
-    </header>
 
 
-    <!-- =========================================================
-         SIMBRIEF PLANNER
-    ========================================================== -->
+        <div class="planner-layout">
 
-    <section class="planner-section" id="planner">
+            <!-- =================================================
+                 LEFT COLUMN
+            ================================================= -->
 
-        <div class="container">
+            <div class="left-column">
 
-            <div class="planner-card simbrief-card">
+                <!-- ROUTE -->
 
-                <div class="planner-inner">
+                <section class="card">
 
-                    <div class="simbrief-heading">
+                    <div class="card-header">
 
-                        <div>
-                            <div class="section-eyebrow">
-                                Flight planning
+                        <div class="card-title">
+
+                            <div class="card-title-icon">
+                                <i class="fa-solid fa-route"></i>
                             </div>
 
-                            <h2 class="section-title">
-                                Plan your flight with SimBrief
-                            </h2>
+                            Route
 
-                            <p class="section-description">
-                                Connect your SimBrief username, then import
-                                your latest Operational Flight Plan directly
-                                into Flight App.
-                            </p>
-                        </div>
-
-                        <div
-                            class="simbrief-badge disconnected"
-                            id="simbriefConnectionBadge"
-                        >
-                            <i class="fa-solid fa-link-slash"></i>
-                            Not connected
                         </div>
 
                     </div>
 
 
-                    <div class="simbrief-controls">
+                    <div class="airport-row">
 
-                        <div class="planner-field simbrief-user-field">
+                        <!-- DEPARTURE -->
 
-                            <div class="planner-field-icon">
-                                <i class="fa-solid fa-user"></i>
+                        <div class="airport-box">
+
+                            <div class="section-label">
+                                Departure
                             </div>
 
-                            <div class="planner-field-content">
+                            <div class="airport-input-wrap">
 
-                                <label
-                                    class="planner-label"
-                                    for="simbriefUsername"
-                                >
-                                    SimBrief username
-                                </label>
+                                <i class="fa-solid fa-plane-departure"></i>
 
                                 <input
-                                    id="simbriefUsername"
-                                    class="planner-input"
+                                    id="departureInput"
+                                    class="airport-input"
                                     type="text"
-                                    maxlength="80"
-                                    placeholder="Enter your SimBrief username"
-                                    autocomplete="username"
+                                    autocomplete="off"
+                                    placeholder="ICAO or airport name"
                                 >
 
-                                <span
-                                    class="planner-subtext"
-                                    id="simbriefStatus"
-                                >
-                                    Enter your username to connect
-                                </span>
-
-                            </div>
-
-                        </div>
-
-
-                        <button
-                            class="planner-submit"
-                            id="simbriefConnectButton"
-                            type="button"
-                        >
-                            <i class="fa-solid fa-link"></i>
-                            Connect SimBrief
-                        </button>
-
-
-                        <a
-                            class="simbrief-open"
-                            href="https://www.simbrief.com/"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                        >
-                            <i class="fa-solid fa-up-right-from-square"></i>
-                            Open SimBrief
-                        </a>
-
-                    </div>
-
-
-                    <!-- SIMBRIEF RESULT -->
-
-                    <div
-                        class="simbrief-result hidden"
-                        id="simbriefResult"
-                    >
-
-                        <div class="simbrief-result-header">
-
-                            <div>
-
-                                <span>
-                                    Latest OFP
-                                </span>
-
-                                <strong id="simbriefRoute">
-                                    Not available
-                                </strong>
+                                <div
+                                    id="departureResults"
+                                    class="airport-results"
+                                ></div>
 
                             </div>
 
                             <span
-                                class="simbrief-status"
-                                id="simbriefResultStatus"
+                                id="departureCode"
+                                class="airport-code"
                             >
-                                Not available
+                                Select an airport
                             </span>
 
                         </div>
 
 
-                        <div class="simbrief-grid">
+                        <!-- SWAP -->
 
-                            <div>
-                                <span>Flight</span>
-                                <strong id="simbriefFlightNumber">
-                                    Not available
-                                </strong>
+                        <button
+                            id="swapButton"
+                            class="swap-button"
+                            type="button"
+                            title="Swap airports"
+                        >
+                            <i class="fa-solid fa-arrow-right-arrow-left"></i>
+                        </button>
+
+
+                        <!-- ARRIVAL -->
+
+                        <div class="airport-box">
+
+                            <div class="section-label">
+                                Arrival
                             </div>
 
-                            <div>
-                                <span>Aircraft</span>
-                                <strong id="simbriefAircraft">
-                                    Not available
-                                </strong>
+                            <div class="airport-input-wrap">
+
+                                <i class="fa-solid fa-plane-arrival"></i>
+
+                                <input
+                                    id="arrivalInput"
+                                    class="airport-input"
+                                    type="text"
+                                    autocomplete="off"
+                                    placeholder="ICAO or airport name"
+                                >
+
+                                <div
+                                    id="arrivalResults"
+                                    class="airport-results"
+                                ></div>
+
                             </div>
 
-                            <div>
-                                <span>Distance</span>
-                                <strong id="simbriefDistance">
-                                    Not available
-                                </strong>
+                            <span
+                                id="arrivalCode"
+                                class="airport-code"
+                            >
+                                Select an airport
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- FLIGHT DETAILS -->
+
+                <section class="card">
+
+                    <div class="card-header">
+
+                        <div class="card-title">
+
+                            <div class="card-title-icon">
+                                <i class="fa-solid fa-ticket"></i>
                             </div>
 
-                            <div>
-                                <span>Flight time</span>
-                                <strong id="simbriefTime">
-                                    Not available
-                                </strong>
-                            </div>
+                            Flight Details
 
-                            <div>
-                                <span>Cruise altitude</span>
-                                <strong id="simbriefAltitude">
-                                    Not available
-                                </strong>
-                            </div>
+                        </div>
 
-                            <div>
-                                <span>OFP ID</span>
-                                <strong id="simbriefOfpId">
-                                    Not available
-                                </strong>
+                    </div>
+
+
+                    <div class="form-grid">
+
+                        <div class="field">
+
+                            <label for="airline">
+                                Airline
+                            </label>
+
+                            <input
+                                id="airline"
+                                class="input"
+                                type="text"
+                                maxlength="3"
+                                placeholder="e.g. ECV"
+                            >
+
+                            <div class="help">
+                                Optional airline ICAO code
                             </div>
 
                         </div>
 
 
-                        <div class="simbrief-route">
+                        <div class="field">
+
+                            <label for="flightNumber">
+                                Flight Number
+                            </label>
+
+                            <input
+                                id="flightNumber"
+                                class="input"
+                                type="text"
+                                maxlength="8"
+                                placeholder="e.g. 123"
+                            >
+
+                        </div>
+
+
+                        <div class="field">
+
+                            <label for="callsign">
+                                ATC Callsign
+                            </label>
+
+                            <input
+                                id="callsign"
+                                class="input"
+                                type="text"
+                                maxlength="8"
+                                placeholder="e.g. ECV123"
+                            >
+
+                            <div class="help">
+                                Leave empty to use airline + flight number
+                            </div>
+
+                        </div>
+
+
+                        <div class="field">
+
+                            <label for="alternate">
+                                Alternate Airport
+                            </label>
+
+                            <input
+                                id="alternate"
+                                class="input"
+                                type="text"
+                                maxlength="4"
+                                placeholder="e.g. EDDM"
+                            >
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- AIRCRAFT -->
+
+                <section class="card">
+
+                    <div class="card-header">
+
+                        <div class="card-title">
+
+                            <div class="card-title-icon">
+                                <i class="fa-solid fa-plane"></i>
+                            </div>
+
+                            Aircraft
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="aircraft-grid">
+
+                        <div class="aircraft-option">
+
+                            <input
+                                type="radio"
+                                name="aircraft"
+                                id="a320"
+                                value="A320"
+                                checked
+                            >
+
+                            <label for="a320">
+                                <span class="aircraft-code">
+                                    A320
+                                </span>
+
+                                <span class="aircraft-name">
+                                    Airbus A320
+                                </span>
+                            </label>
+
+                        </div>
+
+
+                        <div class="aircraft-option">
+
+                            <input
+                                type="radio"
+                                name="aircraft"
+                                id="a20n"
+                                value="A20N"
+                            >
+
+                            <label for="a20n">
+                                <span class="aircraft-code">
+                                    A20N
+                                </span>
+
+                                <span class="aircraft-name">
+                                    Airbus A320neo
+                                </span>
+                            </label>
+
+                        </div>
+
+
+                        <div class="aircraft-option">
+
+                            <input
+                                type="radio"
+                                name="aircraft"
+                                id="a21n"
+                                value="A21N"
+                            >
+
+                            <label for="a21n">
+                                <span class="aircraft-code">
+                                    A21N
+                                </span>
+
+                                <span class="aircraft-name">
+                                    Airbus A321neo
+                                </span>
+                            </label>
+
+                        </div>
+
+
+                        <div class="aircraft-option">
+
+                            <input
+                                type="radio"
+                                name="aircraft"
+                                id="a319"
+                                value="A319"
+                            >
+
+                            <label for="a319">
+                                <span class="aircraft-code">
+                                    A319
+                                </span>
+
+                                <span class="aircraft-name">
+                                    Airbus A319
+                                </span>
+                            </label>
+
+                        </div>
+
+
+                        <div class="aircraft-option">
+
+                            <input
+                                type="radio"
+                                name="aircraft"
+                                id="a359"
+                                value="A359"
+                            >
+
+                            <label for="a359">
+                                <span class="aircraft-code">
+                                    A359
+                                </span>
+
+                                <span class="aircraft-name">
+                                    Airbus A350-900
+                                </span>
+                            </label>
+
+                        </div>
+
+
+                        <div class="aircraft-option">
+
+                            <input
+                                type="radio"
+                                name="aircraft"
+                                id="b738"
+                                value="B738"
+                            >
+
+                            <label for="b738">
+                                <span class="aircraft-code">
+                                    B738
+                                </span>
+
+                                <span class="aircraft-name">
+                                    Boeing 737-800
+                                </span>
+                            </label>
+
+                        </div>
+
+
+                        <div class="aircraft-option">
+
+                            <input
+                                type="radio"
+                                name="aircraft"
+                                id="b38m"
+                                value="B38M"
+                            >
+
+                            <label for="b38m">
+                                <span class="aircraft-code">
+                                    B38M
+                                </span>
+
+                                <span class="aircraft-name">
+                                    Boeing 737 MAX 8
+                                </span>
+                            </label>
+
+                        </div>
+
+
+                        <div class="aircraft-option">
+
+                            <input
+                                type="radio"
+                                name="aircraft"
+                                id="e190"
+                                value="E190"
+                            >
+
+                            <label for="e190">
+                                <span class="aircraft-code">
+                                    E190
+                                </span>
+
+                                <span class="aircraft-name">
+                                    Embraer E190
+                                </span>
+                            </label>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- PERFORMANCE -->
+
+                <section class="card">
+
+                    <div class="card-header">
+
+                        <div class="card-title">
+
+                            <div class="card-title-icon">
+                                <i class="fa-solid fa-gauge-high"></i>
+                            </div>
+
+                            Flight Settings
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="form-grid three">
+
+                        <div class="field">
+
+                            <label for="altitude">
+                                Cruise Altitude
+                            </label>
+
+                            <div class="input-with-unit">
+
+                                <input
+                                    id="altitude"
+                                    class="input"
+                                    type="number"
+                                    min="0"
+                                    max="60000"
+                                    step="1000"
+                                    value="35000"
+                                >
+
+                                <span class="unit">
+                                    FT
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="field">
+
+                            <label for="passengers">
+                                Passengers
+                            </label>
+
+                            <input
+                                id="passengers"
+                                class="input"
+                                type="number"
+                                min="0"
+                                max="1000"
+                                value="150"
+                            >
+
+                        </div>
+
+
+                        <div class="field">
+
+                            <label for="cargo">
+                                Cargo
+                            </label>
+
+                            <div class="input-with-unit">
+
+                                <input
+                                    id="cargo"
+                                    class="input"
+                                    type="number"
+                                    min="0"
+                                    step="0.1"
+                                    value="0"
+                                >
+
+                                <span class="unit">
+                                    TON
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- ROUTE -->
+
+                <section class="card">
+
+                    <div class="card-header">
+
+                        <div class="card-title">
+
+                            <div class="card-title-icon">
+                                <i class="fa-solid fa-map"></i>
+                            </div>
+
+                            Route
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label for="route">
+                            Route / Airway String
+                        </label>
+
+                        <textarea
+                            id="route"
+                            class="textarea"
+                            placeholder="Leave empty to let SimBrief calculate the route..."
+                        ></textarea>
+
+                        <div class="help">
+                            You can enter waypoints and airways manually,
+                            or leave this empty for SimBrief's recommended route.
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- OPTIONS -->
+
+                <section class="card">
+
+                    <div class="card-header">
+
+                        <div class="card-title">
+
+                            <div class="card-title-icon">
+                                <i class="fa-solid fa-sliders"></i>
+                            </div>
+
+                            SimBrief Options
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="options-grid">
+
+                        <label class="check-option">
+
+                            <input
+                                id="findSidStar"
+                                type="checkbox"
+                                checked
+                            >
 
                             <span>
-                                Route
+                                Automatically select SID/STAR
                             </span>
 
-                            <code id="simbriefRouteText">
-                                Not available
-                            </code>
-
-                        </div>
+                        </label>
 
 
-                        <div class="simbrief-actions">
+                        <label class="check-option">
 
-                            <button
-                                class="btn btn-primary"
-                                id="saveSimBriefButton"
-                                type="button"
+                            <input
+                                id="includeNotams"
+                                type="checkbox"
+                                checked
                             >
-                                <i class="fa-solid fa-floppy-disk"></i>
-                                Save to Flight App
-                            </button>
 
-                            <button
-                                class="btn btn-secondary"
-                                id="simbriefRefreshButton"
-                                type="button"
+                            <span>
+                                Include NOTAMs
+                            </span>
+
+                        </label>
+
+
+                        <label class="check-option">
+
+                            <input
+                                id="detailedNavlog"
+                                type="checkbox"
+                                checked
                             >
-                                <i class="fa-solid fa-rotate"></i>
-                                Refresh OFP
-                            </button>
 
-                            <a
-                                class="btn btn-secondary"
-                                href="https://www.simbrief.com/"
-                                target="_blank"
-                                rel="noopener noreferrer"
+                            <span>
+                                Detailed navigation log
+                            </span>
+
+                        </label>
+
+
+                        <label class="check-option">
+
+                            <input
+                                id="stepClimbs"
+                                type="checkbox"
+                                checked
                             >
-                                <i class="fa-solid fa-up-right-from-square"></i>
-                                Open SimBrief
-                            </a>
 
-                        </div>
+                            <span>
+                                Step climbs
+                            </span>
+
+                        </label>
 
                     </div>
 
-                </div>
-
-            </div>
-
-        </div>
-
-    </section>
+                </section>
 
 
-    <!-- =========================================================
-         FEATURES
-    ========================================================== -->
+                <!-- ACTIONS -->
 
-    <section class="section" id="features">
+                <section class="card">
 
-        <div class="container">
+                    <div class="actions">
 
-            <div class="section-header">
+                        <button
+                            id="generateButton"
+                            class="button button-primary"
+                            type="button"
+                        >
+                            <i class="fa-solid fa-paper-plane"></i>
+                            Create Flight in SimBrief
+                        </button>
 
-                <div class="section-eyebrow">
-                    Everything you need
-                </div>
-
-                <h2 class="section-title">
-                    Built for flight simulation
-                </h2>
-
-                <p class="section-description">
-                    Keep your flight planning and simulator information
-                    organized without unnecessary complexity.
-                </p>
-
-            </div>
-
-
-            <div class="features-grid">
-
-                <div class="feature-card">
-
-                    <div class="feature-icon">
-                        <i class="fa-solid fa-route"></i>
-                    </div>
-
-                    <h3>
-                        SimBrief integration
-                    </h3>
-
-                    <p>
-                        Import your latest SimBrief OFP and keep your
-                        flight information in Flight App.
-                    </p>
-
-                </div>
-
-
-                <div class="feature-card">
-
-                    <div class="feature-icon">
-                        <i class="fa-solid fa-chart-line"></i>
-                    </div>
-
-                    <h3>
-                        Flight history
-                    </h3>
-
-                    <p>
-                        Keep track of your previous flights and build
-                        your own personal simulator history.
-                    </p>
-
-                </div>
-
-
-                <div class="feature-card">
-
-                    <div class="feature-icon">
-                        <i class="fa-solid fa-plane-up"></i>
-                    </div>
-
-                    <h3>
-                        Aircraft support
-                    </h3>
-
-                    <p>
-                        Work with popular Airbus and Boeing aircraft
-                        commonly used in flight simulation.
-                    </p>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- =========================================================
-         DASHBOARD
-    ========================================================== -->
-
-    <section class="section" id="dashboard">
-
-        <div class="container">
-
-            <div class="section-header">
-
-                <div class="section-eyebrow">
-                    Your dashboard
-                </div>
-
-                <h2 class="section-title">
-                    Flight statistics
-                </h2>
-
-                <p class="section-description">
-                    Your locally stored flight history and statistics
-                    are shown here.
-                </p>
-
-            </div>
-
-
-            <div class="dashboard-grid">
-
-                <div class="dashboard-card">
-
-                    <div class="dashboard-card-header">
-
-                        <h3>
-                            Recent flights
-                        </h3>
-
-                        <span id="flightCount">
-                            0 flights
-                        </span>
+                        <button
+                            id="resetButton"
+                            class="button button-secondary"
+                            type="button"
+                        >
+                            <i class="fa-solid fa-rotate-left"></i>
+                            Reset
+                        </button>
 
                     </div>
 
                     <div
-                        class="flight-list"
-                        id="flightList"
+                        id="status"
+                        class="status"
                     ></div>
 
-                </div>
+                </section>
+
+            </div>
 
 
-                <div class="dashboard-card">
+            <!-- =================================================
+                 RIGHT COLUMN
+            ================================================= -->
 
-                    <div class="dashboard-card-header">
+            <div class="right-column">
 
-                        <h3>
-                            Statistics
-                        </h3>
+                <section class="card preview-card">
 
-                        <span>
-                            All flights
-                        </span>
+                    <div class="card-header">
+
+                        <div class="card-title">
+
+                            <div class="card-title-icon">
+                                <i class="fa-solid fa-file-lines"></i>
+                            </div>
+
+                            Flight Preview
+
+                        </div>
 
                     </div>
 
-                    <div class="statistics">
 
-                        <div class="stat-card">
+                    <div class="route-preview">
 
-                            <div class="stat-label">
-                                Flights
-                            </div>
+                        <div class="preview-airport">
 
-                            <div
-                                class="stat-value"
-                                id="statFlights"
-                            >
-                                0
-                            </div>
+                            <span>
+                                FROM
+                            </span>
+
+                            <strong id="previewDeparture">
+                                ----
+                            </strong>
 
                         </div>
 
 
-                        <div class="stat-card">
-
-                            <div class="stat-label">
-                                Distance
-                            </div>
-
-                            <div
-                                class="stat-value"
-                                id="statDistance"
-                            >
-                                0
-                            </div>
-
+                        <div class="route-line">
+                            <i class="fa-solid fa-plane"></i>
                         </div>
 
 
-                        <div class="stat-card">
+                        <div class="preview-airport">
 
-                            <div class="stat-label">
-                                Flight time
-                            </div>
+                            <span>
+                                TO
+                            </span>
 
-                            <div
-                                class="stat-value"
-                                id="statHours"
-                            >
-                                0h
-                            </div>
+                            <strong id="previewArrival">
+                                ----
+                            </strong>
 
                         </div>
 
+                    </div>
 
-                        <div class="stat-card">
 
-                            <div class="stat-label">
+                    <div class="preview-list">
+
+                        <div class="preview-item">
+
+                            <span class="preview-label">
                                 Aircraft
-                            </div>
+                            </span>
 
-                            <div
-                                class="stat-value"
-                                id="statAircraft"
+                            <span
+                                id="previewAircraft"
+                                class="preview-value"
                             >
-                                0
-                            </div>
+                                A320
+                            </span>
+
+                        </div>
+
+
+                        <div class="preview-item">
+
+                            <span class="preview-label">
+                                Flight
+                            </span>
+
+                            <span
+                                id="previewFlight"
+                                class="preview-value"
+                            >
+                                —
+                            </span>
+
+                        </div>
+
+
+                        <div class="preview-item">
+
+                            <span class="preview-label">
+                                Callsign
+                            </span>
+
+                            <span
+                                id="previewCallsign"
+                                class="preview-value"
+                            >
+                                —
+                            </span>
+
+                        </div>
+
+
+                        <div class="preview-item">
+
+                            <span class="preview-label">
+                                Cruise
+                            </span>
+
+                            <span
+                                id="previewAltitude"
+                                class="preview-value"
+                            >
+                                FL350
+                            </span>
+
+                        </div>
+
+
+                        <div class="preview-item">
+
+                            <span class="preview-label">
+                                Passengers
+                            </span>
+
+                            <span
+                                id="previewPassengers"
+                                class="preview-value"
+                            >
+                                150
+                            </span>
+
+                        </div>
+
+
+                        <div class="preview-item">
+
+                            <span class="preview-label">
+                                Alternate
+                            </span>
+
+                            <span
+                                id="previewAlternate"
+                                class="preview-value"
+                            >
+                                —
+                            </span>
 
                         </div>
 
                     </div>
 
-                </div>
+
+                    <div class="simbrief-box">
+
+                        <div class="simbrief-box-header">
+
+                            <div class="simbrief-logo">
+                                SB
+                            </div>
+
+                            SimBrief
+
+                        </div>
+
+                        <p>
+                            Your selected flight information will be
+                            transferred to SimBrief. SimBrief will then
+                            calculate the route, fuel, weather, NOTAMs
+                            and operational flight plan.
+                        </p>
+
+                    </div>
+
+                </section>
 
             </div>
 
         </div>
 
-    </section>
+    </main>
 
-
-    <!-- =========================================================
-         TOOLS
-    ========================================================== -->
-
-    <section class="section" id="tools">
-
-        <div class="container">
-
-            <div class="section-header">
-
-                <div class="section-eyebrow">
-                    Flight tools
-                </div>
-
-                <h2 class="section-title">
-                    Useful aviation tools
-                </h2>
-
-                <p class="section-description">
-                    Quick access to tools and information useful during
-                    your simulator sessions.
-                </p>
-
-            </div>
-
-
-            <div class="tools-grid">
-
-                <a
-                    class="tool-card"
-                    href="https://www.simbrief.com/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    <i class="fa-solid fa-route"></i>
-
-                    <h3>
-                        SimBrief
-                    </h3>
-
-                    <p>
-                        Create professional flight plans and OFPs.
-                    </p>
-                </a>
-
-
-                <a
-                    class="tool-card"
-                    href="https://www.simbrief.com/system/dispatch.php"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    <i class="fa-solid fa-file-lines"></i>
-
-                    <h3>
-                        Dispatch
-                    </h3>
-
-                    <p>
-                        Access your SimBrief flight dispatch.
-                    </p>
-                </a>
-
-
-                <div class="tool-card">
-
-                    <i class="fa-solid fa-plane"></i>
-
-                    <h3>
-                        Aircraft
-                    </h3>
-
-                    <p>
-                        Supported aircraft and performance information.
-                    </p>
-
-                </div>
-
-
-                <div class="tool-card">
-
-                    <i class="fa-solid fa-clock"></i>
-
-                    <h3>
-                        Flight timer
-                    </h3>
-
-                    <p>
-                        Keep an eye on your flight duration.
-                    </p>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- =========================================================
-         CTA
-    ========================================================== -->
-
-    <section class="cta">
-
-        <div class="container">
-
-            <div class="cta-card">
-
-                <div>
-
-                    <h2>
-                        Ready for your next flight?
-                    </h2>
-
-                    <p>
-                        Create your flight plan in SimBrief and import
-                        it into Flight App.
-                    </p>
-
-                </div>
-
-                <a
-                    href="#planner"
-                    class="btn btn-primary"
-                >
-                    <i class="fa-solid fa-plane-departure"></i>
-                    Start planning
-                </a>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- =========================================================
-         FOOTER
-    ========================================================== -->
-
-    <footer>
-
-        <div class="container footer-inner">
-
-            <div
-                class="footer-copy"
-                id="footerCopyright"
-            >
-                © 2026 Flight App. All rights reserved.
-            </div>
-
-            <div class="footer-links">
-
-                <a href="#planner">
-                    Planner
-                </a>
-
-                <a href="#dashboard">
-                    Dashboard
-                </a>
-
-                <a href="#tools">
-                    Tools
-                </a>
-
-            </div>
-
-        </div>
-
-    </footer>
-
-
-    <!-- =========================================================
-         SEARCH MODAL
-    ========================================================== -->
-
-    <div
-        class="search-overlay hidden"
-        id="searchOverlay"
-    >
-
-        <div class="search-modal">
-
-            <div class="search-box">
-
-                <i class="fa-solid fa-magnifying-glass"></i>
-
-                <input
-                    id="searchInput"
-                    class="search-input"
-                    type="text"
-                    placeholder="Search Flight App..."
-                    autocomplete="off"
-                >
-
-                <button
-                    class="nav-button"
-                    id="closeSearchButton"
-                    type="button"
-                >
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-
-            </div>
-
-            <div
-                class="search-results"
-                id="searchResults"
-            ></div>
-
-        </div>
-
-    </div>
-
-
-    <!-- =========================================================
-         TOAST CONTAINER
-    ========================================================== -->
-
-    <div
-        class="toast-container"
-        id="toastContainer"
-    ></div>
-
-
-    <!-- =========================================================
-         JAVASCRIPT
-    ========================================================== -->
 
     <script>
+
+        /* =========================================================
+           CONFIG
+        ========================================================= */
 
         const API_BASE =
             "https://flight-app-api-g36e.onrender.com";
 
 
-        async function apiFetch(endpoint, options = {}) {
+        /* =========================================================
+           ELEMENTS
+        ========================================================= */
 
-            const response = await fetch(
-                `${API_BASE}${endpoint}`,
-                {
-                    ...options,
+        const departureInput =
+            document.getElementById("departureInput");
 
-                    headers: {
-                        Accept: "application/json",
-                        ...(options.headers || {})
-                    }
-                }
-            );
+        const arrivalInput =
+            document.getElementById("arrivalInput");
 
-            let data = null;
+        const departureResults =
+            document.getElementById("departureResults");
+
+        const arrivalResults =
+            document.getElementById("arrivalResults");
+
+        const departureCode =
+            document.getElementById("departureCode");
+
+        const arrivalCode =
+            document.getElementById("arrivalCode");
+
+        const swapButton =
+            document.getElementById("swapButton");
+
+        const generateButton =
+            document.getElementById("generateButton");
+
+        const resetButton =
+            document.getElementById("resetButton");
+
+        const status =
+            document.getElementById("status");
+
+
+        /* =========================================================
+           AIRPORT STATE
+        ========================================================= */
+
+        let departureAirport = null;
+        let arrivalAirport = null;
+
+        let departureSearchTimer = null;
+        let arrivalSearchTimer = null;
+
+
+        /* =========================================================
+           AIRPORT SEARCH
+        ========================================================= */
+
+        async function searchAirports(
+            query,
+            resultsElement,
+            type
+        ) {
+
+            query = query.trim();
+
+            if (query.length < 2) {
+                resultsElement.classList.remove("show");
+                resultsElement.innerHTML = "";
+                return;
+            }
+
+            resultsElement.classList.add("show");
+
+            resultsElement.innerHTML = `
+                <div class="search-loading">
+                    <i class="fa-solid fa-spinner fa-spin"></i>
+                    Searching airports...
+                </div>
+            `;
 
             try {
-                data = await response.json();
-            } catch {
-                data = null;
-            }
 
-            if (!response.ok) {
-
-                throw new Error(
-                    data?.error ||
-                    `Request failed with status ${response.status}`
+                const response = await fetch(
+                    `${API_BASE}/api/airports/search?q=${encodeURIComponent(query)}`
                 );
-            }
 
-            return data;
+                if (!response.ok) {
+                    throw new Error("Airport search failed");
+                }
+
+                const data = await response.json();
+
+                if (
+                    !data.airports ||
+                    data.airports.length === 0
+                ) {
+
+                    resultsElement.innerHTML = `
+                        <div class="search-loading">
+                            No airports found
+                        </div>
+                    `;
+
+                    return;
+                }
+
+                resultsElement.innerHTML =
+                    data.airports
+                        .map(airport => {
+
+                            const icao =
+                                airport.icao ||
+                                airport.icaoId ||
+                                airport.id ||
+                                "";
+
+                            const name =
+                                airport.name ||
+                                "Unknown airport";
+
+                            const city =
+                                airport.city ||
+                                "";
+
+                            const country =
+                                airport.country ||
+                                "";
+
+                            return `
+                                <button
+                                    type="button"
+                                    class="airport-result"
+                                    data-type="${type}"
+                                    data-icao="${escapeHtml(icao)}"
+                                    data-name="${escapeHtml(name)}"
+                                    data-city="${escapeHtml(city)}"
+                                    data-country="${escapeHtml(country)}"
+                                >
+
+                                    <span class="airport-result-code">
+                                        ${escapeHtml(icao)}
+                                    </span>
+
+                                    <span class="airport-result-info">
+
+                                        <span class="airport-result-name">
+                                            ${escapeHtml(name)}
+                                        </span>
+
+                                        <span class="airport-result-location">
+                                            ${escapeHtml(
+                                                [city, country]
+                                                    .filter(Boolean)
+                                                    .join(", ")
+                                            )}
+                                        </span>
+
+                                    </span>
+
+                                </button>
+                            `;
+                        })
+                        .join("");
+
+            } catch (error) {
+
+                console.error(
+                    "Airport search error:",
+                    error
+                );
+
+                resultsElement.innerHTML = `
+                    <div class="search-loading">
+                        Unable to search airports
+                    </div>
+                `;
+            }
         }
 
 
-        const FlightApp = {
+        /* =========================================================
+           AIRPORT SELECT
+        ========================================================= */
 
-            currentSimBriefOFP: null,
+        document.addEventListener(
+            "click",
+            event => {
 
-
-            keys: {
-
-                flights: "flightapp_flights",
-
-                settings: "flightapp_settings",
-
-                theme: "flightapp_theme"
-
-            },
-
-
-            aircraft: {
-
-                A320: {
-                    name: "Airbus A320",
-                    cruise: 440,
-                    burn: 2.5
-                },
-
-                A20N: {
-                    name: "Airbus A320neo",
-                    cruise: 450,
-                    burn: 2.35
-                },
-
-                A21N: {
-                    name: "Airbus A321neo",
-                    cruise: 450,
-                    burn: 2.65
-                },
-
-                A350: {
-                    name: "Airbus A350-900",
-                    cruise: 480,
-                    burn: 5.4
-                },
-
-                B738: {
-                    name: "Boeing 737-800",
-                    cruise: 440,
-                    burn: 2.55
-                },
-
-                B38M: {
-                    name: "Boeing 737 MAX 8",
-                    cruise: 455,
-                    burn: 2.35
-                }
-
-            },
-
-
-            airports: {
-
-                EHAM: "Amsterdam Schiphol",
-
-                LEBL: "Barcelona El Prat",
-
-                LIRF: "Rome Fiumicino",
-
-                LKPR: "Prague",
-
-                EGLL: "London Heathrow",
-
-                LFPG: "Paris Charles de Gaulle",
-
-                EDDF: "Frankfurt",
-
-                LOWW: "Vienna",
-
-                LSZH: "Zurich",
-
-                LGKR: "Corfu",
-
-                LGTS: "Thessaloniki",
-
-                LGSM: "Samos"
-
-            },
-
-
-            init() {
-
-                this.ensureStorage();
-
-                this.setupPlanner();
-
-                this.setupNavigation();
-
-                this.setupSearch();
-
-                this.setupTheme();
-
-                this.setupButtons();
-
-                this.renderFlights();
-
-                this.renderStatistics();
-
-                this.updateFooter();
-
-                this.updatePreview();
-
-            },
-
-
-            ensureStorage() {
-
-                if (!localStorage.getItem(this.keys.flights)) {
-
-                    localStorage.setItem(
-                        this.keys.flights,
-                        JSON.stringify([])
+                const result =
+                    event.target.closest(
+                        ".airport-result"
                     );
 
-                }
-
-            },
-
-
-            /* =====================================================
-               SIMBRIEF
-            ====================================================== */
-
-            setupPlanner() {
-
-                const username =
-                    document.getElementById(
-                        "simbriefUsername"
-                    );
-
-                const connectButton =
-                    document.getElementById(
-                        "simbriefConnectButton"
-                    );
-
-                const refreshButton =
-                    document.getElementById(
-                        "simbriefRefreshButton"
-                    );
-
-                const saveButton =
-                    document.getElementById(
-                        "saveSimBriefButton"
-                    );
-
-
-                if (!username || !connectButton) {
+                if (!result) {
                     return;
                 }
 
+                const airport = {
+                    icao:
+                        result.dataset.icao.toUpperCase(),
 
-                const savedUsername =
-                    localStorage.getItem(
-                        "flightapp_simbrief_username"
-                    ) || "";
+                    name:
+                        result.dataset.name,
 
+                    city:
+                        result.dataset.city,
 
-                username.value = savedUsername;
-
-
-                if (savedUsername) {
-
-                    this.setSimBriefConnectionState(
-                        "disconnected",
-                        "Username saved"
-                    );
-
-                    const status =
-                        document.getElementById(
-                            "simbriefStatus"
-                        );
-
-                    if (status) {
-                        status.textContent =
-                            "Username saved — connect to load your OFP";
-                    }
-                }
-
-
-                username.addEventListener(
-                    "input",
-                    () => {
-
-                        const value =
-                            username.value.trim();
-
-                        localStorage.setItem(
-                            "flightapp_simbrief_username",
-                            value
-                        );
-
-                        if (!value) {
-
-                            this.setSimBriefConnectionState(
-                                "disconnected",
-                                "Enter your username to connect"
-                            );
-
-                            return;
-                        }
-
-                        this.setSimBriefConnectionState(
-                            "disconnected",
-                            "Ready to connect"
-                        );
-
-                    }
-                );
-
-
-                connectButton.addEventListener(
-                    "click",
-                    () => this.connectSimBrief()
-                );
-
-
-                if (refreshButton) {
-
-                    refreshButton.addEventListener(
-                        "click",
-                        () => this.importSimBriefOFP()
-                    );
-
-                }
-
-
-                if (saveButton) {
-
-                    saveButton.addEventListener(
-                        "click",
-                        () => this.saveSimBriefPlan()
-                    );
-
-                }
-
-            },
-
-
-            async connectSimBrief() {
-
-                const username =
-                    document
-                        .getElementById("simbriefUsername")
-                        ?.value
-                        .trim();
-
-
-                if (!username) {
-
-                    this.setSimBriefConnectionState(
-                        "disconnected",
-                        "Username required"
-                    );
-
-                    this.toast(
-                        "SimBrief username required",
-                        "Enter your SimBrief username first.",
-                        "warning"
-                    );
-
-                    return;
-                }
-
+                    country:
+                        result.dataset.country
+                };
 
                 if (
-                    !/^[a-zA-Z0-9_.-]{1,80}$/.test(
-                        username
-                    )
+                    result.dataset.type ===
+                    "departure"
                 ) {
 
-                    this.setSimBriefConnectionState(
-                        "disconnected",
-                        "Invalid username"
+                    departureAirport =
+                        airport;
+
+                    departureInput.value =
+                        airport.name;
+
+                    departureCode.textContent =
+                        `${airport.icao} • ${[
+                            airport.city,
+                            airport.country
+                        ]
+                            .filter(Boolean)
+                            .join(", ")}`;
+
+                    departureResults.classList.remove(
+                        "show"
                     );
-
-                    this.toast(
-                        "Invalid username",
-                        "Please enter a valid SimBrief username.",
-                        "warning"
-                    );
-
-                    return;
-                }
-
-
-                localStorage.setItem(
-                    "flightapp_simbrief_username",
-                    username
-                );
-
-
-                const button =
-                    document.getElementById(
-                        "simbriefConnectButton"
-                    );
-
-
-                if (button) {
-
-                    button.disabled = true;
-
-                    button.innerHTML =
-                        `
-                        <i class="fa-solid fa-spinner fa-spin"></i>
-                        Connecting...
-                        `;
-
-                }
-
-
-                this.setSimBriefConnectionState(
-                    "connecting",
-                    "Connecting to SimBrief..."
-                );
-
-
-                try {
-
-                    const data =
-                        await apiFetch(
-                            `/api/simbrief/latest?username=${encodeURIComponent(username)}`
-                        );
-
-
-                    if (
-                        !data ||
-                        !data.available ||
-                        !data.ofp
-                    ) {
-
-                        throw new Error(
-                            data?.error ||
-                            "SimBrief data is not available."
-                        );
-
-                    }
-
-
-                    this.currentSimBriefOFP =
-                        data.ofp;
-
-
-                    this.renderSimBriefOFP(
-                        data.ofp
-                    );
-
-
-                    const result =
-                        document.getElementById(
-                            "simbriefResult"
-                        );
-
-
-                    if (result) {
-                        result.classList.remove(
-                            "hidden"
-                        );
-                    }
-
-
-                    this.setSimBriefConnectionState(
-                        "connected",
-                        "Connected"
-                    );
-
-
-                    const status =
-                        document.getElementById(
-                            "simbriefStatus"
-                        );
-
-
-                    if (status) {
-                        status.textContent =
-                            "Latest OFP loaded successfully";
-                    }
-
-
-                    this.toast(
-                        "SimBrief connected",
-                        "Your latest OFP is ready to use.",
-                        "success"
-                    );
-
-
-                } catch (error) {
-
-                    this.currentSimBriefOFP = null;
-
-
-                    const result =
-                        document.getElementById(
-                            "simbriefResult"
-                        );
-
-
-                    if (result) {
-                        result.classList.add(
-                            "hidden"
-                        );
-                    }
-
-
-                    this.setSimBriefConnectionState(
-                        "disconnected",
-                        "Connection failed"
-                    );
-
-
-                    const status =
-                        document.getElementById(
-                            "simbriefStatus"
-                        );
-
-
-                    if (status) {
-                        status.textContent =
-                            "Could not load SimBrief OFP";
-                    }
-
-
-                    this.toast(
-                        "SimBrief unavailable",
-                        error.message ||
-                        "No SimBrief data was available.",
-                        "warning"
-                    );
-
-
-                } finally {
-
-                    if (button) {
-
-                        button.disabled = false;
-
-                        button.innerHTML =
-                            `
-                            <i class="fa-solid fa-link"></i>
-                            Connect SimBrief
-                            `;
-
-                    }
-
-                }
-
-            },
-
-
-            setSimBriefConnectionState(
-                state,
-                message
-            ) {
-
-                const badge =
-                    document.getElementById(
-                        "simbriefConnectionBadge"
-                    );
-
-
-                if (!badge) {
-                    return;
-                }
-
-
-                badge.classList.remove(
-                    "connected",
-                    "disconnected",
-                    "connecting"
-                );
-
-
-                badge.classList.add(state);
-
-
-                if (state === "connected") {
-
-                    badge.innerHTML =
-                        `
-                        <i class="fa-solid fa-link"></i>
-                        ${message || "Connected"}
-                        `;
-
-                } else if (
-                    state === "connecting"
-                ) {
-
-                    badge.innerHTML =
-                        `
-                        <i class="fa-solid fa-spinner fa-spin"></i>
-                        ${message || "Connecting"}
-                        `;
 
                 } else {
 
-                    badge.innerHTML =
-                        `
-                        <i class="fa-solid fa-link-slash"></i>
-                        ${message || "Not connected"}
-                        `;
+                    arrivalAirport =
+                        airport;
 
-                }
+                    arrivalInput.value =
+                        airport.name;
 
-            },
+                    arrivalCode.textContent =
+                        `${airport.icao} • ${[
+                            airport.city,
+                            airport.country
+                        ]
+                            .filter(Boolean)
+                            .join(", ")}`;
 
-
-            async importSimBriefOFP() {
-
-                const username =
-                    document
-                        .getElementById(
-                            "simbriefUsername"
-                        )
-                        ?.value
-                        .trim();
-
-
-                if (!username) {
-
-                    this.toast(
-                        "SimBrief username required",
-                        "Enter your SimBrief username first.",
-                        "warning"
+                    arrivalResults.classList.remove(
+                        "show"
                     );
-
-                    return;
                 }
 
-
-                const refreshButton =
-                    document.getElementById(
-                        "simbriefRefreshButton"
-                    );
+                updatePreview();
+            }
+        );
 
 
-                if (refreshButton) {
+        /* =========================================================
+           DEPARTURE SEARCH
+        ========================================================= */
 
-                    refreshButton.disabled = true;
+        departureInput.addEventListener(
+            "input",
+            () => {
 
-                    refreshButton.innerHTML =
-                        `
-                        <i class="fa-solid fa-spinner fa-spin"></i>
-                        Refreshing...
-                        `;
+                departureAirport = null;
 
-                }
+                departureCode.textContent =
+                    "Select an airport";
 
+                clearTimeout(
+                    departureSearchTimer
+                );
 
-                const status =
-                    document.getElementById(
-                        "simbriefStatus"
-                    );
+                departureSearchTimer =
+                    setTimeout(() => {
 
-
-                if (status) {
-                    status.textContent =
-                        "Loading latest OFP...";
-                }
-
-
-                try {
-
-                    const data =
-                        await apiFetch(
-                            `/api/simbrief/latest?username=${encodeURIComponent(username)}`
+                        searchAirports(
+                            departureInput.value,
+                            departureResults,
+                            "departure"
                         );
 
+                    }, 300);
+            }
+        );
 
-                    if (
-                        !data?.available ||
-                        !data?.ofp
-                    ) {
 
-                        throw new Error(
-                            data?.error ||
-                            "SimBrief data is not available."
+        /* =========================================================
+           ARRIVAL SEARCH
+        ========================================================= */
+
+        arrivalInput.addEventListener(
+            "input",
+            () => {
+
+                arrivalAirport = null;
+
+                arrivalCode.textContent =
+                    "Select an airport";
+
+                clearTimeout(
+                    arrivalSearchTimer
+                );
+
+                arrivalSearchTimer =
+                    setTimeout(() => {
+
+                        searchAirports(
+                            arrivalInput.value,
+                            arrivalResults,
+                            "arrival"
                         );
 
-                    }
+                    }, 300);
+            }
+        );
 
 
-                    this.currentSimBriefOFP =
-                        data.ofp;
+        /* =========================================================
+           ICAO DIRECT INPUT
+        ========================================================= */
 
+        async function resolveDirectICAO(
+            input,
+            type
+        ) {
 
-                    this.renderSimBriefOFP(
-                        data.ofp
+            const value =
+                input.value
+                    .trim()
+                    .toUpperCase();
+
+            if (
+                !/^[A-Z]{4}$/.test(value)
+            ) {
+                return;
+            }
+
+            try {
+
+                const response =
+                    await fetch(
+                        `${API_BASE}/api/airports/${value}`
                     );
 
-
-                    document
-                        .getElementById(
-                            "simbriefResult"
-                        )
-                        ?.classList
-                        .remove("hidden");
-
-
-                    this.setSimBriefConnectionState(
-                        "connected",
-                        "Connected"
-                    );
-
-
-                    if (status) {
-                        status.textContent =
-                            "Latest OFP refreshed";
-                    }
-
-
-                    this.toast(
-                        "OFP refreshed",
-                        "Your latest SimBrief flight plan has been loaded.",
-                        "success"
-                    );
-
-
-                } catch (error) {
-
-                    this.toast(
-                        "Refresh failed",
-                        error.message ||
-                        "Could not refresh SimBrief.",
-                        "warning"
-                    );
-
-
-                    if (status) {
-                        status.textContent =
-                            "Refresh failed";
-                    }
-
-                } finally {
-
-                    if (refreshButton) {
-
-                        refreshButton.disabled = false;
-
-                        refreshButton.innerHTML =
-                            `
-                            <i class="fa-solid fa-rotate"></i>
-                            Refresh OFP
-                            `;
-
-                    }
-
-                }
-
-            },
-
-
-            ofpValue(ofp, paths) {
-
-                for (const path of paths) {
-
-                    let value = ofp;
-
-                    for (
-                        const key
-                        of path.split(".")
-                    ) {
-
-                        if (value == null) {
-                            break;
-                        }
-
-                        value = value[key];
-
-                    }
-
-
-                    if (
-                        value != null &&
-                        String(value).trim() !== ""
-                    ) {
-
-                        return value;
-
-                    }
-
-                }
-
-
-                return null;
-
-            },
-
-
-            formatOFPTime(value) {
-
-                if (
-                    value == null ||
-                    value === ""
-                ) {
-
-                    return "Not available";
-
-                }
-
-
-                const n = Number(value);
-
-
-                if (
-                    Number.isFinite(n) &&
-                    n > 0
-                ) {
-
-                    const h =
-                        Math.floor(n / 60);
-
-                    const m =
-                        n % 60;
-
-
-                    return (
-                        `${String(h).padStart(2, "0")}:` +
-                        `${String(m).padStart(2, "0")}`
-                    );
-
-                }
-
-
-                const text =
-                    String(value);
-
-
-                if (
-                    /^\d{3,4}$/.test(text)
-                ) {
-
-                    const padded =
-                        text.padStart(4, "0");
-
-
-                    return (
-                        `${padded.slice(0, -2)}:` +
-                        `${padded.slice(-2)}`
-                    );
-
-                }
-
-
-                return text;
-
-            },
-
-
-            formatDistance(value) {
-
-                if (
-                    value == null ||
-                    value === ""
-                ) {
-
-                    return "Not available";
-
-                }
-
-
-                const n = Number(value);
-
-
-                if (Number.isFinite(n)) {
-
-                    return (
-                        `${Math.round(n).toLocaleString()} NM`
-                    );
-
-                }
-
-
-                return String(value);
-
-            },
-
-
-            formatAltitude(value) {
-
-                if (
-                    value == null ||
-                    value === ""
-                ) {
-
-                    return "Not available";
-
-                }
-
-
-                const text =
-                    String(value).trim();
-
-
-                if (
-                    /^FL\d+$/i.test(text)
-                ) {
-
-                    return text.toUpperCase();
-
-                }
-
-
-                const n =
-                    Number(
-                        text.replace(
-                            /[^0-9]/g,
-                            ""
-                        )
-                    );
-
-
-                if (
-                    Number.isFinite(n) &&
-                    n > 0
-                ) {
-
-                    return (
-                        `${n.toLocaleString()} ft`
-                    );
-
-                }
-
-
-                return text;
-
-            },
-
-
-            renderSimBriefOFP(ofp) {
-
-                const departure =
-                    this.ofpValue(
-                        ofp,
-                        [
-                            "general.origin",
-                            "origin.icao_code",
-                            "origin"
-                        ]
-                    );
-
-
-                const arrival =
-                    this.ofpValue(
-                        ofp,
-                        [
-                            "general.destination",
-                            "destination.icao_code",
-                            "destination"
-                        ]
-                    );
-
-
-                const flight =
-                    this.ofpValue(
-                        ofp,
-                        [
-                            "general.flight_number",
-                            "general.flightno",
-                            "flight_number"
-                        ]
-                    );
-
-
-                const aircraft =
-                    this.ofpValue(
-                        ofp,
-                        [
-                            "aircraft.icaocode",
-                            "aircraft.icao_code",
-                            "general.aircraft",
-                            "general.type",
-                            "aircraft.type"
-                        ]
-                    );
-
-
-                const distance =
-                    this.ofpValue(
-                        ofp,
-                        [
-                            "general.air_distance",
-                            "general.air_distance_nm",
-                            "general.distance"
-                        ]
-                    );
-
-
-                const time =
-                    this.ofpValue(
-                        ofp,
-                        [
-                            "times.est_time_enroute",
-                            "general.est_time_enroute",
-                            "general.enroute_time",
-                            "general.air_time",
-                            "general.flight_time"
-                        ]
-                    );
-
-
-                const altitude =
-                    this.ofpValue(
-                        ofp,
-                        [
-                            "general.initial_altitude",
-                            "general.cruise_altitude",
-                            "general.cruise_alt"
-                        ]
-                    );
-
-
-                const ofpId =
-                    this.ofpValue(
-                        ofp,
-                        [
-                            "params.ofp_id",
-                            "general.ofp_id",
-                            "general.release",
-                            "ofp_id"
-                        ]
-                    );
-
-
-                const route =
-                    this.ofpValue(
-                        ofp,
-                        [
-                            "general.route",
-                            "route",
-                            "navlog.route"
-                        ]
-                    );
-
-
-                const set =
-                    (id, value) => {
-
-                        const el =
-                            document.getElementById(
-                                id
-                            );
-
-
-                        if (!el) {
-                            return;
-                        }
-
-
-                        if (
-                            value == null ||
-                            String(value).trim() === ""
-                        ) {
-
-                            el.textContent =
-                                "Not available";
-
-                        } else {
-
-                            el.textContent =
-                                String(value);
-
-                        }
-
-                    };
-
-
-                set(
-                    "simbriefRoute",
-                    departure && arrival
-                        ? `${departure} → ${arrival}`
-                        : "Not available"
-                );
-
-
-                set(
-                    "simbriefFlightNumber",
-                    flight
-                );
-
-
-                set(
-                    "simbriefAircraft",
-                    aircraft
-                );
-
-
-                set(
-                    "simbriefDistance",
-                    this.formatDistance(
-                        distance
-                    )
-                );
-
-
-                set(
-                    "simbriefTime",
-                    this.formatOFPTime(
-                        time
-                    )
-                );
-
-
-                set(
-                    "simbriefAltitude",
-                    this.formatAltitude(
-                        altitude
-                    )
-                );
-
-
-                set(
-                    "simbriefOfpId",
-                    ofpId
-                );
-
-
-                set(
-                    "simbriefRouteText",
-                    route
-                );
-
-
-                set(
-                    "simbriefResultStatus",
-                    departure && arrival
-                        ? "Available"
-                        : "Partially available"
-                );
-
-            },
-
-
-            async saveSimBriefPlan() {
-
-                const ofp =
-                    this.currentSimBriefOFP;
-
-
-                if (!ofp) {
-
-                    this.toast(
-                        "No OFP loaded",
-                        "Import a SimBrief OFP first.",
-                        "warning"
-                    );
-
+                if (!response.ok) {
                     return;
-
                 }
 
+                const data =
+                    await response.json();
 
-                const departure =
-                    this.ofpValue(
-                        ofp,
-                        [
-                            "general.origin",
-                            "origin.icao_code",
-                            "origin"
-                        ]
-                    );
-
-
-                const arrival =
-                    this.ofpValue(
-                        ofp,
-                        [
-                            "general.destination",
-                            "destination.icao_code",
-                            "destination"
-                        ]
-                    );
-
-
-                if (
-                    !departure ||
-                    !arrival
-                ) {
-
-                    this.toast(
-                        "Flight not saved",
-                        "Departure or arrival is missing from the OFP.",
-                        "warning"
-                    );
-
-                    return;
-
-                }
-
-
-                const distance =
-                    this.ofpValue(
-                        ofp,
-                        [
-                            "general.air_distance",
-                            "general.air_distance_nm",
-                            "general.distance"
-                        ]
-                    );
-
-
-                const estimatedTime =
-                    this.ofpValue(
-                        ofp,
-                        [
-                            "times.est_time_enroute",
-                            "general.est_time_enroute",
-                            "general.enroute_time",
-                            "general.air_time",
-                            "general.flight_time"
-                        ]
-                    );
-
-
-                const altitude =
-                    this.ofpValue(
-                        ofp,
-                        [
-                            "general.initial_altitude",
-                            "general.cruise_altitude",
-                            "general.cruise_alt"
-                        ]
-                    );
-
-
-                const flightNumber =
-                    this.ofpValue(
-                        ofp,
-                        [
-                            "general.flight_number",
-                            "general.flightno",
-                            "flight_number"
-                        ]
-                    );
-
-
-                const aircraft =
-                    this.ofpValue(
-                        ofp,
-                        [
-                            "aircraft.icaocode",
-                            "aircraft.icao_code",
-                            "general.aircraft",
-                            "general.type",
-                            "aircraft.type"
-                        ]
-                    );
-
-
-                const route =
-                    this.ofpValue(
-                        ofp,
-                        [
-                            "general.route",
-                            "route",
-                            "navlog.route"
-                        ]
-                    );
-
-
-                const ofpId =
-                    this.ofpValue(
-                        ofp,
-                        [
-                            "params.ofp_id",
-                            "general.ofp_id",
-                            "general.release",
-                            "ofp_id"
-                        ]
-                    );
-
-
-                const payload = {
-
+                const airport = {
+                    icao: value,
                     name:
-                        flightNumber ||
-                        `${departure} → ${arrival}`,
-
-                    departure_icao:
-                        departure,
-
-                    arrival_icao:
-                        arrival,
-
-                    aircraft_icao:
-                        aircraft,
-
-                    cruise_altitude:
-                        Number(
-                            String(
-                                altitude || ""
-                            ).replace(
-                                /[^0-9]/g,
-                                ""
-                            )
-                        ) || null,
-
-                    route:
-                        route,
-
-                    distance_nm:
-                        Number(distance) || null,
-
-                    estimated_minutes:
-                        Number(estimatedTime) || null,
-
-                    simbrief_ofp_id:
-                        ofpId
-
+                        data.name ||
+                        value,
+                    city:
+                        data.city ||
+                        "",
+                    country:
+                        data.country ||
+                        ""
                 };
 
-
-                const saveButton =
-                    document.getElementById(
-                        "saveSimBriefButton"
-                    );
-
-
-                if (saveButton) {
-
-                    saveButton.disabled = true;
-
-                    saveButton.innerHTML =
-                        `
-                        <i class="fa-solid fa-spinner fa-spin"></i>
-                        Saving...
-                        `;
-
-                }
-
-
-                try {
-
-                    await apiFetch(
-                        "/api/plans",
-                        {
-                            method: "POST",
-
-                            headers: {
-                                "Content-Type":
-                                    "application/json"
-                            },
-
-                            body:
-                                JSON.stringify(
-                                    payload
-                                )
-                        }
-                    );
-
-
-                    /*
-                     * Also add the flight to the
-                     * local Flight App dashboard.
-                     */
-
-                    this.saveFlight({
-
-                        id:
-                            `simbrief-${Date.now()}`,
-
-                        name:
-                            payload.name,
-
-                        departure:
-                            departure,
-
-                        arrival:
-                            arrival,
-
-                        aircraft:
-                            aircraft ||
-                            "Unknown",
-
-                        distance:
-                            Number(distance) || 0,
-
-                        duration:
-                            Number(estimatedTime) || 0,
-
-                        status:
-                            "Planned",
-
-                        source:
-                            "SimBrief",
-
-                        simbrief_ofp_id:
-                            ofpId,
-
-                        createdAt:
-                            new Date().toISOString()
-
-                    });
-
-
-                    this.renderFlights();
-
-                    this.renderStatistics();
-
-
-                    this.toast(
-                        "Flight plan saved",
-                        `${departure} → ${arrival} was saved successfully.`,
-                        "success"
-                    );
-
-
-                } catch (error) {
-
-                    this.toast(
-                        "Save failed",
-                        error.message ||
-                        "The backend could not save the flight plan.",
-                        "warning"
-                    );
-
-                } finally {
-
-                    if (saveButton) {
-
-                        saveButton.disabled = false;
-
-                        saveButton.innerHTML =
-                            `
-                            <i class="fa-solid fa-floppy-disk"></i>
-                            Save to Flight App
-                            `;
-
-                    }
-
-                }
-
-            },
-
-
-            saveFlight(flight) {
-
-                const flights =
-                    this.getFlights();
-
-
-                flights.unshift(
-                    flight
-                );
-
-
-                localStorage.setItem(
-                    this.keys.flights,
-                    JSON.stringify(
-                        flights
-                    )
-                );
-
-            },
-
-
-            getFlights() {
-
-                try {
-
-                    const data =
-                        JSON.parse(
-                            localStorage.getItem(
-                                this.keys.flights
-                            ) || "[]"
-                        );
-
-
-                    return Array.isArray(data)
-                        ? data
-                        : [];
-
-                } catch {
-
-                    return [];
-
-                }
-
-            },
-
-
-            /* =====================================================
-               DASHBOARD
-            ====================================================== */
-
-            renderFlights() {
-
-                const list =
-                    document.getElementById(
-                        "flightList"
-                    );
-
-
-                const count =
-                    document.getElementById(
-                        "flightCount"
-                    );
-
-
-                if (!list) {
-                    return;
-                }
-
-
-                const flights =
-                    this.getFlights();
-
-
-                if (count) {
-
-                    count.textContent =
-                        `${flights.length} ${
-                            flights.length === 1
-                                ? "flight"
-                                : "flights"
-                        }`;
-
-                }
-
-
-                if (!flights.length) {
-
-                    list.innerHTML =
-                        `
-                        <div class="empty-state">
-                            <i class="fa-solid fa-plane-slash"></i>
-                            <br><br>
-                            No flights recorded yet.
-                            Import a SimBrief OFP to get started.
-                        </div>
-                        `;
-
-                    return;
-
-                }
-
-
-                list.innerHTML =
-                    flights
-                        .slice(0, 8)
-                        .map(
-                            flight => {
-
-                                const departure =
-                                    flight.departure ||
-                                    flight.departure_icao ||
-                                    "----";
-
-
-                                const arrival =
-                                    flight.arrival ||
-                                    flight.arrival_icao ||
-                                    "----";
-
-
-                                const aircraft =
-                                    flight.aircraft ||
-                                    flight.aircraft_icao ||
-                                    "Unknown";
-
-
-                                const status =
-                                    flight.status ||
-                                    "Completed";
-
-
-                                return `
-                                    <div class="flight-item">
-
-                                        <div class="flight-main">
-
-                                            <div class="flight-route">
-                                                ${this.escapeHTML(departure)}
-                                                →
-                                                ${this.escapeHTML(arrival)}
-                                            </div>
-
-                                            <div class="flight-meta">
-                                                ${this.escapeHTML(aircraft)}
-                                                ${
-                                                    flight.source
-                                                        ? ` · ${this.escapeHTML(flight.source)}`
-                                                        : ""
-                                                }
-                                            </div>
-
-                                        </div>
-
-                                        <div class="flight-status">
-                                            ${this.escapeHTML(status)}
-                                        </div>
-
-                                    </div>
-                                `;
-
-                            }
-                        )
-                        .join("");
-
-            },
-
-
-            renderStatistics() {
-
-                const flights =
-                    this.getFlights();
-
-
-                const totalDistance =
-                    flights.reduce(
-                        (
-                            total,
-                            flight
-                        ) => {
-
-                            return (
-                                total +
-                                (
-                                    Number(
-                                        flight.distance
-                                    ) || 0
-                                )
-                            );
-
-                        },
-                        0
-                    );
-
-
-                const totalMinutes =
-                    flights.reduce(
-                        (
-                            total,
-                            flight
-                        ) => {
-
-                            return (
-                                total +
-                                (
-                                    Number(
-                                        flight.duration
-                                    ) || 0
-                                )
-                            );
-
-                        },
-                        0
-                    );
-
-
-                const aircraft =
-                    new Set(
-                        flights
-                            .map(
-                                flight =>
-                                    flight.aircraft ||
-                                    flight.aircraft_icao
-                            )
+                if (type === "departure") {
+
+                    departureAirport =
+                        airport;
+
+                    departureCode.textContent =
+                        `${value} • ${[
+                            airport.city,
+                            airport.country
+                        ]
                             .filter(Boolean)
-                    );
+                            .join(", ") ||
+                            "Airport"}`;
 
+                } else {
 
-                const statFlights =
-                    document.getElementById(
-                        "statFlights"
-                    );
+                    arrivalAirport =
+                        airport;
 
-
-                const statDistance =
-                    document.getElementById(
-                        "statDistance"
-                    );
-
-
-                const statHours =
-                    document.getElementById(
-                        "statHours"
-                    );
-
-
-                const statAircraft =
-                    document.getElementById(
-                        "statAircraft"
-                    );
-
-
-                if (statFlights) {
-
-                    statFlights.textContent =
-                        flights.length;
-
+                    arrivalCode.textContent =
+                        `${value} • ${[
+                            airport.city,
+                            airport.country
+                        ]
+                            .filter(Boolean)
+                            .join(", ") ||
+                            "Airport"}`;
                 }
 
+                updatePreview();
 
-                if (statDistance) {
+            } catch (error) {
 
-                    statDistance.textContent =
-                        Math.round(
-                            totalDistance
-                        ).toLocaleString();
-
-                }
-
-
-                if (statHours) {
-
-                    statHours.textContent =
-                        `${Math.floor(
-                            totalMinutes / 60
-                        )}h`;
-
-                }
-
-
-                if (statAircraft) {
-
-                    statAircraft.textContent =
-                        aircraft.size;
-
-                }
-
-            },
-
-
-            /* =====================================================
-               NAVIGATION
-            ====================================================== */
-
-            setupNavigation() {
-
-                document
-                    .querySelectorAll(
-                        ".nav-links a"
-                    )
-                    .forEach(
-                        link => {
-
-                            link.addEventListener(
-                                "click",
-                                () => {
-
-                                    document
-                                        .querySelectorAll(
-                                            ".nav-links a"
-                                        )
-                                        .forEach(
-                                            item =>
-                                                item.classList.remove(
-                                                    "active"
-                                                )
-                                        );
-
-
-                                    link.classList.add(
-                                        "active"
-                                    );
-
-                                }
-                            );
-
-                        }
-                    );
-
-            },
-
-
-            /* =====================================================
-               SEARCH
-            ====================================================== */
-
-            setupSearch() {
-
-                const button =
-                    document.getElementById(
-                        "searchButton"
-                    );
-
-
-                const overlay =
-                    document.getElementById(
-                        "searchOverlay"
-                    );
-
-
-                const close =
-                    document.getElementById(
-                        "closeSearchButton"
-                    );
-
-
-                const input =
-                    document.getElementById(
-                        "searchInput"
-                    );
-
-
-                const results =
-                    document.getElementById(
-                        "searchResults"
-                    );
-
-
-                if (!button || !overlay) {
-                    return;
-                }
-
-
-                button.addEventListener(
-                    "click",
-                    () => {
-
-                        overlay.classList.remove(
-                            "hidden"
-                        );
-
-                        setTimeout(
-                            () =>
-                                input?.focus(),
-                            50
-                        );
-
-                    }
+                console.warn(
+                    "Could not resolve ICAO:",
+                    error
                 );
+            }
+        }
 
 
-                close?.addEventListener(
-                    "click",
-                    () => {
-
-                        overlay.classList.add(
-                            "hidden"
-                        );
-
-                    }
-                );
-
-
-                overlay.addEventListener(
-                    "click",
-                    event => {
-
-                        if (
-                            event.target ===
-                            overlay
-                        ) {
-
-                            overlay.classList.add(
-                                "hidden"
-                            );
-
-                        }
-
-                    }
-                );
-
-
-                input?.addEventListener(
-                    "input",
-                    () => {
-
-                        const query =
-                            input.value
-                                .trim()
-                                .toLowerCase();
-
-
-                        if (!query) {
-
-                            results.innerHTML =
-                                "";
-
-                            return;
-
-                        }
-
-
-                        const pages = [
-
-                            {
-                                title: "Flight Planner",
-                                text: "Plan your flight with SimBrief.",
-                                target: "#planner"
-                            },
-
-                            {
-                                title: "Dashboard",
-                                text: "View your flight statistics and history.",
-                                target: "#dashboard"
-                            },
-
-                            {
-                                title: "Features",
-                                text: "Explore Flight App features.",
-                                target: "#features"
-                            },
-
-                            {
-                                title: "Tools",
-                                text: "Explore useful aviation tools.",
-                                target: "#tools"
-                            }
-
-                        ];
-
-
-                        const matches =
-                            pages.filter(
-                                page =>
-                                    page.title
-                                        .toLowerCase()
-                                        .includes(query) ||
-                                    page.text
-                                        .toLowerCase()
-                                        .includes(query)
-                            );
-
-
-                        results.innerHTML =
-                            matches.length
-                                ? matches
-                                    .map(
-                                        page =>
-                                            `
-                                            <a
-                                                href="${page.target}"
-                                                class="search-result"
-                                            >
-                                                <strong>
-                                                    ${this.escapeHTML(page.title)}
-                                                </strong>
-
-                                                <div style="color:var(--text-muted);font-size:10px;">
-                                                    ${this.escapeHTML(page.text)}
-                                                </div>
-                                            </a>
-                                            `
-                                    )
-                                    .join("")
-                                : `
-                                    <div class="empty-state">
-                                        No results found.
-                                    </div>
-                                `;
-
-
-                        results
-                            .querySelectorAll(
-                                ".search-result"
-                            )
-                            .forEach(
-                                result => {
-
-                                    result.addEventListener(
-                                        "click",
-                                        () => {
-
-                                            overlay.classList.add(
-                                                "hidden"
-                                            );
-
-                                        }
-                                    );
-
-                                }
-                            );
-
-                    }
-                );
-
-            },
-
-
-            /* =====================================================
-               THEME
-            ====================================================== */
-
-            setupTheme() {
-
-                const savedTheme =
-                    localStorage.getItem(
-                        this.keys.theme
-                    );
-
-
-                if (savedTheme === "dark") {
-
-                    this.applyDarkTheme();
-
-                }
-
-            },
-
-
-            applyDarkTheme() {
-
-                /*
-                 * The original application can expand this
-                 * theme system later. The button remains functional.
-                 */
-
-                document.documentElement.style.setProperty(
-                    "--background",
-                    "#111827"
-                );
-
-                document.documentElement.style.setProperty(
-                    "--surface",
-                    "#182230"
-                );
-
-                document.documentElement.style.setProperty(
-                    "--surface-soft",
-                    "#202b3b"
-                );
-
-                document.documentElement.style.setProperty(
-                    "--text",
-                    "#f4f7fb"
-                );
-
-                document.documentElement.style.setProperty(
-                    "--text-muted",
-                    "#9aa6b7"
-                );
-
-                document.documentElement.style.setProperty(
-                    "--border",
-                    "#2b3748"
-                );
-
-            },
-
-
-            resetLightTheme() {
-
-                document.documentElement.style.setProperty(
-                    "--background",
-                    "#f4f7fb"
-                );
-
-                document.documentElement.style.setProperty(
-                    "--surface",
-                    "#ffffff"
-                );
-
-                document.documentElement.style.setProperty(
-                    "--surface-soft",
-                    "#f8fafc"
-                );
-
-                document.documentElement.style.setProperty(
-                    "--text",
-                    "#182230"
-                );
-
-                document.documentElement.style.setProperty(
-                    "--text-muted",
-                    "#6d7888"
-                );
-
-                document.documentElement.style.setProperty(
-                    "--border",
-                    "#e3e8ef"
-                );
-
-            },
-
-
-            /* =====================================================
-               BUTTONS
-            ====================================================== */
-
-            setupButtons() {
-
-                const themeButton =
-                    document.getElementById(
-                        "themeButton"
-                    );
-
-
-                themeButton?.addEventListener(
-                    "click",
-                    () => {
-
-                        const current =
-                            localStorage.getItem(
-                                this.keys.theme
-                            );
-
-
-                        if (current === "dark") {
-
-                            localStorage.setItem(
-                                this.keys.theme,
-                                "light"
-                            );
-
-                            this.resetLightTheme();
-
-                        } else {
-
-                            localStorage.setItem(
-                                this.keys.theme,
-                                "dark"
-                            );
-
-                            this.applyDarkTheme();
-
-                        }
-
-                    }
-                );
-
-            },
-
-
-            /* =====================================================
-               PREVIEW
-            ====================================================== */
-
-            updatePreview() {
-
-                return;
-
-            },
-
-
-            /* =====================================================
-               FOOTER
-            ====================================================== */
-
-            updateFooter() {
-
-                const footer =
-                    document.getElementById(
-                        "footerCopyright"
-                    );
-
-
-                if (!footer) {
-                    return;
-                }
-
-
-                footer.textContent =
-                    `© ${new Date().getFullYear()} Flight App. All rights reserved.`;
-
-            },
-
-
-            /* =====================================================
-               TOAST
-            ====================================================== */
-
-            toast(
-                title,
-                message,
-                type = "success"
-            ) {
-
-                const container =
-                    document.getElementById(
-                        "toastContainer"
-                    );
-
-
-                if (!container) {
-                    return;
-                }
-
-
-                const toast =
-                    document.createElement(
-                        "div"
-                    );
-
-
-                toast.className =
-                    `toast ${type}`;
-
-
-                toast.innerHTML =
-                    `
-                    <div class="toast-title">
-                        ${this.escapeHTML(title)}
-                    </div>
-
-                    <div class="toast-message">
-                        ${this.escapeHTML(message)}
-                    </div>
-                    `;
-
-
-                container.appendChild(
-                    toast
-                );
-
+        departureInput.addEventListener(
+            "blur",
+            () => {
 
                 setTimeout(
                     () => {
 
-                        toast.style.opacity =
-                            "0";
-
-                        toast.style.transform =
-                            "translateY(10px)";
-
-                        toast.style.transition =
-                            "0.25s ease";
-
-
-                        setTimeout(
-                            () =>
-                                toast.remove(),
-                            250
+                        resolveDirectICAO(
+                            departureInput,
+                            "departure"
                         );
 
                     },
-                    4000
+                    150
                 );
-
-            },
-
-
-            /* =====================================================
-               SECURITY
-            ====================================================== */
-
-            escapeHTML(value) {
-
-                return String(value ?? "")
-                    .replace(
-                        /&/g,
-                        "&amp;"
-                    )
-                    .replace(
-                        /</g,
-                        "&lt;"
-                    )
-                    .replace(
-                        />/g,
-                        "&gt;"
-                    )
-                    .replace(
-                        /"/g,
-                        "&quot;"
-                    )
-                    .replace(
-                        /'/g,
-                        "&#039;"
-                    );
-
-            }
-
-        };
-
-
-        document.addEventListener(
-            "DOMContentLoaded",
-            () => {
-
-                FlightApp.init();
-
             }
         );
+
+
+        arrivalInput.addEventListener(
+            "blur",
+            () => {
+
+                setTimeout(
+                    () => {
+
+                        resolveDirectICAO(
+                            arrivalInput,
+                            "arrival"
+                        );
+
+                    },
+                    150
+                );
+            }
+        );
+
+
+        /* =========================================================
+           SWAP
+        ========================================================= */
+
+        swapButton.addEventListener(
+            "click",
+            () => {
+
+                const oldDeparture =
+                    departureAirport;
+
+                departureAirport =
+                    arrivalAirport;
+
+                arrivalAirport =
+                    oldDeparture;
+
+                const oldInput =
+                    departureInput.value;
+
+                departureInput.value =
+                    arrivalInput.value;
+
+                arrivalInput.value =
+                    oldInput;
+
+                updateAirportLabels();
+
+                updatePreview();
+            }
+        );
+
+
+        function updateAirportLabels() {
+
+            if (departureAirport) {
+
+                departureCode.textContent =
+                    `${departureAirport.icao} • ${[
+                        departureAirport.city,
+                        departureAirport.country
+                    ]
+                        .filter(Boolean)
+                        .join(", ")}`;
+
+            } else {
+
+                departureCode.textContent =
+                    "Select an airport";
+            }
+
+
+            if (arrivalAirport) {
+
+                arrivalCode.textContent =
+                    `${arrivalAirport.icao} • ${[
+                        arrivalAirport.city,
+                        arrivalAirport.country
+                    ]
+                        .filter(Boolean)
+                        .join(", ")}`;
+
+            } else {
+
+                arrivalCode.textContent =
+                    "Select an airport";
+            }
+        }
+
+
+        /* =========================================================
+           AIRCRAFT
+        ========================================================= */
+
+        function getAircraft() {
+
+            const selected =
+                document.querySelector(
+                    'input[name="aircraft"]:checked'
+                );
+
+            return selected
+                ? selected.value
+                : "A320";
+        }
+
+
+        document
+            .querySelectorAll(
+                'input[name="aircraft"]'
+            )
+            .forEach(input => {
+
+                input.addEventListener(
+                    "change",
+                    updatePreview
+                );
+
+            });
+
+
+        /* =========================================================
+           PREVIEW
+        ========================================================= */
+
+        function updatePreview() {
+
+            document.getElementById(
+                "previewDeparture"
+            ).textContent =
+                departureAirport
+                    ? departureAirport.icao
+                    : "----";
+
+            document.getElementById(
+                "previewArrival"
+            ).textContent =
+                arrivalAirport
+                    ? arrivalAirport.icao
+                    : "----";
+
+
+            document.getElementById(
+                "previewAircraft"
+            ).textContent =
+                getAircraft();
+
+
+            const airline =
+                document.getElementById(
+                    "airline"
+                ).value
+                    .trim()
+                    .toUpperCase();
+
+            const flightNumber =
+                document.getElementById(
+                    "flightNumber"
+                ).value
+                    .trim()
+                    .toUpperCase();
+
+            const callsign =
+                document.getElementById(
+                    "callsign"
+                ).value
+                    .trim()
+                    .toUpperCase();
+
+            document.getElementById(
+                "previewFlight"
+            ).textContent =
+                airline && flightNumber
+                    ? `${airline}${flightNumber}`
+                    : flightNumber || "—";
+
+
+            document.getElementById(
+                "previewCallsign"
+            ).textContent =
+                callsign ||
+                (
+                    airline &&
+                    flightNumber
+                        ? `${airline}${flightNumber}`
+                        : "—"
+                );
+
+
+            const altitude =
+                Number(
+                    document.getElementById(
+                        "altitude"
+                    ).value
+                ) || 0;
+
+            document.getElementById(
+                "previewAltitude"
+            ).textContent =
+                altitude
+                    ? `FL${Math.round(
+                        altitude / 100
+                    )
+                        .toString()
+                        .padStart(3, "0")}`
+                    : "—";
+
+
+            document.getElementById(
+                "previewPassengers"
+            ).textContent =
+                document.getElementById(
+                    "passengers"
+                ).value || "0";
+
+
+            document.getElementById(
+                "previewAlternate"
+            ).textContent =
+                document.getElementById(
+                    "alternate"
+                ).value
+                    .trim()
+                    .toUpperCase() || "—";
+        }
+
+
+        [
+            "airline",
+            "flightNumber",
+            "callsign",
+            "alternate",
+            "altitude",
+            "passengers"
+        ]
+            .forEach(id => {
+
+                document
+                    .getElementById(id)
+                    .addEventListener(
+                        "input",
+                        updatePreview
+                    );
+
+            });
+
+
+        /* =========================================================
+           CREATE SIMBRIEF URL
+        ========================================================= */
+
+        function createSimBriefURL() {
+
+            if (!departureAirport) {
+
+                showStatus(
+                    "Please select a departure airport.",
+                    "error"
+                );
+
+                return null;
+            }
+
+            if (!arrivalAirport) {
+
+                showStatus(
+                    "Please select an arrival airport.",
+                    "error"
+                );
+
+                return null;
+            }
+
+            if (
+                departureAirport.icao ===
+                arrivalAirport.icao
+            ) {
+
+                showStatus(
+                    "Departure and arrival airports cannot be the same.",
+                    "error"
+                );
+
+                return null;
+            }
+
+
+            const aircraft =
+                getAircraft();
+
+            const airline =
+                document.getElementById(
+                    "airline"
+                ).value
+                    .trim()
+                    .toUpperCase();
+
+            const flightNumber =
+                document.getElementById(
+                    "flightNumber"
+                ).value
+                    .trim()
+                    .toUpperCase();
+
+            const callsignInput =
+                document.getElementById(
+                    "callsign"
+                ).value
+                    .trim()
+                    .toUpperCase();
+
+            const alternate =
+                document.getElementById(
+                    "alternate"
+                ).value
+                    .trim()
+                    .toUpperCase();
+
+            const altitude =
+                document.getElementById(
+                    "altitude"
+                ).value;
+
+            const passengers =
+                document.getElementById(
+                    "passengers"
+                ).value;
+
+            const cargo =
+                document.getElementById(
+                    "cargo"
+                ).value;
+
+            const route =
+                document.getElementById(
+                    "route"
+                ).value.trim();
+
+            const callsign =
+                callsignInput ||
+                (
+                    airline &&
+                    flightNumber
+                        ? `${airline}${flightNumber}`
+                        : ""
+                );
+
+
+            const params =
+                new URLSearchParams();
+
+
+            /*
+             * Required SimBrief parameters
+             */
+
+            params.set(
+                "newflight",
+                "1"
+            );
+
+            params.set(
+                "orig",
+                departureAirport.icao
+            );
+
+            params.set(
+                "dest",
+                arrivalAirport.icao
+            );
+
+            params.set(
+                "type",
+                aircraft
+            );
+
+
+            /*
+             * Optional parameters
+             */
+
+            if (airline) {
+
+                params.set(
+                    "airline",
+                    airline
+                );
+            }
+
+            if (flightNumber) {
+
+                params.set(
+                    "fltnum",
+                    flightNumber
+                );
+            }
+
+            if (callsign) {
+
+                params.set(
+                    "callsign",
+                    callsign
+                );
+            }
+
+            if (alternate) {
+
+                params.set(
+                    "altn",
+                    alternate
+                );
+            }
+
+            if (altitude) {
+
+                params.set(
+                    "fl",
+                    altitude
+                );
+            }
+
+            if (passengers) {
+
+                params.set(
+                    "pax",
+                    passengers
+                );
+            }
+
+            if (cargo) {
+
+                params.set(
+                    "cargo",
+                    cargo
+                );
+            }
+
+            if (route) {
+
+                params.set(
+                    "route",
+                    route
+                );
+            }
+
+
+            /*
+             * Automatically select SID/STAR
+             */
+
+            if (
+                document.getElementById(
+                    "findSidStar"
+                ).checked
+            ) {
+
+                params.set(
+                    "find_sidstar",
+                    "1"
+                );
+            }
+
+
+            /*
+             * Optional OFP settings
+             */
+
+            if (
+                document.getElementById(
+                    "includeNotams"
+                ).checked
+            ) {
+
+                params.set(
+                    "notams",
+                    "1"
+                );
+            }
+
+            if (
+                document.getElementById(
+                    "detailedNavlog"
+                ).checked
+            ) {
+
+                params.set(
+                    "navlog",
+                    "1"
+                );
+            }
+
+            if (
+                document.getElementById(
+                    "stepClimbs"
+                ).checked
+            ) {
+
+                params.set(
+                    "stepclimbs",
+                    "1"
+                );
+            }
+
+
+            return (
+                "https://www.simbrief.com/system/dispatch.php?" +
+                params.toString()
+            );
+        }
+
+
+        /* =========================================================
+           GENERATE
+        ========================================================= */
+
+        generateButton.addEventListener(
+            "click",
+            () => {
+
+                const url =
+                    createSimBriefURL();
+
+                if (!url) {
+                    return;
+                }
+
+
+                showStatus(
+                    "Opening SimBrief with your flight details...",
+                    "success"
+                );
+
+
+                /*
+                 * Open SimBrief in a new tab.
+                 *
+                 * SimBrief will show the imported
+                 * flight options and the user can
+                 * generate the OFP from there.
+                 */
+
+                window.open(
+                    url,
+                    "_blank",
+                    "noopener,noreferrer"
+                );
+            }
+        );
+
+
+        /* =========================================================
+           RESET
+        ========================================================= */
+
+        resetButton.addEventListener(
+            "click",
+            () => {
+
+                departureAirport = null;
+                arrivalAirport = null;
+
+                departureInput.value = "";
+                arrivalInput.value = "";
+
+                departureCode.textContent =
+                    "Select an airport";
+
+                arrivalCode.textContent =
+                    "Select an airport";
+
+                document.getElementById(
+                    "airline"
+                ).value = "";
+
+                document.getElementById(
+                    "flightNumber"
+                ).value = "";
+
+                document.getElementById(
+                    "callsign"
+                ).value = "";
+
+                document.getElementById(
+                    "alternate"
+                ).value = "";
+
+                document.getElementById(
+                    "altitude"
+                ).value = "35000";
+
+                document.getElementById(
+                    "passengers"
+                ).value = "150";
+
+                document.getElementById(
+                    "cargo"
+                ).value = "0";
+
+                document.getElementById(
+                    "route"
+                ).value = "";
+
+                document.getElementById(
+                    "a320"
+                ).checked = true;
+
+                document.getElementById(
+                    "findSidStar"
+                ).checked = true;
+
+                document.getElementById(
+                    "includeNotams"
+                ).checked = true;
+
+                document.getElementById(
+                    "detailedNavlog"
+                ).checked = true;
+
+                document.getElementById(
+                    "stepClimbs"
+                ).checked = true;
+
+                departureResults.classList.remove(
+                    "show"
+                );
+
+                arrivalResults.classList.remove(
+                    "show"
+                );
+
+                hideStatus();
+
+                updatePreview();
+            }
+        );
+
+
+        /* =========================================================
+           STATUS
+        ========================================================= */
+
+        function showStatus(
+            message,
+            type
+        ) {
+
+            status.className =
+                `status show ${type}`;
+
+            let icon =
+                "fa-circle-info";
+
+            if (type === "error") {
+                icon = "fa-circle-exclamation";
+            }
+
+            if (type === "success") {
+                icon = "fa-circle-check";
+            }
+
+            status.innerHTML = `
+                <i class="fa-solid ${icon}"></i>
+                <span>${escapeHtml(message)}</span>
+            `;
+        }
+
+
+        function hideStatus() {
+
+            status.className =
+                "status";
+
+            status.innerHTML = "";
+        }
+
+
+        /* =========================================================
+           CLOSE AUTOCOMPLETE
+        ========================================================= */
+
+        document.addEventListener(
+            "click",
+            event => {
+
+                if (
+                    !event.target.closest(
+                        ".airport-box"
+                    )
+                ) {
+
+                    departureResults.classList.remove(
+                        "show"
+                    );
+
+                    arrivalResults.classList.remove(
+                        "show"
+                    );
+                }
+            }
+        );
+
+
+        /* =========================================================
+           HTML ESCAPE
+        ========================================================= */
+
+        function escapeHtml(value) {
+
+            return String(value ?? "")
+                .replace(
+                    /&/g,
+                    "&amp;"
+                )
+                .replace(
+                    /</g,
+                    "&lt;"
+                )
+                .replace(
+                    />/g,
+                    "&gt;"
+                )
+                .replace(
+                    /"/g,
+                    "&quot;"
+                )
+                .replace(
+                    /'/g,
+                    "&#039;"
+                );
+        }
+
+
+        /* =========================================================
+           INITIALIZE
+        ========================================================= */
+
+        updatePreview();
 
     </script>
 
