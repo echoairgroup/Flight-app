@@ -2070,8 +2070,8 @@ async function loadAirportInfo(icao) {
 
         document.getElementById("infoElevation")
             .textContent =
-            airport.elevation != null
-                ? `${airport.elevation} ft`
+            airport.elevation_ft != null
+                ? `${airport.elevation_ft} ft`
                 : "--";
 
         document.getElementById("infoLatitude")
@@ -2111,8 +2111,7 @@ async function loadAirportInfo(icao) {
     }
 
 }
-
-
+    
 /*
 |--------------------------------------------------------------------------
 | TAF
