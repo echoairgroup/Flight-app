@@ -1,14 +1,16 @@
 {
-    "name": "msfs-2024-charts-bridge",
-    "version": "1.0.0",
-    "description": "Local bridge between Microsoft Flight Simulator 2024 Charts API and Echo Flight App",
+    "name": "echo-msfs-charts-bridge",
+    "version": "3.0.0",
+    "description": "Echo Flight App free aviation charts API",
     "main": "server.js",
     "scripts": {
         "start": "node server.js"
     },
+    "engines": {
+        "node": ">=18"
+    },
     "dependencies": {
         "cors": "^2.8.5",
-        "express": "^4.21.2",
-        "ws": "^8.18.0"
+        "express": "^4.21.2"
     }
 }
