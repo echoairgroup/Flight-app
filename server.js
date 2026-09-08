@@ -1,7 +1,6 @@
 const express = require("express");
 const cors = require("cors");
 const https = require("https");
-const zlib = require("zlib");
 const { Pool } = require("pg");
 
 require("dotenv").config();
@@ -105,288 +104,31 @@ function fetchJSON(url) {
 
 /*
 |--------------------------------------------------------------------------
-| AIRPORT SEARCH DATABASE
-|--------------------------------------------------------------------------
-|
-| AviationWeather.gov provides a worldwide station database.
-| We download it once and keep it in memory for 24 hours.
-|
-|--------------------------------------------------------------------------
-*/
-
-let airportStationsCache = null;
-
-let airportStationsCacheUpdated = 0;
-
-const AIRPORT_STATIONS_CACHE_URL =
-    "https://aviationweather.gov/data/cache/stations.cache.json.gz";
-
-
-/*
-|--------------------------------------------------------------------------
-| FETCH GZIP JSON
-|--------------------------------------------------------------------------
-*/
-
-function fetchGzipJSON(url) {
-
-    return new Promise((resolve, reject) => {
-
-        const request = https.get(
-            url,
-            {
-                headers: {
-                    "User-Agent":
-                        "Flight-App/1.0 (flight simulator companion application)",
-
-                    Accept:
-                        "application/json"
-                }
-            },
-            response => {
-
-                if (
-                    response.statusCode < 200 ||
-                    response.statusCode >= 300
-                ) {
-
-                    response.resume();
-
-                    reject(
-                        new Error(
-                            `External API returned HTTP ${response.statusCode}`
-                        )
-                    );
-
-                    return;
-                }
-
-                const chunks = [];
-
-                response.on(
-                    "data",
-                    chunk => {
-                        chunks.push(chunk);
-                    }
-                );
-
-                response.on(
-                    "end",
-                    () => {
-
-                        try {
-
-                            const compressed =
-                                Buffer.concat(chunks);
-
-                            zlib.gunzip(
-                                compressed,
-                                (error, result) => {
-
-                                    if (error) {
-                                        reject(error);
-                                        return;
-                                    }
-
-                                    try {
-
-                                        const data =
-                                            JSON.parse(
-                                                result.toString("utf8")
-                                            );
-
-                                        resolve(data);
-
-                                    } catch (parseError) {
-
-                                        reject(
-                                            new Error(
-                                                "Station cache returned invalid JSON"
-                                            )
-                                        );
-
-                                    }
-
-                                }
-                            );
-
-                        } catch (error) {
-
-                            reject(error);
-
-                        }
-
-                    }
-                );
-
-            }
-        );
-
-        request.on(
-            "error",
-            reject
-        );
-
-        request.setTimeout(
-            30000,
-            () => {
-
-                request.destroy();
-
-                reject(
-                    new Error(
-                        "Station cache request timed out"
-                    )
-                );
-
-            }
-        );
-
-    });
-
-}
-
-
-/*
-|--------------------------------------------------------------------------
-| GET AIRPORT STATIONS
-|--------------------------------------------------------------------------
-*/
-
-async function getAirportStations() {
-
-    const now =
-        Date.now();
-
-    /*
-    |--------------------------------------------------------------------------
-    | USE MEMORY CACHE
-    |--------------------------------------------------------------------------
-    */
-
-    if (
-        airportStationsCache &&
-        now - airportStationsCacheUpdated <
-            24 * 60 * 60 * 1000
-    ) {
-
-        return airportStationsCache;
-
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | DOWNLOAD STATION DATABASE
-    |--------------------------------------------------------------------------
-    */
-
-    console.log(
-        "Downloading AviationWeather.gov airport station database..."
-    );
-
-    const data =
-        await fetchGzipJSON(
-            AIRPORT_STATIONS_CACHE_URL
-        );
-
-    /*
-    |--------------------------------------------------------------------------
-    | HANDLE POSSIBLE RESPONSE FORMATS
-    |--------------------------------------------------------------------------
-    */
-
-    let stations = [];
-
-    if (Array.isArray(data)) {
-
-        stations =
-            data;
-
-    } else if (
-        data &&
-        Array.isArray(data.stations)
-    ) {
-
-        stations =
-            data.stations;
-
-    } else if (
-        data &&
-        Array.isArray(data.data)
-    ) {
-
-        stations =
-            data.data;
-
-    } else {
-
-        throw new Error(
-            "Unexpected airport station database format"
-        );
-
-    }
-
-    airportStationsCache =
-        stations;
-
-    airportStationsCacheUpdated =
-        now;
-
-    console.log(
-        `Airport station database loaded: ${stations.length} stations`
-    );
-
-    return airportStationsCache;
-
-}
-
-
-/*
-|--------------------------------------------------------------------------
 | HEALTH
 |--------------------------------------------------------------------------
 */
 
 app.get("/api/health", async (req, res) => {
-
-    let database =
-        "Unavailable";
+    let database = "Unavailable";
 
     try {
+        await pool.query("SELECT 1");
 
-        await pool.query(
-            "SELECT 1"
-        );
-
-        database =
-            "Connected";
-
+        database = "Connected";
     } catch (error) {
-
         console.error(
             "Database health check failed:",
             error.message
         );
-
     }
 
     res.json({
-
-        status:
-            "ok",
-
-        service:
-            "Flight-app backend",
-
+        status: "ok",
+        service: "Flight-app backend",
         database,
-
-        timestamp:
-            new Date().toISOString()
-
+        timestamp: new Date().toISOString()
     });
-
 });
-
 
 /*
 |--------------------------------------------------------------------------
@@ -395,48 +137,28 @@ app.get("/api/health", async (req, res) => {
 */
 
 app.get("/api/database/test", async (req, res) => {
-
     try {
-
-        const result =
-            await pool.query(
-                "SELECT NOW() AS server_time"
-            );
+        const result = await pool.query(
+            "SELECT NOW() AS server_time"
+        );
 
         res.json({
-
-            available:
-                true,
-
-            database:
-                "Connected",
-
-            serverTime:
-                result.rows[0].server_time
-
+            available: true,
+            database: "Connected",
+            serverTime: result.rows[0].server_time
         });
-
     } catch (error) {
-
         console.error(
             "Database test failed:",
             error.message
         );
 
         res.status(503).json({
-
-            available:
-                false,
-
-            database:
-                "Unavailable"
-
+            available: false,
+            database: "Unavailable"
         });
-
     }
-
 });
-
 
 /*
 |--------------------------------------------------------------------------
@@ -445,11 +167,9 @@ app.get("/api/database/test", async (req, res) => {
 */
 
 app.get("/api/simbrief/latest", async (req, res) => {
-
-    const username =
-        String(
-            req.query.username || ""
-        ).trim();
+    const username = String(
+        req.query.username || ""
+    ).trim();
 
     /*
     |--------------------------------------------------------------------------
@@ -458,31 +178,17 @@ app.get("/api/simbrief/latest", async (req, res) => {
     */
 
     if (!username) {
-
         return res.status(400).json({
-
-            available:
-                false,
-
-            error:
-                "SimBrief username is required."
-
+            available: false,
+            error: "SimBrief username is required."
         });
-
     }
 
     if (username.length > 80) {
-
         return res.status(400).json({
-
-            available:
-                false,
-
-            error:
-                "Invalid SimBrief username."
-
+            available: false,
+            error: "Invalid SimBrief username."
         });
-
     }
 
     /*
@@ -491,26 +197,14 @@ app.get("/api/simbrief/latest", async (req, res) => {
     |--------------------------------------------------------------------------
     */
 
-    if (
-        !/^[a-zA-Z0-9_.-]+$/.test(
-            username
-        )
-    ) {
-
+    if (!/^[a-zA-Z0-9_.-]+$/.test(username)) {
         return res.status(400).json({
-
-            available:
-                false,
-
-            error:
-                "Invalid SimBrief username."
-
+            available: false,
+            error: "Invalid SimBrief username."
         });
-
     }
 
     try {
-
         /*
         |--------------------------------------------------------------------------
         | SIMBRIEF API
@@ -526,8 +220,7 @@ app.get("/api/simbrief/latest", async (req, res) => {
             `Fetching latest SimBrief OFP for: ${username}`
         );
 
-        const data =
-            await fetchJSON(url);
+        const data = await fetchJSON(url);
 
         /*
         |--------------------------------------------------------------------------
@@ -535,21 +228,12 @@ app.get("/api/simbrief/latest", async (req, res) => {
         |--------------------------------------------------------------------------
         */
 
-        if (
-            !data ||
-            typeof data !== "object"
-        ) {
-
+        if (!data || typeof data !== "object") {
             return res.status(502).json({
-
-                available:
-                    false,
-
+                available: false,
                 error:
                     "SimBrief returned an empty or invalid response."
-
             });
-
         }
 
         /*
@@ -559,41 +243,25 @@ app.get("/api/simbrief/latest", async (req, res) => {
         */
 
         return res.json({
-
-            available:
-                true,
-
-            source:
-                "SimBrief",
-
+            available: true,
+            source: "SimBrief",
             username,
-
-            ofp:
-                data
-
+            ofp: data
         });
 
     } catch (error) {
-
         console.error(
             "SimBrief OFP fetch failed:",
             error.message
         );
 
         return res.status(502).json({
-
-            available:
-                false,
-
+            available: false,
             error:
                 "SimBrief did not return a valid latest OFP."
-
         });
-
     }
-
 });
-
 
 /*
 |--------------------------------------------------------------------------
@@ -602,59 +270,35 @@ app.get("/api/simbrief/latest", async (req, res) => {
 */
 
 app.get("/api/weather/:icao", async (req, res) => {
-
-    const icao =
-        req.params.icao
-            .toUpperCase()
-            .trim();
+    const icao = req.params.icao
+        .toUpperCase()
+        .trim();
 
     if (!validICAO(icao)) {
-
         return res.status(400).json({
-
-            available:
-                false,
-
+            available: false,
             icao,
-
-            message:
-                "Invalid ICAO code"
-
+            message: "Invalid ICAO code"
         });
-
     }
 
     try {
-
         const url =
             `https://aviationweather.gov/api/data/metar` +
             `?ids=${encodeURIComponent(icao)}` +
             `&format=json`;
 
-        const data =
-            await fetchJSON(url);
+        const data = await fetchJSON(url);
 
-        if (
-            !Array.isArray(data) ||
-            data.length === 0
-        ) {
-
+        if (!Array.isArray(data) || data.length === 0) {
             return res.json({
-
-                available:
-                    false,
-
+                available: false,
                 icao,
-
-                message:
-                    "Unavailable"
-
+                message: "Unavailable"
             });
-
         }
 
-        const metar =
-            data[0];
+        const metar = data[0];
 
         /*
         |--------------------------------------------------------------------------
@@ -663,7 +307,6 @@ app.get("/api/weather/:icao", async (req, res) => {
         */
 
         try {
-
             await pool.query(
                 `
                 INSERT INTO weather_cache
@@ -673,64 +316,42 @@ app.get("/api/weather/:icao", async (req, res) => {
                     raw_metar,
                     fetched_at
                 )
-                VALUES ($1, $2, $3, NOW())
+                VALUES
+                ($1, $2, $3, NOW())
                 `,
                 [
                     icao,
-
                     metar.rawOb ||
                         metar.raw_text ||
                         null,
-
-                    JSON.stringify(
-                        metar
-                    )
+                    JSON.stringify(metar)
                 ]
             );
-
         } catch (databaseError) {
-
             console.error(
                 "Could not cache METAR:",
                 databaseError.message
             );
-
         }
 
         res.json({
-
-            available:
-                true,
-
+            available: true,
             icao,
-
             metar
-
         });
-
     } catch (error) {
-
         console.error(
             "METAR request failed:",
             error.message
         );
 
         res.status(502).json({
-
-            available:
-                false,
-
+            available: false,
             icao,
-
-            message:
-                "Unavailable"
-
+            message: "Unavailable"
         });
-
     }
-
 });
-
 
 /*
 |--------------------------------------------------------------------------
@@ -739,59 +360,35 @@ app.get("/api/weather/:icao", async (req, res) => {
 */
 
 app.get("/api/weather/:icao/taf", async (req, res) => {
-
-    const icao =
-        req.params.icao
-            .toUpperCase()
-            .trim();
+    const icao = req.params.icao
+        .toUpperCase()
+        .trim();
 
     if (!validICAO(icao)) {
-
         return res.status(400).json({
-
-            available:
-                false,
-
+            available: false,
             icao,
-
-            message:
-                "Invalid ICAO code"
-
+            message: "Invalid ICAO code"
         });
-
     }
 
     try {
-
         const url =
             `https://aviationweather.gov/api/data/taf` +
             `?ids=${encodeURIComponent(icao)}` +
             `&format=json`;
 
-        const data =
-            await fetchJSON(url);
+        const data = await fetchJSON(url);
 
-        if (
-            !Array.isArray(data) ||
-            data.length === 0
-        ) {
-
+        if (!Array.isArray(data) || data.length === 0) {
             return res.json({
-
-                available:
-                    false,
-
+                available: false,
                 icao,
-
-                message:
-                    "Unavailable"
-
+                message: "Unavailable"
             });
-
         }
 
-        const taf =
-            data[0];
+        const taf = data[0];
 
         /*
         |--------------------------------------------------------------------------
@@ -800,7 +397,6 @@ app.get("/api/weather/:icao/taf", async (req, res) => {
         */
 
         try {
-
             await pool.query(
                 `
                 INSERT INTO weather_cache
@@ -810,64 +406,42 @@ app.get("/api/weather/:icao/taf", async (req, res) => {
                     raw_taf,
                     fetched_at
                 )
-                VALUES ($1, $2, $3, NOW())
+                VALUES
+                ($1, $2, $3, NOW())
                 `,
                 [
                     icao,
-
                     taf.rawTAF ||
                         taf.raw_text ||
                         null,
-
-                    JSON.stringify(
-                        taf
-                    )
+                    JSON.stringify(taf)
                 ]
             );
-
         } catch (databaseError) {
-
             console.error(
                 "Could not cache TAF:",
                 databaseError.message
             );
-
         }
 
         res.json({
-
-            available:
-                true,
-
+            available: true,
             icao,
-
             taf
-
         });
-
     } catch (error) {
-
         console.error(
             "TAF request failed:",
             error.message
         );
 
         res.status(502).json({
-
-            available:
-                false,
-
+            available: false,
             icao,
-
-            message:
-                "Unavailable"
-
+            message: "Unavailable"
         });
-
     }
-
 });
-
 
 /*
 |--------------------------------------------------------------------------
@@ -876,439 +450,59 @@ app.get("/api/weather/:icao/taf", async (req, res) => {
 */
 
 app.get("/api/weather/:icao/cache", async (req, res) => {
-
-    const icao =
-        req.params.icao
-            .toUpperCase()
-            .trim();
+    const icao = req.params.icao
+        .toUpperCase()
+        .trim();
 
     if (!validICAO(icao)) {
-
         return res.status(400).json({
-
-            available:
-                false,
-
-            message:
-                "Invalid ICAO code"
-
+            available: false,
+            message: "Invalid ICAO code"
         });
-
     }
 
     try {
-
-        const result =
-            await pool.query(
-                `
-                SELECT
-                    icao,
-                    metar,
-                    taf,
-                    raw_metar,
-                    raw_taf,
-                    fetched_at
-                FROM weather_cache
-                WHERE icao = $1
-                ORDER BY fetched_at DESC
-                LIMIT 1
-                `,
-                [icao]
-            );
-
-        if (
-            result.rows.length === 0
-        ) {
-
-            return res.json({
-
-                available:
-                    false,
-
+        const result = await pool.query(
+            `
+            SELECT
                 icao,
+                metar,
+                taf,
+                raw_metar,
+                raw_taf,
+                fetched_at
+            FROM weather_cache
+            WHERE icao = $1
+            ORDER BY fetched_at DESC
+            LIMIT 1
+            `,
+            [icao]
+        );
 
-                message:
-                    "No cached data available"
-
+        if (result.rows.length === 0) {
+            return res.json({
+                available: false,
+                icao,
+                message: "No cached data available"
             });
-
         }
 
         res.json({
-
-            available:
-                true,
-
-            data:
-                result.rows[0]
-
+            available: true,
+            data: result.rows[0]
         });
-
     } catch (error) {
-
         console.error(
             "Cached weather lookup failed:",
             error.message
         );
 
         res.status(503).json({
-
-            available:
-                false,
-
-            message:
-                "Unavailable"
-
+            available: false,
+            message: "Unavailable"
         });
-
     }
-
 });
-
-
-/*
-|--------------------------------------------------------------------------
-| AIRPORT SEARCH BY NAME / CITY / ICAO
-|--------------------------------------------------------------------------
-|
-| IMPORTANT:
-| This route MUST come before /api/airports/:icao
-| Otherwise Express treats "search" as an ICAO parameter.
-|
-|--------------------------------------------------------------------------
-*/
-
-app.get("/api/airports/search", async (req, res) => {
-
-    const query =
-        String(
-            req.query.q || ""
-        ).trim();
-
-    /*
-    |--------------------------------------------------------------------------
-    | VALIDATION
-    |--------------------------------------------------------------------------
-    */
-
-    if (!query) {
-
-        return res.status(400).json({
-
-            available:
-                false,
-
-            airports:
-                [],
-
-            message:
-                "Search query is required"
-
-        });
-
-    }
-
-    if (query.length < 2) {
-
-        return res.status(400).json({
-
-            available:
-                false,
-
-            airports:
-                [],
-
-            message:
-                "Search query must contain at least 2 characters"
-
-        });
-
-    }
-
-    if (query.length > 100) {
-
-        return res.status(400).json({
-
-            available:
-                false,
-
-            airports:
-                [],
-
-            message:
-                "Search query is too long"
-
-        });
-
-    }
-
-    try {
-
-        /*
-        |--------------------------------------------------------------------------
-        | GET WORLDWIDE AIRPORT DATABASE
-        |--------------------------------------------------------------------------
-        */
-
-        const stations =
-            await getAirportStations();
-
-        const search =
-            query.toLowerCase();
-
-        /*
-        |--------------------------------------------------------------------------
-        | FIND MATCHES
-        |--------------------------------------------------------------------------
-        */
-
-        const matches =
-            stations
-                .filter(station => {
-
-                    const icao =
-                        String(
-                            station.icaoId ||
-                            station.icao ||
-                            station.id ||
-                            ""
-                        ).toLowerCase();
-
-                    const name =
-                        String(
-                            station.name ||
-                            ""
-                        ).toLowerCase();
-
-                    const city =
-                        String(
-                            station.city ||
-                            station.municipality ||
-                            ""
-                        ).toLowerCase();
-
-                    const country =
-                        String(
-                            station.country ||
-                            ""
-                        ).toLowerCase();
-
-                    return (
-                        icao.includes(search) ||
-                        name.includes(search) ||
-                        city.includes(search) ||
-                        country.includes(search)
-                    );
-
-                })
-                .map(station => {
-
-                    return {
-
-                        icao:
-                            station.icaoId ||
-                            station.icao ||
-                            station.id ||
-                            null,
-
-                        name:
-                            station.name ||
-                            "--",
-
-                        city:
-                            station.city ||
-                            station.municipality ||
-                            null,
-
-                        country:
-                            station.country ||
-                            null,
-
-                        latitude:
-                            station.lat != null
-                                ? station.lat
-                                : null,
-
-                        longitude:
-                            station.lon != null
-                                ? station.lon
-                                : null,
-
-                        elevation_ft:
-                            station.elev != null
-                                ? station.elev
-                                : null
-
-                    };
-
-                })
-                .filter(
-                    airport =>
-                        airport.icao &&
-                        /^[A-Z0-9]{4}$/i.test(
-                            airport.icao
-                        )
-                );
-
-        /*
-        |--------------------------------------------------------------------------
-        | SORT RESULTS
-        |--------------------------------------------------------------------------
-        */
-
-        matches.sort(
-            (a, b) => {
-
-                const aIcao =
-                    String(
-                        a.icao
-                    ).toLowerCase();
-
-                const bIcao =
-                    String(
-                        b.icao
-                    ).toLowerCase();
-
-                const aName =
-                    String(
-                        a.name
-                    ).toLowerCase();
-
-                const bName =
-                    String(
-                        b.name
-                    ).toLowerCase();
-
-                /*
-                |--------------------------------------------------------------------------
-                | EXACT MATCH
-                |--------------------------------------------------------------------------
-                */
-
-                const aExact =
-                    aIcao === search ||
-                    aName === search;
-
-                const bExact =
-                    bIcao === search ||
-                    bName === search;
-
-                if (
-                    aExact &&
-                    !bExact
-                ) {
-
-                    return -1;
-
-                }
-
-                if (
-                    !aExact &&
-                    bExact
-                ) {
-
-                    return 1;
-
-                }
-
-                /*
-                |--------------------------------------------------------------------------
-                | STARTS WITH MATCH
-                |--------------------------------------------------------------------------
-                */
-
-                const aStarts =
-                    aName.startsWith(
-                        search
-                    );
-
-                const bStarts =
-                    bName.startsWith(
-                        search
-                    );
-
-                if (
-                    aStarts &&
-                    !bStarts
-                ) {
-
-                    return -1;
-
-                }
-
-                if (
-                    !aStarts &&
-                    bStarts
-                ) {
-
-                    return 1;
-
-                }
-
-                return aName.localeCompare(
-                    bName
-                );
-
-            }
-        );
-
-        /*
-        |--------------------------------------------------------------------------
-        | LIMIT RESULTS
-        |--------------------------------------------------------------------------
-        */
-
-        const limitedMatches =
-            matches.slice(
-                0,
-                10
-            );
-
-        /*
-        |--------------------------------------------------------------------------
-        | RETURN RESULTS
-        |--------------------------------------------------------------------------
-        */
-
-        return res.json({
-
-            available:
-                limitedMatches.length > 0,
-
-            query,
-
-            count:
-                limitedMatches.length,
-
-            airports:
-                limitedMatches
-
-        });
-
-    } catch (error) {
-
-        console.error(
-            "Airport name search failed:",
-            error.message
-        );
-
-        return res.status(502).json({
-
-            available:
-                false,
-
-            airports:
-                [],
-
-            message:
-                "Could not search the airport database"
-
-        });
-
-    }
-
-});
-
 
 /*
 |--------------------------------------------------------------------------
@@ -1318,23 +512,15 @@ app.get("/api/airports/search", async (req, res) => {
 
 app.get("/api/airports/:icao", async (req, res) => {
 
-    const icao =
-        req.params.icao
-            .toUpperCase()
-            .trim();
+    const icao = req.params.icao
+        .toUpperCase()
+        .trim();
 
     if (!validICAO(icao)) {
-
         return res.status(400).json({
-
-            available:
-                false,
-
-            message:
-                "Invalid ICAO code"
-
+            available: false,
+            message: "Invalid ICAO code"
         });
-
     }
 
     try {
@@ -1345,39 +531,31 @@ app.get("/api/airports/:icao", async (req, res) => {
         |--------------------------------------------------------------------------
         */
 
-        const airportResult =
-            await pool.query(
-                `
-                SELECT
-                    icao,
-                    name,
-                    iata,
-                    latitude,
-                    longitude,
-                    elevation_ft,
-                    country,
-                    city,
-                    raw_data,
-                    updated_at
-                FROM airport_cache
-                WHERE icao = $1
-                LIMIT 1
-                `,
-                [icao]
-            );
+        const airportResult = await pool.query(
+            `
+            SELECT
+                icao,
+                name,
+                iata,
+                latitude,
+                longitude,
+                elevation_ft,
+                country,
+                city,
+                raw_data,
+                updated_at
+            FROM airport_cache
+            WHERE icao = $1
+            LIMIT 1
+            `,
+            [icao]
+        );
 
-        if (
-            airportResult.rows.length > 0
-        ) {
+        if (airportResult.rows.length > 0) {
 
             return res.json({
-
-                available:
-                    true,
-
-                airport:
-                    airportResult.rows[0]
-
+                available: true,
+                airport: airportResult.rows[0]
             });
 
         }
@@ -1388,35 +566,26 @@ app.get("/api/airports/:icao", async (req, res) => {
         |--------------------------------------------------------------------------
         */
 
-        const weatherResult =
-            await pool.query(
-                `
-                SELECT
-                    raw_metar,
-                    fetched_at
-                FROM weather_cache
-                WHERE icao = $1
-                  AND raw_metar IS NOT NULL
-                ORDER BY fetched_at DESC
-                LIMIT 1
-                `,
-                [icao]
-            );
+        const weatherResult = await pool.query(
+            `
+            SELECT
+                raw_metar,
+                fetched_at
+            FROM weather_cache
+            WHERE icao = $1
+              AND raw_metar IS NOT NULL
+            ORDER BY fetched_at DESC
+            LIMIT 1
+            `,
+            [icao]
+        );
 
-        if (
-            weatherResult.rows.length === 0
-        ) {
+        if (weatherResult.rows.length === 0) {
 
             return res.json({
-
-                available:
-                    false,
-
+                available: false,
                 icao,
-
-                message:
-                    "Unavailable"
-
+                message: "Unavailable"
             });
 
         }
@@ -1427,9 +596,7 @@ app.get("/api/airports/:icao", async (req, res) => {
 
             metarData =
                 typeof weatherResult.rows[0].raw_metar === "string"
-                    ? JSON.parse(
-                        weatherResult.rows[0].raw_metar
-                    )
+                    ? JSON.parse(weatherResult.rows[0].raw_metar)
                     : weatherResult.rows[0].raw_metar;
 
         } catch (parseError) {
@@ -1440,15 +607,9 @@ app.get("/api/airports/:icao", async (req, res) => {
             );
 
             return res.json({
-
-                available:
-                    false,
-
+                available: false,
                 icao,
-
-                message:
-                    "Unavailable"
-
+                message: "Unavailable"
             });
 
         }
@@ -1509,12 +670,8 @@ app.get("/api/airports/:icao", async (req, res) => {
         */
 
         return res.json({
-
-            available:
-                true,
-
+            available: true,
             airport
-
         });
 
     } catch (error) {
@@ -1525,21 +682,14 @@ app.get("/api/airports/:icao", async (req, res) => {
         );
 
         return res.status(503).json({
-
-            available:
-                false,
-
+            available: false,
             icao,
-
-            message:
-                "Unavailable"
-
+            message: "Unavailable"
         });
 
     }
 
 });
-
 
 /*
 |--------------------------------------------------------------------------
@@ -1548,49 +698,31 @@ app.get("/api/airports/:icao", async (req, res) => {
 */
 
 app.get("/api/plans", async (req, res) => {
-
     try {
-
-        const result =
-            await pool.query(
-                `
-                SELECT *
-                FROM saved_plans
-                ORDER BY created_at DESC
-                `
-            );
+        const result = await pool.query(
+            `
+            SELECT *
+            FROM saved_plans
+            ORDER BY created_at DESC
+            `
+        );
 
         res.json({
-
-            available:
-                true,
-
-            plans:
-                result.rows
-
+            available: true,
+            plans: result.rows
         });
-
     } catch (error) {
-
         console.error(
             "Plans lookup failed:",
             error.message
         );
 
         res.status(503).json({
-
-            available:
-                false,
-
-            plans:
-                []
-
+            available: false,
+            plans: []
         });
-
     }
-
 });
-
 
 /*
 |--------------------------------------------------------------------------
@@ -1622,63 +754,38 @@ app.post("/api/plans", async (req, res) => {
         !name ||
         String(name).trim() === ""
     ) {
-
         return res.status(400).json({
-
-            available:
-                false,
-
-            error:
-                "Plan name is required"
-
+            available: false,
+            error: "Plan name is required"
         });
-
     }
 
     if (
         departure_icao &&
         !validICAO(
-            String(
-                departure_icao
-            )
+            String(departure_icao)
                 .toUpperCase()
                 .trim()
         )
     ) {
-
         return res.status(400).json({
-
-            available:
-                false,
-
-            error:
-                "Invalid departure ICAO"
-
+            available: false,
+            error: "Invalid departure ICAO"
         });
-
     }
 
     if (
         arrival_icao &&
         !validICAO(
-            String(
-                arrival_icao
-            )
+            String(arrival_icao)
                 .toUpperCase()
                 .trim()
         )
     ) {
-
         return res.status(400).json({
-
-            available:
-                false,
-
-            error:
-                "Invalid arrival ICAO"
-
+            available: false,
+            error: "Invalid arrival ICAO"
         });
-
     }
 
     try {
@@ -1689,105 +796,80 @@ app.post("/api/plans", async (req, res) => {
         |--------------------------------------------------------------------------
         */
 
-        const result =
-            await pool.query(
-                `
-                INSERT INTO saved_plans
-                (
-                    name,
-                    departure_icao,
-                    arrival_icao,
-                    aircraft_icao,
-                    cruise_altitude,
-                    route,
-                    distance_nm,
-                    estimated_minutes,
-                    simbrief_ofp_id
-                )
-                VALUES
-                (
-                    $1,
-                    $2,
-                    $3,
-                    $4,
-                    $5,
-                    $6,
-                    $7,
-                    $8,
-                    $9
-                )
-                RETURNING *
-                `,
-                [
-                    String(
-                        name
-                    ).trim(),
+        const result = await pool.query(
+            `
+            INSERT INTO saved_plans
+            (
+                name,
+                departure_icao,
+                arrival_icao,
+                aircraft_icao,
+                cruise_altitude,
+                route,
+                distance_nm,
+                estimated_minutes,
+                simbrief_ofp_id
+            )
+            VALUES
+            (
+                $1,
+                $2,
+                $3,
+                $4,
+                $5,
+                $6,
+                $7,
+                $8,
+                $9
+            )
+            RETURNING *
+            `,
+            [
+                String(name).trim(),
 
-                    departure_icao
-                        ? String(
-                            departure_icao
-                        )
-                            .toUpperCase()
-                            .trim()
-                        : null,
+                departure_icao
+                    ? String(departure_icao)
+                        .toUpperCase()
+                        .trim()
+                    : null,
 
-                    arrival_icao
-                        ? String(
-                            arrival_icao
-                        )
-                            .toUpperCase()
-                            .trim()
-                        : null,
+                arrival_icao
+                    ? String(arrival_icao)
+                        .toUpperCase()
+                        .trim()
+                    : null,
 
-                    aircraft_icao
-                        ? String(
-                            aircraft_icao
-                        )
-                            .toUpperCase()
-                            .trim()
-                        : null,
+                aircraft_icao
+                    ? String(aircraft_icao)
+                        .toUpperCase()
+                        .trim()
+                    : null,
 
-                    cruise_altitude
-                        ? Number(
-                            cruise_altitude
-                        )
-                        : null,
+                cruise_altitude
+                    ? Number(cruise_altitude)
+                    : null,
 
-                    route
-                        ? String(
-                            route
-                        ).trim()
-                        : null,
+                route
+                    ? String(route).trim()
+                    : null,
 
-                    distance_nm
-                        ? Number(
-                            distance_nm
-                        )
-                        : null,
+                distance_nm
+                    ? Number(distance_nm)
+                    : null,
 
-                    estimated_minutes
-                        ? Number(
-                            estimated_minutes
-                        )
-                        : null,
+                estimated_minutes
+                    ? Number(estimated_minutes)
+                    : null,
 
-                    simbrief_ofp_id
-                        ? String(
-                            simbrief_ofp_id
-                        ).trim()
-                        : null
-
-                ]
-            );
+                simbrief_ofp_id
+                    ? String(simbrief_ofp_id).trim()
+                    : null
+            ]
+        );
 
         return res.status(201).json({
-
-            available:
-                true,
-
-            plan:
-                result.rows[0]
-
+            available: true,
+            plan: result.rows[0]
         });
 
     } catch (error) {
@@ -1798,19 +880,11 @@ app.post("/api/plans", async (req, res) => {
         );
 
         return res.status(500).json({
-
-            available:
-                false,
-
-            error:
-                "Could not save plan"
-
+            available: false,
+            error: "Could not save plan"
         });
-
     }
-
 });
-
 
 /*
 |--------------------------------------------------------------------------
@@ -1821,64 +895,39 @@ app.post("/api/plans", async (req, res) => {
 app.delete("/api/plans/:id", async (req, res) => {
 
     const id =
-        Number(
-            req.params.id
-        );
+        Number(req.params.id);
 
-    if (
-        !Number.isInteger(id)
-    ) {
-
+    if (!Number.isInteger(id)) {
         return res.status(400).json({
-
-            available:
-                false,
-
-            error:
-                "Invalid plan ID"
-
+            available: false,
+            error: "Invalid plan ID"
         });
-
     }
 
     try {
 
-        const result =
-            await pool.query(
-                `
-                DELETE FROM saved_plans
-                WHERE id = $1
-                RETURNING id
-                `,
-                [id]
-            );
+        const result = await pool.query(
+            `
+            DELETE FROM saved_plans
+            WHERE id = $1
+            RETURNING id
+            `,
+            [id]
+        );
 
-        if (
-            result.rows.length === 0
-        ) {
+        if (result.rows.length === 0) {
 
             return res.status(404).json({
-
-                available:
-                    false,
-
-                error:
-                    "Plan not found"
-
+                available: false,
+                error: "Plan not found"
             });
 
         }
 
         return res.json({
-
-            available:
-                true,
-
-            deleted:
-                true,
-
+            available: true,
+            deleted: true,
             id
-
         });
 
     } catch (error) {
@@ -1889,19 +938,11 @@ app.delete("/api/plans/:id", async (req, res) => {
         );
 
         return res.status(500).json({
-
-            available:
-                false,
-
-            error:
-                "Could not delete plan"
-
+            available: false,
+            error: "Could not delete plan"
         });
-
     }
-
 });
-
 
 /*
 |--------------------------------------------------------------------------
@@ -1916,9 +957,7 @@ app.get("/", async (req, res) => {
 
     try {
 
-        await pool.query(
-            "SELECT 1"
-        );
+        await pool.query("SELECT 1");
 
         database =
             "Connected";
@@ -1943,7 +982,7 @@ app.get("/", async (req, res) => {
         database,
 
         version:
-            "1.2.0",
+            "1.1.0",
 
         endpoints: {
 
@@ -1968,9 +1007,6 @@ app.get("/", async (req, res) => {
             airports:
                 "/api/airports/:icao",
 
-            airportSearch:
-                "/api/airports/search?q=Amsterdam",
-
             plans:
                 "/api/plans"
 
@@ -1979,7 +1015,6 @@ app.get("/", async (req, res) => {
     });
 
 });
-
 
 /*
 |--------------------------------------------------------------------------
@@ -1991,8 +1026,7 @@ app.use((req, res) => {
 
     res.status(404).json({
 
-        available:
-            false,
+        available: false,
 
         error:
             "Endpoint not found"
@@ -2000,7 +1034,6 @@ app.use((req, res) => {
     });
 
 });
-
 
 /*
 |--------------------------------------------------------------------------
@@ -2018,8 +1051,7 @@ app.use(
 
         res.status(500).json({
 
-            available:
-                false,
+            available: false,
 
             error:
                 "Internal server error"
@@ -2028,7 +1060,6 @@ app.use(
 
     }
 );
-
 
 /*
 |--------------------------------------------------------------------------
@@ -2073,7 +1104,6 @@ async function startServer() {
 }
 
 startServer();
-
 
 /*
 |--------------------------------------------------------------------------
