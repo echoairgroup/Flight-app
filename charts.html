@@ -2340,7 +2340,7 @@
             <span class="status-dot"></span>
 
             <span id="connectionText">
-                MSFS Bridge Offline
+                Local Chart Library
             </span>
 
         </div>
@@ -2547,7 +2547,7 @@
                         </div>
 
                         <h2>
-                            MSFS 2024 Chart Viewer
+                            Flight App Chart Viewer
                         </h2>
 
                         <p>
@@ -2591,7 +2591,7 @@
                                 font-size:11px;
                             "
                         >
-                            Requesting chart data
+                            Loading local chart image
                         </div>
 
                     </div>
@@ -2663,7 +2663,7 @@
                     </h3>
 
                     <span>
-                        MSFS
+                        LOCAL
                     </span>
 
                 </div>
@@ -3115,6 +3115,26 @@
 const API_BASE =
     "https://flight-app-api-g36e.onrender.com";
 
+/* LOCAL CHART LIBRARY
+ * Put your chart images in the repository and add them here.
+ * Example: charts/EHAM/airport.png
+ */
+const LOCAL_CHARTS = {
+    EHAM: {
+        name: "Amsterdam Airport Schiphol",
+        country: "Netherlands",
+        iata: "AMS",
+        charts: [
+            { name: "Airport Chart", type: "AIRPORT", provider: "LIDO", image: "charts/EHAM/airport.png" },
+            { name: "Ground Chart", type: "AIRPORT", provider: "LIDO", image: "charts/EHAM/ground.png" },
+            { name: "SID 18L", type: "SID", provider: "LIDO", image: "charts/EHAM/sid_18l.png" },
+            { name: "STAR 18C", type: "STAR", provider: "LIDO", image: "charts/EHAM/star_18c.png" },
+            { name: "ILS RWY 18R", type: "APPROACH", provider: "LIDO", image: "charts/EHAM/ils_18r.png" }
+        ]
+    }
+    /* Add another airport: , EGLL: { name: "London Heathrow", country: "United Kingdom", iata: "LHR", charts: [{ name: "Airport Chart", type: "AIRPORT", provider: "LIDO", image: "charts/EGLL/airport.png" }] } */
+};
+
 /*
  * This is the future MSFS bridge.
  *
@@ -3520,7 +3540,7 @@ async function checkMSFSBridge() {
             );
 
             connectionText.textContent =
-                "MSFS 2024 Connected";
+                "Local Chart Library";
 
             return true;
         }
@@ -3545,7 +3565,7 @@ async function checkMSFSBridge() {
     );
 
     connectionText.textContent =
-        "MSFS Bridge Offline";
+        "Local Chart Library";
 
     return false;
 }
@@ -3815,99 +3835,43 @@ function renderWeather(
 |--------------------------------------------------------------------------
 */
 
-async function loadMSFSCharts(
-    icao
-) {
+function loadLocalCharts(icao) {
+    const airport = LOCAL_CHARTS[icao];
 
-    if (!state.bridgeOnline) {
-
-        renderBridgeOffline();
-
+    if (!airport) {
+        state.charts = [];
+        state.filteredCharts = [];
+        state.selectedChart = null;
+        state.pages = [];
+        state.currentPage = 0;
+        renderChartList();
+        resetViewer();
+        showToast(`No local charts configured for ${icao}.`, "info");
         return;
     }
 
-    setLoading(
-        true
-    );
+    state.charts = airport.charts.map((chart, index) => ({
+        guid: `${icao}-LOCAL-${index + 1}`,
+        name: chart.name || `Chart ${index + 1}`,
+        provider: chart.provider || "LOCAL",
+        type: chart.type || "OTHER",
+        rawType: chart.type || "OTHER",
+        airportIcao: icao,
+        procedures: [],
+        runways: chart.runways || [],
+        aircraftTypes: [],
+        validFrom: chart.validFrom || null,
+        validUntil: chart.validUntil || null,
+        geoReferenced: false,
+        pages: [{ pageNumber: 1, name: chart.name || "Page 1", imageUrl: chart.image }]
+    }));
 
-    try {
-
-        /*
-         * The bridge is expected to expose:
-         *
-         * GET /api/charts/index/KJFK?provider=LIDO
-         *
-         * and return a normalized object:
-         *
-         * {
-         *   available: true,
-         *   airportIcao: "KJFK",
-         *   provider: "LIDO",
-         *   categories: [
-         *      {
-         *        name: "Approach",
-         *        charts: [...]
-         *      }
-         *   ]
-         * }
-         *
-         * The bridge obtains the underlying chart data
-         * from the official MSFS Charts API.
-         */
-
-        const data =
-            await bridgeFetch(
-                `/api/charts/index/${encodeURIComponent(icao)}?provider=${encodeURIComponent(state.provider)}`
-            );
-
-        const normalized =
-            normalizeChartIndex(
-                data
-            );
-
-        state.charts =
-            normalized;
-
-        state.selectedChart =
-            null;
-
-        state.pages =
-            [];
-
-        state.currentPage =
-            0;
-
-        renderChartList();
-
-        resetViewer();
-
-        showToast(
-            `${normalized.length} MSFS charts loaded.`,
-            "success"
-        );
-
-    } catch (error) {
-
-        console.error(
-            "MSFS chart index failed:",
-            error
-        );
-
-        renderBridgeError(
-            error.message
-        );
-
-        showToast(
-            "Could not retrieve MSFS charts.",
-            "error"
-        );
-
-    } finally {
-
-        setLoading(
-            false
-        );
-    }
+    state.selectedChart = null;
+    state.pages = [];
+    state.currentPage = 0;
+    renderChartList();
+    resetViewer();
+    showToast(`${state.charts.length} local charts loaded for ${icao}.`, "success");
 }
 
 
@@ -4669,7 +4633,7 @@ async function loadPageImage(
         );
 
         showToast(
-            "The MSFS chart image could not be loaded.",
+            "The local chart image could not be loaded.",
             "error"
         );
 
@@ -4745,7 +4709,7 @@ function displayChartImage(
             chartPlaceholder.querySelector(
                 "p"
             ).textContent =
-                "The MSFS bridge returned a chart image that the browser could not display.";
+                "The The local chart image could not be displayed by the browser.";
 
             showToast(
                 "Chart image failed to render.",
@@ -4791,7 +4755,7 @@ function resetViewer() {
     chartPlaceholder.querySelector(
         "h2"
     ).textContent =
-        "MSFS 2024 Chart Viewer";
+        "Flight App Chart Viewer";
 
     chartPlaceholder.querySelector(
         "p"
@@ -4854,7 +4818,7 @@ function renderBridgeOffline() {
 
             <br>
 
-            MSFS 2024 is not connected.
+            No local charts are configured.
 
             <br>
 
@@ -5083,25 +5047,7 @@ async function loadSelectedAirport() {
         icao
     );
 
-    await checkMSFSBridge();
-
-    if (
-        state.bridgeOnline
-    ) {
-
-        await loadMSFSCharts(
-            icao
-        );
-
-    } else {
-
-        renderBridgeOffline();
-
-        showToast(
-            "Airport loaded. Connect MSFS 2024 to retrieve its real charts.",
-            "info"
-        );
-    }
+    loadLocalCharts(icao);
 
     updateMap();
 }
@@ -5815,15 +5761,11 @@ document
                     state.provider =
                         button.dataset.provider;
 
-                    if (
-                        state.airport?.icao &&
-                        state.bridgeOnline
-                    ) {
+                    if (state.airport?.icao) {
 
-                        await loadMSFSCharts(
+                        loadLocalCharts(
                             state.airport.icao
                         );
-
                     }
 
                 }
@@ -6079,8 +6021,6 @@ async function initialize() {
 
     loadUrlParameters();
 
-    await checkMSFSBridge();
-
     /*
      * Automatically load the airport if supplied
      * through the URL.
@@ -6136,41 +6076,9 @@ async function initialize() {
 initialize();
 
 
-/*
-|--------------------------------------------------------------------------
-| PERIODIC BRIDGE CHECK
-|--------------------------------------------------------------------------
-*/
-
-setInterval(
-    async () => {
-
-        const wasOnline =
-            state.bridgeOnline;
-
-        const online =
-            await checkMSFSBridge();
-
-        /*
-         * If MSFS has just become available and an airport
-         * is already selected, automatically load the charts.
-         */
-
-        if (
-            online &&
-            !wasOnline &&
-            state.airport?.icao
-        ) {
-
-            await loadMSFSCharts(
-                state.airport.icao
-            );
-        }
-
-    },
-    10000
-);
-
+/* LOCAL CHART LIBRARY
+ * No simulator or bridge connection is required.
+ */
 
 /*
 |--------------------------------------------------------------------------
@@ -6273,11 +6181,8 @@ window.FlightAppCharts = {
     loadAirport:
         loadSelectedAirport,
 
-    checkBridge:
-        checkMSFSBridge,
-
     loadCharts:
-        loadMSFSCharts,
+        loadLocalCharts,
 
     selectChart,
 
