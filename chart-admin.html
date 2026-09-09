@@ -17,7 +17,7 @@
 
     <link
         rel="preconnect"
-        href="https://fonts.gstatic.com"
+        href="https://fonts.googleapis.com"
         crossorigin
     >
 
@@ -1073,7 +1073,7 @@
 
                 <br>
 
-                Enter your admin key to authorize chart
+                Enter your admin password to authorize chart
                 uploads and deletions.
 
             </div>
@@ -1082,15 +1082,15 @@
             <div class="field">
 
                 <label for="adminKey">
-                    Admin Key
+                    Admin Password
                     <span class="required">*</span>
                 </label>
 
                 <input
                     type="password"
                     id="adminKey"
-                    placeholder="Enter admin key"
-                    autocomplete="off"
+                    placeholder="Enter admin password"
+                    autocomplete="current-password"
                 >
 
             </div>
@@ -1231,7 +1231,7 @@
                 >
 
                 <div class="file-info">
-                    PNG, JPG or WEBP
+                    PNG, JPG or WEBP — maximum 10 MB
                 </div>
 
             </div>
@@ -1350,7 +1350,14 @@
     |--------------------------------------------------------------------------
     */
 
-    const API_BASE = "";
+    const API_BASE =
+        "https://flight-app-api-g36e.onrender.com";
+
+    const TOKEN_STORAGE_KEY =
+        "flightAppChartAdminToken";
+
+    const PASSWORD_STORAGE_KEY =
+        "flightAppChartAdminPassword";
 
 
     /*
@@ -1500,19 +1507,284 @@
 
     /*
     |--------------------------------------------------------------------------
-    | SAVE ADMIN KEY
+    | SAFE JSON RESPONSE
+    |--------------------------------------------------------------------------
+    |
+    | This is important.
+    |
+    | If Render/server returns HTML instead of JSON, the old code crashed
+    | with:
+    |
+    | JSON.parse: unexpected character at line 1 column 1
+    |
+    | We now read the response as text first and only parse JSON when
+    | possible.
+    |
+    */
+
+    async function readResponse(
+        response
+    ) {
+
+        const text =
+            await response.text();
+
+        let data = null;
+
+        if (text) {
+
+            try {
+
+                data =
+                    JSON.parse(
+                        text
+                    );
+
+            } catch (error) {
+
+                console.error(
+                    "Server returned non-JSON response:",
+                    text
+                );
+
+                throw new Error(
+                    `Server returned an invalid response (HTTP ${response.status}).`
+                );
+
+            }
+
+        }
+
+        if (!response.ok) {
+
+            throw new Error(
+                data?.error ||
+                data?.message ||
+                `Request failed with HTTP ${response.status}.`
+            );
+
+        }
+
+        return data;
+
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | ADMIN TOKEN
     |--------------------------------------------------------------------------
     */
 
-    const savedAdminKey =
-        sessionStorage.getItem(
-            "flightAppChartAdminKey"
+    function getAdminToken() {
+
+        return sessionStorage.getItem(
+            TOKEN_STORAGE_KEY
         );
 
-    if (savedAdminKey) {
+    }
+
+
+    function clearAdminAuthentication() {
+
+        sessionStorage.removeItem(
+            TOKEN_STORAGE_KEY
+        );
+
+        sessionStorage.removeItem(
+            PASSWORD_STORAGE_KEY
+        );
+
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | ADMIN LOGIN
+    |--------------------------------------------------------------------------
+    */
+
+    async function loginAdmin() {
+
+        const password =
+            adminKeyInput.value.trim();
+
+        if (!password) {
+
+            throw new Error(
+                "Enter your admin password first."
+            );
+
+        }
+
+        const response =
+            await fetch(
+                `${API_BASE}/api/charts/admin/login`,
+                {
+                    method:
+                        "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:
+                        JSON.stringify({
+                            password:
+                                password
+                        })
+                }
+            );
+
+        const data =
+            await readResponse(
+                response
+            );
+
+        if (
+            !data ||
+            !data.token
+        ) {
+
+            throw new Error(
+                "The server did not return an admin token."
+            );
+
+        }
+
+        sessionStorage.setItem(
+            TOKEN_STORAGE_KEY,
+            data.token
+        );
+
+        /*
+         * Store the password so the page can automatically re-login
+         * if the token expires during the session.
+         */
+        sessionStorage.setItem(
+            PASSWORD_STORAGE_KEY,
+            password
+        );
+
+        return data.token;
+
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | GET VALID ADMIN TOKEN
+    |--------------------------------------------------------------------------
+    */
+
+    async function getValidAdminToken() {
+
+        const existingToken =
+            getAdminToken();
+
+        if (existingToken) {
+
+            return existingToken;
+
+        }
+
+        return await loginAdmin();
+
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | AUTHENTICATED FETCH
+    |--------------------------------------------------------------------------
+    */
+
+    async function authenticatedFetch(
+        url,
+        options = {},
+        retry = true
+    ) {
+
+        let token =
+            await getValidAdminToken();
+
+        const headers =
+            new Headers(
+                options.headers || {}
+            );
+
+        headers.set(
+            "Authorization",
+            `Bearer ${token}`
+        );
+
+        const response =
+            await fetch(
+                url,
+                {
+                    ...options,
+                    headers
+                }
+            );
+
+        /*
+         * If the token expired, login again once.
+         */
+        if (
+            response.status === 401 &&
+            retry
+        ) {
+
+            clearAdminAuthentication();
+
+            const password =
+                adminKeyInput.value.trim() ||
+                sessionStorage.getItem(
+                    PASSWORD_STORAGE_KEY
+                );
+
+            if (!password) {
+
+                throw new Error(
+                    "Your admin session expired. Please enter your admin password again."
+                );
+
+            }
+
+            adminKeyInput.value =
+                password;
+
+            await loginAdmin();
+
+            return authenticatedFetch(
+                url,
+                options,
+                false
+            );
+
+        }
+
+        return response;
+
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | SAVE PASSWORD / RELOGIN
+    |--------------------------------------------------------------------------
+    */
+
+    const savedPassword =
+        sessionStorage.getItem(
+            PASSWORD_STORAGE_KEY
+        );
+
+    if (savedPassword) {
 
         adminKeyInput.value =
-            savedAdminKey;
+            savedPassword;
 
     }
 
@@ -1521,14 +1793,18 @@
         "change",
         () => {
 
-            const key =
+            const password =
                 adminKeyInput.value.trim();
 
-            if (key) {
+            /*
+             * Changing the password means the old token may no longer
+             * be relevant.
+             */
+            if (password) {
 
                 sessionStorage.setItem(
-                    "flightAppChartAdminKey",
-                    key
+                    PASSWORD_STORAGE_KEY,
+                    password
                 );
 
             }
@@ -1559,14 +1835,20 @@
 
             }
 
+            const allowedTypes = [
+                "image/png",
+                "image/jpeg",
+                "image/webp"
+            ];
+
             if (
-                !file.type.startsWith(
-                    "image/"
+                !allowedTypes.includes(
+                    file.type
                 )
             ) {
 
                 showToast(
-                    "Please select an image file.",
+                    "Please select a PNG, JPG or WEBP image.",
                     "error"
                 );
 
@@ -1629,6 +1911,11 @@
     |--------------------------------------------------------------------------
     | LOAD CHARTS
     |--------------------------------------------------------------------------
+    |
+    | The public chart endpoint does not require authentication.
+    | This is intentional because the public Charts page needs to
+    | display uploaded charts.
+    |
     */
 
     async function loadCharts() {
@@ -1648,22 +1935,13 @@
                 );
 
             const data =
-                await response.json();
-
-            if (
-                !response.ok
-            ) {
-
-                throw new Error(
-                    data.error ||
-                    "Could not load charts."
+                await readResponse(
+                    response
                 );
-
-            }
 
             const charts =
                 Array.isArray(
-                    data.charts
+                    data?.charts
                 )
                     ? data.charts
                     : [];
@@ -1900,7 +2178,7 @@
 
     async function uploadChart() {
 
-        const adminKey =
+        const password =
             adminKeyInput.value.trim();
 
         const icao =
@@ -1933,10 +2211,10 @@
         |--------------------------------------------------------------------------
         */
 
-        if (!adminKey) {
+        if (!password) {
 
             showToast(
-                "Enter your admin key first.",
+                "Enter your admin password first.",
                 "error"
             );
 
@@ -2043,6 +2321,18 @@
 
         /*
         |--------------------------------------------------------------------------
+        | SAVE PASSWORD
+        |--------------------------------------------------------------------------
+        */
+
+        sessionStorage.setItem(
+            PASSWORD_STORAGE_KEY,
+            password
+        );
+
+
+        /*
+        |--------------------------------------------------------------------------
         | FORM DATA
         |--------------------------------------------------------------------------
         */
@@ -2103,38 +2393,41 @@
 
         try {
 
+            /*
+             * First authenticate and obtain the JWT-style admin token.
+             */
+            await getValidAdminToken();
+
+
+            /*
+             * Upload the multipart form.
+             *
+             * IMPORTANT:
+             * Do NOT manually set Content-Type here.
+             *
+             * The browser automatically adds:
+             * multipart/form-data; boundary=...
+             */
             const response =
-                await fetch(
+                await authenticatedFetch(
                     `${API_BASE}/api/charts`,
                     {
                         method:
                             "POST",
-
-                        headers: {
-
-                            "Authorization":
-                                `Bearer ${adminKey}`
-
-                        },
 
                         body:
                             formData
                     }
                 );
 
+
+            /*
+             * Safe response handling.
+             */
             const data =
-                await response.json();
-
-            if (
-                !response.ok
-            ) {
-
-                throw new Error(
-                    data.error ||
-                    "Chart upload failed."
+                await readResponse(
+                    response
                 );
-
-            }
 
 
             /*
@@ -2144,6 +2437,7 @@
             */
 
             showToast(
+                data?.message ||
                 "Chart uploaded successfully."
             );
 
@@ -2165,6 +2459,9 @@
 
             preview.style.display =
                 "none";
+
+            previewImage.src =
+                "";
 
 
             /*
@@ -2213,13 +2510,24 @@
         id
     ) {
 
-        const adminKey =
-            adminKeyInput.value.trim();
-
-        if (!adminKey) {
+        if (!id) {
 
             showToast(
-                "Enter your admin key first.",
+                "Invalid chart ID.",
+                "error"
+            );
+
+            return;
+
+        }
+
+        const password =
+            adminKeyInput.value.trim();
+
+        if (!password) {
+
+            showToast(
+                "Enter your admin password first.",
                 "error"
             );
 
@@ -2228,6 +2536,7 @@
             return;
 
         }
+
 
         const confirmed =
             confirm(
@@ -2243,40 +2552,32 @@
 
         try {
 
+            sessionStorage.setItem(
+                PASSWORD_STORAGE_KEY,
+                password
+            );
+
             const response =
-                await fetch(
+                await authenticatedFetch(
                     `${API_BASE}/api/charts/${id}`,
                     {
                         method:
-                            "DELETE",
-
-                        headers: {
-
-                            "Authorization":
-                                `Bearer ${adminKey}`
-
-                        }
-
+                            "DELETE"
                     }
                 );
 
+
             const data =
-                await response.json();
-
-            if (
-                !response.ok
-            ) {
-
-                throw new Error(
-                    data.error ||
-                    "Could not delete chart."
+                await readResponse(
+                    response
                 );
 
-            }
 
             showToast(
+                data?.message ||
                 "Chart deleted successfully."
             );
+
 
             await loadCharts();
 
