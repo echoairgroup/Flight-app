@@ -1,0 +1,2361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Chart Admin | Flight App</title>
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+    >
+
+    <style>
+
+        :root {
+
+            --bg: #f4f7fb;
+            --card: #ffffff;
+
+            --border: #e4e9f2;
+
+            --text: #172033;
+            --muted: #758096;
+
+            --primary: #5b7cfa;
+            --primary-dark: #4264e5;
+            --primary-light: #edf1ff;
+
+            --success: #1daf86;
+            --danger: #e85d68;
+            --warning: #f3a83b;
+
+            --shadow:
+                0 10px 30px rgba(
+                    28,
+                    40,
+                    70,
+                    0.08
+                );
+
+            --radius: 18px;
+
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+
+            margin: 0;
+
+            background:
+                var(--bg);
+
+            color:
+                var(--text);
+
+            font-family:
+                "DM Sans",
+                sans-serif;
+
+        }
+
+        button,
+        input,
+        select {
+
+            font:
+                inherit;
+
+        }
+
+        .navbar {
+
+            height: 74px;
+
+            background:
+                var(--card);
+
+            border-bottom:
+                1px solid var(--border);
+
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            justify-content:
+                space-between;
+
+            padding:
+                0 32px;
+
+        }
+
+        .brand {
+
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            gap:
+                11px;
+
+            font-family:
+                "Manrope",
+                sans-serif;
+
+            font-size:
+                19px;
+
+            font-weight:
+                800;
+
+        }
+
+        .brand-icon {
+
+            width: 38px;
+            height: 38px;
+
+            border-radius:
+                11px;
+
+            background:
+                var(--primary);
+
+            color:
+                white;
+
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            justify-content:
+                center;
+
+        }
+
+        .nav-right {
+
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            gap:
+                12px;
+
+        }
+
+        .back-btn {
+
+            text-decoration:
+                none;
+
+            color:
+                var(--text);
+
+            background:
+                var(--bg);
+
+            border:
+                1px solid var(--border);
+
+            padding:
+                10px 15px;
+
+            border-radius:
+                11px;
+
+            font-weight:
+                600;
+
+        }
+
+        .back-btn:hover {
+
+            background:
+                var(--primary-light);
+
+            color:
+                var(--primary);
+
+        }
+
+        .page {
+
+            max-width:
+                1250px;
+
+            margin:
+                0 auto;
+
+            padding:
+                42px 24px 60px;
+
+        }
+
+        .header {
+
+            margin-bottom:
+                30px;
+
+        }
+
+        .eyebrow {
+
+            color:
+                var(--primary);
+
+            font-size:
+                13px;
+
+            font-weight:
+                700;
+
+            text-transform:
+                uppercase;
+
+            letter-spacing:
+                1px;
+
+            margin-bottom:
+                7px;
+
+        }
+
+        h1 {
+
+            margin:
+                0 0 8px;
+
+            font-family:
+                "Manrope",
+                sans-serif;
+
+            font-size:
+                34px;
+
+            font-weight:
+                800;
+
+        }
+
+        .subtitle {
+
+            color:
+                var(--muted);
+
+            max-width:
+                720px;
+
+            line-height:
+                1.6;
+
+        }
+
+        .layout {
+
+            display:
+                grid;
+
+            grid-template-columns:
+                420px 1fr;
+
+            gap:
+                24px;
+
+            align-items:
+                start;
+
+        }
+
+        .card {
+
+            background:
+                var(--card);
+
+            border:
+                1px solid var(--border);
+
+            border-radius:
+                var(--radius);
+
+            box-shadow:
+                var(--shadow);
+
+            padding:
+                25px;
+
+        }
+
+        .card h2 {
+
+            margin:
+                0 0 5px;
+
+            font-family:
+                "Manrope",
+                sans-serif;
+
+            font-size:
+                20px;
+
+        }
+
+        .card-description {
+
+            margin:
+                0 0 23px;
+
+            color:
+                var(--muted);
+
+            font-size:
+                14px;
+
+            line-height:
+                1.5;
+
+        }
+
+        .field {
+
+            margin-bottom:
+                17px;
+
+        }
+
+        label {
+
+            display:
+                block;
+
+            margin-bottom:
+                7px;
+
+            font-size:
+                13px;
+
+            font-weight:
+                700;
+
+        }
+
+        .required {
+
+            color:
+                var(--danger);
+
+        }
+
+        input,
+        select {
+
+            width:
+                100%;
+
+            height:
+                46px;
+
+            border:
+                1px solid var(--border);
+
+            border-radius:
+                11px;
+
+            background:
+                #fff;
+
+            padding:
+                0 13px;
+
+            color:
+                var(--text);
+
+            outline:
+                none;
+
+            transition:
+                0.15s;
+
+        }
+
+        input:focus,
+        select:focus {
+
+            border-color:
+                var(--primary);
+
+            box-shadow:
+                0 0 0 3px
+                rgba(
+                    91,
+                    124,
+                    250,
+                    0.10
+                );
+
+        }
+
+        .file-input {
+
+            height:
+                auto;
+
+            padding:
+                12px;
+
+            cursor:
+                pointer;
+
+        }
+
+        .file-info {
+
+            margin-top:
+                8px;
+
+            color:
+                var(--muted);
+
+            font-size:
+                12px;
+
+        }
+
+        .preview {
+
+            display:
+                none;
+
+            margin-top:
+                14px;
+
+            border:
+                1px solid var(--border);
+
+            border-radius:
+                12px;
+
+            overflow:
+                hidden;
+
+            background:
+                #f7f9fc;
+
+        }
+
+        .preview img {
+
+            display:
+                block;
+
+            width:
+                100%;
+
+            max-height:
+                280px;
+
+            object-fit:
+                contain;
+
+        }
+
+        .button {
+
+            width:
+                100%;
+
+            border:
+                none;
+
+            border-radius:
+                11px;
+
+            height:
+                47px;
+
+            font-weight:
+                700;
+
+            cursor:
+                pointer;
+
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            justify-content:
+                center;
+
+            gap:
+                8px;
+
+            transition:
+                0.15s;
+
+        }
+
+        .button-primary {
+
+            background:
+                var(--primary);
+
+            color:
+                white;
+
+        }
+
+        .button-primary:hover {
+
+            background:
+                var(--primary-dark);
+
+        }
+
+        .button-primary:disabled {
+
+            opacity:
+                0.55;
+
+            cursor:
+                not-allowed;
+
+        }
+
+        .button-danger {
+
+            background:
+                #fff0f1;
+
+            color:
+                var(--danger);
+
+            border:
+                1px solid #ffd5d8;
+
+        }
+
+        .button-danger:hover {
+
+            background:
+                #ffe4e6;
+
+        }
+
+        .admin-key {
+
+            margin-bottom:
+                20px;
+
+            padding:
+                13px 14px;
+
+            background:
+                #fff8e9;
+
+            border:
+                1px solid #f7dfae;
+
+            color:
+                #86601a;
+
+            border-radius:
+                12px;
+
+            font-size:
+                13px;
+
+            line-height:
+                1.5;
+
+        }
+
+        .toolbar {
+
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            justify-content:
+                space-between;
+
+            gap:
+                12px;
+
+            margin-bottom:
+                18px;
+
+        }
+
+        .toolbar-left h2 {
+
+            margin:
+                0;
+
+        }
+
+        .count {
+
+            color:
+                var(--muted);
+
+            font-size:
+                13px;
+
+            margin-top:
+                3px;
+
+        }
+
+        .refresh-btn {
+
+            border:
+                1px solid var(--border);
+
+            background:
+                white;
+
+            color:
+                var(--text);
+
+            border-radius:
+                10px;
+
+            height:
+                40px;
+
+            padding:
+                0 13px;
+
+            cursor:
+                pointer;
+
+            font-weight:
+                600;
+
+        }
+
+        .refresh-btn:hover {
+
+            border-color:
+                var(--primary);
+
+            color:
+                var(--primary);
+
+        }
+
+        .charts {
+
+            display:
+                flex;
+
+            flex-direction:
+                column;
+
+            gap:
+                12px;
+
+        }
+
+        .chart-item {
+
+            border:
+                1px solid var(--border);
+
+            border-radius:
+                14px;
+
+            padding:
+                14px;
+
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            justify-content:
+                space-between;
+
+            gap:
+                15px;
+
+            background:
+                #fff;
+
+        }
+
+        .chart-info {
+
+            min-width:
+                0;
+
+        }
+
+        .chart-title {
+
+            font-weight:
+                700;
+
+            margin-bottom:
+                5px;
+
+            white-space:
+                nowrap;
+
+            overflow:
+                hidden;
+
+            text-overflow:
+                ellipsis;
+
+        }
+
+        .chart-meta {
+
+            display:
+                flex;
+
+            flex-wrap:
+                wrap;
+
+            gap:
+                6px;
+
+            font-size:
+                12px;
+
+            color:
+                var(--muted);
+
+        }
+
+        .badge {
+
+            display:
+                inline-flex;
+
+            align-items:
+                center;
+
+            padding:
+                4px 8px;
+
+            border-radius:
+                7px;
+
+            background:
+                var(--primary-light);
+
+            color:
+                var(--primary);
+
+            font-weight:
+                700;
+
+        }
+
+        .chart-actions {
+
+            flex:
+                0 0 auto;
+
+        }
+
+        .delete-btn {
+
+            border:
+                1px solid #ffd5d8;
+
+            background:
+                #fff0f1;
+
+            color:
+                var(--danger);
+
+            width:
+                38px;
+
+            height:
+                38px;
+
+            border-radius:
+                10px;
+
+            cursor:
+                pointer;
+
+        }
+
+        .delete-btn:hover {
+
+            background:
+                #ffe0e3;
+
+        }
+
+        .empty {
+
+            text-align:
+                center;
+
+            padding:
+                50px 20px;
+
+            color:
+                var(--muted);
+
+            border:
+                1px dashed var(--border);
+
+            border-radius:
+                14px;
+
+        }
+
+        .empty-icon {
+
+            font-size:
+                30px;
+
+            margin-bottom:
+                12px;
+
+            opacity:
+                0.45;
+
+        }
+
+        .loading {
+
+            text-align:
+                center;
+
+            padding:
+                35px;
+
+            color:
+                var(--muted);
+
+        }
+
+        .toast {
+
+            position:
+                fixed;
+
+            right:
+                24px;
+
+            bottom:
+                24px;
+
+            background:
+                #172033;
+
+            color:
+                white;
+
+            padding:
+                13px 17px;
+
+            border-radius:
+                12px;
+
+            box-shadow:
+                0 10px 30px
+                rgba(
+                    0,
+                    0,
+                    0,
+                    0.18
+                );
+
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            gap:
+                9px;
+
+            transform:
+                translateY(20px);
+
+            opacity:
+                0;
+
+            pointer-events:
+                none;
+
+            transition:
+                0.2s;
+
+            z-index:
+                999;
+
+        }
+
+        .toast.show {
+
+            transform:
+                translateY(0);
+
+            opacity:
+                1;
+
+        }
+
+        .toast.success i {
+
+            color:
+                var(--success);
+
+        }
+
+        .toast.error i {
+
+            color:
+                var(--danger);
+
+        }
+
+        @media (max-width: 850px) {
+
+            .layout {
+
+                grid-template-columns:
+                    1fr;
+
+            }
+
+            .navbar {
+
+                padding:
+                    0 18px;
+
+            }
+
+            .page {
+
+                padding:
+                    30px 16px 50px;
+
+            }
+
+            h1 {
+
+                font-size:
+                    28px;
+
+            }
+
+        }
+
+    </style>
+</head>
+
+<body>
+
+<nav class="navbar">
+
+    <div class="brand">
+
+        <div class="brand-icon">
+            <i class="fa-solid fa-map"></i>
+        </div>
+
+        Flight App
+        Charts Admin
+
+    </div>
+
+    <div class="nav-right">
+
+        <a
+            href="charts.html"
+            class="back-btn"
+        >
+            <i class="fa-solid fa-arrow-left"></i>
+            Back to Charts
+        </a>
+
+    </div>
+
+</nav>
+
+
+<main class="page">
+
+    <div class="header">
+
+        <div class="eyebrow">
+            Administration
+        </div>
+
+        <h1>
+            Chart Management
+        </h1>
+
+        <p class="subtitle">
+            Upload and manage airport charts for the Flight App.
+            Once uploaded, charts automatically become available
+            on the public Charts page.
+        </p>
+
+    </div>
+
+
+    <div class="layout">
+
+
+        <!-- =========================================================
+             UPLOAD
+        ========================================================== -->
+
+        <section class="card">
+
+            <h2>
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+                Add Chart
+            </h2>
+
+            <p class="card-description">
+                Upload a chart image and assign it to an airport
+                and category.
+            </p>
+
+
+            <div class="admin-key">
+
+                <strong>
+                    <i class="fa-solid fa-lock"></i>
+                    Admin access
+                </strong>
+
+                <br>
+
+                Enter your admin key to authorize chart
+                uploads and deletions.
+
+            </div>
+
+
+            <div class="field">
+
+                <label for="adminKey">
+                    Admin Key
+                    <span class="required">*</span>
+                </label>
+
+                <input
+                    type="password"
+                    id="adminKey"
+                    placeholder="Enter admin key"
+                    autocomplete="off"
+                >
+
+            </div>
+
+
+            <div class="field">
+
+                <label for="icao">
+                    Airport ICAO
+                    <span class="required">*</span>
+                </label>
+
+                <input
+                    type="text"
+                    id="icao"
+                    maxlength="4"
+                    placeholder="e.g. EHAM"
+                    autocomplete="off"
+                >
+
+            </div>
+
+
+            <div class="field">
+
+                <label for="airportName">
+                    Airport Name
+                </label>
+
+                <input
+                    type="text"
+                    id="airportName"
+                    placeholder="e.g. Amsterdam Schiphol"
+                >
+
+            </div>
+
+
+            <div class="field">
+
+                <label for="chartName">
+                    Chart Name
+                    <span class="required">*</span>
+                </label>
+
+                <input
+                    type="text"
+                    id="chartName"
+                    placeholder="e.g. ILS RWY 18R"
+                >
+
+            </div>
+
+
+            <div class="field">
+
+                <label for="chartType">
+                    Chart Type
+                    <span class="required">*</span>
+                </label>
+
+                <select id="chartType">
+
+                    <option value="AIRPORT">
+                        Airport
+                    </option>
+
+                    <option value="APPROACH">
+                        Approach
+                    </option>
+
+                    <option value="SID">
+                        SID
+                    </option>
+
+                    <option value="STAR">
+                        STAR
+                    </option>
+
+                    <option value="ENROUTE">
+                        Enroute
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="field">
+
+                <label for="provider">
+                    Provider
+                    <span class="required">*</span>
+                </label>
+
+                <select id="provider">
+
+                    <option value="LIDO">
+                        LIDO
+                    </option>
+
+                    <option value="FAA">
+                        FAA
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="field">
+
+                <label for="validity">
+                    Validity
+                </label>
+
+                <input
+                    type="text"
+                    id="validity"
+                    placeholder="e.g. 08 OCT 2026"
+                >
+
+            </div>
+
+
+            <div class="field">
+
+                <label for="chartFile">
+                    Chart Image
+                    <span class="required">*</span>
+                </label>
+
+                <input
+                    type="file"
+                    id="chartFile"
+                    class="file-input"
+                    accept="image/png,image/jpeg,image/webp"
+                >
+
+                <div class="file-info">
+                    PNG, JPG or WEBP
+                </div>
+
+            </div>
+
+
+            <div
+                class="preview"
+                id="preview"
+            >
+
+                <img
+                    id="previewImage"
+                    alt="Chart preview"
+                >
+
+            </div>
+
+
+            <button
+                class="button button-primary"
+                id="uploadBtn"
+                type="button"
+            >
+
+                <i class="fa-solid fa-upload"></i>
+
+                Upload Chart
+
+            </button>
+
+        </section>
+
+
+        <!-- =========================================================
+             EXISTING CHARTS
+        ========================================================== -->
+
+        <section class="card">
+
+            <div class="toolbar">
+
+                <div class="toolbar-left">
+
+                    <h2>
+                        Uploaded Charts
+                    </h2>
+
+                    <div
+                        class="count"
+                        id="chartCount"
+                    >
+                        Loading...
+                    </div>
+
+                </div>
+
+                <button
+                    class="refresh-btn"
+                    id="refreshBtn"
+                    type="button"
+                >
+
+                    <i class="fa-solid fa-rotate"></i>
+
+                    Refresh
+
+                </button>
+
+            </div>
+
+
+            <div
+                class="charts"
+                id="charts"
+            >
+
+                <div class="loading">
+
+                    <i class="fa-solid fa-spinner fa-spin"></i>
+
+                    Loading charts...
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </div>
+
+</main>
+
+
+<div
+    class="toast"
+    id="toast"
+>
+
+    <i
+        id="toastIcon"
+        class="fa-solid fa-circle-check"
+    ></i>
+
+    <span id="toastText">
+        Done
+    </span>
+
+</div>
+
+
+<script>
+
+    /*
+    |--------------------------------------------------------------------------
+    | CONFIGURATION
+    |--------------------------------------------------------------------------
+    */
+
+    const API_BASE = "";
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | ELEMENTS
+    |--------------------------------------------------------------------------
+    */
+
+    const adminKeyInput =
+        document.getElementById(
+            "adminKey"
+        );
+
+    const icaoInput =
+        document.getElementById(
+            "icao"
+        );
+
+    const airportNameInput =
+        document.getElementById(
+            "airportName"
+        );
+
+    const chartNameInput =
+        document.getElementById(
+            "chartName"
+        );
+
+    const chartTypeInput =
+        document.getElementById(
+            "chartType"
+        );
+
+    const providerInput =
+        document.getElementById(
+            "provider"
+        );
+
+    const validityInput =
+        document.getElementById(
+            "validity"
+        );
+
+    const chartFileInput =
+        document.getElementById(
+            "chartFile"
+        );
+
+    const preview =
+        document.getElementById(
+            "preview"
+        );
+
+    const previewImage =
+        document.getElementById(
+            "previewImage"
+        );
+
+    const uploadBtn =
+        document.getElementById(
+            "uploadBtn"
+        );
+
+    const refreshBtn =
+        document.getElementById(
+            "refreshBtn"
+        );
+
+    const chartsContainer =
+        document.getElementById(
+            "charts"
+        );
+
+    const chartCount =
+        document.getElementById(
+            "chartCount"
+        );
+
+    const toast =
+        document.getElementById(
+            "toast"
+        );
+
+    const toastText =
+        document.getElementById(
+            "toastText"
+        );
+
+    const toastIcon =
+        document.getElementById(
+            "toastIcon"
+        );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | TOAST
+    |--------------------------------------------------------------------------
+    */
+
+    let toastTimer = null;
+
+    function showToast(
+        message,
+        type = "success"
+    ) {
+
+        toastText.textContent =
+            message;
+
+        toast.className =
+            "toast show " +
+            type;
+
+        if (
+            type === "error"
+        ) {
+
+            toastIcon.className =
+                "fa-solid fa-circle-exclamation";
+
+        } else {
+
+            toastIcon.className =
+                "fa-solid fa-circle-check";
+
+        }
+
+        clearTimeout(
+            toastTimer
+        );
+
+        toastTimer =
+            setTimeout(
+                () => {
+
+                    toast.classList.remove(
+                        "show"
+                    );
+
+                },
+                3500
+            );
+
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | SAVE ADMIN KEY
+    |--------------------------------------------------------------------------
+    */
+
+    const savedAdminKey =
+        sessionStorage.getItem(
+            "flightAppChartAdminKey"
+        );
+
+    if (savedAdminKey) {
+
+        adminKeyInput.value =
+            savedAdminKey;
+
+    }
+
+
+    adminKeyInput.addEventListener(
+        "change",
+        () => {
+
+            const key =
+                adminKeyInput.value.trim();
+
+            if (key) {
+
+                sessionStorage.setItem(
+                    "flightAppChartAdminKey",
+                    key
+                );
+
+            }
+
+        }
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | FILE PREVIEW
+    |--------------------------------------------------------------------------
+    */
+
+    chartFileInput.addEventListener(
+        "change",
+        () => {
+
+            const file =
+                chartFileInput.files[0];
+
+            if (!file) {
+
+                preview.style.display =
+                    "none";
+
+                return;
+
+            }
+
+            if (
+                !file.type.startsWith(
+                    "image/"
+                )
+            ) {
+
+                showToast(
+                    "Please select an image file.",
+                    "error"
+                );
+
+                chartFileInput.value =
+                    "";
+
+                preview.style.display =
+                    "none";
+
+                return;
+
+            }
+
+            const reader =
+                new FileReader();
+
+            reader.onload =
+                event => {
+
+                    previewImage.src =
+                        event.target.result;
+
+                    preview.style.display =
+                        "block";
+
+                };
+
+            reader.readAsDataURL(
+                file
+            );
+
+        }
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | ICAO AUTO UPPERCASE
+    |--------------------------------------------------------------------------
+    */
+
+    icaoInput.addEventListener(
+        "input",
+        () => {
+
+            icaoInput.value =
+                icaoInput.value
+                    .toUpperCase()
+                    .replace(
+                        /[^A-Z]/g,
+                        ""
+                    )
+                    .slice(0, 4);
+
+        }
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | LOAD CHARTS
+    |--------------------------------------------------------------------------
+    */
+
+    async function loadCharts() {
+
+        chartsContainer.innerHTML = `
+            <div class="loading">
+                <i class="fa-solid fa-spinner fa-spin"></i>
+                Loading charts...
+            </div>
+        `;
+
+        try {
+
+            const response =
+                await fetch(
+                    `${API_BASE}/api/charts`
+                );
+
+            const data =
+                await response.json();
+
+            if (
+                !response.ok
+            ) {
+
+                throw new Error(
+                    data.error ||
+                    "Could not load charts."
+                );
+
+            }
+
+            const charts =
+                Array.isArray(
+                    data.charts
+                )
+                    ? data.charts
+                    : [];
+
+            renderCharts(
+                charts
+            );
+
+        } catch (error) {
+
+            console.error(
+                "Could not load charts:",
+                error
+            );
+
+            chartCount.textContent =
+                "Unavailable";
+
+            chartsContainer.innerHTML = `
+                <div class="empty">
+
+                    <div class="empty-icon">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                    </div>
+
+                    <strong>
+                        Could not load charts
+                    </strong>
+
+                    <br>
+
+                    <span>
+                        ${escapeHTML(
+                            error.message
+                        )}
+                    </span>
+
+                </div>
+            `;
+
+        }
+
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | RENDER CHARTS
+    |--------------------------------------------------------------------------
+    */
+
+    function renderCharts(
+        charts
+    ) {
+
+        chartCount.textContent =
+            `${charts.length} chart${
+                charts.length === 1
+                    ? ""
+                    : "s"
+            }`;
+
+        if (
+            charts.length === 0
+        ) {
+
+            chartsContainer.innerHTML = `
+                <div class="empty">
+
+                    <div class="empty-icon">
+                        <i class="fa-regular fa-image"></i>
+                    </div>
+
+                    <strong>
+                        No charts uploaded yet
+                    </strong>
+
+                    <br>
+
+                    <span>
+                        Use the form on the left to add your first chart.
+                    </span>
+
+                </div>
+            `;
+
+            return;
+
+        }
+
+        chartsContainer.innerHTML =
+            charts
+                .map(
+                    chart =>
+                        createChartItem(
+                            chart
+                        )
+                )
+                .join("");
+
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | CHART ITEM
+    |--------------------------------------------------------------------------
+    */
+
+    function createChartItem(
+        chart
+    ) {
+
+        const id =
+            Number(
+                chart.id
+            );
+
+        const icao =
+            escapeHTML(
+                chart.airport_icao ||
+                "----"
+            );
+
+        const name =
+            escapeHTML(
+                chart.chart_name ||
+                "Unnamed chart"
+            );
+
+        const airportName =
+            escapeHTML(
+                chart.airport_name ||
+                ""
+            );
+
+        const type =
+            escapeHTML(
+                chart.chart_type ||
+                "AIRPORT"
+            );
+
+        const provider =
+            escapeHTML(
+                chart.provider ||
+                "LIDO"
+            );
+
+        const validity =
+            escapeHTML(
+                chart.validity ||
+                ""
+            );
+
+        return `
+            <div class="chart-item">
+
+                <div class="chart-info">
+
+                    <div class="chart-title">
+                        ${name}
+                    </div>
+
+                    <div class="chart-meta">
+
+                        <span class="badge">
+                            ${icao}
+                        </span>
+
+                        <span>
+                            ${type}
+                        </span>
+
+                        <span>
+                            ${provider}
+                        </span>
+
+                        ${
+                            airportName
+                                ? `
+                                    <span>
+                                        ${airportName}
+                                    </span>
+                                `
+                                : ""
+                        }
+
+                        ${
+                            validity
+                                ? `
+                                    <span>
+                                        ${validity}
+                                    </span>
+                                `
+                                : ""
+                        }
+
+                    </div>
+
+                </div>
+
+                <div class="chart-actions">
+
+                    <button
+                        class="delete-btn"
+                        type="button"
+                        title="Delete chart"
+                        onclick="deleteChart(${id})"
+                    >
+
+                        <i class="fa-solid fa-trash"></i>
+
+                    </button>
+
+                </div>
+
+            </div>
+        `;
+
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | UPLOAD CHART
+    |--------------------------------------------------------------------------
+    */
+
+    uploadBtn.addEventListener(
+        "click",
+        uploadChart
+    );
+
+
+    async function uploadChart() {
+
+        const adminKey =
+            adminKeyInput.value.trim();
+
+        const icao =
+            icaoInput.value
+                .trim()
+                .toUpperCase();
+
+        const airportName =
+            airportNameInput.value.trim();
+
+        const chartName =
+            chartNameInput.value.trim();
+
+        const chartType =
+            chartTypeInput.value;
+
+        const provider =
+            providerInput.value;
+
+        const validity =
+            validityInput.value.trim();
+
+        const file =
+            chartFileInput.files[0];
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | VALIDATION
+        |--------------------------------------------------------------------------
+        */
+
+        if (!adminKey) {
+
+            showToast(
+                "Enter your admin key first.",
+                "error"
+            );
+
+            adminKeyInput.focus();
+
+            return;
+
+        }
+
+        if (
+            !/^[A-Z]{4}$/.test(
+                icao
+            )
+        ) {
+
+            showToast(
+                "Enter a valid 4-letter ICAO code.",
+                "error"
+            );
+
+            icaoInput.focus();
+
+            return;
+
+        }
+
+        if (!chartName) {
+
+            showToast(
+                "Enter a chart name.",
+                "error"
+            );
+
+            chartNameInput.focus();
+
+            return;
+
+        }
+
+        if (!file) {
+
+            showToast(
+                "Select a chart image.",
+                "error"
+            );
+
+            chartFileInput.focus();
+
+            return;
+
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | FILE TYPE
+        |--------------------------------------------------------------------------
+        */
+
+        const allowedTypes = [
+            "image/png",
+            "image/jpeg",
+            "image/webp"
+        ];
+
+        if (
+            !allowedTypes.includes(
+                file.type
+            )
+        ) {
+
+            showToast(
+                "Only PNG, JPG and WEBP images are supported.",
+                "error"
+            );
+
+            return;
+
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | MAX FILE SIZE
+        |--------------------------------------------------------------------------
+        */
+
+        const maxSize =
+            10 * 1024 * 1024;
+
+        if (
+            file.size > maxSize
+        ) {
+
+            showToast(
+                "The chart image must be smaller than 10 MB.",
+                "error"
+            );
+
+            return;
+
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | FORM DATA
+        |--------------------------------------------------------------------------
+        */
+
+        const formData =
+            new FormData();
+
+        formData.append(
+            "airport_icao",
+            icao
+        );
+
+        formData.append(
+            "airport_name",
+            airportName
+        );
+
+        formData.append(
+            "chart_name",
+            chartName
+        );
+
+        formData.append(
+            "chart_type",
+            chartType
+        );
+
+        formData.append(
+            "provider",
+            provider
+        );
+
+        formData.append(
+            "validity",
+            validity
+        );
+
+        formData.append(
+            "image",
+            file
+        );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | BUTTON STATE
+        |--------------------------------------------------------------------------
+        */
+
+        uploadBtn.disabled =
+            true;
+
+        uploadBtn.innerHTML = `
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            Uploading...
+        `;
+
+
+        try {
+
+            const response =
+                await fetch(
+                    `${API_BASE}/api/charts`,
+                    {
+                        method:
+                            "POST",
+
+                        headers: {
+
+                            "Authorization":
+                                `Bearer ${adminKey}`
+
+                        },
+
+                        body:
+                            formData
+                    }
+                );
+
+            const data =
+                await response.json();
+
+            if (
+                !response.ok
+            ) {
+
+                throw new Error(
+                    data.error ||
+                    "Chart upload failed."
+                );
+
+            }
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | SUCCESS
+            |--------------------------------------------------------------------------
+            */
+
+            showToast(
+                "Chart uploaded successfully."
+            );
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | CLEAR FORM
+            |--------------------------------------------------------------------------
+            */
+
+            chartNameInput.value =
+                "";
+
+            validityInput.value =
+                "";
+
+            chartFileInput.value =
+                "";
+
+            preview.style.display =
+                "none";
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | REFRESH LIST
+            |--------------------------------------------------------------------------
+            */
+
+            await loadCharts();
+
+        } catch (error) {
+
+            console.error(
+                "Chart upload failed:",
+                error
+            );
+
+            showToast(
+                error.message ||
+                "Chart upload failed.",
+                "error"
+            );
+
+        } finally {
+
+            uploadBtn.disabled =
+                false;
+
+            uploadBtn.innerHTML = `
+                <i class="fa-solid fa-upload"></i>
+                Upload Chart
+            `;
+
+        }
+
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | DELETE CHART
+    |--------------------------------------------------------------------------
+    */
+
+    async function deleteChart(
+        id
+    ) {
+
+        const adminKey =
+            adminKeyInput.value.trim();
+
+        if (!adminKey) {
+
+            showToast(
+                "Enter your admin key first.",
+                "error"
+            );
+
+            adminKeyInput.focus();
+
+            return;
+
+        }
+
+        const confirmed =
+            confirm(
+                "Are you sure you want to delete this chart?"
+            );
+
+        if (!confirmed) {
+
+            return;
+
+        }
+
+
+        try {
+
+            const response =
+                await fetch(
+                    `${API_BASE}/api/charts/${id}`,
+                    {
+                        method:
+                            "DELETE",
+
+                        headers: {
+
+                            "Authorization":
+                                `Bearer ${adminKey}`
+
+                        }
+
+                    }
+                );
+
+            const data =
+                await response.json();
+
+            if (
+                !response.ok
+            ) {
+
+                throw new Error(
+                    data.error ||
+                    "Could not delete chart."
+                );
+
+            }
+
+            showToast(
+                "Chart deleted successfully."
+            );
+
+            await loadCharts();
+
+        } catch (error) {
+
+            console.error(
+                "Delete chart failed:",
+                error
+            );
+
+            showToast(
+                error.message ||
+                "Could not delete chart.",
+                "error"
+            );
+
+        }
+
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | ESCAPE HTML
+    |--------------------------------------------------------------------------
+    */
+
+    function escapeHTML(
+        value
+    ) {
+
+        return String(
+            value ?? ""
+        )
+            .replace(
+                /&/g,
+                "&amp;"
+            )
+            .replace(
+                /</g,
+                "&lt;"
+            )
+            .replace(
+                />/g,
+                "&gt;"
+            )
+            .replace(
+                /"/g,
+                "&quot;"
+            )
+            .replace(
+                /'/g,
+                "&#039;"
+            );
+
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | REFRESH
+    |--------------------------------------------------------------------------
+    */
+
+    refreshBtn.addEventListener(
+        "click",
+        loadCharts
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | INITIAL LOAD
+    |--------------------------------------------------------------------------
+    */
+
+    loadCharts();
+
+</script>
+
+</body>
+</html>
