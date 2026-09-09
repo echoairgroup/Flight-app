@@ -2334,6 +2334,19 @@
             margin-left: 5px;
         }
 
+        .chart-airport {
+            display: block;
+            margin-top: 4px;
+            color: var(--muted);
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .chart-airport strong {
+            color: var(--text);
+            font-weight: 800;
+        }
+
         @media (max-width: 850px) {
             .simbrief-flight {
                 grid-template-columns: 1fr 1fr;
@@ -2445,50 +2458,45 @@
 <main class="page">
 
     <!-- =====================================================
-     HEADER
-====================================================== -->
+         HEADER
+    ====================================================== -->
 
-<section class="page-header">
+    <section class="page-header">
 
-    <div>
+        <div>
 
-        <div class="eyebrow">
-            <i class="fa-solid fa-map"></i>
-            Flight Charts
+            <div class="eyebrow">
+                <i class="fa-solid fa-map"></i>
+                Flight Charts
+            </div>
+
+            <h1>
+                Charts & Airport Procedures
+            </h1>
+
+            <p>
+                View airport charts, procedures and chart pages
+                directly inside Flight App. The viewer is designed
+                to receive authentic Microsoft Flight Simulator 2024
+                Charts API data.
+            </p>
+
         </div>
 
-        <h1>
-            Charts & Airport Procedures
-        </h1>
+        <div
+            class="connection-status"
+            id="connectionStatus"
+        >
 
-        <p>
-            View airport charts, procedures and chart pages
-            directly inside Flight App. The viewer is designed
-            to receive authentic Microsoft Flight Simulator 2024
-            Charts API data.
-        </p>
+            <span class="status-dot"></span>
 
-    </div>
+            <span id="connectionText">
+                Checking chart library...
+            </span>
 
-    <div
-        class="connection-status"
-        id="connectionStatus"
-    >
+        </div>
 
-        <span class="status-dot"></span>
-
-        <span id="connectionText">
-            Checking chart library...
-        </span>
-
-    </div>
-
-</section>
-
-
-<!-- =====================================================
-     AIRPORT SEARCH
-====================================================== -->
+    </section>
 
 
     <!-- =====================================================
@@ -3713,6 +3721,69 @@ async function bridgeFetch(
 
 /*
 |--------------------------------------------------------------------------
+| CHECK CHART LIBRARY
+|--------------------------------------------------------------------------
+*/
+
+async function updateChartLibraryStatus() {
+
+    if (!connectionStatus || !connectionText) {
+        return false;
+    }
+
+    connectionStatus.classList.remove(
+        "connected",
+        "error"
+    );
+
+    connectionText.textContent =
+        "Checking chart library...";
+
+    try {
+
+        const data =
+            await fetchJson(
+                `${API_BASE}/api/charts?icao=EHAM&provider=LIDO&category=ALL`
+            );
+
+        if (data?.available === true) {
+
+            connectionStatus.classList.add(
+                "connected"
+            );
+
+            connectionText.textContent =
+                "Chart Library Online";
+
+            return true;
+        }
+
+        throw new Error(
+            data?.error ||
+            "Chart library unavailable."
+        );
+
+    } catch (error) {
+
+        console.debug(
+            "Chart library unavailable:",
+            error.message
+        );
+
+        connectionStatus.classList.add(
+            "error"
+        );
+
+        connectionText.textContent =
+            "Chart Library Offline";
+
+        return false;
+    }
+}
+
+
+/*
+|--------------------------------------------------------------------------
 | CHECK MSFS BRIDGE
 |--------------------------------------------------------------------------
 */
@@ -3759,7 +3830,7 @@ async function checkMSFSBridge() {
             );
 
             connectionText.textContent =
-                "Local Chart Library";
+                "MSFS Bridge Online";
 
             return true;
         }
@@ -3784,7 +3855,7 @@ async function checkMSFSBridge() {
     );
 
     connectionText.textContent =
-        "Local Chart Library";
+        "MSFS Bridge Offline";
 
     return false;
 }
@@ -4076,6 +4147,7 @@ function loadLocalCharts(icao) {
         type: chart.type || "OTHER",
         rawType: chart.type || "OTHER",
         airportIcao: icao,
+        airportName: airport.name || icao,
         procedures: [],
         runways: chart.runways || [],
         aircraftTypes: [],
@@ -4416,6 +4488,12 @@ function renderChartList() {
                                 <span class="chart-item-title">
                                     ${escapeHtml(chart.name)}
                                 </span>
+
+                                ${
+                                    chart.pinned && chart.airportIcao
+                                        ? `<span class="chart-airport"><i class="fa-solid fa-location-dot"></i> <strong>${escapeHtml(chart.airportIcao)}</strong>${chart.airportName ? ` · ${escapeHtml(chart.airportName)}` : ""}</span>`
+                                        : ""
+                                }
 
                                 <span class="chart-item-meta">
 
@@ -4916,7 +4994,7 @@ function displayChartImage(
         imageUrl;
 
     state.zoom =
-        0.60;
+        1;
 
     state.rotation =
         0;
@@ -6907,6 +6985,8 @@ function loadUrlParameters() {
 
 async function initialize() {
 
+    updateChartLibraryStatus();
+
     resetViewer();
 
     loadUrlParameters();
@@ -6966,8 +7046,8 @@ async function initialize() {
 initialize();
 
 
-/* LOCAL CHART LIBRARY
- * No simulator or bridge connection is required.
+/* DATABASE CHART LIBRARY
+ * Charts are loaded from the Flight App API / Neon database.
  */
 
 /*
