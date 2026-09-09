@@ -56,48 +56,20 @@
     <style>
 
         :root {
-
-            --bg:
-                #f4f7fb;
-
-            --card:
-                #ffffff;
-
-            --card-soft:
-                #f8faff;
-
-            --border:
-                #e4e9f2;
-
-            --text:
-                #172033;
-
-            --muted:
-                #758096;
-
-            --primary:
-                #5b7cfa;
-
-            --primary-dark:
-                #4264e5;
-
-            --primary-light:
-                #edf1ff;
-
-            --cyan:
-                #4cc9e8;
-
-            --violet:
-                #8b72f7;
-
-            --success:
-                #1daf86;
-
-            --warning:
-                #f3a83b;
-
-            --danger:
-                #e85d68;
+            --bg: #f4f7fb;
+            --card: #ffffff;
+            --card-soft: #f8faff;
+            --border: #e4e9f2;
+            --text: #172033;
+            --muted: #758096;
+            --primary: #5b7cfa;
+            --primary-dark: #4264e5;
+            --primary-light: #edf1ff;
+            --cyan: #4cc9e8;
+            --violet: #8b72f7;
+            --success: #1daf86;
+            --warning: #f3a83b;
+            --danger: #e85d68;
 
             --shadow:
                 0 12px 35px rgba(32, 48, 82, 0.08);
@@ -105,11 +77,8 @@
             --shadow-small:
                 0 5px 18px rgba(32, 48, 82, 0.07);
 
-            --radius:
-                18px;
-
-            --nav-height:
-                74px;
+            --radius: 18px;
+            --nav-height: 74px;
         }
 
         * {
@@ -122,25 +91,19 @@
 
         body {
             margin: 0;
-            background:
-                var(--bg);
-            color:
-                var(--text);
-            font-family:
-                "DM Sans",
-                sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            font-family: "DM Sans", sans-serif;
         }
 
         button,
         input,
         select {
-            font-family:
-                inherit;
+            font-family: inherit;
         }
 
         button {
-            cursor:
-                pointer;
+            cursor: pointer;
         }
 
         /* =====================================================
@@ -148,105 +111,46 @@
         ====================================================== */
 
         .navbar {
-            height:
-                var(--nav-height);
-
-            position:
-                sticky;
-
-            top:
-                0;
-
-            z-index:
-                5000;
-
-            background:
-                rgba(255,255,255,0.96);
-
-            backdrop-filter:
-                blur(18px);
-
-            border-bottom:
-                1px solid var(--border);
-
-            display:
-                flex;
-
-            align-items:
-                center;
+            height: var(--nav-height);
+            position: sticky;
+            top: 0;
+            z-index: 5000;
+            background: rgba(255,255,255,0.96);
+            backdrop-filter: blur(18px);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
         }
 
         .nav-inner {
-            width:
-                min(1450px, calc(100% - 40px));
-
-            margin:
-                auto;
-
-            display:
-                flex;
-
-            align-items:
-                center;
-
-            justify-content:
-                space-between;
-
-            gap:
-                25px;
+            width: min(1450px, calc(100% - 40px));
+            margin: auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 25px;
         }
 
         .brand {
-            display:
-                flex;
-
-            align-items:
-                center;
-
-            gap:
-                12px;
-
-            text-decoration:
-                none;
-
-            color:
-                var(--text);
-
-            font-family:
-                "Manrope",
-                sans-serif;
-
-            font-size:
-                20px;
-
-            font-weight:
-                800;
-
-            white-space:
-                nowrap;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--text);
+            font-family: "Manrope", sans-serif;
+            font-size: 20px;
+            font-weight: 800;
+            white-space: nowrap;
         }
 
         .brand-icon {
-            width:
-                40px;
-
-            height:
-                40px;
-
-            border-radius:
-                12px;
-
-            display:
-                flex;
-
-            align-items:
-                center;
-
-            justify-content:
-                center;
-
-            color:
-                white;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
 
             background:
                 linear-gradient(
@@ -260,85 +164,42 @@
         }
 
         .nav-links {
-            display:
-                flex;
-
-            align-items:
-                center;
-
-            justify-content:
-                center;
-
-            gap:
-                5px;
-
-            flex:
-                1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            flex: 1;
         }
 
         .nav-link {
-            color:
-                var(--muted);
-
-            text-decoration:
-                none;
-
-            padding:
-                10px 13px;
-
-            border-radius:
-                10px;
-
-            font-size:
-                14px;
-
-            font-weight:
-                600;
-
-            transition:
-                .2s ease;
-
-            white-space:
-                nowrap;
+            color: var(--muted);
+            text-decoration: none;
+            padding: 10px 13px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: .2s ease;
+            white-space: nowrap;
         }
 
         .nav-link:hover {
-            color:
-                var(--text);
-
-            background:
-                #f5f7fc;
+            color: var(--text);
+            background: #f5f7fc;
         }
 
         .nav-link.active {
-            color:
-                var(--primary);
-
-            background:
-                var(--primary-light);
+            color: var(--primary);
+            background: var(--primary-light);
         }
 
         .profile-btn {
-            border:
-                0;
-
-            background:
-                var(--primary-light);
-
-            color:
-                var(--primary);
-
-            width:
-                42px;
-
-            height:
-                42px;
-
-            border-radius:
-                50%;
-
-            font-size:
-                16px;
+            border: 0;
+            background: var(--primary-light);
+            color: var(--primary);
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            font-size: 16px;
         }
 
         /* =====================================================
@@ -346,14 +207,9 @@
         ====================================================== */
 
         .page {
-            width:
-                min(1500px, calc(100% - 40px));
-
-            margin:
-                0 auto;
-
-            padding:
-                28px 0 60px;
+            width: min(1500px, calc(100% - 40px));
+            margin: 0 auto;
+            padding: 28px 0 60px;
         }
 
         /* =====================================================
@@ -361,158 +217,73 @@
         ====================================================== */
 
         .page-header {
-            display:
-                flex;
-
-            align-items:
-                flex-end;
-
-            justify-content:
-                space-between;
-
-            gap:
-                25px;
-
-            margin-bottom:
-                25px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 25px;
+            margin-bottom: 25px;
         }
 
         .eyebrow {
-            display:
-                inline-flex;
-
-            align-items:
-                center;
-
-            gap:
-                7px;
-
-            color:
-                var(--primary);
-
-            background:
-                var(--primary-light);
-
-            border-radius:
-                999px;
-
-            padding:
-                6px 11px;
-
-            font-size:
-                11px;
-
-            font-weight:
-                800;
-
-            text-transform:
-                uppercase;
-
-            letter-spacing:
-                .08em;
-
-            margin-bottom:
-                10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            color: var(--primary);
+            background: var(--primary-light);
+            border-radius: 999px;
+            padding: 6px 11px;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            margin-bottom: 10px;
         }
 
         .page-header h1 {
-            margin:
-                0;
-
-            font-family:
-                "Manrope",
-                sans-serif;
-
-            font-size:
-                clamp(28px, 4vw, 42px);
-
-            line-height:
-                1.1;
-
-            letter-spacing:
-                -.04em;
+            margin: 0;
+            font-family: "Manrope", sans-serif;
+            font-size: clamp(28px, 4vw, 42px);
+            line-height: 1.1;
+            letter-spacing: -.04em;
         }
 
         .page-header p {
-            margin:
-                10px 0 0;
-
-            color:
-                var(--muted);
-
-            max-width:
-                700px;
-
-            line-height:
-                1.6;
+            margin: 10px 0 0;
+            color: var(--muted);
+            max-width: 700px;
+            line-height: 1.6;
         }
 
         .connection-status {
-            display:
-                inline-flex;
-
-            align-items:
-                center;
-
-            gap:
-                9px;
-
-            background:
-                white;
-
-            border:
-                1px solid var(--border);
-
-            border-radius:
-                999px;
-
-            padding:
-                10px 14px;
-
-            font-size:
-                13px;
-
-            font-weight:
-                700;
-
-            box-shadow:
-                var(--shadow-small);
-
-            white-space:
-                nowrap;
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            padding: 10px 14px;
+            font-size: 13px;
+            font-weight: 700;
+            box-shadow: var(--shadow-small);
+            white-space: nowrap;
         }
 
         .status-dot {
-            width:
-                9px;
-
-            height:
-                9px;
-
-            border-radius:
-                50%;
-
-            background:
-                var(--warning);
-
-            box-shadow:
-                0 0 0 4px rgba(243,168,59,.12);
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: var(--warning);
+            box-shadow: 0 0 0 4px rgba(243,168,59,.12);
         }
 
         .connection-status.connected .status-dot {
-            background:
-                var(--success);
-
-            box-shadow:
-                0 0 0 4px rgba(29,175,134,.12);
+            background: var(--success);
+            box-shadow: 0 0 0 4px rgba(29,175,134,.12);
         }
 
         .connection-status.error .status-dot {
-            background:
-                var(--danger);
-
-            box-shadow:
-                0 0 0 4px rgba(232,93,104,.12);
+            background: var(--danger);
+            box-shadow: 0 0 0 4px rgba(232,93,104,.12);
         }
 
         /* =====================================================
@@ -520,161 +291,79 @@
         ====================================================== */
 
         .control-card {
-            background:
-                var(--card);
-
-            border:
-                1px solid var(--border);
-
-            border-radius:
-                var(--radius);
-
-            box-shadow:
-                var(--shadow);
-
-            padding:
-                20px;
-
-            margin-bottom:
-                20px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 20px;
+            margin-bottom: 20px;
         }
 
         .control-grid {
-            display:
-                grid;
-
-            grid-template-columns:
-                1fr 1fr 1fr auto;
-
-            gap:
-                14px;
-
-            align-items:
-                end;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr auto;
+            gap: 14px;
+            align-items: end;
         }
 
         .field {
-            min-width:
-                0;
+            min-width: 0;
         }
 
         .field label {
-            display:
-                block;
-
-            margin:
-                0 0 7px;
-
-            font-size:
-                12px;
-
-            font-weight:
-                800;
-
-            color:
-                var(--muted);
-
-            text-transform:
-                uppercase;
-
-            letter-spacing:
-                .06em;
+            display: block;
+            margin: 0 0 7px;
+            font-size: 12px;
+            font-weight: 800;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: .06em;
         }
 
         .input-wrap {
-            position:
-                relative;
+            position: relative;
         }
 
         .input-wrap i {
-            position:
-                absolute;
-
-            left:
-                14px;
-
-            top:
-                50%;
-
-            transform:
-                translateY(-50%);
-
-            color:
-                #8b95a9;
-
-            pointer-events:
-                none;
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #8b95a9;
+            pointer-events: none;
         }
 
         .input {
-            width:
-                100%;
-
-            height:
-                48px;
-
-            border:
-                1px solid var(--border);
-
-            border-radius:
-                12px;
-
-            background:
-                #fff;
-
-            color:
-                var(--text);
-
-            outline:
-                none;
-
-            padding:
-                0 14px 0 42px;
-
-            font-size:
-                14px;
-
-            font-weight:
-                600;
-
-            transition:
-                .2s ease;
+            width: 100%;
+            height: 48px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: #fff;
+            color: var(--text);
+            outline: none;
+            padding: 0 14px 0 42px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: .2s ease;
         }
 
         .input:focus {
-            border-color:
-                var(--primary);
-
-            box-shadow:
-                0 0 0 4px rgba(91,124,250,.10);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(91,124,250,.10);
         }
 
         .airport-info {
-            margin-top:
-                7px;
-
-            min-height:
-                16px;
-
-            color:
-                var(--muted);
-
-            font-size:
-                11px;
+            margin-top: 7px;
+            min-height: 16px;
+            color: var(--muted);
+            font-size: 11px;
         }
 
         .primary-btn {
-            height:
-                48px;
-
-            border:
-                0;
-
-            border-radius:
-                12px;
-
-            padding:
-                0 18px;
+            height: 48px;
+            border: 0;
+            border-radius: 12px;
+            padding: 0 18px;
 
             background:
                 linear-gradient(
@@ -683,65 +372,33 @@
                     var(--primary-dark)
                 );
 
-            color:
-                white;
-
-            font-weight:
-                800;
-
-            font-size:
-                13px;
-
-            box-shadow:
-                0 8px 18px rgba(91,124,250,.22);
-
-            transition:
-                .2s ease;
+            color: white;
+            font-weight: 800;
+            font-size: 13px;
+            box-shadow: 0 8px 18px rgba(91,124,250,.22);
+            transition: .2s ease;
         }
 
         .primary-btn:hover {
-            transform:
-                translateY(-1px);
-
-            box-shadow:
-                0 12px 24px rgba(91,124,250,.27);
+            transform: translateY(-1px);
+            box-shadow: 0 12px 24px rgba(91,124,250,.27);
         }
 
         .secondary-btn {
-            height:
-                44px;
-
-            border:
-                1px solid var(--border);
-
-            border-radius:
-                11px;
-
-            padding:
-                0 14px;
-
-            background:
-                white;
-
-            color:
-                var(--text);
-
-            font-weight:
-                700;
-
-            font-size:
-                13px;
-
-            transition:
-                .2s ease;
+            height: 44px;
+            border: 1px solid var(--border);
+            border-radius: 11px;
+            padding: 0 14px;
+            background: white;
+            color: var(--text);
+            font-weight: 700;
+            font-size: 13px;
+            transition: .2s ease;
         }
 
         .secondary-btn:hover {
-            border-color:
-                #cbd3e2;
-
-            background:
-                #fafbfe;
+            border-color: #cbd3e2;
+            background: #fafbfe;
         }
 
         /* =====================================================
@@ -749,17 +406,12 @@
         ====================================================== */
 
         .main-grid {
-            display:
-                grid;
-
+            display: grid;
             grid-template-columns:
-                minmax(0, 1.65fr) minmax(330px, .75fr);
-
-            gap:
-                20px;
-
-            align-items:
-                start;
+                minmax(0, 1.65fr)
+                minmax(330px, .75fr);
+            gap: 20px;
+            align-items: start;
         }
 
         /* =====================================================
@@ -767,174 +419,83 @@
         ====================================================== */
 
         .viewer-card {
-            background:
-                #111827;
-
-            border:
-                1px solid #20293b;
-
-            border-radius:
-                var(--radius);
-
-            box-shadow:
-                0 20px 45px rgba(13,21,36,.17);
-
-            overflow:
-                hidden;
-
-            min-height:
-                700px;
-
-            display:
-                flex;
-
-            flex-direction:
-                column;
+            background: #111827;
+            border: 1px solid #20293b;
+            border-radius: var(--radius);
+            box-shadow: 0 20px 45px rgba(13,21,36,.17);
+            overflow: hidden;
+            min-height: 700px;
+            display: flex;
+            flex-direction: column;
         }
 
         .viewer-top {
-            height:
-                65px;
-
-            padding:
-                0 18px;
-
-            display:
-                flex;
-
-            align-items:
-                center;
-
-            justify-content:
-                space-between;
-
-            gap:
-                15px;
-
-            border-bottom:
-                1px solid rgba(255,255,255,.08);
-
-            background:
-                #151d2c;
-
-            color:
-                white;
+            height: 65px;
+            padding: 0 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            border-bottom: 1px solid rgba(255,255,255,.08);
+            background: #151d2c;
+            color: white;
         }
 
         .viewer-title {
-            min-width:
-                0;
+            min-width: 0;
         }
 
         .viewer-title strong {
-            display:
-                block;
-
-            font-family:
-                "Manrope",
-                sans-serif;
-
-            font-size:
-                14px;
-
-            white-space:
-                nowrap;
-
-            overflow:
-                hidden;
-
-            text-overflow:
-                ellipsis;
+            display: block;
+            font-family: "Manrope", sans-serif;
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .viewer-title span {
-            display:
-                block;
-
-            margin-top:
-                3px;
-
-            color:
-                #8994aa;
-
-            font-size:
-                11px;
+            display: block;
+            margin-top: 3px;
+            color: #8994aa;
+            font-size: 11px;
         }
 
         .viewer-tools {
-            display:
-                flex;
-
-            align-items:
-                center;
-
-            gap:
-                6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
         .viewer-tool {
-            width:
-                36px;
-
-            height:
-                36px;
-
-            border:
-                1px solid rgba(255,255,255,.08);
-
-            border-radius:
-                9px;
-
-            background:
-                rgba(255,255,255,.04);
-
-            color:
-                #dce3f1;
-
-            transition:
-                .2s ease;
+            width: 36px;
+            height: 36px;
+            border: 1px solid rgba(255,255,255,.08);
+            border-radius: 9px;
+            background: rgba(255,255,255,.04);
+            color: #dce3f1;
+            transition: .2s ease;
         }
 
         .viewer-tool:hover {
-            background:
-                rgba(255,255,255,.10);
+            background: rgba(255,255,255,.10);
         }
 
         .viewer-stage {
-            flex:
-                1;
-
-            min-height:
-                580px;
-
-            position:
-                relative;
-
-            overflow:
-                hidden;
-
-            background:
-                #202838;
+            flex: 1;
+            min-height: 580px;
+            position: relative;
+            overflow: hidden;
+            background: #202838;
         }
 
         .chart-canvas {
-            position:
-                absolute;
-
-            inset:
-                0;
-
-            display:
-                flex;
-
-            align-items:
-                center;
-
-            justify-content:
-                center;
-
-            overflow:
-                hidden;
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
 
             background:
                 radial-gradient(
@@ -946,244 +507,123 @@
         }
 
         .chart-image {
-            max-width:
-                none;
-
-            user-select:
-                none;
-
-            -webkit-user-drag:
-                none;
-
-            transform-origin:
-                center center;
-
-            display:
-                none;
-
-            box-shadow:
-                0 25px 60px rgba(0,0,0,.35);
+            max-width: none;
+            max-height: none;
+            user-select: none;
+            -webkit-user-drag: none;
+            transform-origin: center center;
+            display: none;
+            box-shadow: 0 25px 60px rgba(0,0,0,.35);
         }
 
         .chart-placeholder {
-            width:
-                min(620px, 90%);
-
-            text-align:
-                center;
-
-            color:
-                #b5bfd0;
+            width: min(620px, 90%);
+            text-align: center;
+            color: #b5bfd0;
         }
 
         .chart-placeholder .big-icon {
-            width:
-                90px;
-
-            height:
-                90px;
-
-            margin:
-                0 auto 20px;
-
-            border-radius:
-                25px;
-
-            display:
-                flex;
-
-            align-items:
-                center;
-
-            justify-content:
-                center;
-
-            font-size:
-                35px;
-
-            color:
-                #9fafff;
-
-            background:
-                rgba(91,124,250,.12);
-
-            border:
-                1px solid rgba(91,124,250,.18);
+            width: 90px;
+            height: 90px;
+            margin: 0 auto 20px;
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 35px;
+            color: #9fafff;
+            background: rgba(91,124,250,.12);
+            border: 1px solid rgba(91,124,250,.18);
         }
 
         .chart-placeholder h2 {
-            margin:
-                0;
-
-            color:
-                white;
-
-            font-family:
-                "Manrope",
-                sans-serif;
-
-            font-size:
-                22px;
+            margin: 0;
+            color: white;
+            font-family: "Manrope", sans-serif;
+            font-size: 22px;
         }
 
         .chart-placeholder p {
-            line-height:
-                1.65;
-
-            font-size:
-                13px;
-
-            color:
-                #8e99ad;
-
-            margin:
-                10px auto 0;
-
-            max-width:
-                520px;
+            line-height: 1.65;
+            font-size: 13px;
+            color: #8e99ad;
+            margin: 10px auto 0;
+            max-width: 520px;
         }
 
         .chart-loading {
-            display:
-                none;
-
-            position:
-                absolute;
-
-            inset:
-                0;
-
-            z-index:
-                20;
-
-            align-items:
-                center;
-
-            justify-content:
-                center;
-
-            background:
-                rgba(20,27,39,.82);
-
-            backdrop-filter:
-                blur(5px);
-
-            color:
-                white;
+            display: none;
+            position: absolute;
+            inset: 0;
+            z-index: 20;
+            align-items: center;
+            justify-content: center;
+            background: rgba(20,27,39,.82);
+            backdrop-filter: blur(5px);
+            color: white;
         }
 
         .chart-loading.active {
-            display:
-                flex;
+            display: flex;
         }
 
         .loading-inner {
-            text-align:
-                center;
+            text-align: center;
         }
 
         .spinner {
-            width:
-                38px;
-
-            height:
-                38px;
-
-            margin:
-                0 auto 13px;
-
-            border:
-                3px solid rgba(255,255,255,.12);
-
-            border-top-color:
-                var(--primary);
-
-            border-radius:
-                50%;
-
-            animation:
-                spin .8s linear infinite;
+            width: 38px;
+            height: 38px;
+            margin: 0 auto 13px;
+            border: 3px solid rgba(255,255,255,.12);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin .8s linear infinite;
         }
 
         @keyframes spin {
             to {
-                transform:
-                    rotate(360deg);
+                transform: rotate(360deg);
             }
         }
 
         .viewer-bottom {
-            height:
-                58px;
-
-            display:
-                flex;
-
-            align-items:
-                center;
-
-            justify-content:
-                space-between;
-
-            padding:
-                0 18px;
-
-            background:
-                #151d2c;
-
-            border-top:
-                1px solid rgba(255,255,255,.08);
-
-            color:
-                #9ca8bc;
-
-            font-size:
-                12px;
+            height: 58px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 18px;
+            background: #151d2c;
+            border-top: 1px solid rgba(255,255,255,.08);
+            color: #9ca8bc;
+            font-size: 12px;
         }
 
         .page-controls {
-            display:
-                flex;
-
-            align-items:
-                center;
-
-            gap:
-                8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .page-btn {
-            width:
-                34px;
+            width: 34px;
+            height: 34px;
+            border: 1px solid rgba(255,255,255,.08);
+            border-radius: 8px;
+            background: rgba(255,255,255,.04);
+            color: white;
+        }
 
-            height:
-                34px;
-
-            border:
-                1px solid rgba(255,255,255,.08);
-
-            border-radius:
-                8px;
-
-            background:
-                rgba(255,255,255,.04);
-
-            color:
-                white;
+        .page-btn:disabled {
+            opacity: .35;
+            cursor: not-allowed;
         }
 
         .page-counter {
-            min-width:
-                80px;
-
-            text-align:
-                center;
-
-            font-weight:
-                800;
-
-            color:
-                white;
+            min-width: 80px;
+            text-align: center;
+            font-weight: 800;
+            color: white;
         }
 
         /* =====================================================
@@ -1191,79 +631,42 @@
         ====================================================== */
 
         .sidebar {
-            display:
-                flex;
-
-            flex-direction:
-                column;
-
-            gap:
-                15px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
         }
 
         .side-card {
-            background:
-                white;
-
-            border:
-                1px solid var(--border);
-
-            border-radius:
-                var(--radius);
-
-            box-shadow:
-                var(--shadow-small);
-
-            overflow:
-                hidden;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-small);
+            overflow: hidden;
         }
 
         .side-header {
-            padding:
-                16px 18px;
-
-            border-bottom:
-                1px solid var(--border);
-
-            display:
-                flex;
-
-            align-items:
-                center;
-
-            justify-content:
-                space-between;
-
-            gap:
-                10px;
+            padding: 16px 18px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
         }
 
         .side-header h3 {
-            margin:
-                0;
-
-            font-family:
-                "Manrope",
-                sans-serif;
-
-            font-size:
-                14px;
+            margin: 0;
+            font-family: "Manrope", sans-serif;
+            font-size: 14px;
         }
 
         .side-header span {
-            font-size:
-                11px;
-
-            color:
-                var(--muted);
-
-            font-weight:
-                700;
+            font-size: 11px;
+            color: var(--muted);
+            font-weight: 700;
         }
 
         .side-body {
-            padding:
-                15px 18px;
+            padding: 15px 18px;
         }
 
         /* =====================================================
@@ -1271,75 +674,41 @@
         ====================================================== */
 
         .provider-grid {
-            display:
-                grid;
-
-            grid-template-columns:
-                1fr 1fr;
-
-            gap:
-                8px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
         }
 
         .provider-btn {
-            min-height:
-                48px;
-
-            border:
-                1px solid var(--border);
-
-            background:
-                white;
-
-            border-radius:
-                11px;
-
-            text-align:
-                left;
-
-            padding:
-                9px 11px;
-
-            transition:
-                .2s ease;
+            min-height: 48px;
+            border: 1px solid var(--border);
+            background: white;
+            border-radius: 11px;
+            text-align: left;
+            padding: 9px 11px;
+            transition: .2s ease;
         }
 
         .provider-btn:hover {
-            border-color:
-                #c9d2e3;
+            border-color: #c9d2e3;
         }
 
         .provider-btn.active {
-            border-color:
-                var(--primary);
-
-            background:
-                var(--primary-light);
+            border-color: var(--primary);
+            background: var(--primary-light);
         }
 
         .provider-btn strong {
-            display:
-                block;
-
-            font-size:
-                12px;
-
-            color:
-                var(--text);
+            display: block;
+            font-size: 12px;
+            color: var(--text);
         }
 
         .provider-btn span {
-            display:
-                block;
-
-            font-size:
-                10px;
-
-            color:
-                var(--muted);
-
-            margin-top:
-                2px;
+            display: block;
+            font-size: 10px;
+            color: var(--muted);
+            margin-top: 2px;
         }
 
         /* =====================================================
@@ -1347,54 +716,27 @@
         ====================================================== */
 
         .category-tabs {
-            display:
-                flex;
-
-            gap:
-                6px;
-
-            overflow-x:
-                auto;
-
-            padding-bottom:
-                2px;
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            padding-bottom: 2px;
         }
 
         .category-tab {
-            flex:
-                0 0 auto;
-
-            border:
-                1px solid var(--border);
-
-            background:
-                white;
-
-            color:
-                var(--muted);
-
-            border-radius:
-                9px;
-
-            padding:
-                8px 10px;
-
-            font-size:
-                11px;
-
-            font-weight:
-                800;
+            flex: 0 0 auto;
+            border: 1px solid var(--border);
+            background: white;
+            color: var(--muted);
+            border-radius: 9px;
+            padding: 8px 10px;
+            font-size: 11px;
+            font-weight: 800;
         }
 
         .category-tab.active {
-            color:
-                var(--primary);
-
-            border-color:
-                #cbd5ff;
-
-            background:
-                var(--primary-light);
+            color: var(--primary);
+            border-color: #cbd5ff;
+            background: var(--primary-light);
         }
 
         /* =====================================================
@@ -1402,174 +744,88 @@
         ====================================================== */
 
         .chart-list {
-            max-height:
-                330px;
-
-            overflow-y:
-                auto;
-
-            margin:
-                12px 0 0;
+            max-height: 330px;
+            overflow-y: auto;
+            margin: 12px 0 0;
         }
 
         .chart-list::-webkit-scrollbar {
-            width:
-                5px;
+            width: 5px;
         }
 
         .chart-list::-webkit-scrollbar-thumb {
-            background:
-                #d8deea;
-
-            border-radius:
-                999px;
+            background: #d8deea;
+            border-radius: 999px;
         }
 
         .chart-item {
-            width:
-                100%;
-
-            border:
-                1px solid transparent;
-
-            background:
-                transparent;
-
-            padding:
-                11px;
-
-            border-radius:
-                10px;
-
-            display:
-                flex;
-
-            align-items:
-                center;
-
-            gap:
-                11px;
-
-            text-align:
-                left;
-
-            margin-bottom:
-                4px;
-
-            transition:
-                .2s ease;
+            width: 100%;
+            border: 1px solid transparent;
+            background: transparent;
+            padding: 11px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            text-align: left;
+            margin-bottom: 4px;
+            transition: .2s ease;
         }
 
         .chart-item:hover {
-            background:
-                #f6f8fc;
+            background: #f6f8fc;
         }
 
         .chart-item.active {
-            background:
-                var(--primary-light);
-
-            border-color:
-                #d8dfff;
+            background: var(--primary-light);
+            border-color: #d8dfff;
         }
 
         .chart-item-icon {
-            width:
-                34px;
-
-            height:
-                34px;
-
-            flex:
-                0 0 34px;
-
-            border-radius:
-                9px;
-
-            display:
-                flex;
-
-            align-items:
-                center;
-
-            justify-content:
-                center;
-
-            color:
-                var(--primary);
-
-            background:
-                #f0f3ff;
+            width: 34px;
+            height: 34px;
+            flex: 0 0 34px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            background: #f0f3ff;
         }
 
         .chart-item-main {
-            min-width:
-                0;
-
-            flex:
-                1;
+            min-width: 0;
+            flex: 1;
         }
 
         .chart-item-title {
-            display:
-                block;
-
-            color:
-                var(--text);
-
-            font-size:
-                12px;
-
-            font-weight:
-                800;
-
-            white-space:
-                nowrap;
-
-            overflow:
-                hidden;
-
-            text-overflow:
-                ellipsis;
+            display: block;
+            color: var(--text);
+            font-size: 12px;
+            font-weight: 800;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .chart-item-meta {
-            display:
-                block;
-
-            color:
-                var(--muted);
-
-            font-size:
-                10px;
-
-            margin-top:
-                3px;
+            display: block;
+            color: var(--muted);
+            font-size: 10px;
+            margin-top: 3px;
         }
 
         .chart-item-arrow {
-            color:
-                #aab3c4;
-
-            font-size:
-                11px;
+            color: #aab3c4;
+            font-size: 11px;
         }
 
         .empty-list {
-            padding:
-                25px 10px;
-
-            text-align:
-                center;
-
-            color:
-                var(--muted);
-
-            font-size:
-                12px;
-
-            line-height:
-                1.6;
+            padding: 25px 10px;
+            text-align: center;
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.6;
         }
 
         /* =====================================================
@@ -1577,28 +833,16 @@
         ====================================================== */
 
         .airport-summary {
-            display:
-                grid;
-
-            grid-template-columns:
-                auto 1fr;
-
-            gap:
-                13px;
-
-            align-items:
-                center;
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 13px;
+            align-items: center;
         }
 
         .airport-code {
-            width:
-                58px;
-
-            height:
-                58px;
-
-            border-radius:
-                15px;
+            width: 58px;
+            height: 58px;
+            border-radius: 15px;
 
             background:
                 linear-gradient(
@@ -1607,112 +851,55 @@
                     #f5f1ff
                 );
 
-            color:
-                var(--primary);
-
-            display:
-                flex;
-
-            align-items:
-                center;
-
-            justify-content:
-                center;
-
-            font-family:
-                "Manrope",
-                sans-serif;
-
-            font-weight:
-                800;
-
-            font-size:
-                15px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: "Manrope", sans-serif;
+            font-weight: 800;
+            font-size: 15px;
         }
 
         .airport-summary strong {
-            display:
-                block;
-
-            font-family:
-                "Manrope",
-                sans-serif;
-
-            font-size:
-                14px;
+            display: block;
+            font-family: "Manrope", sans-serif;
+            font-size: 14px;
         }
 
         .airport-summary span {
-            display:
-                block;
-
-            color:
-                var(--muted);
-
-            font-size:
-                11px;
-
-            margin-top:
-                3px;
+            display: block;
+            color: var(--muted);
+            font-size: 11px;
+            margin-top: 3px;
         }
 
         .airport-stats {
-            display:
-                grid;
-
-            grid-template-columns:
-                1fr 1fr;
-
-            gap:
-                8px;
-
-            margin-top:
-                15px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 15px;
         }
 
         .airport-stat {
-            padding:
-                10px;
-
-            border:
-                1px solid var(--border);
-
-            border-radius:
-                10px;
-
-            background:
-                #fafbfe;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: #fafbfe;
         }
 
         .airport-stat span {
-            display:
-                block;
-
-            color:
-                var(--muted);
-
-            font-size:
-                9px;
-
-            text-transform:
-                uppercase;
-
-            font-weight:
-                800;
-
-            letter-spacing:
-                .05em;
+            display: block;
+            color: var(--muted);
+            font-size: 9px;
+            text-transform: uppercase;
+            font-weight: 800;
+            letter-spacing: .05em;
         }
 
         .airport-stat strong {
-            display:
-                block;
-
-            margin-top:
-                4px;
-
-            font-size:
-                12px;
+            display: block;
+            margin-top: 4px;
+            font-size: 12px;
         }
 
         /* =====================================================
@@ -1720,85 +907,42 @@
         ====================================================== */
 
         .weather-row {
-            display:
-                grid;
-
-            grid-template-columns:
-                1fr 1fr;
-
-            gap:
-                8px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
         }
 
         .weather-box {
-            background:
-                #f8faff;
-
-            border:
-                1px solid var(--border);
-
-            border-radius:
-                11px;
-
-            padding:
-                11px;
+            background: #f8faff;
+            border: 1px solid var(--border);
+            border-radius: 11px;
+            padding: 11px;
         }
 
         .weather-box small {
-            display:
-                block;
-
-            color:
-                var(--muted);
-
-            font-size:
-                9px;
-
-            font-weight:
-                800;
-
-            text-transform:
-                uppercase;
+            display: block;
+            color: var(--muted);
+            font-size: 9px;
+            font-weight: 800;
+            text-transform: uppercase;
         }
 
         .weather-box strong {
-            display:
-                block;
-
-            margin-top:
-                5px;
-
-            font-size:
-                12px;
+            display: block;
+            margin-top: 5px;
+            font-size: 12px;
         }
 
         .metar {
-            margin-top:
-                9px;
-
-            padding:
-                10px;
-
-            border-radius:
-                9px;
-
-            background:
-                #f3f5f9;
-
-            font-family:
-                monospace;
-
-            font-size:
-                10px;
-
-            color:
-                #596579;
-
-            word-break:
-                break-word;
-
-            line-height:
-                1.55;
+            margin-top: 9px;
+            padding: 10px;
+            border-radius: 9px;
+            background: #f3f5f9;
+            font-family: monospace;
+            font-size: 10px;
+            color: #596579;
+            word-break: break-word;
+            line-height: 1.55;
         }
 
         /* =====================================================
@@ -1806,71 +950,37 @@
         ====================================================== */
 
         .map-card {
-            margin-top:
-                20px;
-
-            background:
-                white;
-
-            border:
-                1px solid var(--border);
-
-            border-radius:
-                var(--radius);
-
-            overflow:
-                hidden;
-
-            box-shadow:
-                var(--shadow-small);
+            margin-top: 20px;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-small);
         }
 
         .map-header {
-            height:
-                62px;
-
-            display:
-                flex;
-
-            align-items:
-                center;
-
-            justify-content:
-                space-between;
-
-            padding:
-                0 18px;
-
-            border-bottom:
-                1px solid var(--border);
+            height: 62px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 18px;
+            border-bottom: 1px solid var(--border);
         }
 
         .map-header h3 {
-            margin:
-                0;
-
-            font-family:
-                "Manrope",
-                sans-serif;
-
-            font-size:
-                14px;
+            margin: 0;
+            font-family: "Manrope", sans-serif;
+            font-size: 14px;
         }
 
         .map-header span {
-            color:
-                var(--muted);
-
-            font-size:
-                11px;
+            color: var(--muted);
+            font-size: 11px;
         }
 
         #routeMap {
-            height:
-                360px;
-
-            width:
-                100%;
+            height: 360px;
+            width: 100%;
         }
 
         /* =====================================================
@@ -1878,104 +988,51 @@
         ====================================================== */
 
         .route-grid {
-            display:
-                grid;
-
-            grid-template-columns:
-                1fr 1fr 1fr;
-
-            gap:
-                10px;
-
-            padding:
-                16px;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            padding: 16px;
         }
 
         .route-point {
-            border:
-                1px solid var(--border);
-
-            border-radius:
-                12px;
-
-            padding:
-                13px;
-
-            background:
-                #fafbfe;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 13px;
+            background: #fafbfe;
         }
 
         .route-point small {
-            display:
-                block;
-
-            color:
-                var(--muted);
-
-            font-size:
-                9px;
-
-            font-weight:
-                800;
-
-            text-transform:
-                uppercase;
-
-            letter-spacing:
-                .06em;
+            display: block;
+            color: var(--muted);
+            font-size: 9px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .06em;
         }
 
         .route-point strong {
-            display:
-                block;
-
-            margin-top:
-                4px;
-
-            font-family:
-                "Manrope",
-                sans-serif;
-
-            font-size:
-                16px;
+            display: block;
+            margin-top: 4px;
+            font-family: "Manrope", sans-serif;
+            font-size: 16px;
         }
 
         .route-line {
-            display:
-                flex;
-
-            align-items:
-                center;
-
-            gap:
-                8px;
-
-            margin:
-                0 16px 16px;
-
-            color:
-                var(--muted);
-
-            font-size:
-                11px;
-
-            font-weight:
-                700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0 16px 16px;
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 700;
         }
 
         .route-line::before,
         .route-line::after {
-            content:
-                "";
-
-            height:
-                1px;
-
-            background:
-                var(--border);
-
-            flex:
-                1;
+            content: "";
+            height: 1px;
+            background: var(--border);
+            flex: 1;
         }
 
         /* =====================================================
@@ -1983,83 +1040,39 @@
         ====================================================== */
 
         .toast {
-            position:
-                fixed;
-
-            right:
-                22px;
-
-            bottom:
-                22px;
-
-            z-index:
-                9000;
-
-            min-width:
-                270px;
-
-            max-width:
-                400px;
-
-            background:
-                #172033;
-
-            color:
-                white;
-
-            border-radius:
-                13px;
-
-            padding:
-                13px 15px;
-
-            box-shadow:
-                0 18px 45px rgba(0,0,0,.20);
-
-            display:
-                flex;
-
-            align-items:
-                center;
-
-            gap:
-                10px;
-
-            transform:
-                translateY(25px);
-
-            opacity:
-                0;
-
-            pointer-events:
-                none;
-
-            transition:
-                .25s ease;
-
-            font-size:
-                12px;
-
-            font-weight:
-                600;
+            position: fixed;
+            right: 22px;
+            bottom: 22px;
+            z-index: 9000;
+            min-width: 270px;
+            max-width: 400px;
+            background: #172033;
+            color: white;
+            border-radius: 13px;
+            padding: 13px 15px;
+            box-shadow: 0 18px 45px rgba(0,0,0,.20);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transform: translateY(25px);
+            opacity: 0;
+            pointer-events: none;
+            transition: .25s ease;
+            font-size: 12px;
+            font-weight: 600;
         }
 
         .toast.show {
-            transform:
-                translateY(0);
-
-            opacity:
-                1;
+            transform: translateY(0);
+            opacity: 1;
         }
 
         .toast.success i {
-            color:
-                #5ee0b3;
+            color: #5ee0b3;
         }
 
         .toast.error i {
-            color:
-                #ff858e;
+            color: #ff858e;
         }
 
         /* =====================================================
@@ -2069,148 +1082,109 @@
         @media (max-width: 1150px) {
 
             .nav-links {
-                gap:
-                    0;
+                gap: 0;
             }
 
             .nav-link {
-                padding:
-                    9px 8px;
-
-                font-size:
-                    12px;
+                padding: 9px 8px;
+                font-size: 12px;
             }
 
             .control-grid {
-                grid-template-columns:
-                    1fr 1fr;
+                grid-template-columns: 1fr 1fr;
             }
 
             .main-grid {
-                grid-template-columns:
-                    1fr;
+                grid-template-columns: 1fr;
             }
 
             .sidebar {
-                display:
-                    grid;
-
-                grid-template-columns:
-                    repeat(2, 1fr);
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
             }
 
             .viewer-card {
-                min-height:
-                    650px;
+                min-height: 650px;
             }
         }
 
         @media (max-width: 800px) {
 
             .nav-links {
-                display:
-                    none;
+                display: none;
             }
 
             .page {
-                width:
-                    min(100% - 24px, 1500px);
-
-                padding-top:
-                    20px;
+                width: min(100% - 24px, 1500px);
+                padding-top: 20px;
             }
 
             .page-header {
-                align-items:
-                    flex-start;
-
-                flex-direction:
-                    column;
+                align-items: flex-start;
+                flex-direction: column;
             }
 
             .control-grid {
-                grid-template-columns:
-                    1fr;
+                grid-template-columns: 1fr;
             }
 
             .sidebar {
-                grid-template-columns:
-                    1fr;
+                grid-template-columns: 1fr;
             }
 
             .route-grid {
-                grid-template-columns:
-                    1fr;
+                grid-template-columns: 1fr;
             }
 
             .viewer-card {
-                min-height:
-                    560px;
+                min-height: 560px;
             }
 
             .viewer-stage {
-                min-height:
-                    440px;
+                min-height: 440px;
             }
 
             .viewer-top {
-                height:
-                    auto;
-
-                padding:
-                    12px;
-
-                align-items:
-                    flex-start;
-
-                flex-direction:
-                    column;
+                height: auto;
+                padding: 12px;
+                align-items: flex-start;
+                flex-direction: column;
             }
 
             .viewer-tools {
-                width:
-                    100%;
+                width: 100%;
             }
 
             .viewer-tool {
-                flex:
-                    1;
+                flex: 1;
             }
 
             .connection-status {
-                align-self:
-                    stretch;
-
-                justify-content:
-                    center;
+                align-self: stretch;
+                justify-content: center;
             }
         }
 
         @media (max-width: 500px) {
 
             .brand span {
-                display:
-                    none;
+                display: none;
             }
 
             .provider-grid {
-                grid-template-columns:
-                    1fr;
+                grid-template-columns: 1fr;
             }
 
             .weather-row {
-                grid-template-columns:
-                    1fr;
+                grid-template-columns: 1fr;
             }
 
             .airport-stats {
-                grid-template-columns:
-                    1fr 1fr;
+                grid-template-columns: 1fr 1fr;
             }
 
             .viewer-bottom {
-                padding:
-                    0 10px;
+                padding: 0 10px;
             }
         }
 
@@ -2231,7 +1205,6 @@
             href="index.html"
             class="brand"
         >
-
             <span class="brand-icon">
                 <i class="fa-solid fa-plane"></i>
             </span>
@@ -2239,50 +1212,31 @@
             <span>
                 Flight App
             </span>
-
         </a>
 
         <div class="nav-links">
 
-            <a
-                href="index.html"
-                class="nav-link"
-            >
+            <a href="index.html" class="nav-link">
                 Dashboard
             </a>
 
-            <a
-                href="planner.html"
-                class="nav-link"
-            >
+            <a href="planner.html" class="nav-link">
                 Flight Planner
             </a>
 
-            <a
-                href="charts.html"
-                class="nav-link active"
-            >
+            <a href="charts.html" class="nav-link active">
                 Charts
             </a>
 
-            <a
-                href="weather.html"
-                class="nav-link"
-            >
+            <a href="weather.html" class="nav-link">
                 Weather
             </a>
 
-            <a
-                href="simbrief.html"
-                class="nav-link"
-            >
+            <a href="simbrief.html" class="nav-link">
                 SimBrief
             </a>
 
-            <a
-                href="plans.html"
-                class="nav-link"
-            >
+            <a href="plans.html" class="nav-link">
                 Saved Plans
             </a>
 
@@ -2325,9 +1279,9 @@
 
             <p>
                 View airport charts, procedures and chart pages
-                directly inside Flight App. The viewer is designed
-                to receive authentic Microsoft Flight Simulator 2024
-                Charts API data.
+                directly inside Flight App. Charts uploaded through
+                the Flight App Chart Administration are automatically
+                available here.
             </p>
 
         </div>
@@ -2340,7 +1294,7 @@
             <span class="status-dot"></span>
 
             <span id="connectionText">
-                Local Chart Library
+                Connecting...
             </span>
 
         </div>
@@ -2372,7 +1326,7 @@
                         type="text"
                         maxlength="4"
                         autocomplete="off"
-                        placeholder="ICAO e.g. KJFK"
+                        placeholder="ICAO e.g. EHAM"
                     >
 
                 </div>
@@ -2467,7 +1421,6 @@
 
     <section class="main-grid">
 
-
         <!-- =================================================
              CHART VIEWER
         ================================================== -->
@@ -2520,7 +1473,7 @@
                         id="fullscreenBtn"
                         title="Fullscreen"
                     >
-                        <i class="fa-solid fa-expand-wide"></i>
+                        <i class="fa-solid fa-expand"></i>
                     </button>
 
                 </div>
@@ -2552,10 +1505,9 @@
 
                         <p>
                             Select an airport and a chart from the
-                            panel on the right. When the MSFS 2024
-                            Charts bridge is connected, the actual
-                            chart page supplied by Microsoft Flight
-                            Simulator will be rendered here.
+                            panel on the right. Charts uploaded through
+                            the Flight App Chart Administration will
+                            automatically appear here.
                         </p>
 
                     </div>
@@ -2591,7 +1543,7 @@
                                 font-size:11px;
                             "
                         >
-                            Loading local chart image
+                            Loading chart image
                         </div>
 
                     </div>
@@ -2612,7 +1564,7 @@
                     <button
                         class="page-btn"
                         id="previousPageBtn"
-                        title="Previous page"
+                        title="Previous chart"
                     >
                         <i class="fa-solid fa-chevron-left"></i>
                     </button>
@@ -2627,7 +1579,7 @@
                     <button
                         class="page-btn"
                         id="nextPageBtn"
-                        title="Next page"
+                        title="Next chart"
                     >
                         <i class="fa-solid fa-chevron-right"></i>
                     </button>
@@ -2663,7 +1615,7 @@
                     </h3>
 
                     <span>
-                        LOCAL
+                        DATABASE
                     </span>
 
                 </div>
@@ -2799,7 +1751,7 @@
                             <br>
 
                             Search an airport to load
-                            the MSFS chart index.
+                            the chart library.
 
                         </div>
 
@@ -3115,41 +2067,15 @@
 const API_BASE =
     "https://flight-app-api-g36e.onrender.com";
 
-/* LOCAL CHART LIBRARY
- * Put your chart images in the repository and add them here.
- * Example: charts/EHAM/airport.png
- */
-const LOCAL_CHARTS = {
-    EHAM: {
-        name: "Amsterdam Airport Schiphol",
-        country: "Netherlands",
-        iata: "AMS",
-        charts: [
-            { name: "Airport Chart", type: "AIRPORT", provider: "LIDO", image: "charts/EHAM/airport.png" },
-            { name: "Ground Chart", type: "AIRPORT", provider: "LIDO", image: "charts/EHAM/ground.png" },
-            { name: "SID 18L", type: "SID", provider: "LIDO", image: "charts/EHAM/sid_18l.png" },
-            { name: "STAR 18C", type: "STAR", provider: "LIDO", image: "charts/EHAM/star_18c.png" },
-            { name: "ILS RWY 18R", type: "APPROACH", provider: "LIDO", image: "charts/EHAM/ils_18r.png" }
-        ]
-    }
-    /* Add another airport: , EGLL: { name: "London Heathrow", country: "United Kingdom", iata: "LHR", charts: [{ name: "Airport Chart", type: "AIRPORT", provider: "LIDO", image: "charts/EGLL/airport.png" }] } */
-};
 
 /*
- * This is the future MSFS bridge.
- *
- * The website is deliberately written so that we can later run
- * something like:
- *
- * http://127.0.0.1:8765
- *
- * or:
- *
- * http://localhost:8765
- *
- * The bridge will be responsible for communicating with
- * Microsoft Flight Simulator 2024's Charts API.
- */
+|--------------------------------------------------------------------------
+| MSFS BRIDGE
+|--------------------------------------------------------------------------
+|
+| Kept for future MSFS 2024 Charts integration.
+|--------------------------------------------------------------------------
+*/
 
 const MSFS_BRIDGE_URL =
     localStorage.getItem("msfsBridgeUrl") ||
@@ -3188,6 +2114,9 @@ const state = {
     selectedChart:
         null,
 
+    currentChartIndex:
+        -1,
+
     pages:
         [],
 
@@ -3222,8 +2151,8 @@ const state = {
 |--------------------------------------------------------------------------
 */
 
-const $ = id =>
-    document.getElementById(id);
+const $ =
+    id => document.getElementById(id);
 
 const airportInput =
     $("airportInput");
@@ -3236,6 +2165,9 @@ const arrivalInput =
 
 const loadAirportBtn =
     $("loadAirportBtn");
+
+const airportInputInfo =
+    $("airportInputInfo");
 
 const chartList =
     $("chartList");
@@ -3316,18 +2248,24 @@ function showToast(
 
         icon.className =
             "fa-solid fa-circle-info";
+
     }
 
-    clearTimeout(toastTimer);
+    clearTimeout(
+        toastTimer
+    );
 
     toastTimer =
-        setTimeout(() => {
+        setTimeout(
+            () => {
 
-            toast.classList.remove(
-                "show"
-            );
+                toast.classList.remove(
+                    "show"
+                );
 
-        }, 3500);
+            },
+            3500
+        );
 }
 
 
@@ -3337,7 +2275,9 @@ function showToast(
 |--------------------------------------------------------------------------
 */
 
-function escapeHtml(value) {
+function escapeHtml(
+    value
+) {
 
     if (
         value === null ||
@@ -3390,6 +2330,7 @@ function normalizeICAO(
         .slice(0, 4);
 }
 
+
 function isValidICAO(
     value
 ) {
@@ -3416,15 +2357,17 @@ async function fetchJson(
             url,
             {
                 ...options,
+
                 headers: {
                     Accept:
                         "application/json",
+
                     ...(options.headers || {})
                 }
             }
         );
 
-    let data;
+    let data = null;
 
     try {
 
@@ -3435,6 +2378,7 @@ async function fetchJson(
 
         data =
             null;
+
     }
 
     if (!response.ok) {
@@ -3452,7 +2396,27 @@ async function fetchJson(
 
 /*
 |--------------------------------------------------------------------------
-| BRIDGE REQUEST
+| API URL
+|--------------------------------------------------------------------------
+*/
+
+function apiUrl(
+    path
+) {
+
+    return (
+        API_BASE.replace(
+            /\/$/,
+            ""
+        ) +
+        path
+    );
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| MSFS BRIDGE REQUEST
 |--------------------------------------------------------------------------
 */
 
@@ -3473,9 +2437,11 @@ async function bridgeFetch(
             url,
             {
                 ...options,
+
                 headers: {
                     Accept:
                         "application/json",
+
                     ...(options.headers || {})
                 }
             }
@@ -3494,6 +2460,65 @@ async function bridgeFetch(
 
 /*
 |--------------------------------------------------------------------------
+| CHECK API
+|--------------------------------------------------------------------------
+*/
+
+async function checkAPI() {
+
+    try {
+
+        const data =
+            await fetchJson(
+                apiUrl(
+                    "/api/health"
+                )
+            );
+
+        if (
+            data
+        ) {
+
+            connectionStatus.classList.add(
+                "connected"
+            );
+
+            connectionStatus.classList.remove(
+                "error"
+            );
+
+            connectionText.textContent =
+                "Chart Library Online";
+
+            return true;
+        }
+
+    } catch (error) {
+
+        console.error(
+            "API health check failed:",
+            error
+        );
+
+    }
+
+    connectionStatus.classList.remove(
+        "connected"
+    );
+
+    connectionStatus.classList.add(
+        "error"
+    );
+
+    connectionText.textContent =
+        "Chart Library Offline";
+
+    return false;
+}
+
+
+/*
+|--------------------------------------------------------------------------
 | CHECK MSFS BRIDGE
 |--------------------------------------------------------------------------
 */
@@ -3501,19 +2526,6 @@ async function bridgeFetch(
 async function checkMSFSBridge() {
 
     try {
-
-        /*
-         * The bridge should expose:
-         *
-         * GET /api/health
-         *
-         * returning something similar to:
-         *
-         * {
-         *   online: true,
-         *   simulator: "Microsoft Flight Simulator 2024"
-         * }
-         */
 
         const data =
             await bridgeFetch(
@@ -3531,17 +2543,6 @@ async function checkMSFSBridge() {
             state.bridgeOnline =
                 true;
 
-            connectionStatus.classList.add(
-                "connected"
-            );
-
-            connectionStatus.classList.remove(
-                "error"
-            );
-
-            connectionText.textContent =
-                "Local Chart Library";
-
             return true;
         }
 
@@ -3551,21 +2552,11 @@ async function checkMSFSBridge() {
             "MSFS bridge unavailable:",
             error.message
         );
+
     }
 
     state.bridgeOnline =
         false;
-
-    connectionStatus.classList.remove(
-        "connected"
-    );
-
-    connectionStatus.classList.add(
-        "error"
-    );
-
-    connectionText.textContent =
-        "Local Chart Library";
 
     return false;
 }
@@ -3573,7 +2564,7 @@ async function checkMSFSBridge() {
 
 /*
 |--------------------------------------------------------------------------
-| LOAD AIRPORT FROM FLIGHT APP
+| LOAD AIRPORT
 |--------------------------------------------------------------------------
 */
 
@@ -3585,7 +2576,9 @@ async function loadAirportInfo(
 
         const data =
             await fetchJson(
-                `${API_BASE}/api/airports/${encodeURIComponent(icao)}`
+                apiUrl(
+                    `/api/airports/${encodeURIComponent(icao)}`
+                )
             );
 
         if (
@@ -3706,28 +2699,31 @@ async function loadWeather(
         const [
             metarData,
             tafData
-        ] = await Promise.allSettled([
+        ] =
+            await Promise.allSettled([
 
-            fetchJson(
-                `${API_BASE}/api/weather/${encodeURIComponent(icao)}`
-            ),
+                fetchJson(
+                    apiUrl(
+                        `/api/weather/${encodeURIComponent(icao)}`
+                    )
+                ),
 
-            fetchJson(
-                `${API_BASE}/api/weather/${encodeURIComponent(icao)}/taf`
-            )
+                fetchJson(
+                    apiUrl(
+                        `/api/weather/${encodeURIComponent(icao)}/taf`
+                    )
+                )
 
-        ]);
+            ]);
+
 
         if (
             metarData.status === "fulfilled" &&
             metarData.value?.available
         ) {
 
-            const metar =
-                metarData.value.metar;
-
             renderWeather(
-                metar
+                metarData.value.metar
             );
 
         } else {
@@ -3752,14 +2748,15 @@ async function loadWeather(
                 tafData.value.taf;
 
             $("tafText").textContent =
-                taf.rawTAF ||
-                taf.raw_text ||
+                taf?.rawTAF ||
+                taf?.raw_text ||
                 "TAF available.";
 
         } else {
 
             $("tafText").textContent =
                 "TAF unavailable.";
+
         }
 
     } catch (error) {
@@ -3798,11 +2795,14 @@ function renderWeather(
         wind =
             `${metar.wdir}° / ${metar.wspd} kt`;
 
-        if (metar.wgst) {
+        if (
+            metar.wgst
+        ) {
 
             wind +=
                 ` G${metar.wgst}`;
         }
+
     }
 
     let visibility =
@@ -3831,201 +2831,308 @@ function renderWeather(
 
 /*
 |--------------------------------------------------------------------------
-| LOAD MSFS CHART INDEX
+| LOAD DATABASE CHARTS
 |--------------------------------------------------------------------------
 */
 
-function loadLocalCharts(icao) {
-    const airport = LOCAL_CHARTS[icao];
+async function loadCharts(
+    icao,
+    options = {}
+) {
 
-    if (!airport) {
-        state.charts = [];
-        state.filteredCharts = [];
-        state.selectedChart = null;
-        state.pages = [];
-        state.currentPage = 0;
-        renderChartList();
-        resetViewer();
-        showToast(`No local charts configured for ${icao}.`, "info");
+    if (
+        !isValidICAO(icao)
+    ) {
+
         return;
+
     }
 
-    state.charts = airport.charts.map((chart, index) => ({
-        guid: `${icao}-LOCAL-${index + 1}`,
-        name: chart.name || `Chart ${index + 1}`,
-        provider: chart.provider || "LOCAL",
-        type: chart.type || "OTHER",
-        rawType: chart.type || "OTHER",
-        airportIcao: icao,
-        procedures: [],
-        runways: chart.runways || [],
-        aircraftTypes: [],
-        validFrom: chart.validFrom || null,
-        validUntil: chart.validUntil || null,
-        geoReferenced: false,
-        pages: [{ pageNumber: 1, name: chart.name || "Page 1", imageUrl: chart.image }]
-    }));
+    const provider =
+        state.provider;
 
-    state.selectedChart = null;
-    state.pages = [];
-    state.currentPage = 0;
-    renderChartList();
-    resetViewer();
-    showToast(`${state.charts.length} local charts loaded for ${icao}.`, "success");
+    const category =
+        state.category;
+
+    const params =
+        new URLSearchParams();
+
+    params.set(
+        "icao",
+        icao
+    );
+
+    params.set(
+        "provider",
+        provider
+    );
+
+    /*
+     * The API accepts category=ALL.
+     * This lets the server return all charts and
+     * keeps the category buttons working correctly.
+     */
+
+    params.set(
+        "category",
+        category
+    );
+
+
+    setChartListLoading();
+
+
+    try {
+
+        const data =
+            await fetchJson(
+                apiUrl(
+                    `/api/charts?${params.toString()}`
+                )
+            );
+
+        const charts =
+            Array.isArray(
+                data?.charts
+            )
+                ? data.charts
+                : [];
+
+
+        state.charts =
+            charts.map(
+                normalizeDatabaseChart
+            );
+
+
+        state.filteredCharts =
+            [...state.charts];
+
+        state.selectedChart =
+            null;
+
+        state.currentChartIndex =
+            -1;
+
+        state.pages =
+            [];
+
+        state.currentPage =
+            0;
+
+
+        renderChartList();
+
+        resetViewer();
+
+
+        if (
+            state.charts.length === 0
+        ) {
+
+            showToast(
+                `No ${provider} charts found for ${icao}.`,
+                "info"
+            );
+
+            return;
+        }
+
+
+        showToast(
+            `${state.charts.length} chart${
+                state.charts.length === 1
+                    ? ""
+                    : "s"
+            } loaded for ${icao}.`,
+            "success"
+        );
+
+
+        /*
+         * Automatically select the first chart.
+         */
+
+        if (
+            options.autoSelect !== false
+        ) {
+
+            await selectChart(
+                state.filteredCharts[0]
+            );
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Database charts failed:",
+            error
+        );
+
+        state.charts =
+            [];
+
+        state.filteredCharts =
+            [];
+
+        state.selectedChart =
+            null;
+
+        state.currentChartIndex =
+            -1;
+
+        renderChartList();
+
+        resetViewer();
+
+        chartCount.textContent =
+            "Error";
+
+        showToast(
+            `Could not load charts: ${error.message}`,
+            "error"
+        );
+
+    }
+
 }
 
 
 /*
 |--------------------------------------------------------------------------
-| NORMALIZE CHART INDEX
+| NORMALIZE DATABASE CHART
 |--------------------------------------------------------------------------
 */
 
-function normalizeChartIndex(
-    data
+function normalizeDatabaseChart(
+    chart
 ) {
 
+    const chartType =
+        normalizeChartType(
+            chart.chart_type ||
+            chart.type ||
+            "OTHER",
+            chart.chart_name ||
+            chart.name ||
+            ""
+        );
+
+
+    let imageUrl =
+        chart.imageUrl ||
+        chart.image_url ||
+        null;
+
+
     /*
-     * The function accepts both:
+     * imageUrl from the backend is normally:
      *
-     * categories[]
+     * /api/charts/123/image
      *
-     * and:
-     *
-     * charts[]
-     *
-     * so the bridge can evolve without requiring changes
-     * to this page.
+     * Convert it to the full API URL.
      */
 
     if (
-        Array.isArray(data?.charts)
+        imageUrl &&
+        imageUrl.startsWith("/")
     ) {
 
-        return data.charts.map(
-            normalizeChart
-        );
+        imageUrl =
+            apiUrl(
+                imageUrl
+            );
+
     }
 
-    if (
-        Array.isArray(data?.categories)
-    ) {
-
-        return data.categories.flatMap(
-            category => {
-
-                const charts =
-                    Array.isArray(
-                        category.charts
-                    )
-                        ? category.charts
-                        : [];
-
-                return charts.map(
-                    chart =>
-                        normalizeChart(
-                            chart,
-                            category.name
-                        )
-                );
-
-            }
-        );
-    }
-
-    return [];
-}
-
-
-/*
-|--------------------------------------------------------------------------
-| NORMALIZE CHART
-|--------------------------------------------------------------------------
-*/
-
-function normalizeChart(
-    chart,
-    categoryName = ""
-) {
-
-    const name =
-        chart.name ||
-        chart.title ||
-        "Unnamed chart";
-
-    const rawType =
-        chart.type ||
-        chart.category ||
-        categoryName ||
-        "OTHER";
-
-    const type =
-        normalizeChartType(
-            rawType,
-            name
-        );
 
     return {
 
-        guid:
-            chart.guid ||
-            chart.id ||
-            chart.chartGuid ||
-            null,
+        id:
+            chart.id,
 
-        name,
+        guid:
+            `DB-${chart.id}`,
+
+        name:
+            chart.chart_name ||
+            chart.name ||
+            "Unnamed chart",
 
         provider:
             chart.provider ||
             state.provider,
 
-        type,
+        type:
+            chartType,
 
-        rawType,
+        rawType:
+            chart.chart_type ||
+            chart.type ||
+            "OTHER",
 
         airportIcao:
+            chart.airport_icao ||
             chart.airportIcao ||
-            chart.icao ||
             state.airport?.icao ||
             null,
 
+        airportName:
+            chart.airport_name ||
+            "",
+
         procedures:
-            Array.isArray(
-                chart.procedures
-            )
-                ? chart.procedures
-                : [],
+            [],
 
         runways:
-            Array.isArray(
-                chart.runways
-            )
-                ? chart.runways
-                : [],
+            [],
 
         aircraftTypes:
-            Array.isArray(
-                chart.aircraftTypes
-            )
-                ? chart.aircraftTypes
-                : [],
+            [],
 
         validFrom:
-            chart.validFrom ||
+            chart.valid_from ||
             null,
 
         validUntil:
-            chart.validUntil ||
+            chart.valid_until ||
+            null,
+
+        validity:
+            chart.validity ||
+            null,
+
+        fileName:
+            chart.file_name ||
+            "",
+
+        mimeType:
+            chart.mime_type ||
+            "",
+
+        createdAt:
+            chart.created_at ||
             null,
 
         geoReferenced:
-            chart.geoReferenced === true,
+            false,
+
+        imageUrl:
+            imageUrl,
 
         pages:
-            Array.isArray(
-                chart.pages
-            )
-                ? chart.pages
+            imageUrl
+                ? [
+                    {
+                        index: 0,
+                        pageNumber: 1,
+                        name:
+                            chart.chart_name ||
+                            "Page 1",
+                        imageUrl
+                    }
+                ]
                 : []
 
     };
@@ -4047,16 +3154,22 @@ function normalizeChartType(
         `${type} ${name}`
             .toUpperCase();
 
+
     if (
         value.includes("APPROACH") ||
         value.includes(" ILS") ||
+        value.includes("ILS ") ||
         value.includes(" RNAV") ||
+        value.includes("RNAV ") ||
         value.includes(" LOC ") ||
-        value.includes(" VOR ")
+        value.includes("LOC ") ||
+        value.includes(" VOR ") ||
+        value.includes("VOR ")
     ) {
 
         return "APPROACH";
     }
+
 
     if (
         value.includes("SID") ||
@@ -4066,6 +3179,7 @@ function normalizeChartType(
         return "SID";
     }
 
+
     if (
         value.includes("STAR") ||
         value.includes("ARRIVAL")
@@ -4073,6 +3187,7 @@ function normalizeChartType(
 
         return "STAR";
     }
+
 
     if (
         value.includes("ENROUTE") ||
@@ -4082,6 +3197,7 @@ function normalizeChartType(
         return "ENROUTE";
     }
 
+
     if (
         value.includes("AIRPORT") ||
         value.includes("DIAGRAM") ||
@@ -4090,6 +3206,7 @@ function normalizeChartType(
 
         return "AIRPORT";
     }
+
 
     return "OTHER";
 }
@@ -4103,22 +3220,83 @@ function normalizeChartType(
 
 function filterCharts() {
 
+    /*
+     * Normally the API already applies both provider and
+     * category filters. We still filter locally as well,
+     * which makes category changes instant.
+     */
+
+    let charts =
+        [...state.charts];
+
+
     if (
-        state.category === "ALL"
+        state.provider
     ) {
 
-        state.filteredCharts =
-            [...state.charts];
+        charts =
+            charts.filter(
+                chart =>
+                    String(
+                        chart.provider || ""
+                    ).toUpperCase() ===
+                    String(
+                        state.provider
+                    ).toUpperCase()
+            );
 
-        return;
     }
 
+
+    if (
+        state.category !== "ALL"
+    ) {
+
+        charts =
+            charts.filter(
+                chart =>
+                    chart.type ===
+                    state.category
+            );
+
+    }
+
+
     state.filteredCharts =
-        state.charts.filter(
-            chart =>
-                chart.type ===
-                state.category
-        );
+        charts;
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| SET CHART LIST LOADING
+|--------------------------------------------------------------------------
+*/
+
+function setChartListLoading() {
+
+    chartCount.textContent =
+        "Loading...";
+
+    chartList.innerHTML = `
+
+        <div class="empty-list">
+
+            <i
+                class="fa-solid fa-spinner fa-spin"
+                style="
+                    font-size:23px;
+                    margin-bottom:9px;
+                "
+            ></i>
+
+            <br>
+
+            Loading charts...
+
+        </div>
+
+    `;
 }
 
 
@@ -4132,12 +3310,14 @@ function renderChartList() {
 
     filterCharts();
 
+
     chartCount.textContent =
         `${state.filteredCharts.length} ${
             state.filteredCharts.length === 1
                 ? "chart"
                 : "charts"
         }`;
+
 
     if (
         state.filteredCharts.length === 0
@@ -4159,12 +3339,18 @@ function renderChartList() {
 
                 No charts in this category.
 
+                <br>
+
+                Upload charts through
+                Chart Administration.
+
             </div>
 
         `;
 
         return;
     }
+
 
     chartList.innerHTML =
         state.filteredCharts
@@ -4175,6 +3361,13 @@ function renderChartList() {
                         state.selectedChart &&
                         state.selectedChart.guid ===
                         chart.guid;
+
+
+                    const validity =
+                        formatValidity(
+                            chart
+                        );
+
 
                     return `
 
@@ -4188,25 +3381,38 @@ function renderChartList() {
 
                             <span class="chart-item-icon">
 
-                                <i class="${chartIcon(chart.type)}"></i>
+                                <i class="${chartIcon(
+                                    chart.type
+                                )}"></i>
 
                             </span>
+
 
                             <span class="chart-item-main">
 
                                 <span class="chart-item-title">
-                                    ${escapeHtml(chart.name)}
+                                    ${escapeHtml(
+                                        chart.name
+                                    )}
                                 </span>
 
                                 <span class="chart-item-meta">
 
-                                    ${escapeHtml(chart.type)}
+                                    ${escapeHtml(
+                                        chart.type
+                                    )}
+
+                                    ·
+
+                                    ${escapeHtml(
+                                        chart.provider || "—"
+                                    )}
 
                                     ${
-                                        chart.runways.length
+                                        validity !== "—"
                                             ? " · " +
                                               escapeHtml(
-                                                  chart.runways.join(", ")
+                                                  validity
                                               )
                                             : ""
                                     }
@@ -4214,6 +3420,7 @@ function renderChartList() {
                                 </span>
 
                             </span>
+
 
                             <span class="chart-item-arrow">
 
@@ -4229,6 +3436,7 @@ function renderChartList() {
             )
             .join("");
 
+
     chartList
         .querySelectorAll(
             "[data-chart-index]"
@@ -4238,7 +3446,7 @@ function renderChartList() {
 
                 button.addEventListener(
                     "click",
-                    () => {
+                    async () => {
 
                         const index =
                             Number(
@@ -4250,7 +3458,7 @@ function renderChartList() {
                                 index
                             ];
 
-                        selectChart(
+                        await selectChart(
                             chart
                         );
 
@@ -4309,29 +3517,80 @@ async function selectChart(
         return;
     }
 
+
     state.selectedChart =
         chart;
+
+
+    state.currentChartIndex =
+        state.filteredCharts.findIndex(
+            item =>
+                item.guid === chart.guid
+        );
+
 
     state.currentPage =
         0;
 
+
     renderChartList();
+
 
     viewerChartName.textContent =
         chart.name;
 
+
     viewerChartMeta.textContent =
         `${chart.type} · ${chart.provider}`;
 
+
     chartProviderLabel.textContent =
-        `Provider: ${chart.provider || "—"}`;
+        `Provider: ${
+            chart.provider || "—"
+        }`;
+
 
     chartValidity.textContent =
-        `Validity: ${formatValidity(chart)}`;
+        `Validity: ${
+            formatValidity(chart)
+        }`;
+
 
     /*
-     * Some bridge implementations may already include
-     * pages in the chart index.
+     * DATABASE CHART
+     *
+     * Database charts have their image directly available.
+     */
+
+    if (
+        chart.imageUrl
+    ) {
+
+        state.pages =
+            [
+                {
+                    index: 0,
+                    pageNumber: 1,
+                    name:
+                        chart.name,
+                    imageUrl:
+                        chart.imageUrl
+                }
+            ];
+
+        state.currentPage =
+            0;
+
+        renderPage();
+
+        updatePageButtons();
+
+        return;
+    }
+
+
+    /*
+     * Future MSFS bridge chart.
      */
 
     if (
@@ -4344,8 +3603,11 @@ async function selectChart(
 
         renderPage();
 
+        updatePageButtons();
+
         return;
     }
+
 
     await loadChartPages(
         chart
@@ -4355,7 +3617,7 @@ async function selectChart(
 
 /*
 |--------------------------------------------------------------------------
-| LOAD CHART PAGES
+| LOAD MSFS CHART PAGES
 |--------------------------------------------------------------------------
 */
 
@@ -4370,32 +3632,31 @@ async function loadChartPages(
         return;
     }
 
+
     setLoading(
         true
     );
 
-    try {
 
-        /*
-         * The bridge calls:
-         *
-         * fsChartsGetPages(chartGuid)
-         *
-         * in MSFS.
-         */
+    try {
 
         const data =
             await bridgeFetch(
-                `/api/charts/pages/${encodeURIComponent(chart.guid)}`
+                `/api/charts/pages/${encodeURIComponent(
+                    chart.guid
+                )}`
             );
+
 
         state.pages =
             normalizePages(
                 data
             );
 
+
         state.currentPage =
             0;
+
 
         if (
             state.pages.length === 0
@@ -4406,7 +3667,9 @@ async function loadChartPages(
             );
         }
 
+
         renderPage();
+
 
     } catch (error) {
 
@@ -4428,7 +3691,9 @@ async function loadChartPages(
         setLoading(
             false
         );
+
     }
+
 }
 
 
@@ -4448,6 +3713,7 @@ function normalizePages(
             : Array.isArray(data)
                 ? data
                 : [];
+
 
     return pages.map(
         (page, index) => ({
@@ -4500,13 +3766,29 @@ async function renderPage() {
         return;
     }
 
+
     const page =
         state.pages[
             state.currentPage
         ];
 
+
+    if (!page) {
+
+        resetViewer();
+
+        return;
+    }
+
+
     pageCounter.textContent =
-        `${state.currentPage + 1} / ${state.pages.length}`;
+        `${state.currentPage + 1} / ${
+            state.pages.length
+        }`;
+
+
+    updatePageButtons();
+
 
     if (
         page.name &&
@@ -4517,14 +3799,12 @@ async function renderPage() {
             state.selectedChart.name;
 
         viewerChartMeta.textContent =
-            `${state.selectedChart.type} · ${page.name}`;
+            `${state.selectedChart.type} · ${
+                page.name
+            }`;
 
     }
 
-    /*
-     * If the bridge supplies an image URL directly,
-     * we can display it.
-     */
 
     if (
         page.imageUrl
@@ -4537,12 +3817,9 @@ async function renderPage() {
         return;
     }
 
+
     /*
-     * Otherwise ask the bridge for the actual image.
-     *
-     * Internally the bridge should call the MSFS API:
-     *
-     * fsChartsGetPageImage(...)
+     * Future MSFS bridge.
      */
 
     if (
@@ -4554,6 +3831,7 @@ async function renderPage() {
         return;
     }
 
+
     await loadPageImage(
         page
     );
@@ -4562,7 +3840,7 @@ async function renderPage() {
 
 /*
 |--------------------------------------------------------------------------
-| LOAD PAGE IMAGE
+| LOAD PAGE IMAGE FROM MSFS BRIDGE
 |--------------------------------------------------------------------------
 */
 
@@ -4574,10 +3852,12 @@ async function loadPageImage(
         true
     );
 
+
     try {
 
         const chartGuid =
             state.selectedChart?.guid;
+
 
         if (!chartGuid) {
 
@@ -4586,30 +3866,27 @@ async function loadPageImage(
             );
         }
 
+
         const pageNumber =
             page.pageNumber ??
             state.currentPage + 1;
 
-        /*
-         * Expected bridge endpoint:
-         *
-         * GET
-         * /api/charts/page-image/:chartGuid/:pageNumber
-         *
-         * The bridge obtains the page URL from
-         * fsChartsGetPages and retrieves the actual
-         * chart page using fsChartsGetPageImage.
-         */
 
         const data =
             await bridgeFetch(
-                `/api/charts/page-image/${encodeURIComponent(chartGuid)}/${encodeURIComponent(pageNumber)}`
+                `/api/charts/page-image/${encodeURIComponent(
+                    chartGuid
+                )}/${encodeURIComponent(
+                    pageNumber
+                )}`
             );
+
 
         const imageUrl =
             data.imageUrl ||
             data.url ||
             data.dataUrl;
+
 
         if (!imageUrl) {
 
@@ -4618,12 +3895,15 @@ async function loadPageImage(
             );
         }
 
+
         page.imageUrl =
             imageUrl;
+
 
         displayChartImage(
             imageUrl
         );
+
 
     } catch (error) {
 
@@ -4633,31 +3913,37 @@ async function loadPageImage(
         );
 
         showToast(
-            "The local chart image could not be loaded.",
+            "The chart image could not be loaded.",
             "error"
         );
 
+
         chartPlaceholder.style.display =
             "block";
+
 
         chartPlaceholder.querySelector(
             "h2"
         ).textContent =
             "Chart image unavailable";
 
+
         chartPlaceholder.querySelector(
             "p"
         ).textContent =
             error.message;
 
+
         chartImage.style.display =
             "none";
+
 
     } finally {
 
         setLoading(
             false
         );
+
     }
 }
 
@@ -4672,49 +3958,89 @@ function displayChartImage(
     imageUrl
 ) {
 
+    if (!imageUrl) {
+
+        resetViewer();
+
+        return;
+    }
+
+
     state.chartImageUrl =
         imageUrl;
+
 
     chartPlaceholder.style.display =
         "none";
 
+
     chartImage.style.display =
         "block";
+
 
     chartImage.src =
         imageUrl;
 
+
     state.zoom =
         1;
+
 
     state.rotation =
         0;
 
+
     applyChartTransform();
+
+
+    setLoading(
+        true
+    );
+
+
+    chartImage.onload =
+        () => {
+
+            setLoading(
+                false
+            );
+
+        };
+
 
     chartImage.onerror =
         () => {
 
+            setLoading(
+                false
+            );
+
+
             chartImage.style.display =
                 "none";
 
+
             chartPlaceholder.style.display =
                 "block";
+
 
             chartPlaceholder.querySelector(
                 "h2"
             ).textContent =
                 "Unable to display chart";
 
+
             chartPlaceholder.querySelector(
                 "p"
             ).textContent =
-                "The The local chart image could not be displayed by the browser.";
+                "The chart image could not be displayed by the browser.";
+
 
             showToast(
                 "Chart image failed to render.",
                 "error"
             );
+
         };
 }
 
@@ -4742,40 +4068,53 @@ function resetViewer() {
     state.chartImageUrl =
         null;
 
+
     chartImage.removeAttribute(
         "src"
     );
 
+
     chartImage.style.display =
         "none";
 
+
     chartPlaceholder.style.display =
         "block";
+
 
     chartPlaceholder.querySelector(
         "h2"
     ).textContent =
         "Flight App Chart Viewer";
 
+
     chartPlaceholder.querySelector(
         "p"
     ).textContent =
-        "Select an airport and a chart from the panel on the right. When the MSFS 2024 Charts bridge is connected, the actual chart page supplied by Microsoft Flight Simulator will be rendered here.";
+        "Select an airport and a chart from the panel on the right. Charts uploaded through the Flight App Chart Administration will automatically appear here.";
+
 
     viewerChartName.textContent =
         "No chart selected";
 
+
     viewerChartMeta.textContent =
         "Select an airport and chart";
+
 
     chartProviderLabel.textContent =
         "Provider: —";
 
+
     pageCounter.textContent =
         "0 / 0";
 
+
     chartValidity.textContent =
         "Validity: —";
+
+
+    updatePageButtons();
 }
 
 
@@ -4798,11 +4137,128 @@ function setLoading(
 
 /*
 |--------------------------------------------------------------------------
+| PAGE BUTTONS
+|--------------------------------------------------------------------------
+*/
+
+function updatePageButtons() {
+
+    const previous =
+        $("previousPageBtn");
+
+    const next =
+        $("nextPageBtn");
+
+
+    if (
+        state.filteredCharts.length > 0
+    ) {
+
+        /*
+         * For database charts the bottom arrows navigate
+         * between charts.
+         */
+
+        previous.disabled =
+            state.currentChartIndex <= 0;
+
+
+        next.disabled =
+            state.currentChartIndex >=
+            state.filteredCharts.length - 1;
+
+    } else {
+
+        previous.disabled =
+            true;
+
+        next.disabled =
+            true;
+
+    }
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| NAVIGATE CHART
+|--------------------------------------------------------------------------
+*/
+
+async function navigateChart(
+    direction
+) {
+
+    if (
+        !state.filteredCharts.length
+    ) {
+
+        return;
+    }
+
+
+    let nextIndex =
+        state.currentChartIndex +
+        direction;
+
+
+    if (
+        nextIndex < 0
+    ) {
+
+        nextIndex =
+            0;
+    }
+
+
+    if (
+        nextIndex >=
+        state.filteredCharts.length
+    ) {
+
+        nextIndex =
+            state.filteredCharts.length - 1;
+    }
+
+
+    const chart =
+        state.filteredCharts[
+            nextIndex
+        ];
+
+
+    if (!chart) {
+        return;
+    }
+
+
+    await selectChart(
+        chart
+    );
+}
+
+
+/*
+|--------------------------------------------------------------------------
 | BRIDGE OFFLINE UI
 |--------------------------------------------------------------------------
 */
 
 function renderBridgeOffline() {
+
+    /*
+     * Do not destroy the database chart list.
+     *
+     * The database charts work independently of the MSFS bridge.
+     */
+
+    if (
+        state.filteredCharts.length
+    ) {
+
+        return;
+    }
+
 
     chartList.innerHTML = `
 
@@ -4818,65 +4274,17 @@ function renderBridgeOffline() {
 
             <br>
 
-            No local charts are configured.
+            No charts available.
 
             <br>
 
-            Start the Flight App MSFS bridge
-            while Microsoft Flight Simulator 2024
-            is running.
+            Upload charts through
+            Chart Administration.
 
         </div>
 
     `;
 
-    chartCount.textContent =
-        "Bridge offline";
-}
-
-
-/*
-|--------------------------------------------------------------------------
-| BRIDGE ERROR UI
-|--------------------------------------------------------------------------
-*/
-
-function renderBridgeError(
-    message
-) {
-
-    chartList.innerHTML = `
-
-        <div class="empty-list">
-
-            <i
-                class="fa-solid fa-triangle-exclamation"
-                style="
-                    color:var(--danger);
-                    font-size:24px;
-                    margin-bottom:9px;
-                "
-            ></i>
-
-            <br>
-
-            Could not load MSFS charts.
-
-            <br>
-
-            <span
-                style="
-                    font-size:10px;
-                    display:block;
-                    margin-top:7px;
-                "
-            >
-                ${escapeHtml(message)}
-            </span>
-
-        </div>
-
-    `;
 }
 
 
@@ -4890,21 +4298,36 @@ function formatValidity(
     chart
 ) {
 
-    if (
-        !chart
-    ) {
+    if (!chart) {
         return "—";
     }
+
+
+    /*
+     * Database uses one `validity` field.
+     */
+
+    if (
+        chart.validity
+    ) {
+
+        return String(
+            chart.validity
+        );
+    }
+
 
     const from =
         formatDate(
             chart.validFrom
         );
 
+
     const until =
         formatDate(
             chart.validUntil
         );
+
 
     if (
         !from &&
@@ -4914,6 +4337,7 @@ function formatValidity(
         return "—";
     }
 
+
     if (
         from &&
         until
@@ -4921,6 +4345,7 @@ function formatValidity(
 
         return `${from} – ${until}`;
     }
+
 
     return from ||
         until ||
@@ -4948,15 +4373,13 @@ function formatDate(
         return null;
     }
 
+
     let date;
+
 
     if (
         typeof value === "number"
     ) {
-
-        /*
-         * MSFS metadata uses UNIX timestamps.
-         */
 
         date =
             new Date(
@@ -4968,8 +4391,12 @@ function formatDate(
     } else {
 
         date =
-            new Date(value);
+            new Date(
+                value
+            );
+
     }
+
 
     if (
         Number.isNaN(
@@ -4980,13 +4407,16 @@ function formatDate(
         return null;
     }
 
+
     return date.toLocaleDateString(
         undefined,
         {
             day:
                 "2-digit",
+
             month:
                 "short",
+
             year:
                 "numeric"
         }
@@ -4996,7 +4426,7 @@ function formatDate(
 
 /*
 |--------------------------------------------------------------------------
-| AIRPORT SEARCH
+| LOAD SELECTED AIRPORT
 |--------------------------------------------------------------------------
 */
 
@@ -5007,8 +4437,10 @@ async function loadSelectedAirport() {
             airportInput.value
         );
 
+
     airportInput.value =
         icao;
+
 
     if (
         !isValidICAO(icao)
@@ -5024,13 +4456,16 @@ async function loadSelectedAirport() {
         return;
     }
 
+
     airportInputInfo.textContent =
         "Loading airport...";
+
 
     const airport =
         await loadAirportInfo(
             icao
         );
+
 
     if (!airport) {
 
@@ -5040,14 +4475,27 @@ async function loadSelectedAirport() {
         return;
     }
 
+
     airportInputInfo.textContent =
         `${airport.name || "Airport"} loaded.`;
 
-    await loadWeather(
-        icao
-    );
 
-    loadLocalCharts(icao);
+    /*
+     * Weather and charts can load independently.
+     */
+
+    await Promise.allSettled([
+
+        loadWeather(
+            icao
+        ),
+
+        loadCharts(
+            icao
+        )
+
+    ]);
+
 
     updateMap();
 }
@@ -5070,12 +4518,12 @@ async function lookupSmallAirport(
             input.value
         );
 
+
     input.value =
         icao;
 
-    if (
-        !icao
-    ) {
+
+    if (!icao) {
 
         infoElement.textContent =
             "";
@@ -5090,6 +4538,7 @@ async function lookupSmallAirport(
         return;
     }
 
+
     if (
         !isValidICAO(icao)
     ) {
@@ -5100,15 +4549,22 @@ async function lookupSmallAirport(
         return;
     }
 
+
     infoElement.textContent =
         "Looking up...";
+
 
     try {
 
         const data =
             await fetchJson(
-                `${API_BASE}/api/airports/${encodeURIComponent(icao)}`
+                apiUrl(
+                    `/api/airports/${encodeURIComponent(
+                        icao
+                    )}`
+                )
             );
+
 
         if (
             !data.available ||
@@ -5120,16 +4576,20 @@ async function lookupSmallAirport(
             );
         }
 
+
         state.route[property] =
             data.airport;
+
 
         infoElement.textContent =
             data.airport.name ||
             "Airport loaded.";
 
+
         updateRouteUI();
 
         updateMap();
+
 
     } catch (error) {
 
@@ -5137,15 +4597,19 @@ async function lookupSmallAirport(
             error
         );
 
+
         infoElement.textContent =
             "Airport not found.";
+
 
         state.route[property] =
             null;
 
+
         updateRouteUI();
 
         updateMap();
+
     }
 }
 
@@ -5162,20 +4626,26 @@ function updateRouteUI() {
         state.route.departure?.icao ||
         "—";
 
+
     $("routeAirport").textContent =
         state.route.airport?.icao ||
         "—";
 
+
     $("routeArrival").textContent =
         state.route.arrival?.icao ||
         "—";
+
 
     const points =
         [
             state.route.departure,
             state.route.airport,
             state.route.arrival
-        ].filter(Boolean);
+        ].filter(
+            Boolean
+        );
+
 
     if (
         points.length < 2
@@ -5187,8 +4657,10 @@ function updateRouteUI() {
         return;
     }
 
+
     let distance =
         0;
+
 
     for (
         let i = 0;
@@ -5201,20 +4673,27 @@ function updateRouteUI() {
                 Number(
                     points[i].latitude
                 ),
+
                 Number(
                     points[i].longitude
                 ),
+
                 Number(
                     points[i + 1].latitude
                 ),
+
                 Number(
                     points[i + 1].longitude
                 )
             );
+
     }
 
+
     $("routeDistance").textContent =
-        `${Math.round(distance).toLocaleString()} NM total route distance`;
+        `${Math.round(
+            distance
+        ).toLocaleString()} NM total route distance`;
 }
 
 
@@ -5234,25 +4713,36 @@ function haversineNm(
     const R =
         3440.065;
 
+
     const dLat =
         toRad(
             lat2 - lat1
         );
+
 
     const dLon =
         toRad(
             lon2 - lon1
         );
 
+
     const a =
-        Math.sin(dLat / 2) ** 2 +
+        Math.sin(
+            dLat / 2
+        ) ** 2 +
+
         Math.cos(
             toRad(lat1)
         ) *
+
         Math.cos(
             toRad(lat2)
         ) *
-        Math.sin(dLon / 2) ** 2;
+
+        Math.sin(
+            dLon / 2
+        ) ** 2;
+
 
     return (
         2 *
@@ -5263,13 +4753,16 @@ function haversineNm(
     );
 }
 
+
 function toRad(
     degrees
 ) {
 
-    return degrees *
+    return (
+        degrees *
         Math.PI /
-        180;
+        180
+    );
 }
 
 
@@ -5333,12 +4826,14 @@ function createAirportMarker(
         return null;
     }
 
+
     const marker =
         L.circleMarker(
             [
                 Number(
                     airport.latitude
                 ),
+
                 Number(
                     airport.longitude
                 )
@@ -5358,21 +4853,26 @@ function createAirportMarker(
             }
         );
 
+
     marker.bindPopup(
         `
             <strong>
                 ${escapeHtml(
-                    airport.icao || "Airport"
+                    airport.icao ||
+                    "Airport"
                 )}
             </strong>
 
             <br>
 
             ${escapeHtml(
-                label || airport.name || ""
+                label ||
+                airport.name ||
+                ""
             )}
         `
     );
+
 
     return marker;
 }
@@ -5388,6 +4888,7 @@ function updateMap() {
 
     routeLayer.clearLayers();
 
+
     const points =
         [
             state.route.departure,
@@ -5397,8 +4898,10 @@ function updateMap() {
             Boolean
         );
 
+
     const latLngs =
         [];
+
 
     points.forEach(
         (airport, index) => {
@@ -5410,11 +4913,13 @@ function updateMap() {
                     "Arrival"
                 ];
 
+
             const marker =
                 createAirportMarker(
                     airport,
                     labels[index]
                 );
+
 
             if (marker) {
 
@@ -5422,19 +4927,24 @@ function updateMap() {
                     routeLayer
                 );
 
+
                 latLngs.push(
                     [
                         Number(
                             airport.latitude
                         ),
+
                         Number(
                             airport.longitude
                         )
                     ]
                 );
+
             }
+
         }
     );
+
 
     if (
         latLngs.length >= 2
@@ -5459,6 +4969,7 @@ function updateMap() {
             routeLayer
         );
 
+
         routeMap.fitBounds(
             latLngs,
             {
@@ -5466,6 +4977,7 @@ function updateMap() {
                     [35, 35]
             }
         );
+
 
     } else if (
         latLngs.length === 1
@@ -5475,6 +4987,7 @@ function updateMap() {
             latLngs[0],
             9
         );
+
     }
 }
 
@@ -5493,6 +5006,7 @@ $("fitRouteBtn")
             const bounds =
                 routeLayer.getBounds();
 
+
             if (
                 bounds.isValid()
             ) {
@@ -5505,12 +5019,14 @@ $("fitRouteBtn")
                     }
                 );
 
+
             } else {
 
                 showToast(
                     "No route loaded yet.",
                     "info"
                 );
+
             }
 
         }
@@ -5603,7 +5119,9 @@ $("viewerStage")
                 return;
             }
 
+
             event.preventDefault();
+
 
             if (
                 event.deltaY < 0
@@ -5622,7 +5140,9 @@ $("viewerStage")
                         state.zoom - .1,
                         .25
                     );
+
             }
+
 
             applyChartTransform();
 
@@ -5648,6 +5168,7 @@ $("fullscreenBtn")
             const element =
                 $("viewerStage");
 
+
             try {
 
                 if (
@@ -5669,10 +5190,12 @@ $("fullscreenBtn")
                     error
                 );
 
+
                 showToast(
                     "Fullscreen is not available.",
                     "error"
                 );
+
             }
 
         }
@@ -5681,7 +5204,7 @@ $("fullscreenBtn")
 
 /*
 |--------------------------------------------------------------------------
-| PAGE NAVIGATION
+| PREVIOUS CHART
 |--------------------------------------------------------------------------
 */
 
@@ -5690,37 +5213,28 @@ $("previousPageBtn")
         "click",
         async () => {
 
-            if (
-                state.currentPage <= 0
-            ) {
-
-                return;
-            }
-
-            state.currentPage--;
-
-            await renderPage();
+            await navigateChart(
+                -1
+            );
 
         }
     );
 
+
+/*
+|--------------------------------------------------------------------------
+| NEXT CHART
+|--------------------------------------------------------------------------
+*/
 
 $("nextPageBtn")
     .addEventListener(
         "click",
         async () => {
 
-            if (
-                state.currentPage >=
-                state.pages.length - 1
-            ) {
-
-                return;
-            }
-
-            state.currentPage++;
-
-            await renderPage();
+            await navigateChart(
+                1
+            );
 
         }
     );
@@ -5754,18 +5268,34 @@ document
                                 )
                         );
 
+
                     button.classList.add(
                         "active"
                     );
 
+
                     state.provider =
                         button.dataset.provider;
 
-                    if (state.airport?.icao) {
 
-                        loadLocalCharts(
+                    /*
+                     * Reload from database so the provider
+                     * filter always reflects the actual
+                     * database contents.
+                     */
+
+                    if (
+                        state.airport?.icao
+                    ) {
+
+                        await loadCharts(
                             state.airport.icao
                         );
+
+                    } else {
+
+                        renderChartList();
+
                     }
 
                 }
@@ -5790,7 +5320,7 @@ document
 
             button.addEventListener(
                 "click",
-                () => {
+                async () => {
 
                     document
                         .querySelectorAll(
@@ -5803,14 +5333,34 @@ document
                                 )
                         );
 
+
                     button.classList.add(
                         "active"
                     );
 
+
                     state.category =
                         button.dataset.category;
 
-                    renderChartList();
+
+                    /*
+                     * Reload the database query so category
+                     * filtering works even with many charts.
+                     */
+
+                    if (
+                        state.airport?.icao
+                    ) {
+
+                        await loadCharts(
+                            state.airport.icao
+                        );
+
+                    } else {
+
+                        renderChartList();
+
+                    }
 
                 }
             );
@@ -5912,7 +5462,8 @@ departureInput
         event => {
 
             if (
-                event.key === "Enter"
+                event.key ===
+                "Enter"
             ) {
 
                 lookupSmallAirport(
@@ -5933,7 +5484,8 @@ arrivalInput
         event => {
 
             if (
-                event.key === "Enter"
+                event.key ===
+                "Enter"
             ) {
 
                 lookupSmallAirport(
@@ -5955,12 +5507,13 @@ arrivalInput
 |
 | Example:
 |
-| charts.html?airport=KJFK
+| charts.html?airport=EHAM
 |
 | or:
 |
 | charts.html?departure=EHAM&arrival=KJFK
 |
+|--------------------------------------------------------------------------
 */
 
 function loadUrlParameters() {
@@ -5970,38 +5523,54 @@ function loadUrlParameters() {
             window.location.search
         );
 
+
     const airport =
         normalizeICAO(
-            params.get("airport")
+            params.get(
+                "airport"
+            )
         );
+
 
     const departure =
         normalizeICAO(
-            params.get("departure")
+            params.get(
+                "departure"
+            )
         );
+
 
     const arrival =
         normalizeICAO(
-            params.get("arrival")
+            params.get(
+                "arrival"
+            )
         );
+
 
     if (airport) {
 
         airportInput.value =
             airport;
+
     }
+
 
     if (departure) {
 
         departureInput.value =
             departure;
+
     }
+
 
     if (arrival) {
 
         arrivalInput.value =
             arrival;
+
     }
+
 
     return Boolean(
         airport
@@ -6019,11 +5588,27 @@ async function initialize() {
 
     resetViewer();
 
+
     loadUrlParameters();
 
+
     /*
-     * Automatically load the airport if supplied
-     * through the URL.
+     * Check backend.
+     */
+
+    await checkAPI();
+
+
+    /*
+     * Check MSFS bridge separately.
+     * This does NOT affect database charts.
+     */
+
+    checkMSFSBridge();
+
+
+    /*
+     * Automatically load airport from URL.
      */
 
     if (
@@ -6036,6 +5621,7 @@ async function initialize() {
         await loadSelectedAirport();
 
     }
+
 
     /*
      * Resolve optional route airports.
@@ -6050,7 +5636,9 @@ async function initialize() {
             $("departureInfo"),
             "departure"
         );
+
     }
+
 
     if (
         arrivalInput.value
@@ -6061,9 +5649,12 @@ async function initialize() {
             $("arrivalInfo"),
             "arrival"
         );
+
     }
 
+
     updateMap();
+
 }
 
 
@@ -6076,10 +5667,6 @@ async function initialize() {
 initialize();
 
 
-/* LOCAL CHART LIBRARY
- * No simulator or bridge connection is required.
- */
-
 /*
 |--------------------------------------------------------------------------
 | GLOBAL KEYBOARD CONTROLS
@@ -6090,12 +5677,9 @@ document.addEventListener(
     "keydown",
     async event => {
 
-        /*
-         * Don't capture keys while typing.
-         */
-
         const tag =
             document.activeElement?.tagName;
+
 
         if (
             tag === "INPUT" ||
@@ -6105,6 +5689,7 @@ document.addEventListener(
 
             return;
         }
+
 
         if (
             event.key === "+"
@@ -6117,7 +5702,9 @@ document.addEventListener(
                 );
 
             applyChartTransform();
+
         }
+
 
         if (
             event.key === "-"
@@ -6130,35 +5717,29 @@ document.addEventListener(
                 );
 
             applyChartTransform();
+
         }
+
 
         if (
             event.key === "ArrowLeft"
         ) {
 
-            if (
-                state.currentPage > 0
-            ) {
+            await navigateChart(
+                -1
+            );
 
-                state.currentPage--;
-
-                await renderPage();
-            }
         }
+
 
         if (
             event.key === "ArrowRight"
         ) {
 
-            if (
-                state.currentPage <
-                state.pages.length - 1
-            ) {
+            await navigateChart(
+                1
+            );
 
-                state.currentPage++;
-
-                await renderPage();
-            }
         }
 
     }
@@ -6168,9 +5749,6 @@ document.addEventListener(
 /*
 |--------------------------------------------------------------------------
 | DEBUG API
-|--------------------------------------------------------------------------
-|
-| Makes development easier from the browser console.
 |--------------------------------------------------------------------------
 */
 
@@ -6182,7 +5760,21 @@ window.FlightAppCharts = {
         loadSelectedAirport,
 
     loadCharts:
-        loadLocalCharts,
+        () => {
+
+            if (
+                state.airport?.icao
+            ) {
+
+                return loadCharts(
+                    state.airport.icao
+                );
+
+            }
+
+            return Promise.resolve();
+
+        },
 
     selectChart,
 
