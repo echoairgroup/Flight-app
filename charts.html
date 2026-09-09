@@ -2334,19 +2334,6 @@
             margin-left: 5px;
         }
 
-        .chart-airport {
-            display: block;
-            margin-top: 4px;
-            color: var(--muted);
-            font-size: 10px;
-            font-weight: 700;
-        }
-
-        .chart-airport strong {
-            color: var(--text);
-            font-weight: 800;
-        }
-
         @media (max-width: 850px) {
             .simbrief-flight {
                 grid-template-columns: 1fr 1fr;
@@ -2366,6 +2353,19 @@
         }
 
     </style>
+
+        .chart-airport {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            margin-left: 7px;
+            opacity: .82;
+        }
+
+        .chart-airport i {
+            font-size: .78em;
+        }
+
 </head>
 
 <body>
@@ -2491,7 +2491,7 @@
             <span class="status-dot"></span>
 
             <span id="connectionText">
-                Checking chart library...
+                Chart Library Offline
             </span>
 
         </div>
@@ -3721,69 +3721,6 @@ async function bridgeFetch(
 
 /*
 |--------------------------------------------------------------------------
-| CHECK CHART LIBRARY
-|--------------------------------------------------------------------------
-*/
-
-async function updateChartLibraryStatus() {
-
-    if (!connectionStatus || !connectionText) {
-        return false;
-    }
-
-    connectionStatus.classList.remove(
-        "connected",
-        "error"
-    );
-
-    connectionText.textContent =
-        "Checking chart library...";
-
-    try {
-
-        const data =
-            await fetchJson(
-                `${API_BASE}/api/charts?icao=EHAM&provider=LIDO&category=ALL`
-            );
-
-        if (data?.available === true) {
-
-            connectionStatus.classList.add(
-                "connected"
-            );
-
-            connectionText.textContent =
-                "Chart Library Online";
-
-            return true;
-        }
-
-        throw new Error(
-            data?.error ||
-            "Chart library unavailable."
-        );
-
-    } catch (error) {
-
-        console.debug(
-            "Chart library unavailable:",
-            error.message
-        );
-
-        connectionStatus.classList.add(
-            "error"
-        );
-
-        connectionText.textContent =
-            "Chart Library Offline";
-
-        return false;
-    }
-}
-
-
-/*
-|--------------------------------------------------------------------------
 | CHECK MSFS BRIDGE
 |--------------------------------------------------------------------------
 */
@@ -3830,7 +3767,7 @@ async function checkMSFSBridge() {
             );
 
             connectionText.textContent =
-                "MSFS Bridge Online";
+                "Chart Library Offline";
 
             return true;
         }
@@ -3855,7 +3792,7 @@ async function checkMSFSBridge() {
     );
 
     connectionText.textContent =
-        "MSFS Bridge Offline";
+        "Chart Library Offline";
 
     return false;
 }
@@ -4147,7 +4084,6 @@ function loadLocalCharts(icao) {
         type: chart.type || "OTHER",
         rawType: chart.type || "OTHER",
         airportIcao: icao,
-        airportName: airport.name || icao,
         procedures: [],
         runways: chart.runways || [],
         aircraftTypes: [],
@@ -4489,12 +4425,6 @@ function renderChartList() {
                                     ${escapeHtml(chart.name)}
                                 </span>
 
-                                ${
-                                    chart.pinned && chart.airportIcao
-                                        ? `<span class="chart-airport"><i class="fa-solid fa-location-dot"></i> <strong>${escapeHtml(chart.airportIcao)}</strong>${chart.airportName ? ` · ${escapeHtml(chart.airportName)}` : ""}</span>`
-                                        : ""
-                                }
-
                                 <span class="chart-item-meta">
 
                                     ${escapeHtml(chart.type)}
@@ -4510,7 +4440,10 @@ function renderChartList() {
 
                                     ${
                                         chart.pinned
-                                            ? `<span class="chart-pin"><i class="fa-solid fa-thumbtack"></i> Pinned</span>`
+                                            ? `
+                                                <span class="chart-pin"><i class="fa-solid fa-thumbtack"></i> Pinned</span>
+                                                ${chart.airportIcao ? `<span class="chart-airport"><i class="fa-solid fa-location-dot"></i> ${escapeHtml(chart.airportIcao)}${chart.airportName ? ` · ${escapeHtml(chart.airportName)}` : ""}</span>` : ""}
+                                              `
                                             : ""
                                     }
 
@@ -6985,8 +6918,6 @@ function loadUrlParameters() {
 
 async function initialize() {
 
-    updateChartLibraryStatus();
-
     resetViewer();
 
     loadUrlParameters();
@@ -7043,11 +6974,46 @@ async function initialize() {
 |--------------------------------------------------------------------------
 */
 
+async function updateChartLibraryStatus() {
+
+    const connectionText = document.getElementById("connectionText");
+    const connectionStatus = document.getElementById("connectionStatus");
+
+    if (!connectionText || !connectionStatus) return;
+
+    connectionText.textContent = "Checking chart library...";
+    connectionStatus.classList.remove("connected", "error");
+
+    try {
+        const response = await fetch(`${API_BASE}/api/health`, {
+            method: "GET",
+            cache: "no-store"
+        });
+
+        if (!response.ok) throw new Error("Chart API unavailable");
+
+        const data = await response.json();
+
+        if (data && (data.available === true || data.status === "ok" || data.online === true)) {
+            connectionText.textContent = "Chart Library Online";
+            connectionStatus.classList.add("connected");
+        } else {
+            throw new Error("Chart API unavailable");
+        }
+    } catch (error) {
+        console.error("Chart library status check failed:", error);
+        connectionText.textContent = "Chart Library Offline";
+        connectionStatus.classList.remove("connected");
+        connectionStatus.classList.add("error");
+    }
+}
+
 initialize();
+updateChartLibraryStatus();
 
 
-/* DATABASE CHART LIBRARY
- * Charts are loaded from the Flight App API / Neon database.
+/* LOCAL CHART LIBRARY
+ * No simulator or bridge connection is required.
  */
 
 /*
