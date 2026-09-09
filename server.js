@@ -2,6 +2,8 @@ const express = require("express");
 const cors = require("cors");
 const https = require("https");
 const zlib = require("zlib");
+const crypto = require("crypto");
+const multer = require("multer");
 const { Pool } = require("pg");
 
 require("dotenv").config();
@@ -42,14 +44,252 @@ app.use(express.json());
 
 /*
 |--------------------------------------------------------------------------
+| CHART UPLOAD
+|--------------------------------------------------------------------------
+|
+| Images are stored directly in PostgreSQL as BYTEA.
+| This means charts survive server restarts and redeployments.
+|
+|--------------------------------------------------------------------------
+*/
+
+const chartUpload = multer({
+    storage: multer.memoryStorage(),
+
+    limits: {
+        fileSize: 15 * 1024 * 1024
+    },
+
+    fileFilter: (req, file, callback) => {
+
+        const allowedTypes = [
+            "image/png",
+            "image/jpeg",
+            "image/webp"
+        ];
+
+        if (
+            allowedTypes.includes(
+                file.mimetype
+            )
+        ) {
+
+            callback(null, true);
+
+        } else {
+
+            callback(
+                new Error(
+                    "Only PNG, JPG/JPEG and WebP images are allowed."
+                )
+            );
+
+        }
+
+    }
+
+});
+
+/*
+|--------------------------------------------------------------------------
 | HELPERS
 |--------------------------------------------------------------------------
 */
 
 function validICAO(icao) {
+
     return /^[A-Z]{4}$/.test(
-        String(icao || "").trim().toUpperCase()
+        String(icao || "")
+            .trim()
+            .toUpperCase()
     );
+
+}
+
+/*
+|--------------------------------------------------------------------------
+| CHART ADMIN AUTHENTICATION
+|--------------------------------------------------------------------------
+*/
+
+function createAdminToken() {
+
+    const expires =
+        Date.now() +
+        1000 * 60 * 60 * 12;
+
+    const payload =
+        Buffer
+            .from(
+                JSON.stringify({
+                    expires
+                })
+            )
+            .toString("base64url");
+
+    const secret =
+        process.env.CHART_ADMIN_PASSWORD;
+
+    if (!secret) {
+        throw new Error(
+            "CHART_ADMIN_PASSWORD is not configured."
+        );
+    }
+
+    const signature =
+        crypto
+            .createHmac(
+                "sha256",
+                secret
+            )
+            .update(payload)
+            .digest("base64url");
+
+    return `${payload}.${signature}`;
+
+}
+
+function verifyAdminToken(token) {
+
+    if (!token) {
+        return false;
+    }
+
+    const parts =
+        String(token).split(".");
+
+    if (parts.length !== 2) {
+        return false;
+    }
+
+    const [
+        payload,
+        signature
+    ] = parts;
+
+    const secret =
+        process.env.CHART_ADMIN_PASSWORD;
+
+    if (!secret) {
+        return false;
+    }
+
+    const expectedSignature =
+        crypto
+            .createHmac(
+                "sha256",
+                secret
+            )
+            .update(payload)
+            .digest("base64url");
+
+    if (
+        signature.length !==
+        expectedSignature.length
+    ) {
+        return false;
+    }
+
+    try {
+
+        if (
+            !crypto.timingSafeEqual(
+                Buffer.from(signature),
+                Buffer.from(expectedSignature)
+            )
+        ) {
+
+            return false;
+
+        }
+
+    } catch (error) {
+
+        return false;
+
+    }
+
+    try {
+
+        const decoded =
+            JSON.parse(
+                Buffer
+                    .from(
+                        payload,
+                        "base64url"
+                    )
+                    .toString("utf8")
+            );
+
+        if (
+            !decoded.expires ||
+            Date.now() > decoded.expires
+        ) {
+
+            return false;
+
+        }
+
+        return true;
+
+    } catch (error) {
+
+        return false;
+
+    }
+
+}
+
+function requireChartAdmin(
+    req,
+    res,
+    next
+) {
+
+    const authorization =
+        String(
+            req.headers.authorization || ""
+        );
+
+    if (
+        !authorization.startsWith(
+            "Bearer "
+        )
+    ) {
+
+        return res.status(401).json({
+
+            available:
+                false,
+
+            error:
+                "Admin authentication required."
+
+        });
+
+    }
+
+    const token =
+        authorization.substring(7);
+
+    if (
+        !verifyAdminToken(token)
+    ) {
+
+        return res.status(401).json({
+
+            available:
+                false,
+
+            error:
+                "Invalid or expired admin token."
+
+        });
+
+    }
+
+    next();
+
 }
 
 /*
@@ -59,110 +299,120 @@ function validICAO(icao) {
 */
 
 function fetchJSON(url) {
-    return new Promise((resolve, reject) => {
 
-        const request = https.get(
-            url,
-            {
-                headers: {
-                    "User-Agent":
-                        "Flight-App/1.0 (flight simulator companion application)",
+    return new Promise(
+        (resolve, reject) => {
 
-                    Accept:
-                        "application/json"
+            const request = https.get(
+                url,
+                {
+                    headers: {
+                        "User-Agent":
+                            "Flight-App/1.0 (flight simulator companion application)",
+
+                        Accept:
+                            "application/json"
+                    }
+                },
+
+                response => {
+
+                    let data = "";
+
+                    response.setEncoding(
+                        "utf8"
+                    );
+
+                    response.on(
+                        "data",
+                        chunk => {
+
+                            data += chunk;
+
+                        }
+                    );
+
+                    response.on(
+                        "end",
+                        () => {
+
+                            if (
+                                response.statusCode < 200 ||
+                                response.statusCode >= 300
+                            ) {
+
+                                reject(
+                                    new Error(
+                                        `External API returned HTTP ${response.statusCode}`
+                                    )
+                                );
+
+                                return;
+
+                            }
+
+                            /*
+                            |--------------------------------------------------------------------------
+                            | HTTP 204 = NO CONTENT
+                            |--------------------------------------------------------------------------
+                            */
+
+                            if (
+                                response.statusCode === 204 ||
+                                !data.trim()
+                            ) {
+
+                                resolve([]);
+
+                                return;
+
+                            }
+
+                            try {
+
+                                resolve(
+                                    JSON.parse(data)
+                                );
+
+                            } catch (error) {
+
+                                reject(
+                                    new Error(
+                                        "External API returned invalid JSON"
+                                    )
+                                );
+
+                            }
+
+                        }
+                    );
+
                 }
-            },
+            );
 
-            response => {
+            request.on(
+                "error",
+                reject
+            );
 
-                let data = "";
+            request.setTimeout(
+                15000,
+                () => {
 
-                response.setEncoding("utf8");
+                    request.destroy();
 
-                response.on(
-                    "data",
-                    chunk => {
-                        data += chunk;
-                    }
-                );
+                    reject(
+                        new Error(
+                            "External API request timed out"
+                        )
+                    );
 
-                response.on(
-                    "end",
-                    () => {
+                }
+            );
 
-                        if (
-                            response.statusCode < 200 ||
-                            response.statusCode >= 300
-                        ) {
+        }
+    );
 
-                            reject(
-                                new Error(
-                                    `External API returned HTTP ${response.statusCode}`
-                                )
-                            );
-
-                            return;
-                        }
-
-                        /*
-                        |--------------------------------------------------------------------------
-                        | HTTP 204 = NO CONTENT
-                        |--------------------------------------------------------------------------
-                        */
-
-                        if (
-                            response.statusCode === 204 ||
-                            !data.trim()
-                        ) {
-
-                            resolve([]);
-
-                            return;
-                        }
-
-                        try {
-
-                            resolve(
-                                JSON.parse(data)
-                            );
-
-                        } catch (error) {
-
-                            reject(
-                                new Error(
-                                    "External API returned invalid JSON"
-                                )
-                            );
-
-                        }
-
-                    }
-                );
-
-            }
-        );
-
-        request.on(
-            "error",
-            reject
-        );
-
-        request.setTimeout(
-            15000,
-            () => {
-
-                request.destroy();
-
-                reject(
-                    new Error(
-                        "External API request timed out"
-                    )
-                );
-
-            }
-        );
-
-    });
 }
 
 /*
@@ -204,6 +454,7 @@ function fetchGzipJSON(url) {
                         response.resume();
 
                         return;
+
                     }
 
                     const gunzip =
@@ -211,7 +462,9 @@ function fetchGzipJSON(url) {
 
                     let output = "";
 
-                    response.pipe(gunzip);
+                    response.pipe(
+                        gunzip
+                    );
 
                     gunzip.on(
                         "data",
@@ -276,16 +529,13 @@ function fetchGzipJSON(url) {
 
         }
     );
+
 }
 
 /*
 |--------------------------------------------------------------------------
 | AIRPORT CACHE
 |--------------------------------------------------------------------------
-|
-| AviationWeather provides a worldwide station cache that is updated
-| approximately once per day.
-|
 */
 
 let airportStationsCache = null;
@@ -306,95 +556,75 @@ const AIRPORT_CACHE_MAX_AGE =
 
 function normalizeAirport(raw) {
 
-    if (!raw || typeof raw !== "object") {
+    if (
+        !raw ||
+        typeof raw !== "object"
+    ) {
+
         return null;
+
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | IDENTIFIERS
-    |--------------------------------------------------------------------------
-    */
+    const icao =
+        String(
+            raw.icaoId ??
+            raw.icao ??
+            raw.ident ??
+            raw.icao_code ??
+            raw.icaoCode ??
+            raw.station_id ??
+            raw.stationId ??
+            raw.id ??
+            ""
+        )
+            .trim()
+            .toUpperCase();
 
-    const icao = String(
-        raw.icaoId ??
-        raw.icao ??
-        raw.ident ??
-        raw.icao_code ??
-        raw.icaoCode ??
-        raw.station_id ??
-        raw.stationId ??
-        raw.id ??
-        ""
-    )
-        .trim()
-        .toUpperCase();
+    const iata =
+        String(
+            raw.iataId ??
+            raw.iata ??
+            raw.iata_code ??
+            raw.iataCode ??
+            ""
+        )
+            .trim()
+            .toUpperCase();
 
-    const iata = String(
-        raw.iataId ??
-        raw.iata ??
-        raw.iata_code ??
-        raw.iataCode ??
-        ""
-    )
-        .trim()
-        .toUpperCase();
+    const name =
+        String(
+            raw.name ??
+            raw.airport_name ??
+            raw.airportName ??
+            raw.facility_name ??
+            raw.facilityName ??
+            raw.site ??
+            raw.station_name ??
+            raw.stationName ??
+            raw.location ??
+            ""
+        ).trim();
 
-    /*
-    |--------------------------------------------------------------------------
-    | NAME
-    |--------------------------------------------------------------------------
-    */
+    const city =
+        String(
+            raw.city ??
+            raw.municipality ??
+            raw.municipalityName ??
+            raw.town ??
+            raw.locality ??
+            raw.location_city ??
+            ""
+        ).trim();
 
-    const name = String(
-        raw.name ??
-        raw.airport_name ??
-        raw.airportName ??
-        raw.facility_name ??
-        raw.facilityName ??
-        raw.site ??
-        raw.station_name ??
-        raw.stationName ??
-        raw.location ??
-        ""
-    ).trim();
-
-    /*
-    |--------------------------------------------------------------------------
-    | CITY
-    |--------------------------------------------------------------------------
-    */
-
-    const city = String(
-        raw.city ??
-        raw.municipality ??
-        raw.municipalityName ??
-        raw.town ??
-        raw.locality ??
-        raw.location_city ??
-        ""
-    ).trim();
-
-    /*
-    |--------------------------------------------------------------------------
-    | COUNTRY
-    |--------------------------------------------------------------------------
-    */
-
-    const country = String(
-        raw.country ??
-        raw.countryName ??
-        raw.country_name ??
-        raw.countryCode ??
-        raw.country_code ??
-        ""
-    ).trim();
-
-    /*
-    |--------------------------------------------------------------------------
-    | COORDINATES
-    |--------------------------------------------------------------------------
-    */
+    const country =
+        String(
+            raw.country ??
+            raw.countryName ??
+            raw.country_name ??
+            raw.countryCode ??
+            raw.country_code ??
+            ""
+        ).trim();
 
     const latitude =
         raw.lat ??
@@ -411,12 +641,6 @@ function normalizeAirport(raw) {
         raw.longitudeDeg ??
         null;
 
-    /*
-    |--------------------------------------------------------------------------
-    | ELEVATION
-    |--------------------------------------------------------------------------
-    */
-
     const elevation =
         raw.elev ??
         raw.elevation ??
@@ -425,21 +649,15 @@ function normalizeAirport(raw) {
         raw.altitude ??
         null;
 
-    /*
-    |--------------------------------------------------------------------------
-    | VALIDATION
-    |--------------------------------------------------------------------------
-    */
+    if (
+        !icao &&
+        !iata &&
+        !name
+    ) {
 
-    if (!icao && !iata && !name) {
         return null;
-    }
 
-    /*
-    |--------------------------------------------------------------------------
-    | NORMALIZED OBJECT
-    |--------------------------------------------------------------------------
-    */
+    }
 
     return {
 
@@ -483,52 +701,69 @@ function normalizeAirport(raw) {
             raw
 
     };
+
 }
 
 /*
 |--------------------------------------------------------------------------
 | EXTRACT AIRPORT ARRAY FROM CACHE
 |--------------------------------------------------------------------------
-|
-| The upstream cache has changed formats over time, so this function
-| intentionally supports several common structures.
-|
 */
 
 function extractAirportArray(data) {
 
-    if (Array.isArray(data)) {
+    if (
+        Array.isArray(data)
+    ) {
+
         return data;
+
     }
 
-    if (!data || typeof data !== "object") {
+    if (
+        !data ||
+        typeof data !== "object"
+    ) {
+
         return [];
+
     }
 
     const possibleArrays = [
+
         data.airports,
+
         data.stations,
+
         data.features,
+
         data.data,
+
         data.results,
+
         data.items
+
     ];
 
-    for (const value of possibleArrays) {
+    for (
+        const value of possibleArrays
+    ) {
 
-        if (Array.isArray(value)) {
+        if (
+            Array.isArray(value)
+        ) {
+
             return value;
+
         }
 
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | GEOJSON
-    |--------------------------------------------------------------------------
-    */
-
-    if (Array.isArray(data.features)) {
+    if (
+        Array.isArray(
+            data.features
+        )
+    ) {
 
         return data.features.map(
             feature => {
@@ -539,6 +774,7 @@ function extractAirportArray(data) {
                 ) {
 
                     return {
+
                         ...feature.properties,
 
                         latitude:
@@ -546,6 +782,7 @@ function extractAirportArray(data) {
 
                         longitude:
                             feature.geometry?.coordinates?.[0]
+
                     };
 
                 }
@@ -556,20 +793,6 @@ function extractAirportArray(data) {
         );
 
     }
-
-    /*
-    |--------------------------------------------------------------------------
-    | OBJECT MAP
-    |--------------------------------------------------------------------------
-    |
-    | Some datasets are returned as:
-    |
-    | {
-    |     "EHAM": {...},
-    |     "EGLL": {...}
-    | }
-    |
-    */
 
     const values =
         Object.values(data);
@@ -584,9 +807,11 @@ function extractAirportArray(data) {
     ) {
 
         return values;
+
     }
 
     return [];
+
 }
 
 /*
@@ -600,15 +825,10 @@ async function getAirportStations() {
     const now =
         Date.now();
 
-    /*
-    |--------------------------------------------------------------------------
-    | RETURN MEMORY CACHE
-    |--------------------------------------------------------------------------
-    */
-
     if (
         airportStationsCache &&
-        now - airportStationsCacheUpdated <
+        now -
+            airportStationsCacheUpdated <
             AIRPORT_CACHE_MAX_AGE
     ) {
 
@@ -641,7 +861,9 @@ async function getAirportStations() {
                         airport.name
                 );
 
-        if (normalized.length === 0) {
+        if (
+            normalized.length === 0
+        ) {
 
             throw new Error(
                 "Airport cache contained no usable airport records"
@@ -668,14 +890,9 @@ async function getAirportStations() {
             error.message
         );
 
-        /*
-        |--------------------------------------------------------------------------
-        | IMPORTANT:
-        | If an old cache exists, keep using it.
-        |--------------------------------------------------------------------------
-        */
-
-        if (airportStationsCache) {
+        if (
+            airportStationsCache
+        ) {
 
             console.log(
                 "Using previously loaded airport cache."
@@ -732,77 +949,112 @@ function airportSearchScore(
             airport.country || ""
         ).toLowerCase();
 
-    /*
-    |--------------------------------------------------------------------------
-    | EXACT MATCHES
-    |--------------------------------------------------------------------------
-    */
+    if (
+        icao === q
+    ) {
 
-    if (icao === q) {
         return 10000;
+
     }
 
-    if (iata === q) {
+    if (
+        iata === q
+    ) {
+
         return 9500;
+
     }
 
-    if (name === q) {
+    if (
+        name === q
+    ) {
+
         return 9000;
+
     }
 
-    if (city === q) {
+    if (
+        city === q
+    ) {
+
         return 8500;
+
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | STARTS WITH
-    |--------------------------------------------------------------------------
-    */
+    if (
+        icao.startsWith(q)
+    ) {
 
-    if (icao.startsWith(q)) {
         return 8000;
+
     }
 
-    if (iata.startsWith(q)) {
+    if (
+        iata.startsWith(q)
+    ) {
+
         return 7800;
+
     }
 
-    if (name.startsWith(q)) {
+    if (
+        name.startsWith(q)
+    ) {
+
         return 7000;
+
     }
 
-    if (city.startsWith(q)) {
+    if (
+        city.startsWith(q)
+    ) {
+
         return 6800;
+
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | CONTAINS
-    |--------------------------------------------------------------------------
-    */
+    if (
+        name.includes(q)
+    ) {
 
-    if (name.includes(q)) {
         return 6000;
+
     }
 
-    if (city.includes(q)) {
+    if (
+        city.includes(q)
+    ) {
+
         return 5800;
+
     }
 
-    if (country.includes(q)) {
+    if (
+        country.includes(q)
+    ) {
+
         return 4000;
+
     }
 
-    if (icao.includes(q)) {
+    if (
+        icao.includes(q)
+    ) {
+
         return 5000;
+
     }
 
-    if (iata.includes(q)) {
+    if (
+        iata.includes(q)
+    ) {
+
         return 4800;
+
     }
 
     return 0;
+
 }
 
 /*
@@ -908,6 +1160,959 @@ app.get(
 
 /*
 |--------------------------------------------------------------------------
+| CHART DATABASE SETUP
+|--------------------------------------------------------------------------
+*/
+
+async function setupChartsDatabase() {
+
+    await pool.query(
+        `
+        CREATE TABLE IF NOT EXISTS charts
+        (
+            id BIGSERIAL PRIMARY KEY,
+
+            airport_icao VARCHAR(4) NOT NULL,
+
+            airport_name TEXT,
+
+            chart_name TEXT NOT NULL,
+
+            chart_type VARCHAR(30) NOT NULL DEFAULT 'AIRPORT',
+
+            provider VARCHAR(20) NOT NULL DEFAULT 'LIDO',
+
+            file_name TEXT NOT NULL,
+
+            mime_type VARCHAR(100) NOT NULL,
+
+            image_data BYTEA NOT NULL,
+
+            validity TEXT,
+
+            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
+        `
+    );
+
+    await pool.query(
+        `
+        CREATE INDEX IF NOT EXISTS
+        charts_airport_provider_idx
+        ON charts
+        (
+            airport_icao,
+            provider
+        )
+        `
+    );
+
+    await pool.query(
+        `
+        CREATE INDEX IF NOT EXISTS
+        charts_type_idx
+        ON charts
+        (
+            chart_type
+        )
+        `
+    );
+
+    console.log(
+        "Charts database ready."
+    );
+
+}
+
+/*
+|--------------------------------------------------------------------------
+| CHART ADMIN LOGIN
+|--------------------------------------------------------------------------
+*/
+
+app.post(
+    "/api/charts/admin/login",
+    async (req, res) => {
+
+        const password =
+            String(
+                req.body?.password || ""
+            );
+
+        const configuredPassword =
+            process.env.CHART_ADMIN_PASSWORD;
+
+        if (
+            !configuredPassword
+        ) {
+
+            console.error(
+                "CHART_ADMIN_PASSWORD is not configured."
+            );
+
+            return res.status(500).json({
+
+                available:
+                    false,
+
+                error:
+                    "Chart admin authentication is not configured."
+
+            });
+
+        }
+
+        if (
+            !password
+        ) {
+
+            return res.status(400).json({
+
+                available:
+                    false,
+
+                error:
+                    "Password is required."
+
+            });
+
+        }
+
+        const suppliedBuffer =
+            Buffer.from(password);
+
+        const configuredBuffer =
+            Buffer.from(
+                configuredPassword
+            );
+
+        let passwordMatches =
+            false;
+
+        if (
+            suppliedBuffer.length ===
+            configuredBuffer.length
+        ) {
+
+            try {
+
+                passwordMatches =
+                    crypto.timingSafeEqual(
+                        suppliedBuffer,
+                        configuredBuffer
+                    );
+
+            } catch (error) {
+
+                passwordMatches =
+                    false;
+
+            }
+
+        }
+
+        if (
+            !passwordMatches
+        ) {
+
+            return res.status(401).json({
+
+                available:
+                    false,
+
+                error:
+                    "Incorrect password."
+
+            });
+
+        }
+
+        try {
+
+            const token =
+                createAdminToken();
+
+            return res.json({
+
+                available:
+                    true,
+
+                authenticated:
+                    true,
+
+                token
+
+            });
+
+        } catch (error) {
+
+            console.error(
+                "Could not create chart admin token:",
+                error.message
+            );
+
+            return res.status(500).json({
+
+                available:
+                    false,
+
+                error:
+                    "Could not create admin session."
+
+            });
+
+        }
+
+    }
+);
+
+/*
+|--------------------------------------------------------------------------
+| GET CHARTS
+|--------------------------------------------------------------------------
+|
+| Examples:
+|
+| /api/charts?icao=EHAM
+| /api/charts?icao=EHAM&provider=LIDO
+| /api/charts?icao=EHAM&provider=LIDO&category=APPROACH
+|
+|--------------------------------------------------------------------------
+*/
+
+app.get(
+    "/api/charts",
+    async (req, res) => {
+
+        const icao =
+            String(
+                req.query.icao || ""
+            )
+                .trim()
+                .toUpperCase();
+
+        const provider =
+            String(
+                req.query.provider || ""
+            )
+                .trim()
+                .toUpperCase();
+
+        const category =
+            String(
+                req.query.category || "ALL"
+            )
+                .trim()
+                .toUpperCase();
+
+        if (
+            !validICAO(icao)
+        ) {
+
+            return res.status(400).json({
+
+                available:
+                    false,
+
+                charts:
+                    [],
+
+                error:
+                    "A valid ICAO code is required."
+
+            });
+
+        }
+
+        const validProviders = [
+            "LIDO",
+            "FAA"
+        ];
+
+        const validCategories = [
+            "ALL",
+            "AIRPORT",
+            "APPROACH",
+            "SID",
+            "STAR",
+            "ENROUTE"
+        ];
+
+        if (
+            provider &&
+            !validProviders.includes(
+                provider
+            )
+        ) {
+
+            return res.status(400).json({
+
+                available:
+                    false,
+
+                charts:
+                    [],
+
+                error:
+                    "Invalid chart provider."
+
+            });
+
+        }
+
+        if (
+            !validCategories.includes(
+                category
+            )
+        ) {
+
+            return res.status(400).json({
+
+                available:
+                    false,
+
+                charts:
+                    [],
+
+                error:
+                    "Invalid chart category."
+
+            });
+
+        }
+
+        try {
+
+            let query = `
+                SELECT
+                    id,
+                    airport_icao,
+                    airport_name,
+                    chart_name,
+                    chart_type,
+                    provider,
+                    file_name,
+                    mime_type,
+                    validity,
+                    created_at
+                FROM charts
+                WHERE airport_icao = $1
+            `;
+
+            const values = [
+                icao
+            ];
+
+            let parameter =
+                2;
+
+            if (
+                provider
+            ) {
+
+                query +=
+                    ` AND provider = $${parameter}`;
+
+                values.push(
+                    provider
+                );
+
+                parameter++;
+
+            }
+
+            if (
+                category !== "ALL"
+            ) {
+
+                query +=
+                    ` AND chart_type = $${parameter}`;
+
+                values.push(
+                    category
+                );
+
+                parameter++;
+
+            }
+
+            query += `
+                ORDER BY
+                    CASE chart_type
+                        WHEN 'AIRPORT' THEN 1
+                        WHEN 'APPROACH' THEN 2
+                        WHEN 'SID' THEN 3
+                        WHEN 'STAR' THEN 4
+                        WHEN 'ENROUTE' THEN 5
+                        ELSE 99
+                    END,
+                    chart_name ASC
+            `;
+
+            const result =
+                await pool.query(
+                    query,
+                    values
+                );
+
+            const charts =
+                result.rows.map(
+                    chart => ({
+
+                        id:
+                            chart.id,
+
+                        airport_icao:
+                            chart.airport_icao,
+
+                        airport_name:
+                            chart.airport_name,
+
+                        chart_name:
+                            chart.chart_name,
+
+                        chart_type:
+                            chart.chart_type,
+
+                        provider:
+                            chart.provider,
+
+                        file_name:
+                            chart.file_name,
+
+                        mime_type:
+                            chart.mime_type,
+
+                        validity:
+                            chart.validity,
+
+                        created_at:
+                            chart.created_at,
+
+                        image_url:
+                            `/api/charts/${chart.id}/image`
+
+                    })
+                );
+
+            return res.json({
+
+                available:
+                    true,
+
+                icao,
+
+                provider:
+                    provider || null,
+
+                category,
+
+                count:
+                    charts.length,
+
+                charts
+
+            });
+
+        } catch (error) {
+
+            console.error(
+                "Charts lookup failed:",
+                error.message
+            );
+
+            return res.status(503).json({
+
+                available:
+                    false,
+
+                charts:
+                    [],
+
+                error:
+                    "Could not load charts."
+
+            });
+
+        }
+
+    }
+);
+
+/*
+|--------------------------------------------------------------------------
+| GET SINGLE CHART IMAGE
+|--------------------------------------------------------------------------
+*/
+
+app.get(
+    "/api/charts/:id/image",
+    async (req, res) => {
+
+        const id =
+            Number(
+                req.params.id
+            );
+
+        if (
+            !Number.isInteger(id) ||
+            id <= 0
+        ) {
+
+            return res.status(400).send(
+                "Invalid chart ID."
+            );
+
+        }
+
+        try {
+
+            const result =
+                await pool.query(
+                    `
+                    SELECT
+                        mime_type,
+                        image_data,
+                        file_name
+                    FROM charts
+                    WHERE id = $1
+                    LIMIT 1
+                    `,
+                    [id]
+                );
+
+            if (
+                result.rows.length === 0
+            ) {
+
+                return res.status(404).send(
+                    "Chart not found."
+                );
+
+            }
+
+            const chart =
+                result.rows[0];
+
+            res.setHeader(
+                "Content-Type",
+                chart.mime_type
+            );
+
+            res.setHeader(
+                "Content-Disposition",
+                `inline; filename="${String(
+                    chart.file_name
+                ).replace(
+                    /"/g,
+                    ""
+                )}"`
+            );
+
+            res.setHeader(
+                "Cache-Control",
+                "public, max-age=3600"
+            );
+
+            return res.send(
+                chart.image_data
+            );
+
+        } catch (error) {
+
+            console.error(
+                "Chart image lookup failed:",
+                error.message
+            );
+
+            return res.status(500).send(
+                "Could not load chart."
+            );
+
+        }
+
+    }
+);
+
+/*
+|--------------------------------------------------------------------------
+| UPLOAD NEW CHART
+|--------------------------------------------------------------------------
+*/
+
+app.post(
+    "/api/charts",
+    requireChartAdmin,
+    chartUpload.single("image"),
+    async (req, res) => {
+
+        const {
+
+            airport_icao,
+
+            airport_name,
+
+            chart_name,
+
+            chart_type,
+
+            provider,
+
+            validity
+
+        } = req.body;
+
+        const icao =
+            String(
+                airport_icao || ""
+            )
+                .trim()
+                .toUpperCase();
+
+        const airportName =
+            String(
+                airport_name || ""
+            ).trim();
+
+        const chartName =
+            String(
+                chart_name || ""
+            ).trim();
+
+        const type =
+            String(
+                chart_type || "AIRPORT"
+            )
+                .trim()
+                .toUpperCase();
+
+        const chartProvider =
+            String(
+                provider || "LIDO"
+            )
+                .trim()
+                .toUpperCase();
+
+        const chartValidity =
+            String(
+                validity || ""
+            ).trim();
+
+        const validChartTypes = [
+            "AIRPORT",
+            "APPROACH",
+            "SID",
+            "STAR",
+            "ENROUTE"
+        ];
+
+        const validProviders = [
+            "LIDO",
+            "FAA"
+        ];
+
+        /*
+        |--------------------------------------------------------------------------
+        | VALIDATION
+        |--------------------------------------------------------------------------
+        */
+
+        if (
+            !validICAO(icao)
+        ) {
+
+            return res.status(400).json({
+
+                available:
+                    false,
+
+                error:
+                    "A valid four-letter ICAO code is required."
+
+            });
+
+        }
+
+        if (
+            !chartName
+        ) {
+
+            return res.status(400).json({
+
+                available:
+                    false,
+
+                error:
+                    "Chart name is required."
+
+            });
+
+        }
+
+        if (
+            !validChartTypes.includes(
+                type
+            )
+        ) {
+
+            return res.status(400).json({
+
+                available:
+                    false,
+
+                error:
+                    "Invalid chart type."
+
+            });
+
+        }
+
+        if (
+            !validProviders.includes(
+                chartProvider
+            )
+        ) {
+
+            return res.status(400).json({
+
+                available:
+                    false,
+
+                error:
+                    "Invalid chart provider."
+
+            });
+
+        }
+
+        if (
+            !req.file
+        ) {
+
+            return res.status(400).json({
+
+                available:
+                    false,
+
+                error:
+                    "Chart image is required."
+
+            });
+
+        }
+
+        try {
+
+            const result =
+                await pool.query(
+                    `
+                    INSERT INTO charts
+                    (
+                        airport_icao,
+                        airport_name,
+                        chart_name,
+                        chart_type,
+                        provider,
+                        file_name,
+                        mime_type,
+                        image_data,
+                        validity
+                    )
+                    VALUES
+                    (
+                        $1,
+                        $2,
+                        $3,
+                        $4,
+                        $5,
+                        $6,
+                        $7,
+                        $8,
+                        $9
+                    )
+                    RETURNING
+                        id,
+                        airport_icao,
+                        airport_name,
+                        chart_name,
+                        chart_type,
+                        provider,
+                        file_name,
+                        mime_type,
+                        validity,
+                        created_at
+                    `,
+                    [
+
+                        icao,
+
+                        airportName ||
+                            null,
+
+                        chartName,
+
+                        type,
+
+                        chartProvider,
+
+                        req.file.originalname,
+
+                        req.file.mimetype,
+
+                        req.file.buffer,
+
+                        chartValidity ||
+                            null
+
+                    ]
+                );
+
+            const chart =
+                result.rows[0];
+
+            console.log(
+                `Chart uploaded: ${chartProvider} ${icao} - ${chartName}`
+            );
+
+            return res.status(201).json({
+
+                available:
+                    true,
+
+                chart: {
+
+                    ...chart,
+
+                    image_url:
+                        `/api/charts/${chart.id}/image`
+
+                }
+
+            });
+
+        } catch (error) {
+
+            console.error(
+                "Chart upload failed:",
+                error.message
+            );
+
+            return res.status(500).json({
+
+                available:
+                    false,
+
+                error:
+                    "Could not save chart."
+
+            });
+
+        }
+
+    }
+);
+
+/*
+|--------------------------------------------------------------------------
+| DELETE CHART
+|--------------------------------------------------------------------------
+*/
+
+app.delete(
+    "/api/charts/:id",
+    requireChartAdmin,
+    async (req, res) => {
+
+        const id =
+            Number(
+                req.params.id
+            );
+
+        if (
+            !Number.isInteger(id) ||
+            id <= 0
+        ) {
+
+            return res.status(400).json({
+
+                available:
+                    false,
+
+                error:
+                    "Invalid chart ID."
+
+            });
+
+        }
+
+        try {
+
+            const result =
+                await pool.query(
+                    `
+                    DELETE FROM charts
+                    WHERE id = $1
+                    RETURNING id
+                    `,
+                    [id]
+                );
+
+            if (
+                result.rows.length === 0
+            ) {
+
+                return res.status(404).json({
+
+                    available:
+                        false,
+
+                    error:
+                        "Chart not found."
+
+                });
+
+            }
+
+            console.log(
+                `Chart deleted: ${id}`
+            );
+
+            return res.json({
+
+                available:
+                    true,
+
+                deleted:
+                    true,
+
+                id
+
+            });
+
+        } catch (error) {
+
+            console.error(
+                "Chart deletion failed:",
+                error.message
+            );
+
+            return res.status(500).json({
+
+                available:
+                    false,
+
+                error:
+                    "Could not delete chart."
+
+            });
+
+        }
+
+    }
+);
+
+/*
+|--------------------------------------------------------------------------
 | SIMBRIEF - LATEST OFP
 |--------------------------------------------------------------------------
 */
@@ -921,13 +2126,9 @@ app.get(
                 req.query.username || ""
             ).trim();
 
-        /*
-        |--------------------------------------------------------------------------
-        | VALIDATE USERNAME
-        |--------------------------------------------------------------------------
-        */
-
-        if (!username) {
+        if (
+            !username
+        ) {
 
             return res.status(400).json({
 
@@ -941,7 +2142,9 @@ app.get(
 
         }
 
-        if (username.length > 80) {
+        if (
+            username.length > 80
+        ) {
 
             return res.status(400).json({
 
@@ -1106,12 +2309,6 @@ app.get(
             const metar =
                 data[0];
 
-            /*
-            |--------------------------------------------------------------------------
-            | CACHE WEATHER IN NEON
-            |--------------------------------------------------------------------------
-            */
-
             try {
 
                 await pool.query(
@@ -1247,12 +2444,6 @@ app.get(
 
             const taf =
                 data[0];
-
-            /*
-            |--------------------------------------------------------------------------
-            | CACHE TAF
-            |--------------------------------------------------------------------------
-            */
 
             try {
 
@@ -1430,20 +2621,6 @@ app.get(
 |--------------------------------------------------------------------------
 | AIRPORT SEARCH
 |--------------------------------------------------------------------------
-|
-| IMPORTANT:
-| This route MUST be before /api/airports/:icao.
-|
-| Supports:
-|   EHAM
-|   AMS
-|   Amsterdam
-|   Schiphol
-|   Samos
-|   LGSM
-|   etc.
-|
-|--------------------------------------------------------------------------
 */
 
 app.get(
@@ -1455,10 +2632,11 @@ app.get(
                 req.query.q ||
                 req.query.query ||
                 ""
-            )
-                .trim();
+            ).trim();
 
-        if (!query) {
+        if (
+            !query
+        ) {
 
             return res.json({
 
@@ -1504,22 +2682,6 @@ app.get(
             console.log(
                 `Airport search: "${query}"`
             );
-
-            /*
-            |--------------------------------------------------------------------------
-            | FIRST: EXACT AIRPORT API LOOKUP
-            |--------------------------------------------------------------------------
-            |
-            | AviationWeather supports airport information worldwide.
-            |
-            | This is especially useful for:
-            | EHAM
-            | KJFK
-            | LGSM
-            | etc.
-            |
-            |--------------------------------------------------------------------------
-            */
 
             let directResults = [];
 
@@ -1596,12 +2758,6 @@ app.get(
 
             }
 
-            /*
-            |--------------------------------------------------------------------------
-            | IF EXACT LOOKUP WORKED
-            |--------------------------------------------------------------------------
-            */
-
             if (
                 directResults.length > 0
             ) {
@@ -1610,6 +2766,7 @@ app.get(
                     directResults
                         .map(
                             airport => ({
+
                                 ...airport,
 
                                 score:
@@ -1617,6 +2774,7 @@ app.get(
                                         airport,
                                         query
                                     )
+
                             })
                         )
                         .sort(
@@ -1624,7 +2782,10 @@ app.get(
                                 b.score -
                                 a.score
                         )
-                        .slice(0, 10)
+                        .slice(
+                            0,
+                            10
+                        )
                         .map(
                             airport => {
 
@@ -1658,25 +2819,14 @@ app.get(
 
             }
 
-            /*
-            |--------------------------------------------------------------------------
-            | FALLBACK: WORLDWIDE STATION CACHE
-            |--------------------------------------------------------------------------
-            */
-
             const stations =
                 await getAirportStations();
-
-            /*
-            |--------------------------------------------------------------------------
-            | SEARCH
-            |--------------------------------------------------------------------------
-            */
 
             const matches =
                 stations
                     .map(
                         airport => ({
+
                             airport,
 
                             score:
@@ -1684,6 +2834,7 @@ app.get(
                                     airport,
                                     query
                                 )
+
                         })
                     )
                     .filter(
@@ -1723,7 +2874,10 @@ app.get(
 
                         }
                     )
-                    .slice(0, 10)
+                    .slice(
+                        0,
+                        10
+                    )
                     .map(
                         item => {
 
@@ -1843,12 +2997,6 @@ app.get(
 
         try {
 
-            /*
-            |--------------------------------------------------------------------------
-            | FIRST: CHECK AIRPORT CACHE
-            |--------------------------------------------------------------------------
-            */
-
             const airportResult =
                 await pool.query(
                     `
@@ -1886,12 +3034,6 @@ app.get(
 
             }
 
-            /*
-            |--------------------------------------------------------------------------
-            | SECOND: OFFICIAL AIRPORT API
-            |--------------------------------------------------------------------------
-            */
-
             try {
 
                 const url =
@@ -1916,7 +3058,9 @@ app.get(
                             data[0]
                         );
 
-                    if (airport) {
+                    if (
+                        airport
+                    ) {
 
                         return res.json({
 
@@ -1975,12 +3119,6 @@ app.get(
 
             }
 
-            /*
-            |--------------------------------------------------------------------------
-            | THIRD: USE AIRPORT STATION CACHE
-            |--------------------------------------------------------------------------
-            */
-
             try {
 
                 const stations =
@@ -1995,7 +3133,9 @@ app.get(
                             icao
                     );
 
-                if (airport) {
+                if (
+                    airport
+                ) {
 
                     return res.json({
 
@@ -2050,12 +3190,6 @@ app.get(
                 );
 
             }
-
-            /*
-            |--------------------------------------------------------------------------
-            | FOURTH: FALLBACK TO LATEST METAR DATA
-            |--------------------------------------------------------------------------
-            */
 
             const weatherResult =
                 await pool.query(
@@ -2124,12 +3258,6 @@ app.get(
                 });
 
             }
-
-            /*
-            |--------------------------------------------------------------------------
-            | BUILD AIRPORT OBJECT
-            |--------------------------------------------------------------------------
-            */
 
             const airport = {
 
@@ -2298,12 +3426,6 @@ app.post(
 
         } = req.body;
 
-        /*
-        |--------------------------------------------------------------------------
-        | VALIDATION
-        |--------------------------------------------------------------------------
-        */
-
         if (
             !name ||
             String(name).trim() === ""
@@ -2368,12 +3490,6 @@ app.post(
         }
 
         try {
-
-            /*
-            |--------------------------------------------------------------------------
-            | INSERT PLAN
-            |--------------------------------------------------------------------------
-            */
 
             const result =
                 await pool.query(
@@ -2634,7 +3750,7 @@ app.get(
             database,
 
             version:
-                "1.2.0",
+                "1.3.0",
 
             endpoints: {
 
@@ -2661,6 +3777,15 @@ app.get(
 
                 airports:
                     "/api/airports/:icao",
+
+                charts:
+                    "/api/charts?icao=EHAM",
+
+                chartImage:
+                    "/api/charts/:id/image",
+
+                chartAdminLogin:
+                    "/api/charts/admin/login",
 
                 plans:
                     "/api/plans"
@@ -2713,6 +3838,59 @@ app.use(
             error
         );
 
+        if (
+            error instanceof multer.MulterError
+        ) {
+
+            if (
+                error.code ===
+                "LIMIT_FILE_SIZE"
+            ) {
+
+                return res.status(400).json({
+
+                    available:
+                        false,
+
+                    error:
+                        "Chart image is too large. Maximum size is 15 MB."
+
+                });
+
+            }
+
+            return res.status(400).json({
+
+                available:
+                    false,
+
+                error:
+                    error.message
+
+            });
+
+        }
+
+        if (
+            error &&
+            error.message &&
+            error.message.includes(
+                "Only PNG"
+            )
+        ) {
+
+            return res.status(400).json({
+
+                available:
+                    false,
+
+                error:
+                    error.message
+
+            });
+
+        }
+
         res.status(500).json({
 
             available:
@@ -2743,6 +3921,30 @@ async function startServer() {
         console.log(
             "Successfully connected to Neon PostgreSQL."
         );
+
+        /*
+        |--------------------------------------------------------------------------
+        | CREATE CHARTS TABLE
+        |--------------------------------------------------------------------------
+        */
+
+        await setupChartsDatabase();
+
+        /*
+        |--------------------------------------------------------------------------
+        | WARN IF ADMIN PASSWORD IS MISSING
+        |--------------------------------------------------------------------------
+        */
+
+        if (
+            !process.env.CHART_ADMIN_PASSWORD
+        ) {
+
+            console.warn(
+                "WARNING: CHART_ADMIN_PASSWORD is not configured. Chart admin login will not work."
+            );
+
+        }
 
         app.listen(
             PORT,
