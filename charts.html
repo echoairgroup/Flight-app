@@ -2840,13 +2840,18 @@ async function loadCharts(
     options = {}
 ) {
 
+    const requestedICAO =
+        normalizeICAO(icao);
+
+
     if (
-        !isValidICAO(icao)
+        !isValidICAO(requestedICAO)
     ) {
 
         return;
 
     }
+
 
     const provider =
         state.provider;
@@ -2859,19 +2864,13 @@ async function loadCharts(
 
     params.set(
         "icao",
-        icao
+        requestedICAO
     );
 
     params.set(
         "provider",
         provider
     );
-
-    /*
-     * The API accepts category=ALL.
-     * This lets the server return all charts and
-     * keeps the category buttons working correctly.
-     */
 
     params.set(
         "category",
@@ -2891,7 +2890,7 @@ async function loadCharts(
                 )
             );
 
-        const charts =
+        const rawCharts =
             Array.isArray(
                 data?.charts
             )
@@ -2899,15 +2898,53 @@ async function loadCharts(
                 : [];
 
 
-        state.charts =
-            charts.map(
+        /*
+         * Normalize all charts returned by the API.
+         */
+        const normalizedCharts =
+            rawCharts.map(
                 normalizeDatabaseChart
             );
 
 
+        /*
+         * IMPORTANT:
+         *
+         * Only keep charts that actually belong to
+         * the airport that was requested.
+         *
+         * This prevents charts from another airport
+         * from appearing in the list.
+         */
+        state.charts =
+            normalizedCharts.filter(
+                chart => {
+
+                    const chartICAO =
+                        normalizeICAO(
+                            chart.airportIcao
+                        );
+
+                    return (
+                        chartICAO ===
+                        requestedICAO
+                    );
+
+                }
+            );
+
+
+        /*
+         * Create a new array so filtering/rendering
+         * never modifies the original chart list.
+         */
         state.filteredCharts =
             [...state.charts];
 
+
+        /*
+         * Reset selection for the newly loaded airport.
+         */
         state.selectedChart =
             null;
 
@@ -2926,12 +2963,15 @@ async function loadCharts(
         resetViewer();
 
 
+        /*
+         * No charts for this airport.
+         */
         if (
             state.charts.length === 0
         ) {
 
             showToast(
-                `No ${provider} charts found for ${icao}.`,
+                `No ${provider} charts found for ${requestedICAO}.`,
                 "info"
             );
 
@@ -2944,7 +2984,7 @@ async function loadCharts(
                 state.charts.length === 1
                     ? ""
                     : "s"
-            } loaded for ${icao}.`,
+            } loaded for ${requestedICAO}.`,
             "success"
         );
 
@@ -2952,7 +2992,6 @@ async function loadCharts(
         /*
          * Automatically select the first chart.
          */
-
         if (
             options.autoSelect !== false
         ) {
@@ -3075,7 +3114,6 @@ function normalizeDatabaseChart(
         airportIcao:
             chart.airport_icao ||
             chart.airportIcao ||
-            state.airport?.icao ||
             null,
 
         airportName:
