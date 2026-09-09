@@ -2,7 +2,6 @@ const express = require("express");
 const cors = require("cors");
 const https = require("https");
 const zlib = require("zlib");
-const crypto = require("crypto");
 const multer = require("multer");
 const { Pool } = require("pg");
 
@@ -94,260 +93,6 @@ const chartUpload = multer({
 
 /*
 |--------------------------------------------------------------------------
-| CHART ADMIN AUTHENTICATION
-|--------------------------------------------------------------------------
-*/
-
-const CHART_ADMIN_PASSWORD =
-    process.env.CHART_ADMIN_PASSWORD || "";
-
-const CHART_ADMIN_SECRET =
-    process.env.CHART_ADMIN_SECRET ||
-    process.env.JWT_SECRET ||
-    CHART_ADMIN_PASSWORD;
-
-
-/*
-|--------------------------------------------------------------------------
-| BASE64URL HELPER
-|--------------------------------------------------------------------------
-*/
-
-function base64UrlEncode(
-    value
-) {
-
-    return Buffer
-        .from(value)
-        .toString("base64url");
-
-}
-
-
-/*
-|--------------------------------------------------------------------------
-| CREATE CHART ADMIN TOKEN
-|--------------------------------------------------------------------------
-*/
-
-function createChartAdminToken() {
-
-    const payload = {
-
-        role:
-            "chart-admin",
-
-        exp:
-            Date.now() +
-            12 * 60 * 60 * 1000
-
-    };
-
-    const body =
-        base64UrlEncode(
-            JSON.stringify(
-                payload
-            )
-        );
-
-    const signature =
-        crypto
-            .createHmac(
-                "sha256",
-                CHART_ADMIN_SECRET
-            )
-            .update(body)
-            .digest("base64url");
-
-    return `${body}.${signature}`;
-
-}
-
-
-/*
-|--------------------------------------------------------------------------
-| VERIFY CHART ADMIN TOKEN
-|--------------------------------------------------------------------------
-*/
-
-function verifyChartAdminToken(
-    token
-) {
-
-    if (
-        !token ||
-        !CHART_ADMIN_SECRET
-    ) {
-
-        return false;
-
-    }
-
-    const parts =
-        token.split(".");
-
-    if (
-        parts.length !== 2
-    ) {
-
-        return false;
-
-    }
-
-    const [
-        body,
-        signature
-    ] = parts;
-
-    try {
-
-        const expectedSignature =
-            crypto
-                .createHmac(
-                    "sha256",
-                    CHART_ADMIN_SECRET
-                )
-                .update(body)
-                .digest("base64url");
-
-        const providedBuffer =
-            Buffer.from(
-                signature
-            );
-
-        const expectedBuffer =
-            Buffer.from(
-                expectedSignature
-            );
-
-        if (
-            providedBuffer.length !==
-            expectedBuffer.length
-        ) {
-
-            return false;
-
-        }
-
-        if (
-            !crypto.timingSafeEqual(
-                providedBuffer,
-                expectedBuffer
-            )
-        ) {
-
-            return false;
-
-        }
-
-        const payload =
-            JSON.parse(
-                Buffer
-                    .from(
-                        body,
-                        "base64url"
-                    )
-                    .toString("utf8")
-            );
-
-        if (
-            payload.role !==
-            "chart-admin"
-        ) {
-
-            return false;
-
-        }
-
-        if (
-            !payload.exp ||
-            Date.now() >
-                Number(
-                    payload.exp
-                )
-        ) {
-
-            return false;
-
-        }
-
-        return true;
-
-    } catch (error) {
-
-        return false;
-
-    }
-
-}
-
-
-/*
-|--------------------------------------------------------------------------
-| CHART ADMIN MIDDLEWARE
-|--------------------------------------------------------------------------
-*/
-
-function requireChartAdmin(
-    req,
-    res,
-    next
-) {
-
-    const authorization =
-        String(
-            req.headers.authorization ||
-            ""
-        );
-
-    if (
-        !authorization.startsWith(
-            "Bearer "
-        )
-    ) {
-
-        return res.status(401).json({
-
-            available:
-                false,
-
-            error:
-                "Chart admin authorization required."
-
-        });
-
-    }
-
-    const token =
-        authorization
-            .slice(7)
-            .trim();
-
-    if (
-        !verifyChartAdminToken(
-            token
-        )
-    ) {
-
-        return res.status(401).json({
-
-            available:
-                false,
-
-            error:
-                "Invalid or expired chart admin token."
-
-        });
-
-    }
-
-    next();
-
-}
-
-
-/*
-|--------------------------------------------------------------------------
 | HELPERS
 |--------------------------------------------------------------------------
 */
@@ -361,7 +106,6 @@ function validICAO(icao) {
     );
 
 }
-
 
 /*
 |--------------------------------------------------------------------------
@@ -1307,119 +1051,6 @@ app.get(
 
 /*
 |--------------------------------------------------------------------------
-| CHART ADMIN LOGIN
-|--------------------------------------------------------------------------
-*/
-
-app.post(
-    "/api/charts/admin/login",
-    async (req, res) => {
-
-        if (
-            !CHART_ADMIN_PASSWORD ||
-            !CHART_ADMIN_SECRET
-        ) {
-
-            return res.status(503).json({
-
-                available:
-                    false,
-
-                error:
-                    "Chart admin is not configured on the server."
-
-            });
-
-        }
-
-        const password =
-            String(
-                req.body?.password ||
-                ""
-            );
-
-        if (
-            !password
-        ) {
-
-            return res.status(400).json({
-
-                available:
-                    false,
-
-                error:
-                    "Password is required."
-
-            });
-
-        }
-
-        const passwordBuffer =
-            Buffer.from(
-                password
-            );
-
-        const correctBuffer =
-            Buffer.from(
-                CHART_ADMIN_PASSWORD
-            );
-
-        let valid =
-            passwordBuffer.length ===
-            correctBuffer.length;
-
-        if (
-            valid
-        ) {
-
-            valid =
-                crypto.timingSafeEqual(
-                    passwordBuffer,
-                    correctBuffer
-                );
-
-        }
-
-        if (
-            !valid
-        ) {
-
-            return res.status(401).json({
-
-                available:
-                    false,
-
-                error:
-                    "Invalid admin password."
-
-            });
-
-        }
-
-        const token =
-            createChartAdminToken();
-
-        return res.json({
-
-            available:
-                true,
-
-            authenticated:
-                true,
-
-            token,
-
-            expiresIn:
-                12 * 60 * 60
-
-        });
-
-    }
-);
-
-
-/*
-|--------------------------------------------------------------------------
 | CHARTS - PUBLIC LIST
 |--------------------------------------------------------------------------
 |
@@ -1692,14 +1323,13 @@ app.get(
 | CHARTS - ADMIN LIST
 |--------------------------------------------------------------------------
 |
-| Allows chart-admin.html to retrieve all charts.
+| Public because chart admin authentication has been removed.
 |
 |--------------------------------------------------------------------------
 */
 
 app.get(
     "/api/charts/admin/all",
-    requireChartAdmin,
     async (req, res) => {
 
         try {
@@ -1894,11 +1524,14 @@ app.get(
 |--------------------------------------------------------------------------
 | UPLOAD CHART
 |--------------------------------------------------------------------------
+|
+| Public because chart admin authentication has been removed.
+|
+|--------------------------------------------------------------------------
 */
 
 app.post(
     "/api/charts",
-    requireChartAdmin,
     (req, res) => {
 
         chartUpload.single(
@@ -2193,11 +1826,14 @@ app.post(
 |--------------------------------------------------------------------------
 | DELETE CHART
 |--------------------------------------------------------------------------
+|
+| Public because chart admin authentication has been removed.
+|
+|--------------------------------------------------------------------------
 */
 
 app.delete(
     "/api/charts/:id",
-    requireChartAdmin,
     async (req, res) => {
 
         const id =
@@ -4092,9 +3728,6 @@ app.get(
 
                 chartImage:
                     "/api/charts/:id/image",
-
-                chartAdminLogin:
-                    "/api/charts/admin/login",
 
                 chartAdminAll:
                     "/api/charts/admin/all"
