@@ -11,6 +11,8 @@ const app = express();
 
 const PORT = process.env.PORT || 3000;
 
+const API_VERSION = "1.4.0";
+
 /*
 |--------------------------------------------------------------------------
 | DATABASE
@@ -37,17 +39,73 @@ const pool = new Pool({
 |--------------------------------------------------------------------------
 */
 
-app.use(cors());
+app.use(
+    cors({
+        origin: true,
+        methods: [
+            "GET",
+            "POST",
+            "DELETE",
+            "OPTIONS"
+        ],
+        allowedHeaders: [
+            "Content-Type",
+            "Accept"
+        ]
+    })
+);
 
-app.use(express.json());
+app.use(
+    express.json({
+        limit: "5mb"
+    })
+);
 
 /*
 |--------------------------------------------------------------------------
-| CHART UPLOAD CONFIGURATION
+| PUBLIC BASE URL
+|--------------------------------------------------------------------------
+|
+| Render normally provides RENDER_EXTERNAL_URL.
+| If that is unavailable, requests are used to construct URLs.
+|
 |--------------------------------------------------------------------------
 */
 
-const chartUpload = multer({
+function getBaseUrl(req) {
+
+    if (
+        process.env.PUBLIC_BASE_URL
+    ) {
+        return process.env.PUBLIC_BASE_URL
+            .replace(/\/+$/, "");
+    }
+
+    if (
+        process.env.RENDER_EXTERNAL_URL
+    ) {
+        return process.env.RENDER_EXTERNAL_URL
+            .replace(/\/+$/, "");
+    }
+
+    const protocol =
+        req.headers["x-forwarded-proto"] ||
+        req.protocol ||
+        "https";
+
+    const host =
+        req.get("host");
+
+    return `${protocol}://${host}`;
+}
+
+/*
+|--------------------------------------------------------------------------
+| IMAGE UPLOAD CONFIGURATION
+|--------------------------------------------------------------------------
+*/
+
+const imageUpload = multer({
 
     storage:
         multer.memoryStorage(),
@@ -84,11 +142,8 @@ const chartUpload = multer({
                         "Only PNG, JPG/JPEG and WebP images are allowed."
                     )
                 );
-
             }
-
         }
-
 });
 
 /*
@@ -97,19 +152,66 @@ const chartUpload = multer({
 |--------------------------------------------------------------------------
 */
 
-function validICAO(icao) {
+function validICAO(
+    icao
+) {
 
     return /^[A-Z]{4}$/.test(
-        String(icao || "")
+        String(
+            icao || ""
+        )
             .trim()
             .toUpperCase()
     );
+}
 
+function cleanString(
+    value,
+    maxLength = 500
+) {
+
+    return String(
+        value ?? ""
+    )
+        .trim()
+        .slice(
+            0,
+            maxLength
+        );
+}
+
+function parseJsonValue(
+    value
+) {
+
+    if (
+        value === null ||
+        value === undefined
+    ) {
+        return null;
+    }
+
+    if (
+        typeof value === "object"
+    ) {
+        return value;
+    }
+
+    try {
+
+        return JSON.parse(
+            value
+        );
+
+    } catch {
+
+        return null;
+    }
 }
 
 /*
 |--------------------------------------------------------------------------
-| CHART VALIDATION HELPERS
+| CHART VALIDATION
 |--------------------------------------------------------------------------
 */
 
@@ -126,32 +228,112 @@ const VALID_CHART_PROVIDERS = [
     "FAA"
 ];
 
-
 function validChartType(
     type
 ) {
 
     return VALID_CHART_TYPES.includes(
-        String(type || "")
+        String(
+            type || ""
+        )
             .trim()
             .toUpperCase()
     );
-
 }
-
 
 function validChartProvider(
     provider
 ) {
 
     return VALID_CHART_PROVIDERS.includes(
-        String(provider || "")
+        String(
+            provider || ""
+        )
             .trim()
             .toUpperCase()
     );
-
 }
 
+/*
+|--------------------------------------------------------------------------
+| AIRCRAFT TYPE HELPERS
+|--------------------------------------------------------------------------
+*/
+
+function validAircraftName(
+    name
+) {
+
+    const value =
+        cleanString(
+            name,
+            150
+        );
+
+    return (
+        value.length >= 2 &&
+        value.length <= 150
+    );
+}
+
+function validAircraftCode(
+    code
+) {
+
+    if (
+        !code
+    ) {
+        return true;
+    }
+
+    return /^[A-Z0-9._-]{2,30}$/.test(
+        String(code)
+            .trim()
+            .toUpperCase()
+    );
+}
+
+/*
+|--------------------------------------------------------------------------
+| CHECKLIST HELPERS
+|--------------------------------------------------------------------------
+*/
+
+const VALID_CHECKLIST_CATEGORIES = [
+    "PREFLIGHT",
+    "COCKPIT",
+    "BEFORE_START",
+    "START",
+    "TAXI",
+    "TAKEOFF",
+    "CLIMB",
+    "CRUISE",
+    "DESCENT",
+    "APPROACH",
+    "LANDING",
+    "SHUTDOWN",
+    "EMERGENCY",
+    "OTHER"
+];
+
+function normalizeChecklistCategory(
+    category
+) {
+
+    const value =
+        String(
+            category ||
+            "OTHER"
+        )
+            .trim()
+            .toUpperCase();
+
+    return VALID_CHECKLIST_CATEGORIES.includes(
+        value
+    )
+        ? value
+        : "OTHER";
+}
 
 /*
 |--------------------------------------------------------------------------
@@ -159,10 +341,15 @@ function validChartProvider(
 |--------------------------------------------------------------------------
 */
 
-function fetchJSON(url) {
+function fetchJSON(
+    url
+) {
 
     return new Promise(
-        (resolve, reject) => {
+        (
+            resolve,
+            reject
+        ) => {
 
             const request =
                 https.get(
@@ -174,14 +361,16 @@ function fetchJSON(url) {
                                 "Flight-App/1.0 (flight simulator companion application)",
 
                             Accept:
-                                "application/json"
+                                "application/json",
 
+                            "Accept-Encoding":
+                                "identity"
                         }
                     },
-
                     response => {
 
-                        let data = "";
+                        let data =
+                            "";
 
                         response.setEncoding(
                             "utf8"
@@ -193,7 +382,6 @@ function fetchJSON(url) {
 
                                 data +=
                                     chunk;
-
                             }
                         );
 
@@ -213,24 +401,18 @@ function fetchJSON(url) {
                                     );
 
                                     return;
-
                                 }
-
-                                /*
-                                |--------------------------------------------------------------------------
-                                | HTTP 204 = NO CONTENT
-                                |--------------------------------------------------------------------------
-                                */
 
                                 if (
                                     response.statusCode === 204 ||
                                     !data.trim()
                                 ) {
 
-                                    resolve([]);
+                                    resolve(
+                                        []
+                                    );
 
                                     return;
-
                                 }
 
                                 try {
@@ -241,19 +423,16 @@ function fetchJSON(url) {
                                         )
                                     );
 
-                                } catch (error) {
+                                } catch {
 
                                     reject(
                                         new Error(
                                             "External API returned invalid JSON"
                                         )
                                     );
-
                                 }
-
                             }
                         );
-
                     }
                 );
 
@@ -273,15 +452,11 @@ function fetchJSON(url) {
                             "External API request timed out"
                         )
                     );
-
                 }
             );
-
         }
     );
-
 }
-
 
 /*
 |--------------------------------------------------------------------------
@@ -289,10 +464,15 @@ function fetchJSON(url) {
 |--------------------------------------------------------------------------
 */
 
-function fetchGzipJSON(url) {
+function fetchGzipJSON(
+    url
+) {
 
     return new Promise(
-        (resolve, reject) => {
+        (
+            resolve,
+            reject
+        ) => {
 
             const request =
                 https.get(
@@ -305,10 +485,8 @@ function fetchGzipJSON(url) {
 
                             Accept:
                                 "application/json"
-
                         }
                     },
-
                     response => {
 
                         if (
@@ -316,22 +494,22 @@ function fetchGzipJSON(url) {
                             response.statusCode >= 300
                         ) {
 
+                            response.resume();
+
                             reject(
                                 new Error(
                                     `External cache returned HTTP ${response.statusCode}`
                                 )
                             );
 
-                            response.resume();
-
                             return;
-
                         }
 
                         const gunzip =
                             zlib.createGunzip();
 
-                        let output = "";
+                        let output =
+                            "";
 
                         response.pipe(
                             gunzip
@@ -343,7 +521,6 @@ function fetchGzipJSON(url) {
 
                                 output +=
                                     chunk.toString();
-
                             }
                         );
 
@@ -359,16 +536,14 @@ function fetchGzipJSON(url) {
                                         )
                                     );
 
-                                } catch (error) {
+                                } catch {
 
                                     reject(
                                         new Error(
                                             "Compressed cache returned invalid JSON"
                                         )
                                     );
-
                                 }
-
                             }
                         );
 
@@ -376,7 +551,6 @@ function fetchGzipJSON(url) {
                             "error",
                             reject
                         );
-
                     }
                 );
 
@@ -396,15 +570,11 @@ function fetchGzipJSON(url) {
                             "Compressed cache request timed out"
                         )
                     );
-
                 }
             );
-
         }
     );
-
 }
-
 
 /*
 |--------------------------------------------------------------------------
@@ -422,12 +592,14 @@ const AIRPORT_STATIONS_CACHE_URL =
     "https://aviationweather.gov/data/cache/stations.cache.json.gz";
 
 const AIRPORT_CACHE_MAX_AGE =
-    24 * 60 * 60 * 1000;
-
+    24 *
+    60 *
+    60 *
+    1000;
 
 /*
 |--------------------------------------------------------------------------
-| AIRPORT DATA NORMALIZER
+| AIRPORT NORMALIZER
 |--------------------------------------------------------------------------
 */
 
@@ -439,9 +611,7 @@ function normalizeAirport(
         !raw ||
         typeof raw !== "object"
     ) {
-
         return null;
-
     }
 
     const icao =
@@ -482,7 +652,8 @@ function normalizeAirport(
             raw.stationName ??
             raw.location ??
             ""
-        ).trim();
+        )
+            .trim();
 
     const city =
         String(
@@ -493,7 +664,8 @@ function normalizeAirport(
             raw.locality ??
             raw.location_city ??
             ""
-        ).trim();
+        )
+            .trim();
 
     const country =
         String(
@@ -503,7 +675,8 @@ function normalizeAirport(
             raw.countryCode ??
             raw.country_code ??
             ""
-        ).trim();
+        )
+            .trim();
 
     const latitude =
         raw.lat ??
@@ -517,7 +690,6 @@ function normalizeAirport(
         raw.lng ??
         raw.longitude ??
         raw.lonDeg ??
-        raw.longitudeDeg ??
         null;
 
     const elevation =
@@ -535,7 +707,6 @@ function normalizeAirport(
     ) {
 
         return null;
-
     }
 
     return {
@@ -578,15 +749,12 @@ function normalizeAirport(
 
         raw_data:
             raw
-
     };
-
 }
-
 
 /*
 |--------------------------------------------------------------------------
-| EXTRACT AIRPORT ARRAY FROM CACHE
+| EXTRACT AIRPORT ARRAY
 |--------------------------------------------------------------------------
 */
 
@@ -595,11 +763,12 @@ function extractAirportArray(
 ) {
 
     if (
-        Array.isArray(data)
+        Array.isArray(
+            data
+        )
     ) {
 
         return data;
-
     }
 
     if (
@@ -608,18 +777,15 @@ function extractAirportArray(
     ) {
 
         return [];
-
     }
 
     const possibleArrays = [
-
         data.airports,
         data.stations,
         data.features,
         data.data,
         data.results,
         data.items
-
     ];
 
     for (
@@ -627,13 +793,13 @@ function extractAirportArray(
     ) {
 
         if (
-            Array.isArray(value)
+            Array.isArray(
+                value
+            )
         ) {
 
             return value;
-
         }
-
     }
 
     if (
@@ -661,16 +827,12 @@ function extractAirportArray(
                         longitude:
                             feature.geometry
                                 ?.coordinates?.[0]
-
                     };
-
                 }
 
                 return feature;
-
             }
         );
-
     }
 
     const values =
@@ -689,13 +851,10 @@ function extractAirportArray(
     ) {
 
         return values;
-
     }
 
     return [];
-
 }
-
 
 /*
 |--------------------------------------------------------------------------
@@ -716,7 +875,6 @@ async function getAirportStations() {
     ) {
 
         return airportStationsCache;
-
     }
 
     console.log(
@@ -755,7 +913,6 @@ async function getAirportStations() {
             throw new Error(
                 "Airport cache contained no usable airport records"
             );
-
         }
 
         airportStationsCache =
@@ -770,7 +927,9 @@ async function getAirportStations() {
 
         return normalized;
 
-    } catch (error) {
+    } catch (
+        error
+    ) {
 
         console.error(
             "Could not load AviationWeather airport cache:",
@@ -781,20 +940,12 @@ async function getAirportStations() {
             airportStationsCache
         ) {
 
-            console.log(
-                "Using previously loaded airport cache."
-            );
-
             return airportStationsCache;
-
         }
 
         throw error;
-
     }
-
 }
-
 
 /*
 |--------------------------------------------------------------------------
@@ -839,112 +990,58 @@ function airportSearchScore(
 
     if (
         icao === q
-    ) {
-
-        return 10000;
-
-    }
+    ) return 10000;
 
     if (
         iata === q
-    ) {
-
-        return 9500;
-
-    }
+    ) return 9500;
 
     if (
         name === q
-    ) {
-
-        return 9000;
-
-    }
+    ) return 9000;
 
     if (
         city === q
-    ) {
-
-        return 8500;
-
-    }
+    ) return 8500;
 
     if (
         icao.startsWith(q)
-    ) {
-
-        return 8000;
-
-    }
+    ) return 8000;
 
     if (
         iata.startsWith(q)
-    ) {
-
-        return 7800;
-
-    }
+    ) return 7800;
 
     if (
         name.startsWith(q)
-    ) {
-
-        return 7000;
-
-    }
+    ) return 7000;
 
     if (
         city.startsWith(q)
-    ) {
-
-        return 6800;
-
-    }
+    ) return 6800;
 
     if (
         name.includes(q)
-    ) {
-
-        return 6000;
-
-    }
+    ) return 6000;
 
     if (
         city.includes(q)
-    ) {
-
-        return 5800;
-
-    }
+    ) return 5800;
 
     if (
         country.includes(q)
-    ) {
-
-        return 4000;
-
-    }
+    ) return 4000;
 
     if (
         icao.includes(q)
-    ) {
-
-        return 5000;
-
-    }
+    ) return 5000;
 
     if (
         iata.includes(q)
-    ) {
-
-        return 4800;
-
-    }
+    ) return 4800;
 
     return 0;
-
 }
-
 
 /*
 |--------------------------------------------------------------------------
@@ -954,7 +1051,10 @@ function airportSearchScore(
 
 app.get(
     "/api/health",
-    async (req, res) => {
+    async (
+        req,
+        res
+    ) => {
 
         let database =
             "Unavailable";
@@ -968,13 +1068,14 @@ app.get(
             database =
                 "Connected";
 
-        } catch (error) {
+        } catch (
+            error
+        ) {
 
             console.error(
                 "Database health check failed:",
                 error.message
             );
-
         }
 
         res.json({
@@ -985,16 +1086,16 @@ app.get(
             service:
                 "Flight-app backend",
 
+            version:
+                API_VERSION,
+
             database,
 
             timestamp:
                 new Date().toISOString()
-
         });
-
     }
 );
-
 
 /*
 |--------------------------------------------------------------------------
@@ -1004,7 +1105,10 @@ app.get(
 
 app.get(
     "/api/database/test",
-    async (req, res) => {
+    async (
+        req,
+        res
+    ) => {
 
         try {
 
@@ -1022,11 +1126,13 @@ app.get(
                     "Connected",
 
                 serverTime:
-                    result.rows[0].server_time
-
+                    result.rows[0]
+                        .server_time
             });
 
-        } catch (error) {
+        } catch (
+            error
+        ) {
 
             console.error(
                 "Database test failed:",
@@ -1040,33 +1146,23 @@ app.get(
 
                 database:
                     "Unavailable"
-
             });
-
         }
-
     }
 );
-
 
 /*
 |--------------------------------------------------------------------------
 | CHARTS - PUBLIC LIST
 |--------------------------------------------------------------------------
-|
-| Examples:
-|
-| /api/charts
-| /api/charts?icao=EHAM
-| /api/charts?icao=EHAM&provider=LIDO
-| /api/charts?icao=EHAM&provider=LIDO&category=APPROACH
-|
-|--------------------------------------------------------------------------
 */
 
 app.get(
     "/api/charts",
-    async (req, res) => {
+    async (
+        req,
+        res
+    ) => {
 
         const icao =
             String(
@@ -1094,7 +1190,9 @@ app.get(
 
         if (
             icao &&
-            !validICAO(icao)
+            !validICAO(
+                icao
+            )
         ) {
 
             return res.status(400).json({
@@ -1104,9 +1202,7 @@ app.get(
 
                 error:
                     "Invalid ICAO code."
-
             });
-
         }
 
         if (
@@ -1123,9 +1219,7 @@ app.get(
 
                 error:
                     "Invalid chart provider."
-
             });
-
         }
 
         if (
@@ -1142,16 +1236,16 @@ app.get(
 
                 error:
                     "Invalid chart category."
-
             });
-
         }
 
         try {
 
-            const conditions = [];
+            const conditions =
+                [];
 
-            const values = [];
+            const values =
+                [];
 
             let parameter =
                 1;
@@ -1169,7 +1263,6 @@ app.get(
                 );
 
                 parameter++;
-
             }
 
             if (
@@ -1185,7 +1278,6 @@ app.get(
                 );
 
                 parameter++;
-
             }
 
             if (
@@ -1201,7 +1293,6 @@ app.get(
                 );
 
                 parameter++;
-
             }
 
             const where =
@@ -1240,6 +1331,11 @@ app.get(
                     values
                 );
 
+            const baseUrl =
+                getBaseUrl(
+                    req
+                );
+
             const charts =
                 result.rows.map(
                     chart => ({
@@ -1275,8 +1371,7 @@ app.get(
                             chart.created_at,
 
                         imageUrl:
-                            `/api/charts/${chart.id}/image`
-
+                            `${baseUrl}/api/charts/${chart.id}/image`
                     })
                 );
 
@@ -1289,10 +1384,11 @@ app.get(
                     charts.length,
 
                 charts
-
             });
 
-        } catch (error) {
+        } catch (
+            error
+        ) {
 
             console.error(
                 "Chart lookup failed:",
@@ -1309,28 +1405,23 @@ app.get(
 
                 error:
                     "Could not load charts."
-
             });
-
         }
-
     }
 );
-
 
 /*
 |--------------------------------------------------------------------------
 | CHARTS - ADMIN LIST
 |--------------------------------------------------------------------------
-|
-| Public because chart admin authentication has been removed.
-|
-|--------------------------------------------------------------------------
 */
 
 app.get(
     "/api/charts/admin/all",
-    async (req, res) => {
+    async (
+        req,
+        res
+    ) => {
 
         try {
 
@@ -1354,6 +1445,11 @@ app.get(
                     `
                 );
 
+            const baseUrl =
+                getBaseUrl(
+                    req
+                );
+
             const charts =
                 result.rows.map(
                     chart => ({
@@ -1361,8 +1457,7 @@ app.get(
                         ...chart,
 
                         imageUrl:
-                            `/api/charts/${chart.id}/image`
-
+                            `${baseUrl}/api/charts/${chart.id}/image`
                     })
                 );
 
@@ -1375,10 +1470,11 @@ app.get(
                     charts.length,
 
                 charts
-
             });
 
-        } catch (error) {
+        } catch (
+            error
+        ) {
 
             console.error(
                 "Admin chart lookup failed:",
@@ -1395,14 +1491,10 @@ app.get(
 
                 error:
                     "Could not load charts."
-
             });
-
         }
-
     }
 );
-
 
 /*
 |--------------------------------------------------------------------------
@@ -1412,7 +1504,10 @@ app.get(
 
 app.get(
     "/api/charts/:id/image",
-    async (req, res) => {
+    async (
+        req,
+        res
+    ) => {
 
         const id =
             Number(
@@ -1431,9 +1526,7 @@ app.get(
 
                 error:
                     "Invalid chart ID."
-
             });
-
         }
 
         try {
@@ -1463,9 +1556,7 @@ app.get(
 
                     error:
                         "Chart not found."
-
                 });
-
             }
 
             const chart =
@@ -1497,7 +1588,9 @@ app.get(
                 chart.image_data
             );
 
-        } catch (error) {
+        } catch (
+            error
+        ) {
 
             console.error(
                 "Chart image lookup failed:",
@@ -1511,30 +1604,25 @@ app.get(
 
                 error:
                     "Could not load chart image."
-
             });
-
         }
-
     }
 );
-
 
 /*
 |--------------------------------------------------------------------------
 | UPLOAD CHART
 |--------------------------------------------------------------------------
-|
-| Public because chart admin authentication has been removed.
-|
-|--------------------------------------------------------------------------
 */
 
 app.post(
     "/api/charts",
-    (req, res) => {
+    (
+        req,
+        res
+    ) => {
 
-        chartUpload.single(
+        imageUpload.single(
             "image"
         )(
             req,
@@ -1545,11 +1633,6 @@ app.post(
                     error
                 ) {
 
-                    console.error(
-                        "Chart upload middleware error:",
-                        error.message
-                    );
-
                     return res.status(400).json({
 
                         available:
@@ -1557,9 +1640,7 @@ app.post(
 
                         error:
                             error.message
-
                     });
-
                 }
 
                 try {
@@ -1573,16 +1654,16 @@ app.post(
                             .toUpperCase();
 
                     const airportName =
-                        String(
-                            req.body.airport_name ||
-                            ""
-                        ).trim();
+                        cleanString(
+                            req.body.airport_name,
+                            200
+                        );
 
                     const chartName =
-                        String(
-                            req.body.chart_name ||
-                            ""
-                        ).trim();
+                        cleanString(
+                            req.body.chart_name,
+                            200
+                        );
 
                     const chartType =
                         String(
@@ -1601,17 +1682,10 @@ app.post(
                             .toUpperCase();
 
                     const validity =
-                        String(
-                            req.body.validity ||
-                            ""
-                        ).trim();
-
-
-                    /*
-                    |--------------------------------------------------------------------------
-                    | VALIDATION
-                    |--------------------------------------------------------------------------
-                    */
+                        cleanString(
+                            req.body.validity,
+                            200
+                        );
 
                     if (
                         !validICAO(
@@ -1626,9 +1700,7 @@ app.post(
 
                             error:
                                 "A valid 4-letter ICAO code is required."
-
                         });
-
                     }
 
                     if (
@@ -1642,9 +1714,7 @@ app.post(
 
                             error:
                                 "Chart name is required."
-
                         });
-
                     }
 
                     if (
@@ -1660,9 +1730,7 @@ app.post(
 
                             error:
                                 "Invalid chart type."
-
                         });
-
                     }
 
                     if (
@@ -1678,9 +1746,7 @@ app.post(
 
                             error:
                                 "Invalid chart provider."
-
                         });
-
                     }
 
                     if (
@@ -1694,17 +1760,8 @@ app.post(
 
                             error:
                                 "Chart image is required."
-
                         });
-
                     }
-
-
-                    /*
-                    |--------------------------------------------------------------------------
-                    | DATABASE INSERT
-                    |--------------------------------------------------------------------------
-                    */
 
                     const result =
                         await pool.query(
@@ -1766,16 +1823,16 @@ app.post(
 
                                 validity ||
                                     null
-
                             ]
                         );
 
                     const chart =
                         result.rows[0];
 
-                    console.log(
-                        `Chart uploaded: ${airportICAO} - ${chartName}`
-                    );
+                    const baseUrl =
+                        getBaseUrl(
+                            req
+                        );
 
                     return res.status(201).json({
 
@@ -1790,13 +1847,13 @@ app.post(
                             ...chart,
 
                             imageUrl:
-                                `/api/charts/${chart.id}/image`
-
+                                `${baseUrl}/api/charts/${chart.id}/image`
                         }
-
                     });
 
-                } catch (databaseError) {
+                } catch (
+                    databaseError
+                ) {
 
                     console.error(
                         "Could not upload chart:",
@@ -1810,31 +1867,25 @@ app.post(
 
                         error:
                             "Could not save chart."
-
                     });
-
                 }
-
             }
         );
-
     }
 );
-
 
 /*
 |--------------------------------------------------------------------------
 | DELETE CHART
 |--------------------------------------------------------------------------
-|
-| Public because chart admin authentication has been removed.
-|
-|--------------------------------------------------------------------------
 */
 
 app.delete(
     "/api/charts/:id",
-    async (req, res) => {
+    async (
+        req,
+        res
+    ) => {
 
         const id =
             Number(
@@ -1853,9 +1904,7 @@ app.delete(
 
                 error:
                     "Invalid chart ID."
-
             });
-
         }
 
         try {
@@ -1884,14 +1933,8 @@ app.delete(
 
                     error:
                         "Chart not found."
-
                 });
-
             }
-
-            console.log(
-                `Chart deleted: ${result.rows[0].airport_icao} - ${result.rows[0].chart_name}`
-            );
 
             return res.json({
 
@@ -1903,10 +1946,11 @@ app.delete(
 
                 chart:
                     result.rows[0]
-
             });
 
-        } catch (error) {
+        } catch (
+            error
+        ) {
 
             console.error(
                 "Could not delete chart:",
@@ -1920,14 +1964,10 @@ app.delete(
 
                 error:
                     "Could not delete chart."
-
             });
-
         }
-
     }
 );
-
 
 /*
 |--------------------------------------------------------------------------
@@ -1937,11 +1977,15 @@ app.delete(
 
 app.get(
     "/api/simbrief/latest",
-    async (req, res) => {
+    async (
+        req,
+        res
+    ) => {
 
         const username =
             String(
-                req.query.username || ""
+                req.query.username ||
+                ""
             ).trim();
 
         if (
@@ -1955,28 +1999,11 @@ app.get(
 
                 error:
                     "SimBrief username is required."
-
             });
-
         }
 
         if (
-            username.length > 80
-        ) {
-
-            return res.status(400).json({
-
-                available:
-                    false,
-
-                error:
-                    "Invalid SimBrief username."
-
-            });
-
-        }
-
-        if (
+            username.length > 80 ||
             !/^[a-zA-Z0-9_.-]+$/.test(
                 username
             )
@@ -1989,9 +2016,7 @@ app.get(
 
                 error:
                     "Invalid SimBrief username."
-
             });
-
         }
 
         try {
@@ -2014,7 +2039,8 @@ app.get(
 
             if (
                 !data ||
-                typeof data !== "object"
+                typeof data !==
+                    "object"
             ) {
 
                 return res.status(502).json({
@@ -2024,9 +2050,7 @@ app.get(
 
                     error:
                         "SimBrief returned an empty or invalid response."
-
                 });
-
             }
 
             return res.json({
@@ -2041,10 +2065,11 @@ app.get(
 
                 ofp:
                     data
-
             });
 
-        } catch (error) {
+        } catch (
+            error
+        ) {
 
             console.error(
                 "SimBrief OFP fetch failed:",
@@ -2058,185 +2083,10 @@ app.get(
 
                 error:
                     "SimBrief did not return a valid latest OFP."
-
             });
-
         }
-
     }
 );
-
-
-/*
-app.get("/api/weather/:icao", async (req, res) => {
-    const icao = String(req.params.icao || "")
-        .trim()
-        .toUpperCase();
-
-    if (!validICAO(icao)) {
-        return res.status(400).json({
-            available: false,
-            icao,
-            source: "unavailable",
-            message: "Invalid ICAO code"
-        });
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | TRY LIVE METAR
-    |--------------------------------------------------------------------------
-    */
-
-    try {
-        const url =
-            "https://aviationweather.gov/api/data/metar" +
-            `?ids=${encodeURIComponent(icao)}` +
-            "&format=json";
-
-        const data = await fetchJSON(url);
-
-        if (Array.isArray(data) && data.length > 0) {
-            const metar = data[0];
-
-            /*
-             * Save the complete METAR response in the database.
-             * This allows us to use it when the live API is unavailable.
-             */
-            try {
-                await pool.query(
-                    `
-                    INSERT INTO weather_cache
-                    (
-                        icao,
-                        metar,
-                        raw_metar,
-                        fetched_at
-                    )
-                    VALUES ($1, $2, $3, NOW())
-                    `,
-                    [
-                        icao,
-                        metar.rawOb ||
-                            metar.raw_text ||
-                            null,
-                        JSON.stringify(metar)
-                    ]
-                );
-            } catch (databaseError) {
-                console.error(
-                    "Could not cache METAR:",
-                    databaseError.message
-                );
-            }
-
-            return res.json({
-                available: true,
-                source: "live",
-                icao,
-                metar
-            });
-        }
-
-        console.warn(
-            `No live METAR returned for ${icao}`
-        );
-    } catch (error) {
-        console.error(
-            `Live METAR request failed for ${icao}:`,
-            error.message
-        );
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | LIVE FAILED → TRY DATABASE CACHE
-    |--------------------------------------------------------------------------
-    */
-
-    try {
-        const cached = await pool.query(
-            `
-            SELECT
-                icao,
-                metar,
-                raw_metar,
-                fetched_at
-            FROM weather_cache
-            WHERE icao = $1
-            ORDER BY fetched_at DESC
-            LIMIT 1
-            `,
-            [icao]
-        );
-
-        if (cached.rows.length > 0) {
-            const row = cached.rows[0];
-
-            let metar = null;
-
-            /*
-             * raw_metar contains the complete JSON object.
-             */
-            if (row.raw_metar) {
-                try {
-                    metar =
-                        typeof row.raw_metar === "string"
-                            ? JSON.parse(row.raw_metar)
-                            : row.raw_metar;
-                } catch (parseError) {
-                    console.error(
-                        "Could not parse cached METAR:",
-                        parseError.message
-                    );
-                }
-            }
-
-            /*
-             * If raw_metar somehow isn't available,
-             * create a minimal METAR object from the stored text.
-             */
-            if (!metar && row.metar) {
-                metar = {
-                    rawOb: row.metar,
-                    raw_text: row.metar
-                };
-            }
-
-            if (metar) {
-                console.log(
-                    `Using cached METAR for ${icao}`
-                );
-
-                return res.json({
-                    available: true,
-                    source: "cached",
-                    icao,
-                    cachedAt: row.fetched_at,
-                    metar
-                });
-            }
-        }
-    } catch (databaseError) {
-        console.error(
-            `Could not read cached METAR for ${icao}:`,
-            databaseError.message
-        );
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | NOTHING AVAILABLE
-    |--------------------------------------------------------------------------
-    */
-
-    return res.json({
-        available: false,
-        source: "unavailable",
-        icao,
-        message: "No METAR available"
-    });
-});
 
 /*
 |--------------------------------------------------------------------------
@@ -2246,35 +2096,47 @@ app.get("/api/weather/:icao", async (req, res) => {
 
 app.get(
     "/api/weather/:icao",
-    async (req, res) => {
+    async (
+        req,
+        res
+    ) => {
 
         const icao =
-            String(req.params.icao || "")
+            String(
+                req.params.icao ||
+                ""
+            )
                 .trim()
                 .toUpperCase();
 
-        if (!validICAO(icao)) {
+        if (
+            !validICAO(
+                icao
+            )
+        ) {
 
             return res.status(400).json({
-                available: false,
+
+                available:
+                    false,
+
                 icao,
-                source: "unavailable",
-                message: "Invalid ICAO code"
+
+                source:
+                    "unavailable",
+
+                message:
+                    "Invalid ICAO code"
             });
-
         }
-
-        /*
-        |--------------------------------------------------------------------------
-        | LIVE METAR
-        |--------------------------------------------------------------------------
-        */
 
         try {
 
             const url =
                 "https://aviationweather.gov/api/data/metar" +
-                `?ids=${encodeURIComponent(icao)}` +
+                `?ids=${encodeURIComponent(
+                    icao
+                )}` +
                 "&format=json";
 
             console.log(
@@ -2282,20 +2144,19 @@ app.get(
             );
 
             const data =
-                await fetchJSON(url);
+                await fetchJSON(
+                    url
+                );
 
             if (
-                Array.isArray(data) &&
+                Array.isArray(
+                    data
+                ) &&
                 data.length > 0
             ) {
 
-                const metar = data[0];
-
-                /*
-                |--------------------------------------------------------------------------
-                | CACHE METAR
-                |--------------------------------------------------------------------------
-                */
+                const metar =
+                    data[0];
 
                 try {
 
@@ -2317,6 +2178,7 @@ app.get(
                         )
                         `,
                         [
+
                             icao,
 
                             metar.rawOb ||
@@ -2324,55 +2186,45 @@ app.get(
                                 metar.rawObText ||
                                 null,
 
-                            JSON.stringify(metar)
+                            JSON.stringify(
+                                metar
+                            )
                         ]
                     );
 
-                } catch (databaseError) {
+                } catch (
+                    databaseError
+                ) {
 
                     console.error(
                         `Could not cache METAR for ${icao}:`,
                         databaseError.message
                     );
-
                 }
-
-                console.log(
-                    `Live METAR found for ${icao}.`
-                );
 
                 return res.json({
 
-                    available: true,
+                    available:
+                        true,
 
-                    source: "live",
+                    source:
+                        "live",
 
                     icao,
 
                     metar
-
                 });
-
             }
 
-            console.warn(
-                `No live METAR returned for ${icao}.`
-            );
-
-        } catch (error) {
+        } catch (
+            error
+        ) {
 
             console.error(
                 `Live METAR request failed for ${icao}:`,
                 error.message
             );
-
         }
-
-        /*
-        |--------------------------------------------------------------------------
-        | DATABASE CACHE FALLBACK
-        |--------------------------------------------------------------------------
-        */
 
         try {
 
@@ -2400,35 +2252,22 @@ app.get(
                 const row =
                     cached.rows[0];
 
-                let metar = null;
-
-                try {
-
-                    metar =
-                        typeof row.raw_metar === "string"
-                            ? JSON.parse(row.raw_metar)
-                            : row.raw_metar;
-
-                } catch (parseError) {
-
-                    console.error(
-                        `Could not parse cached METAR for ${icao}:`,
-                        parseError.message
+                const metar =
+                    parseJsonValue(
+                        row.raw_metar
                     );
 
-                }
-
-                if (metar) {
-
-                    console.log(
-                        `Using cached METAR for ${icao}.`
-                    );
+                if (
+                    metar
+                ) {
 
                     return res.json({
 
-                        available: true,
+                        available:
+                            true,
 
-                        source: "cached",
+                        source:
+                            "cached",
 
                         icao,
 
@@ -2436,43 +2275,35 @@ app.get(
                             row.fetched_at,
 
                         metar
-
                     });
-
                 }
-
             }
 
-        } catch (databaseError) {
+        } catch (
+            databaseError
+        ) {
 
             console.error(
-                `Could not read cached METAR for ${icao}:`,
+                "Could not read cached METAR:",
                 databaseError.message
             );
-
         }
-
-        /*
-        |--------------------------------------------------------------------------
-        | NOTHING AVAILABLE
-        |--------------------------------------------------------------------------
-        */
 
         return res.json({
 
-            available: false,
+            available:
+                false,
 
-            source: "unavailable",
+            source:
+                "unavailable",
 
             icao,
 
-            message: "No METAR available"
-
+            message:
+                "No METAR available"
         });
-
     }
 );
-
 
 /*
 |--------------------------------------------------------------------------
@@ -2482,59 +2313,60 @@ app.get(
 
 app.get(
     "/api/weather/:icao/taf",
-    async (req, res) => {
+    async (
+        req,
+        res
+    ) => {
 
         const icao =
-            String(req.params.icao || "")
+            String(
+                req.params.icao ||
+                ""
+            )
                 .trim()
                 .toUpperCase();
 
-        if (!validICAO(icao)) {
+        if (
+            !validICAO(
+                icao
+            )
+        ) {
 
             return res.status(400).json({
 
-                available: false,
+                available:
+                    false,
 
                 icao,
 
-                message: "Invalid ICAO code"
-
+                message:
+                    "Invalid ICAO code"
             });
-
         }
-
-        /*
-        |--------------------------------------------------------------------------
-        | LIVE TAF
-        |--------------------------------------------------------------------------
-        */
 
         try {
 
             const url =
                 "https://aviationweather.gov/api/data/taf" +
-                `?ids=${encodeURIComponent(icao)}` +
+                `?ids=${encodeURIComponent(
+                    icao
+                )}` +
                 "&format=json";
 
-            console.log(
-                `Fetching live TAF for ${icao}...`
-            );
-
             const data =
-                await fetchJSON(url);
+                await fetchJSON(
+                    url
+                );
 
             if (
-                Array.isArray(data) &&
+                Array.isArray(
+                    data
+                ) &&
                 data.length > 0
             ) {
 
-                const taf = data[0];
-
-                /*
-                |--------------------------------------------------------------------------
-                | CACHE TAF
-                |--------------------------------------------------------------------------
-                */
+                const taf =
+                    data[0];
 
                 try {
 
@@ -2556,6 +2388,7 @@ app.get(
                         )
                         `,
                         [
+
                             icao,
 
                             taf.rawTAF ||
@@ -2563,55 +2396,45 @@ app.get(
                                 taf.raw_text ||
                                 null,
 
-                            JSON.stringify(taf)
+                            JSON.stringify(
+                                taf
+                            )
                         ]
                     );
 
-                } catch (databaseError) {
+                } catch (
+                    databaseError
+                ) {
 
                     console.error(
-                        `Could not cache TAF for ${icao}:`,
+                        "Could not cache TAF:",
                         databaseError.message
                     );
-
                 }
-
-                console.log(
-                    `Live TAF found for ${icao}.`
-                );
 
                 return res.json({
 
-                    available: true,
+                    available:
+                        true,
 
-                    source: "live",
+                    source:
+                        "live",
 
                     icao,
 
                     taf
-
                 });
-
             }
 
-            console.warn(
-                `No live TAF returned for ${icao}.`
-            );
-
-        } catch (error) {
+        } catch (
+            error
+        ) {
 
             console.error(
                 `Live TAF request failed for ${icao}:`,
                 error.message
             );
-
         }
-
-        /*
-        |--------------------------------------------------------------------------
-        | DATABASE CACHE FALLBACK
-        |--------------------------------------------------------------------------
-        */
 
         try {
 
@@ -2639,35 +2462,22 @@ app.get(
                 const row =
                     cached.rows[0];
 
-                let taf = null;
-
-                try {
-
-                    taf =
-                        typeof row.raw_taf === "string"
-                            ? JSON.parse(row.raw_taf)
-                            : row.raw_taf;
-
-                } catch (parseError) {
-
-                    console.error(
-                        `Could not parse cached TAF for ${icao}:`,
-                        parseError.message
+                const taf =
+                    parseJsonValue(
+                        row.raw_taf
                     );
 
-                }
-
-                if (taf) {
-
-                    console.log(
-                        `Using cached TAF for ${icao}.`
-                    );
+                if (
+                    taf
+                ) {
 
                     return res.json({
 
-                        available: true,
+                        available:
+                            true,
 
-                        source: "cached",
+                        source:
+                            "cached",
 
                         icao,
 
@@ -2675,43 +2485,35 @@ app.get(
                             row.fetched_at,
 
                         taf
-
                     });
-
                 }
-
             }
 
-        } catch (databaseError) {
+        } catch (
+            error
+        ) {
 
             console.error(
-                `Could not read cached TAF for ${icao}:`,
-                databaseError.message
+                "Could not read cached TAF:",
+                error.message
             );
-
         }
-
-        /*
-        |--------------------------------------------------------------------------
-        | NOTHING AVAILABLE
-        |--------------------------------------------------------------------------
-        */
 
         return res.json({
 
-            available: false,
+            available:
+                false,
 
-            source: "unavailable",
+            source:
+                "unavailable",
 
             icao,
 
-            message: "No TAF available"
-
+            message:
+                "No TAF available"
         });
-
     }
 );
-
 
 /*
 |--------------------------------------------------------------------------
@@ -2721,12 +2523,18 @@ app.get(
 
 app.get(
     "/api/weather/:icao/cache",
-    async (req, res) => {
+    async (
+        req,
+        res
+    ) => {
 
         const icao =
-            req.params.icao
-                .toUpperCase()
-                .trim();
+            String(
+                req.params.icao ||
+                ""
+            )
+                .trim()
+                .toUpperCase();
 
         if (
             !validICAO(
@@ -2741,9 +2549,7 @@ app.get(
 
                 message:
                     "Invalid ICAO code"
-
             });
-
         }
 
         try {
@@ -2779,43 +2585,38 @@ app.get(
 
                     message:
                         "No cached data available"
-
                 });
-
             }
 
-            res.json({
+            return res.json({
 
                 available:
                     true,
 
                 data:
                     result.rows[0]
-
             });
 
-        } catch (error) {
+        } catch (
+            error
+        ) {
 
             console.error(
                 "Cached weather lookup failed:",
                 error.message
             );
 
-            res.status(503).json({
+            return res.status(503).json({
 
                 available:
                     false,
 
                 message:
                     "Unavailable"
-
             });
-
         }
-
     }
 );
-
 
 /*
 |--------------------------------------------------------------------------
@@ -2825,7 +2626,10 @@ app.get(
 
 app.get(
     "/api/airports/search",
-    async (req, res) => {
+    async (
+        req,
+        res
+    ) => {
 
         const query =
             String(
@@ -2851,9 +2655,7 @@ app.get(
 
                 airports:
                     []
-
             });
-
         }
 
         if (
@@ -2872,16 +2674,10 @@ app.get(
 
                 airports:
                     []
-
             });
-
         }
 
         try {
-
-            console.log(
-                `Airport search: "${query}"`
-            );
 
             let directResults =
                 [];
@@ -2928,24 +2724,16 @@ app.get(
                                 )
                                 .filter(Boolean);
 
-                    } else if (
-                        airportData &&
-                        typeof airportData ===
-                            "object"
-                    ) {
-
-                        const extracted =
-                            extractAirportArray(
-                                airportData
-                            );
+                    } else {
 
                         directResults =
-                            extracted
+                            extractAirportArray(
+                                airportData
+                            )
                                 .map(
                                     normalizeAirport
                                 )
                                 .filter(Boolean);
-
                     }
 
                 } catch (
@@ -2956,9 +2744,7 @@ app.get(
                         "Direct airport API lookup failed:",
                         directError.message
                     );
-
                 }
-
             }
 
             if (
@@ -2977,7 +2763,6 @@ app.get(
                                         airport,
                                         query
                                     )
-
                             })
                         )
                         .sort(
@@ -2998,10 +2783,7 @@ app.get(
                                     ...cleanAirport
                                 } = airport;
 
-                                return {
-                                    ...cleanAirport
-                                };
-
+                                return cleanAirport;
                             }
                         );
 
@@ -3017,9 +2799,7 @@ app.get(
 
                     airports:
                         sorted
-
                 });
-
             }
 
             const stations =
@@ -3037,7 +2817,6 @@ app.get(
                                     airport,
                                     query
                                 )
-
                         })
                     )
                     .filter(
@@ -3056,25 +2835,17 @@ app.get(
                                     b.score -
                                     a.score
                                 );
-
                             }
 
-                            const aName =
-                                String(
-                                    a.airport.name ||
-                                    ""
-                                );
-
-                            const bName =
+                            return String(
+                                a.airport.name ||
+                                ""
+                            ).localeCompare(
                                 String(
                                     b.airport.name ||
                                     ""
-                                );
-
-                            return aName.localeCompare(
-                                bName
+                                )
                             );
-
                         }
                     )
                     .slice(
@@ -3112,15 +2883,9 @@ app.get(
 
                                 elevation_ft:
                                     airport.elevation_ft
-
                             };
-
                         }
                     );
-
-            console.log(
-                `Airport search "${query}" returned ${matches.length} result(s).`
-            );
 
             return res.json({
 
@@ -3134,10 +2899,11 @@ app.get(
 
                 airports:
                     matches
-
             });
 
-        } catch (error) {
+        } catch (
+            error
+        ) {
 
             console.error(
                 "Airport search failed:",
@@ -3159,14 +2925,10 @@ app.get(
 
                 error:
                     "Airport search is temporarily unavailable."
-
             });
-
         }
-
     }
 );
-
 
 /*
 |--------------------------------------------------------------------------
@@ -3176,12 +2938,18 @@ app.get(
 
 app.get(
     "/api/airports/:icao",
-    async (req, res) => {
+    async (
+        req,
+        res
+    ) => {
 
         const icao =
-            req.params.icao
-                .toUpperCase()
-                .trim();
+            String(
+                req.params.icao ||
+                ""
+            )
+                .trim()
+                .toUpperCase();
 
         if (
             !validICAO(
@@ -3196,48 +2964,56 @@ app.get(
 
                 message:
                     "Invalid ICAO code"
-
             });
-
         }
 
         try {
 
-            const airportResult =
-                await pool.query(
-                    `
-                    SELECT
-                        icao,
-                        name,
-                        iata,
-                        latitude,
-                        longitude,
-                        elevation_ft,
-                        country,
-                        city,
-                        raw_data,
-                        updated_at
-                    FROM airport_cache
-                    WHERE icao = $1
-                    LIMIT 1
-                    `,
-                    [icao]
-                );
+            try {
 
-            if (
-                airportResult.rows.length > 0
+                const airportResult =
+                    await pool.query(
+                        `
+                        SELECT
+                            icao,
+                            name,
+                            iata,
+                            latitude,
+                            longitude,
+                            elevation_ft,
+                            country,
+                            city,
+                            raw_data,
+                            updated_at
+                        FROM airport_cache
+                        WHERE icao = $1
+                        LIMIT 1
+                        `,
+                        [icao]
+                    );
+
+                if (
+                    airportResult.rows.length > 0
+                ) {
+
+                    return res.json({
+
+                        available:
+                            true,
+
+                        airport:
+                            airportResult.rows[0]
+                    });
+                }
+
+            } catch (
+                cacheError
             ) {
 
-                return res.json({
-
-                    available:
-                        true,
-
-                    airport:
-                        airportResult.rows[0]
-
-                });
-
+                console.warn(
+                    "Airport database cache unavailable:",
+                    cacheError.message
+                );
             }
 
             try {
@@ -3255,7 +3031,9 @@ app.get(
                     );
 
                 if (
-                    Array.isArray(data) &&
+                    Array.isArray(
+                        data
+                    ) &&
                     data.length > 0
                 ) {
 
@@ -3268,52 +3046,127 @@ app.get(
                         airport
                     ) {
 
+                        const normalized = {
+
+                            icao:
+                                airport.icao ||
+                                icao,
+
+                            name:
+                                airport.name ||
+                                "--",
+
+                            iata:
+                                airport.iata ||
+                                null,
+
+                            latitude:
+                                airport.latitude,
+
+                            longitude:
+                                airport.longitude,
+
+                            elevation_ft:
+                                airport.elevation_ft,
+
+                            country:
+                                airport.country,
+
+                            city:
+                                airport.city,
+
+                            raw_data:
+                                airport.raw_data,
+
+                            updated_at:
+                                new Date()
+                        };
+
+                        try {
+
+                            await pool.query(
+                                `
+                                INSERT INTO airport_cache
+                                (
+                                    icao,
+                                    name,
+                                    iata,
+                                    latitude,
+                                    longitude,
+                                    elevation_ft,
+                                    country,
+                                    city,
+                                    raw_data,
+                                    updated_at
+                                )
+                                VALUES
+                                (
+                                    $1,
+                                    $2,
+                                    $3,
+                                    $4,
+                                    $5,
+                                    $6,
+                                    $7,
+                                    $8,
+                                    $9,
+                                    NOW()
+                                )
+                                ON CONFLICT (icao)
+                                DO UPDATE SET
+                                    name = EXCLUDED.name,
+                                    iata = EXCLUDED.iata,
+                                    latitude = EXCLUDED.latitude,
+                                    longitude = EXCLUDED.longitude,
+                                    elevation_ft = EXCLUDED.elevation_ft,
+                                    country = EXCLUDED.country,
+                                    city = EXCLUDED.city,
+                                    raw_data = EXCLUDED.raw_data,
+                                    updated_at = NOW()
+                                `,
+                                [
+
+                                    normalized.icao,
+
+                                    normalized.name,
+
+                                    normalized.iata,
+
+                                    normalized.latitude,
+
+                                    normalized.longitude,
+
+                                    normalized.elevation_ft,
+
+                                    normalized.country,
+
+                                    normalized.city,
+
+                                    JSON.stringify(
+                                        normalized.raw_data
+                                    )
+                                ]
+                            );
+
+                        } catch (
+                            databaseError
+                        ) {
+
+                            console.warn(
+                                "Could not cache airport:",
+                                databaseError.message
+                            );
+                        }
+
                         return res.json({
 
                             available:
                                 true,
 
-                            airport: {
-
-                                icao:
-                                    airport.icao ||
-                                    icao,
-
-                                name:
-                                    airport.name ||
-                                    "--",
-
-                                iata:
-                                    airport.iata ||
-                                    null,
-
-                                latitude:
-                                    airport.latitude,
-
-                                longitude:
-                                    airport.longitude,
-
-                                elevation_ft:
-                                    airport.elevation_ft,
-
-                                country:
-                                    airport.country,
-
-                                city:
-                                    airport.city,
-
-                                raw_data:
-                                    airport.raw_data,
-
-                                updated_at:
-                                    new Date()
-
-                            }
-
+                            airport:
+                                normalized
                         });
-
                     }
-
                 }
 
             } catch (
@@ -3324,7 +3177,6 @@ app.get(
                     `Airport API lookup for ${icao} failed:`,
                     airportApiError.message
                 );
-
             }
 
             try {
@@ -3336,8 +3188,10 @@ app.get(
                     stations.find(
                         item =>
                             String(
-                                item.icao || ""
-                            ).toUpperCase() ===
+                                item.icao ||
+                                ""
+                            )
+                                .toUpperCase() ===
                             icao
                     );
 
@@ -3383,11 +3237,8 @@ app.get(
 
                             updated_at:
                                 new Date()
-
                         }
-
                     });
-
                 }
 
             } catch (
@@ -3398,139 +3249,22 @@ app.get(
                     "Airport station cache lookup failed:",
                     stationError.message
                 );
-
             }
-
-            const weatherResult =
-                await pool.query(
-                    `
-                    SELECT
-                        raw_metar,
-                        fetched_at
-                    FROM weather_cache
-                    WHERE icao = $1
-                      AND raw_metar IS NOT NULL
-                    ORDER BY fetched_at DESC
-                    LIMIT 1
-                    `,
-                    [icao]
-                );
-
-            if (
-                weatherResult.rows.length === 0
-            ) {
-
-                return res.json({
-
-                    available:
-                        false,
-
-                    icao,
-
-                    message:
-                        "Unavailable"
-
-                });
-
-            }
-
-            let metarData;
-
-            try {
-
-                metarData =
-                    typeof weatherResult.rows[0].raw_metar ===
-                    "string"
-
-                        ? JSON.parse(
-                            weatherResult.rows[0].raw_metar
-                        )
-
-                        : weatherResult.rows[0].raw_metar;
-
-            } catch (
-                parseError
-            ) {
-
-                console.error(
-                    "Could not parse cached METAR:",
-                    parseError.message
-                );
-
-                return res.json({
-
-                    available:
-                        false,
-
-                    icao,
-
-                    message:
-                        "Unavailable"
-
-                });
-
-            }
-
-            const airport = {
-
-                icao:
-                    metarData.icaoId ||
-                    icao,
-
-                name:
-                    metarData.name ||
-                    "--",
-
-                iata:
-                    metarData.iata ||
-                    null,
-
-                latitude:
-                    metarData.lat != null
-                        ? Number(
-                            metarData.lat
-                        )
-                        : null,
-
-                longitude:
-                    metarData.lon != null
-                        ? Number(
-                            metarData.lon
-                        )
-                        : null,
-
-                elevation_ft:
-                    metarData.elev != null
-                        ? Number(
-                            metarData.elev
-                        )
-                        : null,
-
-                country:
-                    null,
-
-                city:
-                    null,
-
-                raw_data:
-                    metarData,
-
-                updated_at:
-                    weatherResult.rows[0]
-                        .fetched_at
-
-            };
 
             return res.json({
 
                 available:
-                    true,
+                    false,
 
-                airport
+                icao,
 
+                message:
+                    "Unavailable"
             });
 
-        } catch (error) {
+        } catch (
+            error
+        ) {
 
             console.error(
                 "Airport information lookup failed:",
@@ -3546,14 +3280,10 @@ app.get(
 
                 message:
                     "Unavailable"
-
             });
-
         }
-
     }
 );
-
 
 /*
 |--------------------------------------------------------------------------
@@ -3563,7 +3293,10 @@ app.get(
 
 app.get(
     "/api/plans",
-    async (req, res) => {
+    async (
+        req,
+        res
+    ) => {
 
         try {
 
@@ -3576,38 +3309,35 @@ app.get(
                     `
                 );
 
-            res.json({
+            return res.json({
 
                 available:
                     true,
 
                 plans:
                     result.rows
-
             });
 
-        } catch (error) {
+        } catch (
+            error
+        ) {
 
             console.error(
                 "Plans lookup failed:",
                 error.message
             );
 
-            res.status(503).json({
+            return res.status(503).json({
 
                 available:
                     false,
 
                 plans:
                     []
-
             });
-
         }
-
     }
 );
-
 
 /*
 |--------------------------------------------------------------------------
@@ -3617,7 +3347,10 @@ app.get(
 
 app.post(
     "/api/plans",
-    async (req, res) => {
+    async (
+        req,
+        res
+    ) => {
 
         const {
 
@@ -3643,7 +3376,9 @@ app.post(
 
         if (
             !name ||
-            String(name).trim() === ""
+            String(
+                name
+            ).trim() === ""
         ) {
 
             return res.status(400).json({
@@ -3653,9 +3388,7 @@ app.post(
 
                 error:
                     "Plan name is required"
-
             });
-
         }
 
         if (
@@ -3676,9 +3409,7 @@ app.post(
 
                 error:
                     "Invalid departure ICAO"
-
             });
-
         }
 
         if (
@@ -3699,9 +3430,7 @@ app.post(
 
                 error:
                     "Invalid arrival ICAO"
-
             });
-
         }
 
         try {
@@ -3737,9 +3466,10 @@ app.post(
                     `,
                     [
 
-                        String(
-                            name
-                        ).trim(),
+                        cleanString(
+                            name,
+                            200
+                        ),
 
                         departure_icao
                             ? String(
@@ -3758,11 +3488,10 @@ app.post(
                             : null,
 
                         aircraft_icao
-                            ? String(
-                                aircraft_icao
+                            ? cleanString(
+                                aircraft_icao,
+                                50
                             )
-                                .toUpperCase()
-                                .trim()
                             : null,
 
                         cruise_altitude
@@ -3772,9 +3501,10 @@ app.post(
                             : null,
 
                         route
-                            ? String(
-                                route
-                            ).trim()
+                            ? cleanString(
+                                route,
+                                5000
+                            )
                             : null,
 
                         distance_nm
@@ -3790,11 +3520,11 @@ app.post(
                             : null,
 
                         simbrief_ofp_id
-                            ? String(
-                                simbrief_ofp_id
-                            ).trim()
+                            ? cleanString(
+                                simbrief_ofp_id,
+                                100
+                            )
                             : null
-
                     ]
                 );
 
@@ -3805,10 +3535,11 @@ app.post(
 
                 plan:
                     result.rows[0]
-
             });
 
-        } catch (error) {
+        } catch (
+            error
+        ) {
 
             console.error(
                 "Could not save plan:",
@@ -3822,14 +3553,10 @@ app.post(
 
                 error:
                     "Could not save plan"
-
             });
-
         }
-
     }
 );
-
 
 /*
 |--------------------------------------------------------------------------
@@ -3839,7 +3566,10 @@ app.post(
 
 app.delete(
     "/api/plans/:id",
-    async (req, res) => {
+    async (
+        req,
+        res
+    ) => {
 
         const id =
             Number(
@@ -3847,7 +3577,8 @@ app.delete(
             );
 
         if (
-            !Number.isInteger(id)
+            !Number.isInteger(id) ||
+            id <= 0
         ) {
 
             return res.status(400).json({
@@ -3857,9 +3588,7 @@ app.delete(
 
                 error:
                     "Invalid plan ID"
-
             });
-
         }
 
         try {
@@ -3885,9 +3614,7 @@ app.delete(
 
                     error:
                         "Plan not found"
-
                 });
-
             }
 
             return res.json({
@@ -3899,10 +3626,11 @@ app.delete(
                     true,
 
                 id
-
             });
 
-        } catch (error) {
+        } catch (
+            error
+        ) {
 
             console.error(
                 "Could not delete plan:",
@@ -3916,28 +3644,1551 @@ app.delete(
 
                 error:
                     "Could not delete plan"
-
             });
-
         }
-
     }
 );
 
+/*
+|--------------------------------------------------------------------------
+| CHECKLISTS
+|--------------------------------------------------------------------------
+| AIRCRAFT TYPES
+|--------------------------------------------------------------------------
+|
+| These are dynamic.
+|
+| You do NOT have to edit server.js to add a new aircraft.
+|
+|--------------------------------------------------------------------------
+*/
+
+/*
+|--------------------------------------------------------------------------
+| GET AIRCRAFT TYPES
+|--------------------------------------------------------------------------
+*/
+
+app.get(
+    "/api/aircraft",
+    async (
+        req,
+        res
+    ) => {
+
+        try {
+
+            const result =
+                await pool.query(
+                    `
+                    SELECT
+                        id,
+                        name,
+                        manufacturer,
+                        model,
+                        code,
+                        description,
+                        image_url,
+                        created_at
+                    FROM aircraft_types
+                    ORDER BY
+                        manufacturer ASC NULLS LAST,
+                        name ASC
+                    `
+                );
+
+            return res.json({
+
+                available:
+                    true,
+
+                count:
+                    result.rows.length,
+
+                aircraft:
+                    result.rows
+            });
+
+        } catch (
+            error
+        ) {
+
+            console.error(
+                "Aircraft lookup failed:",
+                error.message
+            );
+
+            return res.status(503).json({
+
+                available:
+                    false,
+
+                aircraft:
+                    [],
+
+                error:
+                    "Could not load aircraft types."
+            });
+        }
+    }
+);
+
+/*
+|--------------------------------------------------------------------------
+| GET SINGLE AIRCRAFT TYPE
+|--------------------------------------------------------------------------
+*/
+
+app.get(
+    "/api/aircraft/:id",
+    async (
+        req,
+        res
+    ) => {
+
+        const id =
+            Number(
+                req.params.id
+            );
+
+        if (
+            !Number.isInteger(id) ||
+            id <= 0
+        ) {
+
+            return res.status(400).json({
+
+                available:
+                    false,
+
+                error:
+                    "Invalid aircraft ID."
+            });
+        }
+
+        try {
+
+            const result =
+                await pool.query(
+                    `
+                    SELECT
+                        id,
+                        name,
+                        manufacturer,
+                        model,
+                        code,
+                        description,
+                        image_url,
+                        created_at
+                    FROM aircraft_types
+                    WHERE id = $1
+                    LIMIT 1
+                    `,
+                    [id]
+                );
+
+            if (
+                result.rows.length === 0
+            ) {
+
+                return res.status(404).json({
+
+                    available:
+                        false,
+
+                    error:
+                        "Aircraft type not found."
+                });
+            }
+
+            return res.json({
+
+                available:
+                    true,
+
+                aircraft:
+                    result.rows[0]
+            });
+
+        } catch (
+            error
+        ) {
+
+            console.error(
+                "Aircraft lookup failed:",
+                error.message
+            );
+
+            return res.status(503).json({
+
+                available:
+                    false,
+
+                error:
+                    "Could not load aircraft type."
+            });
+        }
+    }
+);
+
+/*
+|--------------------------------------------------------------------------
+| CREATE AIRCRAFT TYPE
+|--------------------------------------------------------------------------
+|
+| Example:
+|
+| POST /api/aircraft
+|
+| {
+|   "name": "Airbus A320",
+|   "manufacturer": "Airbus",
+|   "model": "A320",
+|   "code": "A320",
+|   "description": "Airbus A320 family"
+| }
+|
+|--------------------------------------------------------------------------
+*/
+
+app.post(
+    "/api/aircraft",
+    async (
+        req,
+        res
+    ) => {
+
+        const name =
+            cleanString(
+                req.body.name,
+                150
+            );
+
+        const manufacturer =
+            cleanString(
+                req.body.manufacturer,
+                100
+            );
+
+        const model =
+            cleanString(
+                req.body.model,
+                100
+            );
+
+        const code =
+            cleanString(
+                req.body.code,
+                30
+            )
+                .toUpperCase();
+
+        const description =
+            cleanString(
+                req.body.description,
+                1000
+            );
+
+        const imageUrl =
+            cleanString(
+                req.body.image_url,
+                500
+            );
+
+        if (
+            !validAircraftName(
+                name
+            )
+        ) {
+
+            return res.status(400).json({
+
+                available:
+                    false,
+
+                error:
+                    "Aircraft name is required."
+            });
+        }
+
+        if (
+            !validAircraftCode(
+                code
+            )
+        ) {
+
+            return res.status(400).json({
+
+                available:
+                    false,
+
+                error:
+                    "Invalid aircraft code."
+            });
+        }
+
+        try {
+
+            const result =
+                await pool.query(
+                    `
+                    INSERT INTO aircraft_types
+                    (
+                        name,
+                        manufacturer,
+                        model,
+                        code,
+                        description,
+                        image_url
+                    )
+                    VALUES
+                    (
+                        $1,
+                        $2,
+                        $3,
+                        $4,
+                        $5,
+                        $6
+                    )
+                    RETURNING
+                        id,
+                        name,
+                        manufacturer,
+                        model,
+                        code,
+                        description,
+                        image_url,
+                        created_at
+                    `,
+                    [
+
+                        name,
+
+                        manufacturer ||
+                            null,
+
+                        model ||
+                            null,
+
+                        code ||
+                            null,
+
+                        description ||
+                            null,
+
+                        imageUrl ||
+                            null
+                    ]
+                );
+
+            console.log(
+                `Aircraft type added: ${name}`
+            );
+
+            return res.status(201).json({
+
+                available:
+                    true,
+
+                message:
+                    "Aircraft type created successfully.",
+
+                aircraft:
+                    result.rows[0]
+            });
+
+        } catch (
+            error
+        ) {
+
+            console.error(
+                "Could not create aircraft:",
+                error.message
+            );
+
+            if (
+                error.code === "23505"
+            ) {
+
+                return res.status(409).json({
+
+                    available:
+                        false,
+
+                    error:
+                        "This aircraft type already exists."
+                });
+            }
+
+            return res.status(500).json({
+
+                available:
+                    false,
+
+                error:
+                    "Could not create aircraft type."
+            });
+        }
+    }
+);
+
+/*
+|--------------------------------------------------------------------------
+| DELETE AIRCRAFT TYPE
+|--------------------------------------------------------------------------
+|
+| Checklists belonging to the aircraft are automatically deleted
+| because the database uses ON DELETE CASCADE.
+|
+|--------------------------------------------------------------------------
+*/
+
+app.delete(
+    "/api/aircraft/:id",
+    async (
+        req,
+        res
+    ) => {
+
+        const id =
+            Number(
+                req.params.id
+            );
+
+        if (
+            !Number.isInteger(id) ||
+            id <= 0
+        ) {
+
+            return res.status(400).json({
+
+                available:
+                    false,
+
+                error:
+                    "Invalid aircraft ID."
+            });
+        }
+
+        try {
+
+            const result =
+                await pool.query(
+                    `
+                    DELETE FROM aircraft_types
+                    WHERE id = $1
+                    RETURNING
+                        id,
+                        name
+                    `,
+                    [id]
+                );
+
+            if (
+                result.rows.length === 0
+            ) {
+
+                return res.status(404).json({
+
+                    available:
+                        false,
+
+                    error:
+                        "Aircraft type not found."
+                });
+            }
+
+            console.log(
+                `Aircraft type deleted: ${result.rows[0].name}`
+            );
+
+            return res.json({
+
+                available:
+                    true,
+
+                deleted:
+                    true,
+
+                aircraft:
+                    result.rows[0]
+            });
+
+        } catch (
+            error
+        ) {
+
+            console.error(
+                "Could not delete aircraft:",
+                error.message
+            );
+
+            return res.status(500).json({
+
+                available:
+                    false,
+
+                error:
+                    "Could not delete aircraft type."
+            });
+        }
+    }
+);
+
+/*
+|--------------------------------------------------------------------------
+| CHECKLIST - PUBLIC LIST
+|--------------------------------------------------------------------------
+|
+| Examples:
+|
+| /api/checklists
+| /api/checklists?aircraft_id=1
+| /api/checklists?category=TAKEOFF
+|
+|--------------------------------------------------------------------------
+*/
+
+app.get(
+    "/api/checklists",
+    async (
+        req,
+        res
+    ) => {
+
+        const aircraftId =
+            req.query.aircraft_id
+                ? Number(
+                    req.query.aircraft_id
+                )
+                : null;
+
+        const category =
+            req.query.category
+                ? normalizeChecklistCategory(
+                    req.query.category
+                )
+                : null;
+
+        try {
+
+            const conditions =
+                [];
+
+            const values =
+                [];
+
+            let parameter =
+                1;
+
+            if (
+                aircraftId !== null
+            ) {
+
+                if (
+                    !Number.isInteger(
+                        aircraftId
+                    ) ||
+                    aircraftId <= 0
+                ) {
+
+                    return res.status(400).json({
+
+                        available:
+                            false,
+
+                        error:
+                            "Invalid aircraft ID."
+                    });
+                }
+
+                conditions.push(
+                    `c.aircraft_id = $${parameter}`
+                );
+
+                values.push(
+                    aircraftId
+                );
+
+                parameter++;
+            }
+
+            if (
+                category
+            ) {
+
+                conditions.push(
+                    `c.category = $${parameter}`
+                );
+
+                values.push(
+                    category
+                );
+
+                parameter++;
+            }
+
+            const where =
+                conditions.length
+                    ? `WHERE ${conditions.join(" AND ")}`
+                    : "";
+
+            const result =
+                await pool.query(
+                    `
+                    SELECT
+                        c.id,
+                        c.aircraft_id,
+                        a.name AS aircraft_name,
+                        a.manufacturer,
+                        a.model,
+                        a.code AS aircraft_code,
+                        c.name,
+                        c.category,
+                        c.description,
+                        c.file_name,
+                        c.mime_type,
+                        c.notes,
+                        c.created_at
+                    FROM checklists c
+                    INNER JOIN aircraft_types a
+                        ON a.id = c.aircraft_id
+                    ${where}
+                    ORDER BY
+                        a.manufacturer ASC NULLS LAST,
+                        a.name ASC,
+                        CASE c.category
+                            WHEN 'PREFLIGHT' THEN 1
+                            WHEN 'COCKPIT' THEN 2
+                            WHEN 'BEFORE_START' THEN 3
+                            WHEN 'START' THEN 4
+                            WHEN 'TAXI' THEN 5
+                            WHEN 'TAKEOFF' THEN 6
+                            WHEN 'CLIMB' THEN 7
+                            WHEN 'CRUISE' THEN 8
+                            WHEN 'DESCENT' THEN 9
+                            WHEN 'APPROACH' THEN 10
+                            WHEN 'LANDING' THEN 11
+                            WHEN 'SHUTDOWN' THEN 12
+                            WHEN 'EMERGENCY' THEN 13
+                            ELSE 99
+                        END,
+                        c.name ASC
+                    `,
+                    values
+                );
+
+            const baseUrl =
+                getBaseUrl(
+                    req
+                );
+
+            const checklists =
+                result.rows.map(
+                    checklist => ({
+
+                        ...checklist,
+
+                        imageUrl:
+                            `${baseUrl}/api/checklists/${checklist.id}/image`
+                    })
+                );
+
+            return res.json({
+
+                available:
+                    true,
+
+                count:
+                    checklists.length,
+
+                checklists
+            });
+
+        } catch (
+            error
+        ) {
+
+            console.error(
+                "Checklist lookup failed:",
+                error.message
+            );
+
+            return res.status(503).json({
+
+                available:
+                    false,
+
+                checklists:
+                    [],
+
+                error:
+                    "Could not load checklists."
+            });
+        }
+    }
+);
+
+/*
+|--------------------------------------------------------------------------
+| CHECKLISTS FOR ONE AIRCRAFT
+|--------------------------------------------------------------------------
+*/
+
+app.get(
+    "/api/checklists/aircraft/:aircraftId",
+    async (
+        req,
+        res
+    ) => {
+
+        const aircraftId =
+            Number(
+                req.params.aircraftId
+            );
+
+        if (
+            !Number.isInteger(
+                aircraftId
+            ) ||
+            aircraftId <= 0
+        ) {
+
+            return res.status(400).json({
+
+                available:
+                    false,
+
+                error:
+                    "Invalid aircraft ID."
+            });
+        }
+
+        try {
+
+            const aircraftResult =
+                await pool.query(
+                    `
+                    SELECT
+                        id,
+                        name,
+                        manufacturer,
+                        model,
+                        code,
+                        description,
+                        image_url,
+                        created_at
+                    FROM aircraft_types
+                    WHERE id = $1
+                    LIMIT 1
+                    `,
+                    [aircraftId]
+                );
+
+            if (
+                aircraftResult.rows.length === 0
+            ) {
+
+                return res.status(404).json({
+
+                    available:
+                        false,
+
+                    error:
+                        "Aircraft type not found."
+                });
+            }
+
+            const result =
+                await pool.query(
+                    `
+                    SELECT
+                        id,
+                        aircraft_id,
+                        name,
+                        category,
+                        description,
+                        file_name,
+                        mime_type,
+                        notes,
+                        created_at
+                    FROM checklists
+                    WHERE aircraft_id = $1
+                    ORDER BY
+                        CASE category
+                            WHEN 'PREFLIGHT' THEN 1
+                            WHEN 'COCKPIT' THEN 2
+                            WHEN 'BEFORE_START' THEN 3
+                            WHEN 'START' THEN 4
+                            WHEN 'TAXI' THEN 5
+                            WHEN 'TAKEOFF' THEN 6
+                            WHEN 'CLIMB' THEN 7
+                            WHEN 'CRUISE' THEN 8
+                            WHEN 'DESCENT' THEN 9
+                            WHEN 'APPROACH' THEN 10
+                            WHEN 'LANDING' THEN 11
+                            WHEN 'SHUTDOWN' THEN 12
+                            WHEN 'EMERGENCY' THEN 13
+                            ELSE 99
+                        END,
+                        name ASC
+                    `,
+                    [aircraftId]
+                );
+
+            const baseUrl =
+                getBaseUrl(
+                    req
+                );
+
+            const checklists =
+                result.rows.map(
+                    checklist => ({
+
+                        ...checklist,
+
+                        imageUrl:
+                            `${baseUrl}/api/checklists/${checklist.id}/image`
+                    })
+                );
+
+            return res.json({
+
+                available:
+                    true,
+
+                aircraft:
+                    aircraftResult.rows[0],
+
+                count:
+                    checklists.length,
+
+                checklists
+            });
+
+        } catch (
+            error
+        ) {
+
+            console.error(
+                "Aircraft checklist lookup failed:",
+                error.message
+            );
+
+            return res.status(503).json({
+
+                available:
+                    false,
+
+                checklists:
+                    [],
+
+                error:
+                    "Could not load aircraft checklists."
+            });
+        }
+    }
+);
+
+/*
+|--------------------------------------------------------------------------
+| SINGLE CHECKLIST
+|--------------------------------------------------------------------------
+*/
+
+app.get(
+    "/api/checklists/:id",
+    async (
+        req,
+        res
+    ) => {
+
+        const id =
+            Number(
+                req.params.id
+            );
+
+        if (
+            !Number.isInteger(id) ||
+            id <= 0
+        ) {
+
+            return res.status(400).json({
+
+                available:
+                    false,
+
+                error:
+                    "Invalid checklist ID."
+            });
+        }
+
+        try {
+
+            const result =
+                await pool.query(
+                    `
+                    SELECT
+                        c.id,
+                        c.aircraft_id,
+                        a.name AS aircraft_name,
+                        a.manufacturer,
+                        a.model,
+                        a.code AS aircraft_code,
+                        c.name,
+                        c.category,
+                        c.description,
+                        c.file_name,
+                        c.mime_type,
+                        c.notes,
+                        c.created_at
+                    FROM checklists c
+                    INNER JOIN aircraft_types a
+                        ON a.id = c.aircraft_id
+                    WHERE c.id = $1
+                    LIMIT 1
+                    `,
+                    [id]
+                );
+
+            if (
+                result.rows.length === 0
+            ) {
+
+                return res.status(404).json({
+
+                    available:
+                        false,
+
+                    error:
+                        "Checklist not found."
+                });
+            }
+
+            const baseUrl =
+                getBaseUrl(
+                    req
+                );
+
+            return res.json({
+
+                available:
+                    true,
+
+                checklist: {
+
+                    ...result.rows[0],
+
+                    imageUrl:
+                        `${baseUrl}/api/checklists/${id}/image`
+                }
+            });
+
+        } catch (
+            error
+        ) {
+
+            console.error(
+                "Checklist lookup failed:",
+                error.message
+            );
+
+            return res.status(503).json({
+
+                available:
+                    false,
+
+                error:
+                    "Could not load checklist."
+            });
+        }
+    }
+);
+
+/*
+|--------------------------------------------------------------------------
+| CHECKLIST IMAGE
+|--------------------------------------------------------------------------
+*/
+
+app.get(
+    "/api/checklists/:id/image",
+    async (
+        req,
+        res
+    ) => {
+
+        const id =
+            Number(
+                req.params.id
+            );
+
+        if (
+            !Number.isInteger(id) ||
+            id <= 0
+        ) {
+
+            return res.status(400).json({
+
+                available:
+                    false,
+
+                error:
+                    "Invalid checklist ID."
+            });
+        }
+
+        try {
+
+            const result =
+                await pool.query(
+                    `
+                    SELECT
+                        image_data,
+                        mime_type,
+                        file_name
+                    FROM checklists
+                    WHERE id = $1
+                    LIMIT 1
+                    `,
+                    [id]
+                );
+
+            if (
+                result.rows.length === 0
+            ) {
+
+                return res.status(404).json({
+
+                    available:
+                        false,
+
+                    error:
+                        "Checklist not found."
+                });
+            }
+
+            const checklist =
+                result.rows[0];
+
+            res.setHeader(
+                "Content-Type",
+                checklist.mime_type ||
+                    "image/png"
+            );
+
+            res.setHeader(
+                "Content-Disposition",
+                `inline; filename="${String(
+                    checklist.file_name ||
+                    "checklist"
+                ).replace(
+                    /"/g,
+                    ""
+                )}"`
+            );
+
+            res.setHeader(
+                "Cache-Control",
+                "public, max-age=86400"
+            );
+
+            return res.send(
+                checklist.image_data
+            );
+
+        } catch (
+            error
+        ) {
+
+            console.error(
+                "Checklist image lookup failed:",
+                error.message
+            );
+
+            return res.status(503).json({
+
+                available:
+                    false,
+
+                error:
+                    "Could not load checklist image."
+            });
+        }
+    }
+);
+
+/*
+|--------------------------------------------------------------------------
+| UPLOAD CHECKLIST
+|--------------------------------------------------------------------------
+|
+| multipart/form-data:
+|
+| aircraft_id
+| name
+| category
+| description
+| notes
+| image
+|
+|--------------------------------------------------------------------------
+*/
+
+app.post(
+    "/api/checklists",
+    (
+        req,
+        res
+    ) => {
+
+        imageUpload.single(
+            "image"
+        )(
+            req,
+            res,
+            async error => {
+
+                if (
+                    error
+                ) {
+
+                    console.error(
+                        "Checklist upload middleware error:",
+                        error.message
+                    );
+
+                    return res.status(400).json({
+
+                        available:
+                            false,
+
+                        error:
+                            error.message
+                    });
+                }
+
+                try {
+
+                    const aircraftId =
+                        Number(
+                            req.body.aircraft_id
+                        );
+
+                    const name =
+                        cleanString(
+                            req.body.name,
+                            200
+                        );
+
+                    const category =
+                        normalizeChecklistCategory(
+                            req.body.category
+                        );
+
+                    const description =
+                        cleanString(
+                            req.body.description,
+                            1000
+                        );
+
+                    const notes =
+                        cleanString(
+                            req.body.notes,
+                            5000
+                        );
+
+                    if (
+                        !Number.isInteger(
+                            aircraftId
+                        ) ||
+                        aircraftId <= 0
+                    ) {
+
+                        return res.status(400).json({
+
+                            available:
+                                false,
+
+                            error:
+                                "A valid aircraft type is required."
+                        });
+                    }
+
+                    if (
+                        !name
+                    ) {
+
+                        return res.status(400).json({
+
+                            available:
+                                false,
+
+                            error:
+                                "Checklist name is required."
+                        });
+                    }
+
+                    if (
+                        !req.file
+                    ) {
+
+                        return res.status(400).json({
+
+                            available:
+                                false,
+
+                            error:
+                                "Checklist image is required."
+                        });
+                    }
+
+                    const aircraftResult =
+                        await pool.query(
+                            `
+                            SELECT
+                                id,
+                                name,
+                                manufacturer,
+                                model,
+                                code
+                            FROM aircraft_types
+                            WHERE id = $1
+                            LIMIT 1
+                            `,
+                            [aircraftId]
+                        );
+
+                    if (
+                        aircraftResult.rows.length === 0
+                    ) {
+
+                        return res.status(404).json({
+
+                            available:
+                                false,
+
+                            error:
+                                "Aircraft type not found."
+                        });
+                    }
+
+                    const result =
+                        await pool.query(
+                            `
+                            INSERT INTO checklists
+                            (
+                                aircraft_id,
+                                name,
+                                category,
+                                description,
+                                file_name,
+                                mime_type,
+                                image_data,
+                                notes
+                            )
+                            VALUES
+                            (
+                                $1,
+                                $2,
+                                $3,
+                                $4,
+                                $5,
+                                $6,
+                                $7,
+                                $8
+                            )
+                            RETURNING
+                                id,
+                                aircraft_id,
+                                name,
+                                category,
+                                description,
+                                file_name,
+                                mime_type,
+                                notes,
+                                created_at
+                            `,
+                            [
+
+                                aircraftId,
+
+                                name,
+
+                                category,
+
+                                description ||
+                                    null,
+
+                                req.file.originalname,
+
+                                req.file.mimetype,
+
+                                req.file.buffer,
+
+                                notes ||
+                                    null
+                            ]
+                        );
+
+                    const checklist =
+                        result.rows[0];
+
+                    const baseUrl =
+                        getBaseUrl(
+                            req
+                        );
+
+                    console.log(
+                        `Checklist uploaded: ${aircraftResult.rows[0].name} - ${name}`
+                    );
+
+                    return res.status(201).json({
+
+                        available:
+                            true,
+
+                        message:
+                            "Checklist uploaded successfully.",
+
+                        checklist: {
+
+                            ...checklist,
+
+                            aircraft:
+                                aircraftResult.rows[0],
+
+                            imageUrl:
+                                `${baseUrl}/api/checklists/${checklist.id}/image`
+                        }
+                    });
+
+                } catch (
+                    databaseError
+                ) {
+
+                    console.error(
+                        "Could not upload checklist:",
+                        databaseError.message
+                    );
+
+                    return res.status(500).json({
+
+                        available:
+                            false,
+
+                        error:
+                            "Could not save checklist."
+                    });
+                }
+            }
+        );
+    }
+);
+
+/*
+|--------------------------------------------------------------------------
+| DELETE CHECKLIST
+|--------------------------------------------------------------------------
+*/
+
+app.delete(
+    "/api/checklists/:id",
+    async (
+        req,
+        res
+    ) => {
+
+        const id =
+            Number(
+                req.params.id
+            );
+
+        if (
+            !Number.isInteger(id) ||
+            id <= 0
+        ) {
+
+            return res.status(400).json({
+
+                available:
+                    false,
+
+                error:
+                    "Invalid checklist ID."
+            });
+        }
+
+        try {
+
+            const result =
+                await pool.query(
+                    `
+                    DELETE FROM checklists
+                    WHERE id = $1
+                    RETURNING
+                        id,
+                        aircraft_id,
+                        name
+                    `,
+                    [id]
+                );
+
+            if (
+                result.rows.length === 0
+            ) {
+
+                return res.status(404).json({
+
+                    available:
+                        false,
+
+                    error:
+                        "Checklist not found."
+                });
+            }
+
+            console.log(
+                `Checklist deleted: ${result.rows[0].name}`
+            );
+
+            return res.json({
+
+                available:
+                    true,
+
+                deleted:
+                    true,
+
+                checklist:
+                    result.rows[0]
+            });
+
+        } catch (
+            error
+        ) {
+
+            console.error(
+                "Could not delete checklist:",
+                error.message
+            );
+
+            return res.status(500).json({
+
+                available:
+                    false,
+
+                error:
+                    "Could not delete checklist."
+            });
+        }
+    }
+);
+
+/*
+|--------------------------------------------------------------------------
+| CHECKLIST ADMIN - EVERYTHING
+|--------------------------------------------------------------------------
+*/
+
+app.get(
+    "/api/checklists/admin/all",
+    async (
+        req,
+        res
+    ) => {
+
+        try {
+
+            const result =
+                await pool.query(
+                    `
+                    SELECT
+                        c.id,
+                        c.aircraft_id,
+                        a.name AS aircraft_name,
+                        a.manufacturer,
+                        a.model,
+                        a.code AS aircraft_code,
+                        c.name,
+                        c.category,
+                        c.description,
+                        c.file_name,
+                        c.mime_type,
+                        c.notes,
+                        c.created_at
+                    FROM checklists c
+                    INNER JOIN aircraft_types a
+                        ON a.id = c.aircraft_id
+                    ORDER BY
+                        c.created_at DESC
+                    `
+                );
+
+            const baseUrl =
+                getBaseUrl(
+                    req
+                );
+
+            const checklists =
+                result.rows.map(
+                    checklist => ({
+
+                        ...checklist,
+
+                        imageUrl:
+                            `${baseUrl}/api/checklists/${checklist.id}/image`
+                    })
+                );
+
+            return res.json({
+
+                available:
+                    true,
+
+                count:
+                    checklists.length,
+
+                checklists
+            });
+
+        } catch (
+            error
+        ) {
+
+            console.error(
+                "Checklist admin lookup failed:",
+                error.message
+            );
+
+            return res.status(503).json({
+
+                available:
+                    false,
+
+                checklists:
+                    [],
+
+                error:
+                    "Could not load checklist administration data."
+            });
+        }
+    }
+);
 
 /*
 |--------------------------------------------------------------------------
 | DATABASE INITIALIZATION
 |--------------------------------------------------------------------------
-|
-| Creates the charts table automatically.
-|
-| Existing tables are NOT modified.
-|
-|--------------------------------------------------------------------------
 */
 
 async function initializeDatabase() {
+
+    /*
+    |--------------------------------------------------------------------------
+    | CHARTS
+    |--------------------------------------------------------------------------
+    */
 
     await pool.query(
         `
@@ -3995,10 +5246,11 @@ async function initializeDatabase() {
         `
     );
 
-
-    // ============================================================
-    // WEATHER CACHE
-    // ============================================================
+    /*
+    |--------------------------------------------------------------------------
+    | WEATHER CACHE
+    |--------------------------------------------------------------------------
+    */
 
     await pool.query(
         `
@@ -4034,15 +5286,224 @@ async function initializeDatabase() {
         `
     );
 
+    /*
+    |--------------------------------------------------------------------------
+    | AIRPORT CACHE
+    |--------------------------------------------------------------------------
+    */
 
-    console.log(
-        "Charts database table is ready."
+    await pool.query(
+        `
+        CREATE TABLE IF NOT EXISTS airport_cache
+        (
+            icao VARCHAR(4) PRIMARY KEY,
+
+            name TEXT,
+
+            iata VARCHAR(3),
+
+            latitude DOUBLE PRECISION,
+
+            longitude DOUBLE PRECISION,
+
+            elevation_ft DOUBLE PRECISION,
+
+            country TEXT,
+
+            city TEXT,
+
+            raw_data JSONB,
+
+            updated_at TIMESTAMPTZ NOT NULL
+                DEFAULT NOW()
+        )
+        `
+    );
+
+    /*
+    |--------------------------------------------------------------------------
+    | SAVED PLANS
+    |--------------------------------------------------------------------------
+    */
+
+    await pool.query(
+        `
+        CREATE TABLE IF NOT EXISTS saved_plans
+        (
+            id BIGSERIAL PRIMARY KEY,
+
+            name TEXT NOT NULL,
+
+            departure_icao VARCHAR(4),
+
+            arrival_icao VARCHAR(4),
+
+            aircraft_icao TEXT,
+
+            cruise_altitude INTEGER,
+
+            route TEXT,
+
+            distance_nm DOUBLE PRECISION,
+
+            estimated_minutes INTEGER,
+
+            simbrief_ofp_id TEXT,
+
+            created_at TIMESTAMPTZ NOT NULL
+                DEFAULT NOW()
+        )
+        `
+    );
+
+    await pool.query(
+        `
+        CREATE INDEX IF NOT EXISTS
+        saved_plans_created_at_idx
+        ON saved_plans
+        (
+            created_at DESC
+        )
+        `
+    );
+
+    /*
+    |--------------------------------------------------------------------------
+    | AIRCRAFT TYPES
+    |--------------------------------------------------------------------------
+    */
+
+    await pool.query(
+        `
+        CREATE TABLE IF NOT EXISTS aircraft_types
+        (
+            id BIGSERIAL PRIMARY KEY,
+
+            name TEXT NOT NULL,
+
+            manufacturer TEXT,
+
+            model TEXT,
+
+            code VARCHAR(30),
+
+            description TEXT,
+
+            image_url TEXT,
+
+            created_at TIMESTAMPTZ NOT NULL
+                DEFAULT NOW()
+        )
+        `
+    );
+
+    await pool.query(
+        `
+        CREATE INDEX IF NOT EXISTS
+        aircraft_types_name_idx
+        ON aircraft_types
+        (
+            name
+        )
+        `
+    );
+
+    /*
+    |--------------------------------------------------------------------------
+    | AIRCRAFT CODE UNIQUE INDEX
+    |--------------------------------------------------------------------------
+    |
+    | NULL values are allowed multiple times.
+    |
+    |--------------------------------------------------------------------------
+    */
+
+    await pool.query(
+        `
+        CREATE UNIQUE INDEX IF NOT EXISTS
+        aircraft_types_code_unique_idx
+        ON aircraft_types
+        (
+            code
+        )
+        WHERE code IS NOT NULL
+        `
+    );
+
+    /*
+    |--------------------------------------------------------------------------
+    | CHECKLISTS
+    |--------------------------------------------------------------------------
+    */
+
+    await pool.query(
+        `
+        CREATE TABLE IF NOT EXISTS checklists
+        (
+            id BIGSERIAL PRIMARY KEY,
+
+            aircraft_id BIGINT NOT NULL
+                REFERENCES aircraft_types(id)
+                ON DELETE CASCADE,
+
+            name TEXT NOT NULL,
+
+            category VARCHAR(30) NOT NULL
+                DEFAULT 'OTHER',
+
+            description TEXT,
+
+            file_name TEXT NOT NULL,
+
+            mime_type VARCHAR(100) NOT NULL,
+
+            image_data BYTEA NOT NULL,
+
+            notes TEXT,
+
+            created_at TIMESTAMPTZ NOT NULL
+                DEFAULT NOW()
+        )
+        `
+    );
+
+    await pool.query(
+        `
+        CREATE INDEX IF NOT EXISTS
+        checklists_aircraft_idx
+        ON checklists
+        (
+            aircraft_id
+        )
+        `
+    );
+
+    await pool.query(
+        `
+        CREATE INDEX IF NOT EXISTS
+        checklists_aircraft_category_idx
+        ON checklists
+        (
+            aircraft_id,
+            category
+        )
+        `
+    );
+
+    await pool.query(
+        `
+        CREATE INDEX IF NOT EXISTS
+        checklists_created_at_idx
+        ON checklists
+        (
+            created_at DESC
+        )
+        `
     );
 
     console.log(
-        "Weather cache database table is ready."
+        "Database tables and indexes are ready."
     );
-
 }
 
 /*
@@ -4053,7 +5514,10 @@ async function initializeDatabase() {
 
 app.get(
     "/",
-    async (req, res) => {
+    async (
+        req,
+        res
+    ) => {
 
         let database =
             "Unavailable";
@@ -4067,13 +5531,14 @@ app.get(
             database =
                 "Connected";
 
-        } catch (error) {
+        } catch (
+            error
+        ) {
 
             console.error(
                 "Root database check failed:",
                 error.message
             );
-
         }
 
         res.json({
@@ -4084,10 +5549,10 @@ app.get(
             status:
                 "Online",
 
-            database,
-
             version:
-                "1.3.0",
+                API_VERSION,
+
+            database,
 
             endpoints: {
 
@@ -4125,15 +5590,32 @@ app.get(
                     "/api/charts/:id/image",
 
                 chartAdminAll:
-                    "/api/charts/admin/all"
+                    "/api/charts/admin/all",
 
+                aircraft:
+                    "/api/aircraft",
+
+                aircraftSingle:
+                    "/api/aircraft/:id",
+
+                checklists:
+                    "/api/checklists",
+
+                checklistsByAircraft:
+                    "/api/checklists/aircraft/:aircraftId",
+
+                checklistSingle:
+                    "/api/checklists/:id",
+
+                checklistImage:
+                    "/api/checklists/:id/image",
+
+                checklistAdminAll:
+                    "/api/checklists/admin/all"
             }
-
         });
-
     }
 );
-
 
 /*
 |--------------------------------------------------------------------------
@@ -4142,7 +5624,10 @@ app.get(
 */
 
 app.use(
-    (req, res) => {
+    (
+        req,
+        res
+    ) => {
 
         res.status(404).json({
 
@@ -4151,12 +5636,9 @@ app.use(
 
             error:
                 "Endpoint not found"
-
         });
-
     }
 );
-
 
 /*
 |--------------------------------------------------------------------------
@@ -4177,6 +5659,15 @@ app.use(
             error
         );
 
+        if (
+            res.headersSent
+        ) {
+
+            return next(
+                error
+            );
+        }
+
         res.status(500).json({
 
             available:
@@ -4184,12 +5675,9 @@ app.use(
 
             error:
                 "Internal server error"
-
         });
-
     }
 );
-
 
 /*
 |--------------------------------------------------------------------------
@@ -4209,12 +5697,6 @@ async function startServer() {
             "Successfully connected to Neon PostgreSQL."
         );
 
-        /*
-        |--------------------------------------------------------------------------
-        | CREATE CHART TABLE / INDEXES
-        |--------------------------------------------------------------------------
-        */
-
         await initializeDatabase();
 
         app.listen(
@@ -4222,13 +5704,22 @@ async function startServer() {
             () => {
 
                 console.log(
-                    `Flight-app backend running on port ${PORT}`
+                    `Flight-app backend v${API_VERSION} running on port ${PORT}`
                 );
 
+                console.log(
+                    "Checklist system enabled."
+                );
+
+                console.log(
+                    "Aircraft type management enabled."
+                );
             }
         );
 
-    } catch (error) {
+    } catch (
+        error
+    ) {
 
         console.error(
             "Could not initialize Flight-app backend:",
@@ -4236,13 +5727,10 @@ async function startServer() {
         );
 
         process.exit(1);
-
     }
-
 }
 
 startServer();
-
 
 /*
 |--------------------------------------------------------------------------
@@ -4250,33 +5738,45 @@ startServer();
 |--------------------------------------------------------------------------
 */
 
-process.on(
-    "SIGTERM",
-    async () => {
+async function shutdown(
+    signal
+) {
 
-        console.log(
-            "SIGTERM received."
-        );
+    console.log(
+        `${signal} received.`
+    );
+
+    try {
 
         await pool.end();
 
-        process.exit(0);
+        console.log(
+            "Database connection pool closed."
+        );
 
+    } catch (
+        error
+    ) {
+
+        console.error(
+            "Error while closing database pool:",
+            error.message
+        );
     }
-);
 
+    process.exit(0);
+}
+
+process.on(
+    "SIGTERM",
+    () => shutdown(
+        "SIGTERM"
+    )
+);
 
 process.on(
     "SIGINT",
-    async () => {
-
-        console.log(
-            "SIGINT received."
-        );
-
-        await pool.end();
-
-        process.exit(0);
-
-    }
+    () => shutdown(
+        "SIGINT"
+    )
 );
