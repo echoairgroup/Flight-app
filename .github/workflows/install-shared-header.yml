@@ -1,0 +1,54 @@
+name: Install shared Charts header
+
+on:
+  push:
+    paths:
+      - 'common-header.js'
+      - 'common-header.css'
+      - '.github/workflows/install-shared-header.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  install:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Add shared header assets
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          for path in Path('.').glob('*.html'):
+              text = path.read_text(encoding='utf-8')
+
+              # charts.html already contains the exact source header, so leave it untouched.
+              if path.name == 'charts.html':
+                  continue
+
+              if 'common-header.css' not in text:
+                  text = text.replace('</head>', '    <link rel="stylesheet" href="common-header.css?v=1">\n</head>', 1)
+
+              if 'common-header.js' not in text:
+                  text = text.replace('</body>', '    <script src="common-header.js?v=1"></script>\n</body>', 1)
+
+              path.write_text(text, encoding='utf-8')
+          PY
+
+      - name: Commit changes
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add '*.html' common-header.css common-header.js
+          if git diff --cached --quiet; then
+            echo 'No changes needed.'
+            exit 0
+          fi
+          git commit -m 'Apply shared Charts-style header to all pages [skip ci]'
+          git push
