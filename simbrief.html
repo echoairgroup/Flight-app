@@ -1,1264 +1,4134 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0b63ce">
 
-```
-<title>SimBrief | Flight App</title>
+<title>Flight App — SimBrief</title>
 
 <style>
-    * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
+
+:root {
+    --primary: #0b63ce;
+    --primary-dark: #084b9e;
+    --primary-light: #eaf3ff;
+
+    --background: #f4f7fb;
+    --surface: #ffffff;
+    --surface-soft: #f8fafc;
+
+    --text: #172033;
+    --text-soft: #64748b;
+    --border: #dce3ec;
+
+    --success: #16803c;
+    --success-bg: #eaf8ef;
+
+    --warning: #b77900;
+    --warning-bg: #fff7df;
+
+    --danger: #c62828;
+    --danger-bg: #fff0f0;
+
+    --shadow:
+        0 8px 30px rgba(15, 23, 42, 0.07);
+
+    --radius: 16px;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    background: var(--background);
+    color: var(--text);
+    font-family:
+        Inter,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+}
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+
+    height: 70px;
+
+    background:
+        rgba(255,255,255,0.96);
+
+    backdrop-filter:
+        blur(12px);
+
+    border-bottom:
+        1px solid var(--border);
+
+    display: flex;
+    align-items: center;
+}
+
+.header-inner {
+    width: min(1500px, calc(100% - 36px));
+    margin: auto;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    text-decoration: none;
+    color: var(--text);
+
+    font-weight: 800;
+    font-size: 19px;
+}
+
+.logo-icon {
+    width: 40px;
+    height: 40px;
+
+    border-radius: 12px;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--primary),
+            #2f8cff
+        );
+
+    color: white;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 20px;
+}
+
+.nav {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.nav a {
+    color: var(--text-soft);
+    text-decoration: none;
+
+    padding: 10px 13px;
+
+    border-radius: 9px;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    transition:
+        background 0.2s,
+        color 0.2s;
+}
+
+.nav a:hover {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+.nav a.active {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+.mobile-menu {
+    display: none;
+
+    border: 0;
+    background: transparent;
+
+    font-size: 24px;
+
+    cursor: pointer;
+}
+
+/* =========================================================
+   PAGE
+   ========================================================= */
+
+.page {
+    width: min(1500px, calc(100% - 36px));
+    margin: 0 auto;
+
+    padding:
+        34px
+        0
+        70px;
+}
+
+.page-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+
+    gap: 25px;
+
+    margin-bottom: 25px;
+}
+
+.title-left h1 {
+    margin: 0 0 7px;
+
+    font-size: 34px;
+    letter-spacing: -0.8px;
+}
+
+.title-left p {
+    margin: 0;
+
+    color: var(--text-soft);
+
+    font-size: 15px;
+}
+
+.status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    padding: 8px 13px;
+
+    border-radius: 999px;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    background: var(--surface);
+    border: 1px solid var(--border);
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+
+    background: #94a3b8;
+}
+
+.status-pill.online .status-dot {
+    background: var(--success);
+}
+
+.status-pill.loading .status-dot {
+    background: var(--warning);
+}
+
+/* =========================================================
+   MAIN CARD
+   ========================================================= */
+
+.card {
+    background: var(--surface);
+
+    border:
+        1px solid var(--border);
+
+    border-radius:
+        var(--radius);
+
+    box-shadow:
+        var(--shadow);
+}
+
+.connection-card {
+    padding: 22px;
+
+    margin-bottom: 25px;
+}
+
+.connection-grid {
+    display: grid;
+
+    grid-template-columns:
+        1fr 1.4fr auto;
+
+    gap: 15px;
+
+    align-items: end;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.field label {
+    font-size: 12px;
+    font-weight: 800;
+
+    color: var(--text-soft);
+
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.field input,
+.field select {
+    width: 100%;
+
+    height: 45px;
+
+    border:
+        1px solid var(--border);
+
+    border-radius: 10px;
+
+    padding:
+        0 13px;
+
+    background: white;
+
+    color: var(--text);
+
+    font-size: 14px;
+
+    outline: none;
+
+    transition:
+        border-color 0.2s,
+        box-shadow 0.2s;
+}
+
+.field input:focus,
+.field select:focus {
+    border-color: var(--primary);
+
+    box-shadow:
+        0 0 0 3px
+        rgba(11,99,206,0.1);
+}
+
+.button-row {
+    display: flex;
+    gap: 10px;
+}
+
+button {
+    font-family: inherit;
+}
+
+.btn {
+    height: 45px;
+
+    padding:
+        0 18px;
+
+    border-radius: 10px;
+
+    border: 1px solid transparent;
+
+    cursor: pointer;
+
+    font-size: 14px;
+    font-weight: 800;
+
+    transition:
+        transform 0.15s,
+        box-shadow 0.2s,
+        background 0.2s;
+}
+
+.btn:active {
+    transform: translateY(1px);
+}
+
+.btn-primary {
+    color: white;
+
+    background: var(--primary);
+
+    box-shadow:
+        0 5px 14px
+        rgba(11,99,206,0.22);
+}
+
+.btn-primary:hover {
+    background: var(--primary-dark);
+}
+
+.btn-secondary {
+    color: var(--text);
+
+    background: white;
+
+    border-color: var(--border);
+}
+
+.btn-secondary:hover {
+    background: var(--surface-soft);
+}
+
+/* =========================================================
+   ALERT
+   ========================================================= */
+
+.alert {
+    display: none;
+
+    padding: 14px 16px;
+
+    border-radius: 11px;
+
+    margin-bottom: 20px;
+
+    font-size: 14px;
+
+    border: 1px solid transparent;
+}
+
+.alert.show {
+    display: flex;
+    align-items: flex-start;
+    gap: 11px;
+}
+
+.alert.error {
+    background: var(--danger-bg);
+    border-color: #ffd1d1;
+    color: var(--danger);
+}
+
+.alert.success {
+    background: var(--success-bg);
+    border-color: #c7ead3;
+    color: var(--success);
+}
+
+.alert.warning {
+    background: var(--warning-bg);
+    border-color: #f0dfad;
+    color: var(--warning);
+}
+
+/* =========================================================
+   EMPTY STATE
+   ========================================================= */
+
+.empty-state {
+    padding: 65px 30px;
+
+    text-align: center;
+}
+
+.empty-icon {
+    width: 68px;
+    height: 68px;
+
+    margin:
+        0 auto
+        18px;
+
+    border-radius: 18px;
+
+    background: var(--primary-light);
+
+    color: var(--primary);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 29px;
+}
+
+.empty-state h2 {
+    margin: 0 0 8px;
+
+    font-size: 22px;
+}
+
+.empty-state p {
+    max-width: 580px;
+
+    margin:
+        0 auto;
+
+    color: var(--text-soft);
+
+    line-height: 1.6;
+}
+
+/* =========================================================
+   LOADING
+   ========================================================= */
+
+.loading {
+    display: none;
+
+    padding: 55px 20px;
+
+    text-align: center;
+}
+
+.loading.show {
+    display: block;
+}
+
+.spinner {
+    width: 42px;
+    height: 42px;
+
+    margin:
+        0 auto
+        15px;
+
+    border:
+        4px solid
+        #dbe8f8;
+
+    border-top-color:
+        var(--primary);
+
+    border-radius: 50%;
+
+    animation:
+        spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* =========================================================
+   OFP HEADER
+   ========================================================= */
+
+.ofp-header {
+    display: none;
+
+    padding: 24px;
+
+    margin-bottom: 20px;
+}
+
+.ofp-header.show {
+    display: block;
+}
+
+.route-large {
+    display: grid;
+
+    grid-template-columns:
+        1fr
+        80px
+        1fr;
+
+    align-items: center;
+
+    gap: 20px;
+}
+
+.airport-big {
+    display: flex;
+    flex-direction: column;
+
+    gap: 5px;
+}
+
+.airport-big.right {
+    align-items: flex-end;
+    text-align: right;
+}
+
+.airport-code {
+    font-size: 38px;
+
+    line-height: 1;
+
+    font-weight: 900;
+
+    letter-spacing: -1px;
+}
+
+.airport-name {
+    color: var(--text-soft);
+
+    font-size: 13px;
+}
+
+.route-line {
+    position: relative;
+
+    height: 2px;
+
+    background:
+        linear-gradient(
+            90deg,
+            var(--primary),
+            #c8d9ec,
+            var(--primary)
+        );
+}
+
+.route-plane {
+    position: absolute;
+
+    left: 50%;
+    top: 50%;
+
+    transform:
+        translate(-50%, -50%);
+
+    width: 38px;
+    height: 38px;
+
+    border-radius: 50%;
+
+    background: white;
+
+    border:
+        1px solid var(--border);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: var(--primary);
+
+    font-size: 17px;
+}
+
+.ofp-meta {
+    display: flex;
+
+    justify-content: center;
+
+    gap: 12px;
+
+    flex-wrap: wrap;
+
+    margin-top: 22px;
+}
+
+.meta-chip {
+    padding:
+        7px 11px;
+
+    border-radius: 8px;
+
+    background: var(--surface-soft);
+
+    border:
+        1px solid var(--border);
+
+    font-size: 12px;
+
+    color: var(--text-soft);
+}
+
+.meta-chip strong {
+    color: var(--text);
+}
+
+/* =========================================================
+   DASHBOARD GRID
+   ========================================================= */
+
+.dashboard {
+    display: none;
+
+    grid-template-columns:
+        repeat(12, 1fr);
+
+    gap: 18px;
+}
+
+.dashboard.show {
+    display: grid;
+}
+
+.section-card {
+    grid-column:
+        span 4;
+
+    padding: 20px;
+
+    min-width: 0;
+}
+
+.section-card.span-6 {
+    grid-column:
+        span 6;
+}
+
+.section-card.span-8 {
+    grid-column:
+        span 8;
+}
+
+.section-card.span-12 {
+    grid-column:
+        span 12;
+}
+
+.section-title {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 10px;
+
+    margin-bottom: 17px;
+
+    padding-bottom: 13px;
+
+    border-bottom:
+        1px solid var(--border);
+}
+
+.section-title h3 {
+    margin: 0;
+
+    font-size: 16px;
+}
+
+.section-title span {
+    color: var(--text-soft);
+
+    font-size: 12px;
+}
+
+/* =========================================================
+   STAT GRID
+   ========================================================= */
+
+.stats {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, 1fr);
+
+    gap: 10px;
+}
+
+.stat {
+    padding: 13px;
+
+    border:
+        1px solid var(--border);
+
+    border-radius: 11px;
+
+    background:
+        var(--surface-soft);
+}
+
+.stat-label {
+    color: var(--text-soft);
+
+    font-size: 11px;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.4px;
+
+    font-weight: 700;
+
+    margin-bottom: 5px;
+}
+
+.stat-value {
+    font-size: 18px;
+
+    font-weight: 850;
+
+    overflow-wrap: anywhere;
+}
+
+.stat-unit {
+    color: var(--text-soft);
+
+    font-size: 11px;
+
+    margin-left: 2px;
+}
+
+/* =========================================================
+   DETAIL ROWS
+   ========================================================= */
+
+.detail-list {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 0;
+}
+
+.detail-row {
+    display: grid;
+
+    grid-template-columns:
+        minmax(130px, 0.9fr)
+        minmax(0, 1.4fr);
+
+    gap: 15px;
+
+    padding:
+        10px 0;
+
+    border-bottom:
+        1px solid #edf1f5;
+}
+
+.detail-row:last-child {
+    border-bottom: 0;
+}
+
+.detail-label {
+    color: var(--text-soft);
+
+    font-size: 12px;
+}
+
+.detail-value {
+    text-align: right;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    overflow-wrap: anywhere;
+}
+
+/* =========================================================
+   FUEL
+   ========================================================= */
+
+.fuel-bars {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 13px;
+}
+
+.fuel-item {
+    display: grid;
+
+    grid-template-columns:
+        130px
+        1fr
+        80px;
+
+    gap: 10px;
+
+    align-items: center;
+}
+
+.fuel-name {
+    color: var(--text-soft);
+
+    font-size: 12px;
+}
+
+.fuel-track {
+    height: 8px;
+
+    border-radius: 999px;
+
+    background:
+        #e9eef4;
+
+    overflow: hidden;
+}
+
+.fuel-fill {
+    height: 100%;
+
+    width: 0;
+
+    border-radius: inherit;
+
+    background:
+        linear-gradient(
+            90deg,
+            var(--primary),
+            #5ca4f5
+        );
+
+    transition:
+        width 0.6s ease;
+}
+
+.fuel-number {
+    text-align: right;
+
+    font-size: 12px;
+
+    font-weight: 800;
+}
+
+/* =========================================================
+   ROUTE
+   ========================================================= */
+
+.route-box {
+    background:
+        #101827;
+
+    color: #dce9f8;
+
+    border-radius:
+        12px;
+
+    padding:
+        18px;
+
+    font-family:
+        "JetBrains Mono",
+        "Cascadia Code",
+        Consolas,
+        monospace;
+
+    font-size: 13px;
+
+    line-height: 1.8;
+
+    overflow-x: auto;
+
+    white-space: pre-wrap;
+
+    word-break: break-word;
+}
+
+.route-copy {
+    margin-top: 12px;
+
+    display: flex;
+
+    justify-content: flex-end;
+}
+
+/* =========================================================
+   RAW DATA
+   ========================================================= */
+
+.raw-data {
+    display: none;
+}
+
+.raw-data.show {
+    display: block;
+}
+
+.raw-json {
+    margin: 0;
+
+    max-height: 550px;
+
+    overflow: auto;
+
+    padding: 18px;
+
+    background:
+        #0c1220;
+
+    color:
+        #d7e5f5;
+
+    border-radius:
+        12px;
+
+    font-family:
+        "JetBrains Mono",
+        Consolas,
+        monospace;
+
+    font-size: 12px;
+
+    line-height: 1.6;
+
+    white-space: pre-wrap;
+
+    word-break: break-word;
+}
+
+/* =========================================================
+   ACTIONS
+   ========================================================= */
+
+.actions {
+    display: flex;
+
+    gap: 10px;
+
+    flex-wrap: wrap;
+
+    margin-bottom: 20px;
+}
+
+.actions .btn {
+    height: 40px;
+}
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+.footer {
+    margin-top: 45px;
+
+    text-align: center;
+
+    color: var(--text-soft);
+
+    font-size: 12px;
+}
+
+.footer a {
+    color: var(--primary);
+
+    text-decoration: none;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1100px) {
+
+    .connection-grid {
+        grid-template-columns:
+            1fr 1fr;
     }
 
-    body {
-        font-family:
-            Inter,
-            Arial,
-            Helvetica,
-            sans-serif;
-        background: #f4f7fb;
-        color: #172033;
-        min-height: 100vh;
+    .connection-grid .button-row {
+        grid-column:
+            span 2;
     }
 
-    /* =========================================================
-       HEADER
-    ========================================================= */
-
-    header {
-        height: 72px;
-        background: #ffffff;
-        border-bottom: 1px solid #e2e8f0;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 0 32px;
-        position: sticky;
-        top: 0;
-        z-index: 100;
+    .section-card,
+    .section-card.span-6,
+    .section-card.span-8 {
+        grid-column:
+            span 6;
     }
 
-    .brand {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        text-decoration: none;
-        color: #172033;
-    }
+}
 
-    .brand-icon {
-        width: 40px;
-        height: 40px;
-        border-radius: 11px;
-        background: #1769e0;
-        color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 19px;
-        font-weight: 800;
-    }
+@media (max-width: 800px) {
 
-    .brand-text {
-        font-size: 20px;
-        font-weight: 800;
-        letter-spacing: -0.4px;
-    }
-
-    nav {
-        display: flex;
-        align-items: center;
-        gap: 7px;
-    }
-
-    nav a {
-        text-decoration: none;
-        color: #657085;
-        font-size: 14px;
-        font-weight: 600;
-        padding: 9px 13px;
-        border-radius: 8px;
-        transition: 0.2s;
-    }
-
-    nav a:hover {
-        background: #eef5ff;
-        color: #1769e0;
-    }
-
-    nav a.active {
-        background: #eaf3ff;
-        color: #1769e0;
-    }
-
-    /* =========================================================
-       PAGE
-    ========================================================= */
-
-    main {
-        max-width: 1250px;
-        margin: 0 auto;
-        padding: 38px 24px 70px;
-    }
-
-    .page-header {
-        margin-bottom: 28px;
-    }
-
-    .page-header h1 {
-        font-size: 32px;
-        letter-spacing: -0.8px;
-        margin-bottom: 8px;
-    }
-
-    .page-header p {
-        color: #718096;
-        font-size: 15px;
-    }
-
-    /* =========================================================
-       CONTROL CARD
-    ========================================================= */
-
-    .control-card {
-        background: #ffffff;
-        border: 1px solid #e1e7ef;
-        border-radius: 15px;
-        padding: 22px;
-        margin-bottom: 24px;
-        box-shadow: 0 4px 18px rgba(25, 55, 95, 0.04);
-    }
-
-    .control-title {
-        font-size: 17px;
-        font-weight: 750;
-        margin-bottom: 5px;
-    }
-
-    .control-description {
-        color: #788499;
-        font-size: 13px;
-        margin-bottom: 18px;
-    }
-
-    .form-row {
-        display: flex;
-        gap: 12px;
-        align-items: end;
-    }
-
-    .field {
-        flex: 1;
-    }
-
-    .field label {
-        display: block;
-        font-size: 12px;
-        font-weight: 700;
-        color: #596579;
-        margin-bottom: 7px;
-    }
-
-    .field input {
-        width: 100%;
-        height: 44px;
-        border: 1px solid #d8e0ea;
-        border-radius: 9px;
-        padding: 0 13px;
-        font-size: 14px;
-        outline: none;
-        background: #fbfcfe;
-        transition: 0.2s;
-    }
-
-    .field input:focus {
-        border-color: #1769e0;
-        box-shadow: 0 0 0 3px rgba(23, 105, 224, 0.10);
-        background: #ffffff;
-    }
-
-    button {
-        height: 44px;
-        border: none;
-        border-radius: 9px;
-        padding: 0 20px;
-        background: #1769e0;
-        color: white;
-        font-size: 14px;
-        font-weight: 700;
-        cursor: pointer;
-        transition: 0.2s;
-        white-space: nowrap;
-    }
-
-    button:hover {
-        background: #125bc2;
-        transform: translateY(-1px);
-    }
-
-    button:disabled {
-        opacity: 0.6;
-        cursor: wait;
-        transform: none;
-    }
-
-    .secondary-button {
-        background: #edf4ff;
-        color: #1769e0;
-    }
-
-    .secondary-button:hover {
-        background: #e0edff;
-    }
-
-    /* =========================================================
-       STATUS
-    ========================================================= */
-
-    .status {
-        display: none;
-        padding: 12px 14px;
-        border-radius: 9px;
-        margin-top: 15px;
-        font-size: 13px;
-        font-weight: 600;
-    }
-
-    .status.show {
-        display: block;
-    }
-
-    .status.loading {
-        background: #eef5ff;
-        color: #1769e0;
-    }
-
-    .status.success {
-        background: #edf9f1;
-        color: #217a42;
-    }
-
-    .status.error {
-        background: #fff0f0;
-        color: #c0392b;
-    }
-
-    /* =========================================================
-       EMPTY STATE
-    ========================================================= */
-
-    .empty-state {
-        background: #ffffff;
-        border: 1px solid #e1e7ef;
-        border-radius: 15px;
-        padding: 55px 25px;
-        text-align: center;
-        box-shadow: 0 4px 18px rgba(25, 55, 95, 0.04);
-    }
-
-    .empty-icon {
-        width: 62px;
+    .header {
         height: 62px;
-        margin: 0 auto 17px;
-        border-radius: 16px;
-        background: #edf4ff;
-        color: #1769e0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 28px;
-        font-weight: 800;
     }
 
-    .empty-state h2 {
-        font-size: 20px;
-        margin-bottom: 8px;
+    .header-inner {
+        width:
+            calc(100% - 24px);
     }
 
-    .empty-state p {
-        max-width: 520px;
-        margin: 0 auto;
-        color: #7a8598;
-        font-size: 14px;
-        line-height: 1.6;
-    }
-
-    /* =========================================================
-       FLIGHT OVERVIEW
-    ========================================================= */
-
-    #flightContent {
+    .nav {
         display: none;
+
+        position: absolute;
+
+        top: 62px;
+        left: 0;
+        right: 0;
+
+        background: white;
+
+        border-bottom:
+            1px solid var(--border);
+
+        padding: 10px;
+
+        flex-direction: column;
+
+        align-items: stretch;
     }
 
-    .flight-header {
-        background: #ffffff;
-        border: 1px solid #e1e7ef;
-        border-radius: 15px;
-        padding: 25px;
-        margin-bottom: 20px;
-        box-shadow: 0 4px 18px rgba(25, 55, 95, 0.04);
-    }
-
-    .flight-top {
+    .nav.open {
         display: flex;
-        justify-content: space-between;
-        gap: 20px;
-        align-items: center;
     }
 
-    .callsign {
-        color: #1769e0;
-        font-size: 13px;
-        font-weight: 800;
-        letter-spacing: 0.8px;
-        margin-bottom: 8px;
+    .mobile-menu {
+        display: block;
     }
 
-    .route {
-        display: flex;
-        align-items: center;
-        gap: 20px;
+    .page {
+        width:
+            calc(100% - 24px);
+
+        padding-top:
+            22px;
     }
 
-    .airport {
+    .page-title {
+        flex-direction: column;
+    }
+
+    .title-left h1 {
+        font-size: 29px;
+    }
+
+    .connection-grid {
+        grid-template-columns:
+            1fr;
+    }
+
+    .connection-grid .button-row {
+        grid-column:
+            auto;
+    }
+
+    .route-large {
+        grid-template-columns:
+            1fr;
+
         text-align: center;
     }
 
-    .airport-code {
-        font-size: 31px;
-        font-weight: 850;
-        letter-spacing: -1px;
-    }
+    .airport-big,
+    .airport-big.right {
+        align-items: center;
 
-    .airport-name {
-        color: #7b8698;
-        font-size: 12px;
-        margin-top: 3px;
+        text-align: center;
     }
 
     .route-line {
-        width: 90px;
-        height: 1px;
-        background: #ccd5e1;
-        position: relative;
+        width: 70%;
+
+        margin: 5px auto;
     }
 
-    .route-line::after {
-        content: "✈";
-        position: absolute;
-        top: -10px;
-        left: 37px;
-        background: white;
-        color: #1769e0;
-        padding: 0 6px;
-        font-size: 14px;
+    .section-card,
+    .section-card.span-6,
+    .section-card.span-8,
+    .section-card.span-12 {
+        grid-column:
+            span 12;
     }
 
-    .aircraft-badge {
-        padding: 10px 14px;
-        background: #f1f5fa;
-        color: #536075;
-        border-radius: 9px;
-        font-size: 13px;
-        font-weight: 750;
+}
+
+@media (max-width: 520px) {
+
+    .page {
+        width:
+            calc(100% - 16px);
     }
 
-    /* =========================================================
-       CARDS
-    ========================================================= */
-
-    .section-title {
-        font-size: 18px;
-        font-weight: 800;
-        margin: 28px 0 13px;
-    }
-
-    .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 14px;
-    }
-
-    .stat-card {
-        background: #ffffff;
-        border: 1px solid #e1e7ef;
-        border-radius: 13px;
-        padding: 18px;
-        box-shadow: 0 4px 18px rgba(25, 55, 95, 0.03);
-    }
-
-    .stat-label {
-        color: #7a8597;
-        font-size: 12px;
-        font-weight: 650;
-        margin-bottom: 8px;
-    }
-
-    .stat-value {
-        font-size: 20px;
-        font-weight: 800;
-        color: #1b2638;
-    }
-
-    .stat-unit {
-        color: #8791a2;
-        font-size: 12px;
-        margin-left: 3px;
-        font-weight: 600;
-    }
-
-    .info-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 15px;
-    }
-
-    .info-card {
-        background: #ffffff;
-        border: 1px solid #e1e7ef;
-        border-radius: 13px;
-        padding: 20px;
-        box-shadow: 0 4px 18px rgba(25, 55, 95, 0.03);
-    }
-
-    .info-card h3 {
-        font-size: 15px;
-        margin-bottom: 17px;
-    }
-
-    .info-row {
-        display: flex;
-        justify-content: space-between;
-        gap: 15px;
-        padding: 9px 0;
-        border-bottom: 1px solid #edf0f4;
-        font-size: 13px;
-    }
-
-    .info-row:last-child {
-        border-bottom: none;
-    }
-
-    .info-label {
-        color: #7b8698;
-    }
-
-    .info-value {
-        font-weight: 700;
-        text-align: right;
-        word-break: break-word;
-    }
-
-    .route-card {
-        background: #ffffff;
-        border: 1px solid #e1e7ef;
-        border-radius: 13px;
-        padding: 20px;
-        box-shadow: 0 4px 18px rgba(25, 55, 95, 0.03);
-    }
-
-    .route-text {
-        background: #f6f8fb;
-        border-radius: 9px;
+    .connection-card,
+    .section-card,
+    .ofp-header {
         padding: 15px;
-        font-family:
-            Consolas,
-            Monaco,
-            monospace;
-        color: #354155;
-        font-size: 13px;
-        line-height: 1.7;
-        overflow-x: auto;
-        white-space: pre-wrap;
-        word-break: break-word;
     }
 
-    .remarks {
-        color: #606c7e;
-        line-height: 1.6;
-        font-size: 13px;
+    .airport-code {
+        font-size: 32px;
     }
 
-    /* =========================================================
-       FOOTER
-    ========================================================= */
-
-    footer {
-        text-align: center;
-        padding: 25px;
-        color: #8a94a4;
-        font-size: 12px;
+    .stats {
+        grid-template-columns:
+            1fr;
     }
 
-    /* =========================================================
-       RESPONSIVE
-    ========================================================= */
-
-    @media (max-width: 850px) {
-        header {
-            padding: 0 18px;
-        }
-
-        nav a {
-            padding: 8px;
-            font-size: 12px;
-        }
-
-        main {
-            padding: 28px 16px 50px;
-        }
-
-        .form-row {
-            flex-direction: column;
-            align-items: stretch;
-        }
-
-        .form-row button {
-            width: 100%;
-        }
-
-        .stats-grid {
-            grid-template-columns: repeat(2, 1fr);
-        }
-
-        .info-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .flight-top {
-            flex-direction: column;
-            align-items: flex-start;
-        }
+    .fuel-item {
+        grid-template-columns:
+            95px
+            1fr
+            65px;
     }
 
-    @media (max-width: 550px) {
-        .brand-text {
-            display: none;
-        }
-
-        nav {
-            gap: 2px;
-        }
-
-        nav a {
-            font-size: 11px;
-            padding: 7px 6px;
-        }
-
-        .page-header h1 {
-            font-size: 27px;
-        }
-
-        .stats-grid {
-            grid-template-columns: 1fr 1fr;
-        }
-
-        .route {
-            width: 100%;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .route-line {
-            width: 45px;
-        }
-
-        .route-line::after {
-            left: 14px;
-        }
-
-        .airport-code {
-            font-size: 25px;
-        }
+    .detail-row {
+        grid-template-columns:
+            1fr;
+        gap: 4px;
     }
+
+    .detail-value {
+        text-align: left;
+    }
+
+}
+
+/* =========================================================
+   PRINT
+   ========================================================= */
+
+@media print {
+
+    .header,
+    .connection-card,
+    .actions,
+    .footer,
+    .status-pill {
+        display: none !important;
+    }
+
+    body {
+        background: white;
+    }
+
+    .page {
+        width: 100%;
+        padding: 0;
+    }
+
+    .card {
+        box-shadow: none;
+
+        border:
+            1px solid #ccc;
+    }
+
+    .dashboard {
+        display: grid !important;
+    }
+
+}
+
 </style>
-```
-
 </head>
 
 <body>
 
-<header>
-    <a href="index.html" class="brand">
-        <div class="brand-icon">✈</div>
-        <div class="brand-text">Flight App</div>
-    </a>
+<!-- =======================================================
+     HEADER
+     ======================================================= -->
 
-```
-<nav>
-    <a href="index.html">Home</a>
-    <a href="weather.html">Weather</a>
-    <a href="charts.html">Charts</a>
-    <a href="simbrief.html" class="active">SimBrief</a>
-</nav>
-```
+<header class="header">
+
+    <div class="header-inner">
+
+        <a href="index.html" class="logo">
+
+            <div class="logo-icon">
+                ✈
+            </div>
+
+            <span>
+                Flight App
+            </span>
+
+        </a>
+
+        <nav class="nav" id="navigation">
+
+            <a href="index.html">
+                Home
+            </a>
+
+            <a href="weather.html">
+                Weather
+            </a>
+
+            <a href="charts.html">
+                Charts
+            </a>
+
+            <a href="simbrief.html" class="active">
+                SimBrief
+            </a>
+
+        </nav>
+
+        <button
+            class="mobile-menu"
+            id="mobileMenu"
+            aria-label="Open menu"
+        >
+            ☰
+        </button>
+
+    </div>
 
 </header>
 
-<main>
 
-```
-<div class="page-header">
-    <h1>SimBrief Flight</h1>
-    <p>
-        Load and view your latest SimBrief operational flight plan.
-    </p>
-</div>
+<!-- =======================================================
+     MAIN
+     ======================================================= -->
 
-<section class="control-card">
+<main class="page">
 
-    <div class="control-title">
-        Load SimBrief OFP
-    </div>
 
-    <div class="control-description">
-        Enter your SimBrief username or pilot ID to retrieve your
-        latest operational flight plan.
-    </div>
+    <!-- PAGE TITLE -->
 
-    <div class="form-row">
+    <div class="page-title">
 
-        <div class="field">
-            <label for="username">
-                SimBrief Username / Pilot ID
-            </label>
+        <div class="title-left">
 
-            <input
-                id="username"
-                type="text"
-                placeholder="Enter your SimBrief username"
-                autocomplete="off"
-            >
+            <h1>
+                SimBrief OFP
+            </h1>
+
+            <p>
+                Load and inspect your latest SimBrief Operational Flight Plan.
+            </p>
+
         </div>
 
-        <button id="loadButton" onclick="loadFlight()">
-            Load Flight
+        <div
+            class="status-pill"
+            id="connectionStatus"
+        >
+
+            <span class="status-dot"></span>
+
+            <span id="connectionStatusText">
+                Ready
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <!-- ===================================================
+         CONNECTION
+         =================================================== -->
+
+    <section class="card connection-card">
+
+        <div class="connection-grid">
+
+
+            <div class="field">
+
+                <label for="username">
+                    SimBrief Username
+                </label>
+
+                <input
+                    id="username"
+                    type="text"
+                    maxlength="80"
+                    autocomplete="off"
+                    placeholder="Enter your SimBrief username"
+                >
+
+            </div>
+
+
+            <div class="field">
+
+                <label for="backendUrl">
+                    Backend API
+                </label>
+
+                <input
+                    id="backendUrl"
+                    type="url"
+                    placeholder="https://your-render-service.onrender.com"
+                >
+
+            </div>
+
+
+            <div class="button-row">
+
+                <button
+                    class="btn btn-primary"
+                    id="loadButton"
+                >
+                    Load Latest OFP
+                </button>
+
+                <button
+                    class="btn btn-secondary"
+                    id="clearButton"
+                >
+                    Clear
+                </button>
+
+            </div>
+
+
+        </div>
+
+    </section>
+
+
+    <!-- ALERT -->
+
+    <div
+        class="alert"
+        id="alert"
+    >
+        <span id="alertIcon">!</span>
+
+        <span id="alertText"></span>
+    </div>
+
+
+    <!-- ===================================================
+         LOADING
+         =================================================== -->
+
+    <section
+        class="card loading"
+        id="loading"
+    >
+
+        <div class="spinner"></div>
+
+        <strong>
+            Loading SimBrief OFP...
+        </strong>
+
+        <p
+            style="
+                color:var(--text-soft);
+                margin:7px 0 0;
+                font-size:13px;
+            "
+        >
+            Contacting the Flight App backend and retrieving your latest OFP.
+        </p>
+
+    </section>
+
+
+    <!-- ===================================================
+         EMPTY
+         =================================================== -->
+
+    <section
+        class="card empty-state"
+        id="emptyState"
+    >
+
+        <div class="empty-icon">
+            ✈
+        </div>
+
+        <h2>
+            No OFP loaded
+        </h2>
+
+        <p>
+            Enter your SimBrief username above and load your latest
+            Operational Flight Plan. The Flight App backend will retrieve
+            the OFP directly from SimBrief.
+        </p>
+
+    </section>
+
+
+    <!-- ===================================================
+         OFP HEADER
+         =================================================== -->
+
+    <section
+        class="card ofp-header"
+        id="ofpHeader"
+    >
+
+        <div class="route-large">
+
+
+            <div class="airport-big">
+
+                <div
+                    class="airport-code"
+                    id="departureCode"
+                >
+                    ----
+                </div>
+
+                <div
+                    class="airport-name"
+                    id="departureName"
+                >
+                    Departure
+                </div>
+
+            </div>
+
+
+            <div class="route-line">
+
+                <div class="route-plane">
+                    ✈
+                </div>
+
+            </div>
+
+
+            <div class="airport-big right">
+
+                <div
+                    class="airport-code"
+                    id="arrivalCode"
+                >
+                    ----
+                </div>
+
+                <div
+                    class="airport-name"
+                    id="arrivalName"
+                >
+                    Arrival
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+        <div class="ofp-meta">
+
+            <div class="meta-chip">
+                Flight:
+                <strong id="metaFlight">
+                    --
+                </strong>
+            </div>
+
+            <div class="meta-chip">
+                Aircraft:
+                <strong id="metaAircraft">
+                    --
+                </strong>
+            </div>
+
+            <div class="meta-chip">
+                Date:
+                <strong id="metaDate">
+                    --
+                </strong>
+            </div>
+
+            <div class="meta-chip">
+                OFP:
+                <strong id="metaOFP">
+                    --
+                </strong>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ===================================================
+         ACTIONS
+         =================================================== -->
+
+    <div
+        class="actions"
+        id="actions"
+        style="display:none;"
+    >
+
+        <button
+            class="btn btn-secondary"
+            id="refreshButton"
+        >
+            ↻ Refresh
         </button>
 
         <button
-            class="secondary-button"
-            onclick="clearFlight()"
+            class="btn btn-secondary"
+            id="printButton"
         >
-            Clear
+            🖨 Print OFP
+        </button>
+
+        <button
+            class="btn btn-secondary"
+            id="rawButton"
+        >
+            { } Raw Data
+        </button>
+
+        <button
+            class="btn btn-secondary"
+            id="saveButton"
+        >
+            Save Plan
         </button>
 
     </div>
 
-    <div id="status" class="status"></div>
 
-</section>
+    <!-- ===================================================
+         DASHBOARD
+         =================================================== -->
 
-<section id="emptyState" class="empty-state">
+    <section
+        class="dashboard"
+        id="dashboard"
+    >
 
-    <div class="empty-icon">
-        ✈
-    </div>
 
-    <h2>No flight loaded</h2>
+        <!-- ===============================================
+             FLIGHT INFORMATION
+             =============================================== -->
 
-    <p>
-        Enter your SimBrief username or pilot ID above and load
-        your latest OFP. Your flight information will appear here.
-    </p>
+        <section class="card section-card span-6">
 
-</section>
+            <div class="section-title">
 
-<section id="flightContent">
+                <h3>
+                    Flight Information
+                </h3>
 
-    <div class="flight-header">
+                <span>
+                    OFP
+                </span>
 
-        <div class="flight-top">
+            </div>
 
-            <div>
-                <div
-                    id="flightNumber"
-                    class="callsign"
+            <div class="detail-list">
+
+                <div class="detail-row">
+                    <span class="detail-label">
+                        Flight number
+                    </span>
+
+                    <span
+                        class="detail-value"
+                        id="flightNumber"
+                    >
+                        --
+                    </span>
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">
+                        Callsign
+                    </span>
+
+                    <span
+                        class="detail-value"
+                        id="callsign"
+                    >
+                        --
+                    </span>
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">
+                        Aircraft
+                    </span>
+
+                    <span
+                        class="detail-value"
+                        id="aircraft"
+                    >
+                        --
+                    </span>
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">
+                        Registration
+                    </span>
+
+                    <span
+                        class="detail-value"
+                        id="registration"
+                    >
+                        --
+                    </span>
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">
+                        Operator
+                    </span>
+
+                    <span
+                        class="detail-value"
+                        id="operator"
+                    >
+                        --
+                    </span>
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">
+                        Airline
+                    </span>
+
+                    <span
+                        class="detail-value"
+                        id="airline"
+                    >
+                        --
+                    </span>
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">
+                        OFP ID
+                    </span>
+
+                    <span
+                        class="detail-value"
+                        id="ofpId"
+                    >
+                        --
+                    </span>
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">
+                        SimBrief username
+                    </span>
+
+                    <span
+                        class="detail-value"
+                        id="ofpUsername"
+                    >
+                        --
+                    </span>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ===============================================
+             TIMINGS
+             =============================================== -->
+
+        <section class="card section-card span-6">
+
+            <div class="section-title">
+
+                <h3>
+                    Flight Times
+                </h3>
+
+                <span>
+                    Schedule
+                </span>
+
+            </div>
+
+            <div class="stats">
+
+                <div class="stat">
+
+                    <div class="stat-label">
+                        Scheduled departure
+                    </div>
+
+                    <div
+                        class="stat-value"
+                        id="scheduledDeparture"
+                    >
+                        --
+                    </div>
+
+                </div>
+
+                <div class="stat">
+
+                    <div class="stat-label">
+                        Estimated departure
+                    </div>
+
+                    <div
+                        class="stat-value"
+                        id="estimatedDeparture"
+                    >
+                        --
+                    </div>
+
+                </div>
+
+                <div class="stat">
+
+                    <div class="stat-label">
+                        Estimated arrival
+                    </div>
+
+                    <div
+                        class="stat-value"
+                        id="estimatedArrival"
+                    >
+                        --
+                    </div>
+
+                </div>
+
+                <div class="stat">
+
+                    <div class="stat-label">
+                        Flight time
+                    </div>
+
+                    <div
+                        class="stat-value"
+                        id="flightTime"
+                    >
+                        --
+                    </div>
+
+                </div>
+
+                <div class="stat">
+
+                    <div class="stat-label">
+                        Block time
+                    </div>
+
+                    <div
+                        class="stat-value"
+                        id="blockTime"
+                    >
+                        --
+                    </div>
+
+                </div>
+
+                <div class="stat">
+
+                    <div class="stat-label">
+                        Air time
+                    </div>
+
+                    <div
+                        class="stat-value"
+                        id="airTime"
+                    >
+                        --
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ===============================================
+             ROUTE
+             =============================================== -->
+
+        <section class="card section-card span-12">
+
+            <div class="section-title">
+
+                <h3>
+                    Route
+                </h3>
+
+                <span id="routeSummary">
+                    --
+                </span>
+
+            </div>
+
+            <div
+                class="route-box"
+                id="routeBox"
+            >
+                No route loaded.
+            </div>
+
+            <div class="route-copy">
+
+                <button
+                    class="btn btn-secondary"
+                    id="copyRouteButton"
                 >
-                    FLIGHT
-                </div>
+                    Copy Route
+                </button>
 
-                <div class="route">
-
-                    <div class="airport">
-                        <div
-                            id="departure"
-                            class="airport-code"
-                        >
-                            ----
-                        </div>
-
-                        <div
-                            id="departureName"
-                            class="airport-name"
-                        >
-                            Departure
-                        </div>
-                    </div>
-
-                    <div class="route-line"></div>
-
-                    <div class="airport">
-                        <div
-                            id="arrival"
-                            class="airport-code"
-                        >
-                            ----
-                        </div>
-
-                        <div
-                            id="arrivalName"
-                            class="airport-name"
-                        >
-                            Arrival
-                        </div>
-                    </div>
-
-                </div>
             </div>
 
-            <div
-                id="aircraft"
-                class="aircraft-badge"
-            >
-                Aircraft unavailable
-            </div>
+        </section>
 
-        </div>
 
-    </div>
+        <!-- ===============================================
+             AIRCRAFT
+             =============================================== -->
 
-    <div class="section-title">
-        Flight overview
-    </div>
+        <section class="card section-card span-4">
 
-    <div class="stats-grid">
+            <div class="section-title">
 
-        <div class="stat-card">
-            <div class="stat-label">
-                Flight time
-            </div>
-
-            <div
-                id="flightTime"
-                class="stat-value"
-            >
-                —
-            </div>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-label">
-                Distance
-            </div>
-
-            <div class="stat-value">
-                <span id="distance">—</span>
-                <span class="stat-unit">NM</span>
-            </div>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-label">
-                Cruise altitude
-            </div>
-
-            <div class="stat-value">
-                <span id="cruiseAltitude">—</span>
-            </div>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-label">
-                Block fuel
-            </div>
-
-            <div class="stat-value">
-                <span id="blockFuel">—</span>
-                <span class="stat-unit">kg</span>
-            </div>
-        </div>
-
-    </div>
-
-    <div class="section-title">
-        Flight information
-    </div>
-
-    <div class="info-grid">
-
-        <div class="info-card">
-
-            <h3>Aircraft & operation</h3>
-
-            <div class="info-row">
-                <span class="info-label">
+                <h3>
                     Aircraft
+                </h3>
+
+                <span>
+                    Configuration
                 </span>
 
-                <span
-                    id="infoAircraft"
-                    class="info-value"
-                >
-                    —
-                </span>
             </div>
 
-            <div class="info-row">
-                <span class="info-label">
-                    Registration
-                </span>
+            <div class="detail-list">
 
-                <span
-                    id="registration"
-                    class="info-value"
-                >
-                    —
-                </span>
+                <div class="detail-row">
+                    <span class="detail-label">
+                        ICAO
+                    </span>
+
+                    <span
+                        class="detail-value"
+                        id="aircraftICAO"
+                    >
+                        --
+                    </span>
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">
+                        Type
+                    </span>
+
+                    <span
+                        class="detail-value"
+                        id="aircraftType"
+                    >
+                        --
+                    </span>
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">
+                        Registration
+                    </span>
+
+                    <span
+                        class="detail-value"
+                        id="aircraftReg"
+                    >
+                        --
+                    </span>
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">
+                        Cruise altitude
+                    </span>
+
+                    <span
+                        class="detail-value"
+                        id="cruiseAltitude"
+                    >
+                        --
+                    </span>
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">
+                        Cost index
+                    </span>
+
+                    <span
+                        class="detail-value"
+                        id="costIndex"
+                    >
+                        --
+                    </span>
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">
+                        Cruise Mach
+                    </span>
+
+                    <span
+                        class="detail-value"
+                        id="cruiseMach"
+                    >
+                        --
+                    </span>
+                </div>
+
             </div>
 
-            <div class="info-row">
-                <span class="info-label">
-                    Airline
+        </section>
+
+
+        <!-- ===============================================
+             DISTANCE
+             =============================================== -->
+
+        <section class="card section-card span-4">
+
+            <div class="section-title">
+
+                <h3>
+                    Distance
+                </h3>
+
+                <span>
+                    Navigation
                 </span>
 
-                <span
-                    id="airline"
-                    class="info-value"
-                >
-                    —
-                </span>
             </div>
 
-            <div class="info-row">
-                <span class="info-label">
-                    Cost index
-                </span>
+            <div class="stats">
 
-                <span
-                    id="costIndex"
-                    class="info-value"
-                >
-                    —
-                </span>
+                <div class="stat">
+
+                    <div class="stat-label">
+                        Total distance
+                    </div>
+
+                    <div
+                        class="stat-value"
+                        id="totalDistance"
+                    >
+                        --
+                    </div>
+
+                </div>
+
+                <div class="stat">
+
+                    <div class="stat-label">
+                        Air distance
+                    </div>
+
+                    <div
+                        class="stat-value"
+                        id="airDistance"
+                    >
+                        --
+                    </div>
+
+                </div>
+
+                <div class="stat">
+
+                    <div class="stat-label">
+                        Great circle
+                    </div>
+
+                    <div
+                        class="stat-value"
+                        id="greatCircle"
+                    >
+                        --
+                    </div>
+
+                </div>
+
+                <div class="stat">
+
+                    <div class="stat-label">
+                        Route length
+                    </div>
+
+                    <div
+                        class="stat-value"
+                        id="routeDistance"
+                    >
+                        --
+                    </div>
+
+                </div>
+
             </div>
 
-            <div class="info-row">
-                <span class="info-label">
-                    Callsign
+        </section>
+
+
+        <!-- ===============================================
+             PERFORMANCE
+             =============================================== -->
+
+        <section class="card section-card span-4">
+
+            <div class="section-title">
+
+                <h3>
+                    Performance
+                </h3>
+
+                <span>
+                    Flight planning
                 </span>
 
-                <span
-                    id="infoCallsign"
-                    class="info-value"
-                >
-                    —
-                </span>
             </div>
 
-        </div>
+            <div class="detail-list">
 
-        <div class="info-card">
+                <div class="detail-row">
+                    <span class="detail-label">
+                        Cost index
+                    </span>
 
-            <h3>Fuel & payload</h3>
+                    <span
+                        class="detail-value"
+                        id="performanceCI"
+                    >
+                        --
+                    </span>
+                </div>
 
-            <div class="info-row">
-                <span class="info-label">
-                    Trip fuel
-                </span>
+                <div class="detail-row">
+                    <span class="detail-label">
+                        Cruise altitude
+                    </span>
 
-                <span
-                    id="tripFuel"
-                    class="info-value"
-                >
-                    —
-                </span>
+                    <span
+                        class="detail-value"
+                        id="performanceAltitude"
+                    >
+                        --
+                    </span>
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">
+                        Cruise speed
+                    </span>
+
+                    <span
+                        class="detail-value"
+                        id="performanceSpeed"
+                    >
+                        --
+                    </span>
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">
+                        Average wind
+                    </span>
+
+                    <span
+                        class="detail-value"
+                        id="averageWind"
+                    >
+                        --
+                    </span>
+                </div>
+
             </div>
 
-            <div class="info-row">
-                <span class="info-label">
-                    Block fuel
+        </section>
+
+
+        <!-- ===============================================
+             WEIGHTS
+             =============================================== -->
+
+        <section class="card section-card span-6">
+
+            <div class="section-title">
+
+                <h3>
+                    Weights
+                </h3>
+
+                <span>
+                    Aircraft loading
                 </span>
 
-                <span
-                    id="infoBlockFuel"
-                    class="info-value"
-                >
-                    —
-                </span>
             </div>
 
-            <div class="info-row">
-                <span class="info-label">
+            <div class="stats">
+
+                <div class="stat">
+                    <div class="stat-label">
+                        Dry operating weight
+                    </div>
+
+                    <div
+                        class="stat-value"
+                        id="dow"
+                    >
+                        --
+                    </div>
+                </div>
+
+                <div class="stat">
+                    <div class="stat-label">
+                        Zero fuel weight
+                    </div>
+
+                    <div
+                        class="stat-value"
+                        id="zfw"
+                    >
+                        --
+                    </div>
+                </div>
+
+                <div class="stat">
+                    <div class="stat-label">
+                        Takeoff weight
+                    </div>
+
+                    <div
+                        class="stat-value"
+                        id="tow"
+                    >
+                        --
+                    </div>
+                </div>
+
+                <div class="stat">
+                    <div class="stat-label">
+                        Landing weight
+                    </div>
+
+                    <div
+                        class="stat-value"
+                        id="lw"
+                    >
+                        --
+                    </div>
+                </div>
+
+                <div class="stat">
+                    <div class="stat-label">
+                        Maximum takeoff
+                    </div>
+
+                    <div
+                        class="stat-value"
+                        id="mtow"
+                    >
+                        --
+                    </div>
+                </div>
+
+                <div class="stat">
+                    <div class="stat-label">
+                        Maximum landing
+                    </div>
+
+                    <div
+                        class="stat-value"
+                        id="mlw"
+                    >
+                        --
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ===============================================
+             PAYLOAD
+             =============================================== -->
+
+        <section class="card section-card span-6">
+
+            <div class="section-title">
+
+                <h3>
                     Payload
+                </h3>
+
+                <span>
+                    Loading
                 </span>
 
-                <span
-                    id="payload"
-                    class="info-value"
-                >
-                    —
-                </span>
             </div>
 
-            <div class="info-row">
-                <span class="info-label">
-                    Passengers
-                </span>
+            <div class="stats">
 
-                <span
-                    id="passengers"
-                    class="info-value"
-                >
-                    —
-                </span>
+                <div class="stat">
+                    <div class="stat-label">
+                        Passengers
+                    </div>
+
+                    <div
+                        class="stat-value"
+                        id="passengers"
+                    >
+                        --
+                    </div>
+                </div>
+
+                <div class="stat">
+                    <div class="stat-label">
+                        Cargo
+                    </div>
+
+                    <div
+                        class="stat-value"
+                        id="cargo"
+                    >
+                        --
+                    </div>
+                </div>
+
+                <div class="stat">
+                    <div class="stat-label">
+                        Payload
+                    </div>
+
+                    <div
+                        class="stat-value"
+                        id="payload"
+                    >
+                        --
+                    </div>
+                </div>
+
+                <div class="stat">
+                    <div class="stat-label">
+                        Bags
+                    </div>
+
+                    <div
+                        class="stat-value"
+                        id="bags"
+                    >
+                        --
+                    </div>
+                </div>
+
             </div>
 
-            <div class="info-row">
-                <span class="info-label">
-                    Zero fuel weight
+        </section>
+
+
+        <!-- ===============================================
+             FUEL
+             =============================================== -->
+
+        <section class="card section-card span-8">
+
+            <div class="section-title">
+
+                <h3>
+                    Fuel
+                </h3>
+
+                <span>
+                    Planned fuel
                 </span>
 
-                <span
-                    id="zeroFuelWeight"
-                    class="info-value"
-                >
-                    —
-                </span>
             </div>
 
-        </div>
+            <div class="fuel-bars">
 
-    </div>
+                <div class="fuel-item">
 
-    <div class="section-title">
-        Route
-    </div>
+                    <span class="fuel-name">
+                        Taxi
+                    </span>
 
-    <div class="route-card">
+                    <div class="fuel-track">
+                        <div
+                            class="fuel-fill"
+                            id="fuelTaxiBar"
+                        ></div>
+                    </div>
 
-        <div
-            id="route"
-            class="route-text"
+                    <span
+                        class="fuel-number"
+                        id="fuelTaxi"
+                    >
+                        --
+                    </span>
+
+                </div>
+
+
+                <div class="fuel-item">
+
+                    <span class="fuel-name">
+                        Trip
+                    </span>
+
+                    <div class="fuel-track">
+                        <div
+                            class="fuel-fill"
+                            id="fuelTripBar"
+                        ></div>
+                    </div>
+
+                    <span
+                        class="fuel-number"
+                        id="fuelTrip"
+                    >
+                        --
+                    </span>
+
+                </div>
+
+
+                <div class="fuel-item">
+
+                    <span class="fuel-name">
+                        Contingency
+                    </span>
+
+                    <div class="fuel-track">
+                        <div
+                            class="fuel-fill"
+                            id="fuelContingencyBar"
+                        ></div>
+                    </div>
+
+                    <span
+                        class="fuel-number"
+                        id="fuelContingency"
+                    >
+                        --
+                    </span>
+
+                </div>
+
+
+                <div class="fuel-item">
+
+                    <span class="fuel-name">
+                        Alternate
+                    </span>
+
+                    <div class="fuel-track">
+                        <div
+                            class="fuel-fill"
+                            id="fuelAlternateBar"
+                        ></div>
+                    </div>
+
+                    <span
+                        class="fuel-number"
+                        id="fuelAlternate"
+                    >
+                        --
+                    </span>
+
+                </div>
+
+
+                <div class="fuel-item">
+
+                    <span class="fuel-name">
+                        Reserve
+                    </span>
+
+                    <div class="fuel-track">
+                        <div
+                            class="fuel-fill"
+                            id="fuelReserveBar"
+                        ></div>
+                    </div>
+
+                    <span
+                        class="fuel-number"
+                        id="fuelReserve"
+                    >
+                        --
+                    </span>
+
+                </div>
+
+
+                <div class="fuel-item">
+
+                    <span class="fuel-name">
+                        Extra
+                    </span>
+
+                    <div class="fuel-track">
+                        <div
+                            class="fuel-fill"
+                            id="fuelExtraBar"
+                        ></div>
+                    </div>
+
+                    <span
+                        class="fuel-number"
+                        id="fuelExtra"
+                    >
+                        --
+                    </span>
+
+                </div>
+
+
+                <div class="fuel-item">
+
+                    <span class="fuel-name">
+                        Block
+                    </span>
+
+                    <div class="fuel-track">
+                        <div
+                            class="fuel-fill"
+                            id="fuelBlockBar"
+                        ></div>
+                    </div>
+
+                    <span
+                        class="fuel-number"
+                        id="fuelBlock"
+                    >
+                        --
+                    </span>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ===============================================
+             ALTERNATE
+             =============================================== -->
+
+        <section class="card section-card span-4">
+
+            <div class="section-title">
+
+                <h3>
+                    Alternate
+                </h3>
+
+                <span>
+                    Destination alternate
+                </span>
+
+            </div>
+
+            <div class="detail-list">
+
+                <div class="detail-row">
+                    <span class="detail-label">
+                        Airport
+                    </span>
+
+                    <span
+                        class="detail-value"
+                        id="alternateAirport"
+                    >
+                        --
+                    </span>
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">
+                        Distance
+                    </span>
+
+                    <span
+                        class="detail-value"
+                        id="alternateDistance"
+                    >
+                        --
+                    </span>
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">
+                        Fuel
+                    </span>
+
+                    <span
+                        class="detail-value"
+                        id="alternateFuel"
+                    >
+                        --
+                    </span>
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">
+                        Time
+                    </span>
+
+                    <span
+                        class="detail-value"
+                        id="alternateTime"
+                    >
+                        --
+                    </span>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ===============================================
+             DEPARTURE
+             =============================================== -->
+
+        <section class="card section-card span-6">
+
+            <div class="section-title">
+
+                <h3>
+                    Departure
+                </h3>
+
+                <span>
+                    Origin
+                </span>
+
+            </div>
+
+            <div class="detail-list">
+
+                <div class="detail-row">
+                    <span class="detail-label">
+                        ICAO
+                    </span>
+
+                    <span
+                        class="detail-value"
+                        id="departureICAO"
+                    >
+                        --
+                    </span>
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">
+                        Airport
+                    </span>
+
+                    <span
+                        class="detail-value"
+                        id="departureAirport"
+                    >
+                        --
+                    </span>
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">
+                        Runway
+                    </span>
+
+                    <span
+                        class="detail-value"
+                        id="departureRunway"
+                    >
+                        --
+                    </span>
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">
+                        SID
+                    </span>
+
+                    <span
+                        class="detail-value"
+                        id="departureSID"
+                    >
+                        --
+                    </span>
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">
+                        ATIS
+                    </span>
+
+                    <span
+                        class="detail-value"
+                        id="departureATIS"
+                    >
+                        --
+                    </span>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ===============================================
+             ARRIVAL
+             =============================================== -->
+
+        <section class="card section-card span-6">
+
+            <div class="section-title">
+
+                <h3>
+                    Arrival
+                </h3>
+
+                <span>
+                    Destination
+                </span>
+
+            </div>
+
+            <div class="detail-list">
+
+                <div class="detail-row">
+                    <span class="detail-label">
+                        ICAO
+                    </span>
+
+                    <span
+                        class="detail-value"
+                        id="arrivalICAO"
+                    >
+                        --
+                    </span>
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">
+                        Airport
+                    </span>
+
+                    <span
+                        class="detail-value"
+                        id="arrivalAirport"
+                    >
+                        --
+                    </span>
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">
+                        Runway
+                    </span>
+
+                    <span
+                        class="detail-value"
+                        id="arrivalRunway"
+                    >
+                        --
+                    </span>
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">
+                        STAR
+                    </span>
+
+                    <span
+                        class="detail-value"
+                        id="arrivalSTAR"
+                    >
+                        --
+                    </span>
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">
+                        Approach
+                    </span>
+
+                    <span
+                        class="detail-value"
+                        id="arrivalApproach"
+                    >
+                        --
+                    </span>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ===============================================
+             NAVIGATION
+             =============================================== -->
+
+        <section class="card section-card span-12">
+
+            <div class="section-title">
+
+                <h3>
+                    Navigation & Flight Planning
+                </h3>
+
+                <span>
+                    OFP details
+                </span>
+
+            </div>
+
+            <div class="stats">
+
+                <div class="stat">
+
+                    <div class="stat-label">
+                        Initial altitude
+                    </div>
+
+                    <div
+                        class="stat-value"
+                        id="initialAltitude"
+                    >
+                        --
+                    </div>
+
+                </div>
+
+                <div class="stat">
+
+                    <div class="stat-label">
+                        Cruise altitude
+                    </div>
+
+                    <div
+                        class="stat-value"
+                        id="navCruiseAltitude"
+                    >
+                        --
+                    </div>
+
+                </div>
+
+                <div class="stat">
+
+                    <div class="stat-label">
+                        Cost index
+                    </div>
+
+                    <div
+                        class="stat-value"
+                        id="navCostIndex"
+                    >
+                        --
+                    </div>
+
+                </div>
+
+                <div class="stat">
+
+                    <div class="stat-label">
+                        Cruise Mach
+                    </div>
+
+                    <div
+                        class="stat-value"
+                        id="navCruiseMach"
+                    >
+                        --
+                    </div>
+
+                </div>
+
+                <div class="stat">
+
+                    <div class="stat-label">
+                        Average wind
+                    </div>
+
+                    <div
+                        class="stat-value"
+                        id="navWind"
+                    >
+                        --
+                    </div>
+
+                </div>
+
+                <div class="stat">
+
+                    <div class="stat-label">
+                        Track
+                    </div>
+
+                    <div
+                        class="stat-value"
+                        id="navTrack"
+                    >
+                        --
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ===============================================
+             RAW DATA
+             =============================================== -->
+
+        <section
+            class="card section-card span-12 raw-data"
+            id="rawDataSection"
         >
-            Route unavailable.
-        </div>
 
-    </div>
+            <div class="section-title">
 
-    <div class="section-title">
-        Additional information
-    </div>
+                <h3>
+                    Raw SimBrief Data
+                </h3>
 
-    <div class="info-grid">
-
-        <div class="info-card">
-
-            <h3>Departure</h3>
-
-            <div class="info-row">
-                <span class="info-label">
-                    Airport
+                <span>
+                    Debug
                 </span>
 
-                <span
-                    id="departureFull"
-                    class="info-value"
-                >
-                    —
-                </span>
             </div>
 
-            <div class="info-row">
-                <span class="info-label">
-                    Runway
-                </span>
+            <pre
+                class="raw-json"
+                id="rawJson"
+            ></pre>
 
-                <span
-                    id="departureRunway"
-                    class="info-value"
-                >
-                    —
-                </span>
-            </div>
+        </section>
 
-            <div class="info-row">
-                <span class="info-label">
-                    SID
-                </span>
 
-                <span
-                    id="sid"
-                    class="info-value"
-                >
-                    —
-                </span>
-            </div>
+    </section>
 
-        </div>
 
-        <div class="info-card">
+    <!-- ===================================================
+         FOOTER
+         =================================================== -->
 
-            <h3>Arrival</h3>
+    <footer class="footer">
 
-            <div class="info-row">
-                <span class="info-label">
-                    Airport
-                </span>
+        Flight App SimBrief integration
 
-                <span
-                    id="arrivalFull"
-                    class="info-value"
-                >
-                    —
-                </span>
-            </div>
+        <br>
 
-            <div class="info-row">
-                <span class="info-label">
-                    Runway
-                </span>
+        Data supplied by your Flight App backend
+        and SimBrief.
 
-                <span
-                    id="arrivalRunway"
-                    class="info-value"
-                >
-                    —
-                </span>
-            </div>
+    </footer>
 
-            <div class="info-row">
-                <span class="info-label">
-                    STAR
-                </span>
-
-                <span
-                    id="star"
-                    class="info-value"
-                >
-                    —
-                </span>
-            </div>
-
-        </div>
-
-    </div>
-
-    <div class="section-title">
-        Remarks
-    </div>
-
-    <div class="info-card">
-        <div
-            id="remarks"
-            class="remarks"
-        >
-            No remarks available.
-        </div>
-    </div>
-
-</section>
-```
 
 </main>
 
-<footer>
-    Flight App · SimBrief Integration
-</footer>
 
 <script>
 
 /* =========================================================
-   BACKEND CONFIGURATION
-========================================================= */
+   CONFIGURATION
+   ========================================================= */
+
+const DEFAULT_BACKEND_URL =
+    "";
+
 
 /*
-    Your Render backend URL.
-
-    If your frontend and backend use different URLs,
-    replace this with your Render backend URL.
-
-    Example:
-    https://your-flight-app-backend.onrender.com
-*/
-
-const API_BASE =
-    "https://flight-app-backend.onrender.com";
-
-
-/* =========================================================
-   HELPERS
-========================================================= */
-
-function valueOrUnavailable(value) {
-
-    if (
-        value === undefined ||
-        value === null ||
-        value === "" ||
-        value === "null" ||
-        value === "undefined"
-    ) {
-        return "Unavailable";
-    }
-
-    return value;
-}
-
-
-function numberOrUnavailable(value) {
-
-    if (
-        value === undefined ||
-        value === null ||
-        value === "" ||
-        isNaN(Number(value))
-    ) {
-        return "Unavailable";
-    }
-
-    return Number(value).toLocaleString();
-}
-
-
-function setStatus(message, type) {
-
-    const status =
-        document.getElementById("status");
-
-    status.textContent = message;
-
-    status.className =
-        "status show " + type;
-}
+ * If simbrief.html is hosted by the same server as the API,
+ * the empty string above is correct.
+ *
+ * If your frontend is hosted separately, enter your Render
+ * backend URL in the field on the page.
+ *
+ * Example:
+ *
+ * https://flight-app-backend-xxxx.onrender.com
+ */
 
 
 /* =========================================================
-   LOAD FLIGHT
-========================================================= */
+   DOM
+   ========================================================= */
 
-async function loadFlight() {
+const usernameInput =
+    document.getElementById(
+        "username"
+    );
+
+const backendInput =
+    document.getElementById(
+        "backendUrl"
+    );
+
+const loadButton =
+    document.getElementById(
+        "loadButton"
+    );
+
+const clearButton =
+    document.getElementById(
+        "clearButton"
+    );
+
+const refreshButton =
+    document.getElementById(
+        "refreshButton"
+    );
+
+const printButton =
+    document.getElementById(
+        "printButton"
+    );
+
+const rawButton =
+    document.getElementById(
+        "rawButton"
+    );
+
+const saveButton =
+    document.getElementById(
+        "saveButton"
+    );
+
+const copyRouteButton =
+    document.getElementById(
+        "copyRouteButton"
+    );
+
+const mobileMenu =
+    document.getElementById(
+        "mobileMenu"
+    );
+
+const navigation =
+    document.getElementById(
+        "navigation"
+    );
+
+const alertBox =
+    document.getElementById(
+        "alert"
+    );
+
+const alertText =
+    document.getElementById(
+        "alertText"
+    );
+
+const alertIcon =
+    document.getElementById(
+        "alertIcon"
+    );
+
+const loading =
+    document.getElementById(
+        "loading"
+    );
+
+const emptyState =
+    document.getElementById(
+        "emptyState"
+    );
+
+const ofpHeader =
+    document.getElementById(
+        "ofpHeader"
+    );
+
+const dashboard =
+    document.getElementById(
+        "dashboard"
+    );
+
+const actions =
+    document.getElementById(
+        "actions"
+    );
+
+const connectionStatus =
+    document.getElementById(
+        "connectionStatus"
+    );
+
+const connectionStatusText =
+    document.getElementById(
+        "connectionStatusText"
+    );
+
+const rawDataSection =
+    document.getElementById(
+        "rawDataSection"
+    );
+
+const rawJson =
+    document.getElementById(
+        "rawJson"
+    );
+
+
+/* =========================================================
+   STATE
+   ========================================================= */
+
+let currentOFP =
+    null;
+
+let currentUsername =
+    "";
+
+let currentBackend =
+    "";
+
+
+/* =========================================================
+   LOCAL STORAGE
+   ========================================================= */
+
+function loadSettings() {
+
+    const savedUsername =
+        localStorage.getItem(
+            "flightapp_simbrief_username"
+        );
+
+    const savedBackend =
+        localStorage.getItem(
+            "flightapp_backend_url"
+        );
+
+
+    if (
+        savedUsername
+    ) {
+
+        usernameInput.value =
+            savedUsername;
+
+    }
+
+
+    if (
+        savedBackend
+    ) {
+
+        backendInput.value =
+            savedBackend;
+
+    } else {
+
+        backendInput.value =
+            DEFAULT_BACKEND_URL;
+
+    }
+
+}
+
+
+function saveSettings() {
 
     const username =
-        document
-            .getElementById("username")
-            .value
-            .trim();
+        usernameInput.value.trim();
 
-    const button =
-        document.getElementById("loadButton");
+    const backend =
+        backendInput.value.trim();
 
-    if (!username) {
+
+    if (
+        username
+    ) {
+
+        localStorage.setItem(
+            "flightapp_simbrief_username",
+            username
+        );
+
+    }
+
+
+    if (
+        backend
+    ) {
+
+        localStorage.setItem(
+            "flightapp_backend_url",
+            backend
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   BACKEND URL
+   ========================================================= */
+
+function getBackendURL() {
+
+    let backend =
+        backendInput.value.trim();
+
+
+    if (
+        !backend
+    ) {
+
+        backend =
+            DEFAULT_BACKEND_URL;
+
+    }
+
+
+    /*
+     * Remove trailing slash.
+     */
+
+    backend =
+        backend.replace(
+            /\/+$/,
+            ""
+        );
+
+
+    return backend;
+
+}
+
+
+/* =========================================================
+   STATUS
+   ========================================================= */
+
+function setStatus(
+    type,
+    text
+) {
+
+    connectionStatus.className =
+        "status-pill";
+
+
+    if (
+        type === "online"
+    ) {
+
+        connectionStatus.classList.add(
+            "online"
+        );
+
+    }
+
+
+    if (
+        type === "loading"
+    ) {
+
+        connectionStatus.classList.add(
+            "loading"
+        );
+
+    }
+
+
+    connectionStatusText.textContent =
+        text;
+
+}
+
+
+/* =========================================================
+   ALERT
+   ========================================================= */
+
+function showAlert(
+    type,
+    message
+) {
+
+    alertBox.className =
+        "alert show " +
+        type;
+
+    alertText.textContent =
+        message;
+
+
+    if (
+        type === "error"
+    ) {
+
+        alertIcon.textContent =
+            "✕";
+
+    } else if (
+        type === "success"
+    ) {
+
+        alertIcon.textContent =
+            "✓";
+
+    } else {
+
+        alertIcon.textContent =
+            "!";
+
+    }
+
+}
+
+
+function hideAlert() {
+
+    alertBox.className =
+        "alert";
+
+}
+
+
+/* =========================================================
+   LOADING
+   ========================================================= */
+
+function setLoading(
+    isLoading
+) {
+
+    if (
+        isLoading
+    ) {
+
+        loading.classList.add(
+            "show"
+        );
+
+        loadButton.disabled =
+            true;
+
+        loadButton.textContent =
+            "Loading...";
 
         setStatus(
-            "Please enter your SimBrief username or pilot ID.",
-            "error"
+            "loading",
+            "Loading"
+        );
+
+    } else {
+
+        loading.classList.remove(
+            "show"
+        );
+
+        loadButton.disabled =
+            false;
+
+        loadButton.textContent =
+            "Load Latest OFP";
+
+    }
+
+}
+
+
+/* =========================================================
+   VALUE HELPERS
+   ========================================================= */
+
+function firstValue(
+    object,
+    paths,
+    fallback = null
+) {
+
+    if (
+        !object
+    ) {
+
+        return fallback;
+
+    }
+
+
+    for (
+        const path of paths
+    ) {
+
+        const parts =
+            path.split(".");
+
+
+        let value =
+            object;
+
+
+        let exists =
+            true;
+
+
+        for (
+            const part of parts
+        ) {
+
+            if (
+                value === null ||
+                value === undefined ||
+                !Object.prototype.hasOwnProperty.call(
+                    value,
+                    part
+                )
+            ) {
+
+                exists =
+                    false;
+
+                break;
+
+            }
+
+
+            value =
+                value[part];
+
+        }
+
+
+        if (
+            exists &&
+            value !== null &&
+            value !== undefined &&
+            value !== ""
+        ) {
+
+            return value;
+
+        }
+
+    }
+
+
+    return fallback;
+
+}
+
+
+function text(
+    value,
+    fallback = "--"
+) {
+
+    if (
+        value === null ||
+        value === undefined ||
+        value === ""
+    ) {
+
+        return fallback;
+
+    }
+
+
+    return String(
+        value
+    );
+
+}
+
+
+function numberValue(
+    value
+) {
+
+    if (
+        value === null ||
+        value === undefined ||
+        value === ""
+    ) {
+
+        return null;
+
+    }
+
+
+    const parsed =
+        Number(
+            String(
+                value
+            ).replace(
+                /,/g,
+                ""
+            )
+        );
+
+
+    return Number.isFinite(
+        parsed
+    )
+        ? parsed
+        : null;
+
+}
+
+
+function formatNumber(
+    value
+) {
+
+    const n =
+        numberValue(
+            value
+        );
+
+
+    if (
+        n === null
+    ) {
+
+        return "--";
+
+    }
+
+
+    return n.toLocaleString(
+        "en-US",
+        {
+            maximumFractionDigits: 0
+        }
+    );
+
+}
+
+
+function formatWeight(
+    value
+) {
+
+    const n =
+        numberValue(
+            value
+        );
+
+
+    if (
+        n === null
+    ) {
+
+        return "--";
+
+    }
+
+
+    return (
+        formatNumber(n) +
+        " kg"
+    );
+
+}
+
+
+function formatDistance(
+    value
+) {
+
+    const n =
+        numberValue(
+            value
+        );
+
+
+    if (
+        n === null
+    ) {
+
+        return "--";
+
+    }
+
+
+    return (
+        formatNumber(n) +
+        " NM"
+    );
+
+}
+
+
+function formatFuel(
+    value
+) {
+
+    const n =
+        numberValue(
+            value
+        );
+
+
+    if (
+        n === null
+    ) {
+
+        return "--";
+
+    }
+
+
+    return (
+        formatNumber(n) +
+        " kg"
+    );
+
+}
+
+
+function formatMinutes(
+    value
+) {
+
+    const n =
+        numberValue(
+            value
+        );
+
+
+    if (
+        n === null
+    ) {
+
+        return "--";
+
+    }
+
+
+    const hours =
+        Math.floor(
+            n / 60
+        );
+
+    const minutes =
+        Math.round(
+            n % 60
+        );
+
+
+    return (
+        String(hours).padStart(
+            2,
+            "0"
+        ) +
+        ":" +
+        String(minutes).padStart(
+            2,
+            "0"
+        )
+    );
+
+}
+
+
+function formatTime(
+    value
+) {
+
+    if (
+        value === null ||
+        value === undefined ||
+        value === ""
+    ) {
+
+        return "--";
+
+    }
+
+
+    const stringValue =
+        String(value);
+
+
+    /*
+     * Unix timestamp.
+     */
+
+    if (
+        /^\d{9,13}$/.test(
+            stringValue
+        )
+    ) {
+
+        let timestamp =
+            Number(
+                stringValue
+            );
+
+
+        if (
+            timestamp < 100000000000
+        ) {
+
+            timestamp *=
+                1000;
+
+        }
+
+
+        const date =
+            new Date(
+                timestamp
+            );
+
+
+        if (
+            !Number.isNaN(
+                date.getTime()
+            )
+        ) {
+
+            return date.toLocaleString(
+                [],
+                {
+                    dateStyle:
+                        "medium",
+                    timeStyle:
+                        "short"
+                }
+            );
+
+        }
+
+    }
+
+
+    return stringValue;
+
+}
+
+
+/* =========================================================
+   DOM SETTER
+   ========================================================= */
+
+function setText(
+    id,
+    value,
+    fallback = "--"
+) {
+
+    const element =
+        document.getElementById(
+            id
+        );
+
+
+    if (
+        !element
+    ) {
+
+        return;
+
+    }
+
+
+    element.textContent =
+        text(
+            value,
+            fallback
+        );
+
+}
+
+
+/* =========================================================
+   EXTRACT AIRPORT
+   ========================================================= */
+
+function getAirportCode(
+    airport
+) {
+
+    if (
+        typeof airport === "string"
+    ) {
+
+        return airport;
+
+    }
+
+
+    return firstValue(
+        airport,
+        [
+            "icao",
+            "icao_code",
+            "icaoCode",
+            "ident",
+            "iata",
+            "iata_code"
+        ]
+    );
+
+}
+
+
+function getAirportName(
+    airport
+) {
+
+    if (
+        typeof airport === "string"
+    ) {
+
+        return "";
+
+    }
+
+
+    return firstValue(
+        airport,
+        [
+            "name",
+            "airport_name",
+            "airportName",
+            "facility_name",
+            "city"
+        ]
+    );
+
+}
+
+
+/* =========================================================
+   OFP DATA NORMALIZATION
+   ========================================================= */
+
+function normalizeOFP(
+    response
+) {
+
+    /*
+     * Your backend returns:
+     *
+     * {
+     *   available: true,
+     *   source: "SimBrief",
+     *   username: "...",
+     *   ofp: { ... }
+     * }
+     */
+
+    const ofp =
+        response?.ofp ||
+        response?.data ||
+        response;
+
+
+    if (
+        !ofp ||
+        typeof ofp !== "object"
+    ) {
+
+        return null;
+
+    }
+
+
+    return ofp;
+
+}
+
+
+/* =========================================================
+   LOAD OFP
+   ========================================================= */
+
+async function loadOFP() {
+
+    hideAlert();
+
+
+    const username =
+        usernameInput.value.trim();
+
+
+    if (
+        !username
+    ) {
+
+        showAlert(
+            "error",
+            "Please enter your SimBrief username."
+        );
+
+        usernameInput.focus();
+
+        return;
+
+    }
+
+
+    if (
+        username.length > 80
+    ) {
+
+        showAlert(
+            "error",
+            "The SimBrief username is too long."
         );
 
         return;
+
     }
 
-    button.disabled = true;
 
-    setStatus(
-        "Loading SimBrief flight plan...",
-        "loading"
+    if (
+        !/^[a-zA-Z0-9_.-]+$/.test(
+            username
+        )
+    ) {
+
+        showAlert(
+            "error",
+            "The SimBrief username contains invalid characters."
+        );
+
+        return;
+
+    }
+
+
+    const backend =
+        getBackendURL();
+
+
+    currentUsername =
+        username;
+
+    currentBackend =
+        backend;
+
+
+    saveSettings();
+
+
+    setLoading(
+        true
     );
+
 
     try {
 
         /*
-            The frontend first tries the backend endpoint.
+         * This is the exact endpoint from your server.js:
+         *
+         * GET /api/simbrief/latest?username=...
+         */
 
-            Expected endpoint:
-            GET /api/simbrief?username=USERNAME
+        const endpoint =
+            backend +
+            "/api/simbrief/latest?username=" +
+            encodeURIComponent(
+                username
+            );
 
-            If your server uses another endpoint,
-            only this URL needs to be changed.
-        */
 
         const response =
             await fetch(
-                API_BASE +
-                "/api/simbrief?username=" +
-                encodeURIComponent(username)
+                endpoint,
+                {
+                    method:
+                        "GET",
+
+                    headers: {
+                        Accept:
+                            "application/json"
+                    }
+                }
             );
 
-        if (!response.ok) {
+
+        let data =
+            null;
+
+
+        try {
+
+            data =
+                await response.json();
+
+        } catch (
+            jsonError
+        ) {
 
             throw new Error(
-                "Backend returned HTTP " +
-                response.status
+                "The backend did not return valid JSON."
             );
+
         }
 
-        const data =
-            await response.json();
 
-        console.log(
-            "SimBrief response:",
-            data
+        if (
+            !response.ok
+        ) {
+
+            throw new Error(
+                data?.error ||
+                `Backend returned HTTP ${response.status}.`
+            );
+
+        }
+
+
+        if (
+            data?.available === false
+        ) {
+
+            throw new Error(
+                data?.error ||
+                "SimBrief did not return an OFP."
+            );
+
+        }
+
+
+        const ofp =
+            normalizeOFP(
+                data
+            );
+
+
+        if (
+            !ofp
+        ) {
+
+            throw new Error(
+                "No usable OFP data was returned."
+            );
+
+        }
+
+
+        currentOFP =
+            ofp;
+
+
+        renderOFP(
+            ofp,
+            username
         );
 
-        if (!data) {
 
-            throw new Error(
-                "No SimBrief data was returned."
-            );
-        }
-
-        renderFlight(data);
+        setLoading(
+            false
+        );
 
         setStatus(
-            "SimBrief flight plan loaded successfully.",
-            "success"
+            "online",
+            "OFP Loaded"
         );
 
-    } catch (error) {
+
+        showAlert(
+            "success",
+            "Latest SimBrief OFP loaded successfully."
+        );
+
+
+    } catch (
+        error
+    ) {
 
         console.error(
-            "SimBrief error:",
+            "SimBrief loading error:",
             error
         );
 
-        setStatus(
-            "Unable to load the SimBrief flight plan. " +
-            error.message,
-            "error"
+
+        setLoading(
+            false
         );
 
-    } finally {
 
-        button.disabled = false;
+        setStatus(
+            "",
+            "Error"
+        );
+
+
+        let message =
+            error?.message ||
+            "Could not load SimBrief OFP.";
+
+
+        /*
+         * Helpful CORS / network error.
+         */
+
+        if (
+            error instanceof TypeError
+        ) {
+
+            message =
+                "Could not connect to the backend. Check the Render backend URL and make sure the backend is online.";
+
+        }
+
+
+        showAlert(
+            "error",
+            message
+        );
+
     }
+
 }
 
 
 /* =========================================================
-   RENDER FLIGHT
-========================================================= */
+   RENDER OFP
+   ========================================================= */
 
-function renderFlight(data) {
+function renderOFP(
+    ofp,
+    username
+) {
+
+    emptyState.style.display =
+        "none";
+
+
+    ofpHeader.classList.add(
+        "show"
+    );
+
+
+    dashboard.classList.add(
+        "show"
+    );
+
+
+    actions.style.display =
+        "flex";
+
+
+    rawDataSection.classList.remove(
+        "show"
+    );
+
+
+    rawJson.textContent =
+        JSON.stringify(
+            ofp,
+            null,
+            2
+        );
+
 
     /*
-        SimBrief data can arrive either directly or inside
-        an OFP/data object depending on the backend.
+     * =====================================================
+     * GENERAL
+     * =====================================================
+     */
 
-        This makes the page tolerant of both formats.
-    */
-
-    const ofp =
-        data.ofp ||
-        data.data ||
-        data;
+    const general =
+        ofp.general ||
+        {};
 
     const origin =
         ofp.origin ||
@@ -1270,460 +4140,2028 @@ function renderFlight(data) {
         ofp.arrival ||
         {};
 
-    const aircraft =
+    const aircraftData =
         ofp.aircraft ||
         {};
 
+    const fuel =
+        ofp.fuel ||
+        {};
 
-    /* -----------------------------------------------------
-       BASIC FLIGHT
-    ----------------------------------------------------- */
+    const weights =
+        ofp.weights ||
+        ofp.weight ||
+        {};
 
-    document.getElementById(
-        "flightNumber"
-    ).textContent =
-        valueOrUnavailable(
-            ofp.flight_number ||
-            ofp.flight ||
-            ofp.callsign
+    const times =
+        ofp.times ||
+        {};
+
+    const params =
+        ofp.params ||
+        ofp.performance ||
+        {};
+
+    const alternate =
+        ofp.alternate ||
+        {};
+
+
+    /*
+     * =====================================================
+     * AIRPORTS
+     * =====================================================
+     */
+
+    const departureCode =
+        getAirportCode(
+            origin
+        ) ||
+        firstValue(
+            general,
+            [
+                "origin",
+                "orig",
+                "departure"
+            ]
         );
 
 
-    document.getElementById(
-        "departure"
-    ).textContent =
-        valueOrUnavailable(
-            origin.icao ||
-            ofp.origin_icao ||
-            ofp.dep_icao ||
-            ofp.origin
+    const arrivalCode =
+        getAirportCode(
+            destination
+        ) ||
+        firstValue(
+            general,
+            [
+                "destination",
+                "dest",
+                "arrival"
+            ]
         );
 
 
-    document.getElementById(
-        "arrival"
-    ).textContent =
-        valueOrUnavailable(
-            destination.icao ||
-            ofp.destination_icao ||
-            ofp.arr_icao ||
-            ofp.destination
+    const departureName =
+        getAirportName(
+            origin
         );
 
 
-    document.getElementById(
-        "departureName"
-    ).textContent =
-        valueOrUnavailable(
-            origin.name ||
-            ofp.origin_name
+    const arrivalName =
+        getAirportName(
+            destination
         );
 
 
-    document.getElementById(
-        "arrivalName"
-    ).textContent =
-        valueOrUnavailable(
-            destination.name ||
-            ofp.destination_name
+    setText(
+        "departureCode",
+        String(
+            departureCode || "----"
+        ).toUpperCase()
+    );
+
+
+    setText(
+        "arrivalCode",
+        String(
+            arrivalCode || "----"
+        ).toUpperCase()
+    );
+
+
+    setText(
+        "departureName",
+        departureName ||
+        "Departure"
+    );
+
+
+    setText(
+        "arrivalName",
+        arrivalName ||
+        "Arrival"
+    );
+
+
+    /*
+     * =====================================================
+     * FLIGHT
+     * =====================================================
+     */
+
+    const flightNumber =
+        firstValue(
+            general,
+            [
+                "flight_number",
+                "flight",
+                "fltno",
+                "flight_no",
+                "flightNumber"
+            ]
         );
 
 
-    document.getElementById(
-        "aircraft"
-    ).textContent =
-        valueOrUnavailable(
-            aircraft.icaocode ||
-            aircraft.icao ||
-            ofp.aircraft_type ||
-            ofp.aircraft
+    const callsign =
+        firstValue(
+            general,
+            [
+                "callsign",
+                "call_sign",
+                "atc_callsign"
+            ]
         );
 
 
-    /* -----------------------------------------------------
-       OVERVIEW
-    ----------------------------------------------------- */
-
-    document.getElementById(
-        "flightTime"
-    ).textContent =
-        formatDuration(
-            ofp.times?.est_block_time ||
-            ofp.block_time ||
-            ofp.flight_time
+    const ofpId =
+        firstValue(
+            general,
+            [
+                "ofp_id",
+                "ofp",
+                "id",
+                "plan_id"
+            ]
         );
 
 
-    document.getElementById(
-        "distance"
-    ).textContent =
-        numberOrUnavailable(
-            ofp.general?.route_distance ||
-            ofp.route_distance ||
-            ofp.distance
+    const date =
+        firstValue(
+            general,
+            [
+                "date",
+                "date_utc",
+                "date_local",
+                "day"
+            ]
         );
 
 
-    document.getElementById(
-        "cruiseAltitude"
-    ).textContent =
-        formatAltitude(
-            ofp.general?.initial_altitude ||
-            ofp.initial_altitude ||
-            ofp.cruise_altitude
+    setText(
+        "flightNumber",
+        flightNumber
+    );
+
+
+    setText(
+        "callsign",
+        callsign
+    );
+
+
+    setText(
+        "ofpId",
+        ofpId
+    );
+
+
+    setText(
+        "ofpUsername",
+        username
+    );
+
+
+    setText(
+        "metaFlight",
+        flightNumber ||
+        callsign
+    );
+
+
+    setText(
+        "metaOFP",
+        ofpId
+    );
+
+
+    setText(
+        "metaDate",
+        date
+    );
+
+
+    /*
+     * =====================================================
+     * AIRCRAFT
+     * =====================================================
+     */
+
+    const aircraftICAO =
+        firstValue(
+            aircraftData,
+            [
+                "icaocode",
+                "icao",
+                "icao_code",
+                "type",
+                "aircraft"
+            ]
         );
 
 
-    document.getElementById(
-        "blockFuel"
-    ).textContent =
-        numberOrUnavailable(
-            ofp.fuel?.block ||
-            ofp.block_fuel ||
-            ofp.fuel_block
+    const aircraftName =
+        firstValue(
+            aircraftData,
+            [
+                "name",
+                "type",
+                "icaocode"
+            ]
         );
 
 
-    /* -----------------------------------------------------
-       AIRCRAFT
-    ----------------------------------------------------- */
-
-    document.getElementById(
-        "infoAircraft"
-    ).textContent =
-        valueOrUnavailable(
-            aircraft.icaocode ||
-            aircraft.icao ||
-            ofp.aircraft_type
+    const registration =
+        firstValue(
+            aircraftData,
+            [
+                "reg",
+                "registration",
+                "tail",
+                "tail_number"
+            ]
         );
 
 
-    document.getElementById(
-        "registration"
-    ).textContent =
-        valueOrUnavailable(
-            aircraft.reg ||
-            aircraft.registration ||
-            ofp.registration
+    const airline =
+        firstValue(
+            general,
+            [
+                "airline",
+                "operator",
+                "company"
+            ]
         );
 
 
-    document.getElementById(
-        "airline"
-    ).textContent =
-        valueOrUnavailable(
-            ofp.airline ||
-            ofp.operator
+    setText(
+        "aircraft",
+        aircraftName ||
+        aircraftICAO
+    );
+
+
+    setText(
+        "aircraftICAO",
+        aircraftICAO
+    );
+
+
+    setText(
+        "aircraftType",
+        aircraftName
+    );
+
+
+    setText(
+        "aircraftReg",
+        registration
+    );
+
+
+    setText(
+        "registration",
+        registration
+    );
+
+
+    setText(
+        "operator",
+        airline
+    );
+
+
+    setText(
+        "airline",
+        airline
+    );
+
+
+    setText(
+        "metaAircraft",
+        aircraftICAO ||
+        aircraftName
+    );
+
+
+    /*
+     * =====================================================
+     * ALTITUDE / PERFORMANCE
+     * =====================================================
+     */
+
+    const cruiseAltitude =
+        firstValue(
+            params,
+            [
+                "cruise_altitude",
+                "cruisealt",
+                "initial_altitude",
+                "cruise"
+            ]
+        ) ||
+        firstValue(
+            general,
+            [
+                "cruise_altitude",
+                "cruise_alt"
+            ]
         );
 
 
-    document.getElementById(
-        "costIndex"
-    ).textContent =
-        valueOrUnavailable(
-            ofp.general?.costindex ||
-            ofp.cost_index
+    const initialAltitude =
+        firstValue(
+            params,
+            [
+                "initial_altitude",
+                "initialalt",
+                "stepclimb"
+            ]
         );
 
 
-    document.getElementById(
-        "infoCallsign"
-    ).textContent =
-        valueOrUnavailable(
-            ofp.callsign ||
-            ofp.flight_number
+    const costIndex =
+        firstValue(
+            params,
+            [
+                "cost_index",
+                "costindex",
+                "ci"
+            ]
+        ) ||
+        firstValue(
+            general,
+            [
+                "cost_index",
+                "costindex"
+            ]
         );
 
 
-    /* -----------------------------------------------------
-       FUEL & PAYLOAD
-    ----------------------------------------------------- */
-
-    document.getElementById(
-        "tripFuel"
-    ).textContent =
-        numberOrUnavailable(
-            ofp.fuel?.enroute_burn ||
-            ofp.trip_fuel ||
-            ofp.fuel_trip
-        ) + " kg";
-
-
-    document.getElementById(
-        "infoBlockFuel"
-    ).textContent =
-        numberOrUnavailable(
-            ofp.fuel?.block ||
-            ofp.block_fuel ||
-            ofp.fuel_block
-        ) + " kg";
-
-
-    document.getElementById(
-        "payload"
-    ).textContent =
-        numberOrUnavailable(
-            ofp.weights?.payload ||
-            ofp.payload
-        ) + " kg";
-
-
-    document.getElementById(
-        "passengers"
-    ).textContent =
-        numberOrUnavailable(
-            ofp.weights?.pax_count ||
-            ofp.passengers ||
-            ofp.pax
+    const cruiseMach =
+        firstValue(
+            params,
+            [
+                "cruise_mach",
+                "cruise_mach",
+                "mach",
+                "cruise"
+            ]
         );
 
 
-    document.getElementById(
-        "zeroFuelWeight"
-    ).textContent =
-        numberOrUnavailable(
-            ofp.weights?.est_zfw ||
-            ofp.zero_fuel_weight ||
-            ofp.zfw
-        ) + " kg";
-
-
-    /* -----------------------------------------------------
-       ROUTE
-    ----------------------------------------------------- */
-
-    document.getElementById(
-        "route"
-    ).textContent =
-        valueOrUnavailable(
-            ofp.general?.route ||
-            ofp.route ||
-            ofp.fpl?.route
+    const cruiseSpeed =
+        firstValue(
+            params,
+            [
+                "cruise_speed",
+                "cruise_tas",
+                "tas",
+                "speed"
+            ]
         );
 
 
-    /* -----------------------------------------------------
-       DEPARTURE
-    ----------------------------------------------------- */
-
-    document.getElementById(
-        "departureFull"
-    ).textContent =
-        valueOrUnavailable(
-            origin.icao ||
-            ofp.origin_icao ||
-            ofp.origin
+    const averageWind =
+        firstValue(
+            params,
+            [
+                "avg_wind",
+                "average_wind",
+                "wind"
+            ]
         );
 
 
-    document.getElementById(
-        "departureRunway"
-    ).textContent =
-        valueOrUnavailable(
-            ofp.origin_runway ||
-            ofp.departure_runway ||
-            ofp.runway_departure
+    setText(
+        "cruiseAltitude",
+        cruiseAltitude
+    );
+
+
+    setText(
+        "initialAltitude",
+        initialAltitude
+    );
+
+
+    setText(
+        "costIndex",
+        costIndex
+    );
+
+
+    setText(
+        "cruiseMach",
+        cruiseMach
+    );
+
+
+    setText(
+        "performanceCI",
+        costIndex
+    );
+
+
+    setText(
+        "performanceAltitude",
+        cruiseAltitude
+    );
+
+
+    setText(
+        "performanceSpeed",
+        cruiseSpeed
+    );
+
+
+    setText(
+        "averageWind",
+        averageWind
+    );
+
+
+    setText(
+        "navCruiseAltitude",
+        cruiseAltitude
+    );
+
+
+    setText(
+        "navCostIndex",
+        costIndex
+    );
+
+
+    setText(
+        "navCruiseMach",
+        cruiseMach
+    );
+
+
+    setText(
+        "navWind",
+        averageWind
+    );
+
+
+    /*
+     * =====================================================
+     * DISTANCE
+     * =====================================================
+     */
+
+    const totalDistance =
+        firstValue(
+            general,
+            [
+                "route_distance",
+                "distance",
+                "route_dist",
+                "total_distance"
+            ]
         );
 
 
-    document.getElementById(
-        "sid"
-    ).textContent =
-        valueOrUnavailable(
-            ofp.sid ||
-            ofp.departure_sid
+    const airDistance =
+        firstValue(
+            general,
+            [
+                "air_distance",
+                "air_dist"
+            ]
         );
 
 
-    /* -----------------------------------------------------
-       ARRIVAL
-    ----------------------------------------------------- */
-
-    document.getElementById(
-        "arrivalFull"
-    ).textContent =
-        valueOrUnavailable(
-            destination.icao ||
-            ofp.destination_icao ||
-            ofp.destination
+    const greatCircle =
+        firstValue(
+            general,
+            [
+                "gc_distance",
+                "great_circle",
+                "great_circle_distance"
+            ]
         );
 
 
-    document.getElementById(
-        "arrivalRunway"
-    ).textContent =
-        valueOrUnavailable(
-            ofp.destination_runway ||
-            ofp.arrival_runway ||
-            ofp.runway_arrival
+    const routeDistance =
+        firstValue(
+            general,
+            [
+                "route_distance",
+                "distance"
+            ]
         );
 
 
-    document.getElementById(
-        "star"
-    ).textContent =
-        valueOrUnavailable(
-            ofp.star ||
-            ofp.arrival_star
+    setText(
+        "totalDistance",
+        formatDistance(
+            totalDistance
+        )
+    );
+
+
+    setText(
+        "airDistance",
+        formatDistance(
+            airDistance
+        )
+    );
+
+
+    setText(
+        "greatCircle",
+        formatDistance(
+            greatCircle
+        )
+    );
+
+
+    setText(
+        "routeDistance",
+        formatDistance(
+            routeDistance
+        )
+    );
+
+
+    /*
+     * =====================================================
+     * TIMES
+     * =====================================================
+     */
+
+    const departureTime =
+        firstValue(
+            times,
+            [
+                "sched_out",
+                "scheduled_out",
+                "departure",
+                "est_out",
+                "out"
+            ]
         );
 
 
-    /* -----------------------------------------------------
-       REMARKS
-    ----------------------------------------------------- */
-
-    document.getElementById(
-        "remarks"
-    ).textContent =
-        valueOrUnavailable(
-            ofp.remarks ||
-            ofp.notes ||
-            ofp.general?.remarks
+    const estimatedDeparture =
+        firstValue(
+            times,
+            [
+                "est_out",
+                "estimated_out",
+                "departure_estimated",
+                "out"
+            ]
         );
 
 
-    /* -----------------------------------------------------
-       SHOW PAGE
-    ----------------------------------------------------- */
-
-    document.getElementById(
-        "emptyState"
-    ).style.display = "none";
-
-
-    document.getElementById(
-        "flightContent"
-    ).style.display = "block";
-
-
-    window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-    });
-}
-
-
-/* =========================================================
-   FORMAT DURATION
-========================================================= */
-
-function formatDuration(value) {
-
-    if (
-        value === undefined ||
-        value === null ||
-        value === ""
-    ) {
-        return "Unavailable";
-    }
-
-    const numeric =
-        Number(value);
-
-    if (!isNaN(numeric)) {
-
-        /*
-            SimBrief commonly provides time in minutes.
-        */
-
-        const hours =
-            Math.floor(numeric / 60);
-
-        const minutes =
-            numeric % 60;
-
-        return (
-            hours +
-            "h " +
-            String(minutes).padStart(2, "0") +
-            "m"
+    const estimatedArrival =
+        firstValue(
+            times,
+            [
+                "est_in",
+                "estimated_in",
+                "arrival",
+                "in"
+            ]
         );
-    }
-
-    return value;
-}
 
 
-/* =========================================================
-   FORMAT ALTITUDE
-========================================================= */
+    const flightMinutes =
+        firstValue(
+            times,
+            [
+                "enroute",
+                "flight_time",
+                "flighttime",
+                "ete"
+            ]
+        );
 
-function formatAltitude(value) {
 
-    if (
-        value === undefined ||
-        value === null ||
-        value === ""
-    ) {
-        return "Unavailable";
-    }
+    const blockMinutes =
+        firstValue(
+            times,
+            [
+                "block",
+                "block_time",
+                "blocktime"
+            ]
+        );
 
-    const number =
-        Number(value);
 
-    if (!isNaN(number)) {
+    const airMinutes =
+        firstValue(
+            times,
+            [
+                "airborne",
+                "air_time",
+                "airtime"
+            ]
+        );
 
-        if (number >= 1000) {
-            return "FL" +
-                Math.round(number / 100);
+
+    setText(
+        "scheduledDeparture",
+        formatTime(
+            departureTime
+        )
+    );
+
+
+    setText(
+        "estimatedDeparture",
+        formatTime(
+            estimatedDeparture
+        )
+    );
+
+
+    setText(
+        "estimatedArrival",
+        formatTime(
+            estimatedArrival
+        )
+    );
+
+
+    setText(
+        "flightTime",
+        formatMinutes(
+            flightMinutes
+        )
+    );
+
+
+    setText(
+        "blockTime",
+        formatMinutes(
+            blockMinutes
+        )
+    );
+
+
+    setText(
+        "airTime",
+        formatMinutes(
+            airMinutes
+        )
+    );
+
+
+    /*
+     * =====================================================
+     * WEIGHTS
+     * =====================================================
+     */
+
+    const dow =
+        firstValue(
+            weights,
+            [
+                "oew",
+                "dow",
+                "dry_operating_weight"
+            ]
+        );
+
+
+    const zfw =
+        firstValue(
+            weights,
+            [
+                "zfw",
+                "zero_fuel_weight"
+            ]
+        );
+
+
+    const tow =
+        firstValue(
+            weights,
+            [
+                "tow",
+                "takeoff_weight"
+            ]
+        );
+
+
+    const lw =
+        firstValue(
+            weights,
+            [
+                "lw",
+                "landing_weight"
+            ]
+        );
+
+
+    const mtow =
+        firstValue(
+            weights,
+            [
+                "mtow",
+                "max_takeoff_weight"
+            ]
+        );
+
+
+    const mlw =
+        firstValue(
+            weights,
+            [
+                "mlw",
+                "max_landing_weight"
+            ]
+        );
+
+
+    setText(
+        "dow",
+        formatWeight(
+            dow
+        )
+    );
+
+
+    setText(
+        "zfw",
+        formatWeight(
+            zfw
+        )
+    );
+
+
+    setText(
+        "tow",
+        formatWeight(
+            tow
+        )
+    );
+
+
+    setText(
+        "lw",
+        formatWeight(
+            lw
+        )
+    );
+
+
+    setText(
+        "mtow",
+        formatWeight(
+            mtow
+        )
+    );
+
+
+    setText(
+        "mlw",
+        formatWeight(
+            mlw
+        )
+    );
+
+
+    /*
+     * =====================================================
+     * PAYLOAD
+     * =====================================================
+     */
+
+    const passengers =
+        firstValue(
+            ofp,
+            [
+                "weights.pax_count",
+                "weights.passengers",
+                "payload.passengers",
+                "general.pax"
+            ]
+        );
+
+
+    const cargo =
+        firstValue(
+            ofp,
+            [
+                "weights.cargo",
+                "weights.cargo_weight",
+                "payload.cargo"
+            ]
+        );
+
+
+    const payload =
+        firstValue(
+            weights,
+            [
+                "payload",
+                "payload_weight"
+            ]
+        );
+
+
+    const bags =
+        firstValue(
+            ofp,
+            [
+                "weights.bag_weight",
+                "weights.bags",
+                "payload.bags"
+            ]
+        );
+
+
+    setText(
+        "passengers",
+        passengers
+    );
+
+
+    setText(
+        "cargo",
+        formatWeight(
+            cargo
+        )
+    );
+
+
+    setText(
+        "payload",
+        formatWeight(
+            payload
+        )
+    );
+
+
+    setText(
+        "bags",
+        formatWeight(
+            bags
+        )
+    );
+
+
+    /*
+     * =====================================================
+     * FUEL
+     * =====================================================
+     */
+
+    const taxiFuel =
+        firstValue(
+            fuel,
+            [
+                "taxi",
+                "taxi_fuel"
+            ]
+        );
+
+
+    const tripFuel =
+        firstValue(
+            fuel,
+            [
+                "enroute_burn",
+                "trip",
+                "trip_fuel"
+            ]
+        );
+
+
+    const contingencyFuel =
+        firstValue(
+            fuel,
+            [
+                "contingency",
+                "contingency_fuel"
+            ]
+        );
+
+
+    const alternateFuel =
+        firstValue(
+            fuel,
+            [
+                "alternate_burn",
+                "alternate",
+                "alternate_fuel"
+            ]
+        );
+
+
+    const reserveFuel =
+        firstValue(
+            fuel,
+            [
+                "reserve",
+                "reserve_fuel"
+            ]
+        );
+
+
+    const extraFuel =
+        firstValue(
+            fuel,
+            [
+                "extra",
+                "extra_fuel"
+            ]
+        );
+
+
+    const blockFuel =
+        firstValue(
+            fuel,
+            [
+                "block",
+                "block_fuel",
+                "plan_fuel"
+            ]
+        );
+
+
+    setText(
+        "fuelTaxi",
+        formatFuel(
+            taxiFuel
+        )
+    );
+
+
+    setText(
+        "fuelTrip",
+        formatFuel(
+            tripFuel
+        )
+    );
+
+
+    setText(
+        "fuelContingency",
+        formatFuel(
+            contingencyFuel
+        )
+    );
+
+
+    setText(
+        "fuelAlternate",
+        formatFuel(
+            alternateFuel
+        )
+    );
+
+
+    setText(
+        "fuelReserve",
+        formatFuel(
+            reserveFuel
+        )
+    );
+
+
+    setText(
+        "fuelExtra",
+        formatFuel(
+            extraFuel
+        )
+    );
+
+
+    setText(
+        "fuelBlock",
+        formatFuel(
+            blockFuel
+        )
+    );
+
+
+    /*
+     * Fuel bars.
+     */
+
+    const fuelValues = [
+
+        [
+            "fuelTaxiBar",
+            taxiFuel
+        ],
+
+        [
+            "fuelTripBar",
+            tripFuel
+        ],
+
+        [
+            "fuelContingencyBar",
+            contingencyFuel
+        ],
+
+        [
+            "fuelAlternateBar",
+            alternateFuel
+        ],
+
+        [
+            "fuelReserveBar",
+            reserveFuel
+        ],
+
+        [
+            "fuelExtraBar",
+            extraFuel
+        ],
+
+        [
+            "fuelBlockBar",
+            blockFuel
+        ]
+
+    ];
+
+
+    const maximumFuel =
+        Math.max(
+            1,
+            ...fuelValues
+                .map(
+                    item =>
+                        numberValue(
+                            item[1]
+                        ) || 0
+                )
+        );
+
+
+    fuelValues.forEach(
+        item => {
+
+            const element =
+                document.getElementById(
+                    item[0]
+                );
+
+
+            if (
+                !element
+            ) {
+
+                return;
+
+            }
+
+
+            const value =
+                numberValue(
+                    item[1]
+                ) || 0;
+
+
+            const percentage =
+                Math.min(
+                    100,
+                    (
+                        value /
+                        maximumFuel
+                    ) *
+                    100
+                );
+
+
+            element.style.width =
+                percentage +
+                "%";
+
         }
+    );
 
-        return number + " ft";
-    }
 
-    return value;
+    /*
+     * =====================================================
+     * ALTERNATE
+     * =====================================================
+     */
+
+    const alternateCode =
+        getAirportCode(
+            alternate
+        ) ||
+        firstValue(
+            alternate,
+            [
+                "icao",
+                "airport",
+                "ident"
+            ]
+        );
+
+
+    const alternateDistanceValue =
+        firstValue(
+            alternate,
+            [
+                "distance",
+                "distance_nm"
+            ]
+        );
+
+
+    const alternateFuelValue =
+        firstValue(
+            alternate,
+            [
+                "fuel",
+                "fuel_required"
+            ]
+        );
+
+
+    const alternateTimeValue =
+        firstValue(
+            alternate,
+            [
+                "time",
+                "ete",
+                "minutes"
+            ]
+        );
+
+
+    setText(
+        "alternateAirport",
+        alternateCode
+    );
+
+
+    setText(
+        "alternateDistance",
+        formatDistance(
+            alternateDistanceValue
+        )
+    );
+
+
+    setText(
+        "alternateFuel",
+        formatFuel(
+            alternateFuelValue
+        )
+    );
+
+
+    setText(
+        "alternateTime",
+        formatMinutes(
+            alternateTimeValue
+        )
+    );
+
+
+    /*
+     * =====================================================
+     * DEPARTURE DETAILS
+     * =====================================================
+     */
+
+    const departureRunway =
+        firstValue(
+            origin,
+            [
+                "runway",
+                "dep_rwy",
+                "runway_departure"
+            ]
+        );
+
+
+    const departureSID =
+        firstValue(
+            origin,
+            [
+                "sid",
+                "sid_ident",
+                "departure_procedure"
+            ]
+        );
+
+
+    const departureATIS =
+        firstValue(
+            origin,
+            [
+                "atis"
+            ]
+        );
+
+
+    setText(
+        "departureICAO",
+        departureCode
+    );
+
+
+    setText(
+        "departureAirport",
+        departureName ||
+        departureCode
+    );
+
+
+    setText(
+        "departureRunway",
+        departureRunway
+    );
+
+
+    setText(
+        "departureSID",
+        departureSID
+    );
+
+
+    setText(
+        "departureATIS",
+        departureATIS
+    );
+
+
+    /*
+     * =====================================================
+     * ARRIVAL DETAILS
+     * =====================================================
+     */
+
+    const arrivalRunway =
+        firstValue(
+            destination,
+            [
+                "runway",
+                "arr_rwy",
+                "runway_arrival"
+            ]
+        );
+
+
+    const arrivalSTAR =
+        firstValue(
+            destination,
+            [
+                "star",
+                "star_ident",
+                "arrival_procedure"
+            ]
+        );
+
+
+    const arrivalApproach =
+        firstValue(
+            destination,
+            [
+                "approach",
+                "approach_ident"
+            ]
+        );
+
+
+    setText(
+        "arrivalICAO",
+        arrivalCode
+    );
+
+
+    setText(
+        "arrivalAirport",
+        arrivalName ||
+        arrivalCode
+    );
+
+
+    setText(
+        "arrivalRunway",
+        arrivalRunway
+    );
+
+
+    setText(
+        "arrivalSTAR",
+        arrivalSTAR
+    );
+
+
+    setText(
+        "arrivalApproach",
+        arrivalApproach
+    );
+
+
+    /*
+     * =====================================================
+     * ROUTE
+     * =====================================================
+     */
+
+    const route =
+        firstValue(
+            general,
+            [
+                "route",
+                "route_string",
+                "route_text"
+            ]
+        ) ||
+        firstValue(
+            ofp,
+            [
+                "route",
+                "route_string"
+            ]
+        );
+
+
+    const routeBox =
+        document.getElementById(
+            "routeBox"
+        );
+
+
+    routeBox.textContent =
+        text(
+            route,
+            "No route was included in the OFP."
+        );
+
+
+    setText(
+        "routeSummary",
+        route
+            ? (
+                String(route)
+                    .trim()
+                    .split(/\s+/)
+                    .length +
+                " route elements"
+            )
+            : "No route"
+    );
+
+
+    /*
+     * =====================================================
+     * TRACK
+     * =====================================================
+     */
+
+    const track =
+        firstValue(
+            general,
+            [
+                "initial_track",
+                "track",
+                "heading"
+            ]
+        );
+
+
+    setText(
+        "navTrack",
+        track
+    );
+
+
+    /*
+     * =====================================================
+     * RAW JSON
+     * =====================================================
+     */
+
+    rawJson.textContent =
+        JSON.stringify(
+            ofp,
+            null,
+            2
+        );
+
 }
 
 
 /* =========================================================
    CLEAR
-========================================================= */
+   ========================================================= */
 
-function clearFlight() {
+function clearOFP() {
 
-    document.getElementById(
-        "username"
-    ).value = "";
+    currentOFP =
+        null;
 
-    document.getElementById(
-        "flightContent"
-    ).style.display = "none";
 
-    document.getElementById(
-        "emptyState"
-    ).style.display = "block";
+    hideAlert();
 
-    const status =
-        document.getElementById("status");
 
-    status.className =
-        "status";
+    ofpHeader.classList.remove(
+        "show"
+    );
 
-    status.textContent = "";
 
-    window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-    });
+    dashboard.classList.remove(
+        "show"
+    );
+
+
+    actions.style.display =
+        "none";
+
+
+    rawDataSection.classList.remove(
+        "show"
+    );
+
+
+    loading.classList.remove(
+        "show"
+    );
+
+
+    emptyState.style.display =
+        "";
+
+
+    setStatus(
+        "",
+        "Ready"
+    );
+
 }
 
 
 /* =========================================================
-   ENTER KEY
-========================================================= */
+   REFRESH
+   ========================================================= */
 
-document
-    .getElementById("username")
-    .addEventListener(
-        "keydown",
-        function(event) {
+async function refreshOFP() {
 
-            if (event.key === "Enter") {
-                loadFlight();
-            }
+    if (
+        !currentUsername
+    ) {
+
+        currentUsername =
+            usernameInput.value.trim();
+
+    }
+
+
+    if (
+        !currentUsername
+    ) {
+
+        showAlert(
+            "error",
+            "Enter your SimBrief username first."
+        );
+
+        return;
+
+    }
+
+
+    await loadOFP();
+
+}
+
+
+/* =========================================================
+   COPY ROUTE
+   ========================================================= */
+
+async function copyRoute() {
+
+    if (
+        !currentOFP
+    ) {
+
+        return;
+
+    }
+
+
+    const route =
+        firstValue(
+            currentOFP.general,
+            [
+                "route",
+                "route_string",
+                "route_text"
+            ]
+        ) ||
+        firstValue(
+            currentOFP,
+            [
+                "route",
+                "route_string"
+            ]
+        );
+
+
+    if (
+        !route
+    ) {
+
+        showAlert(
+            "warning",
+            "No route is available to copy."
+        );
+
+        return;
+
+    }
+
+
+    try {
+
+        await navigator.clipboard.writeText(
+            String(route)
+        );
+
+
+        showAlert(
+            "success",
+            "Route copied to clipboard."
+        );
+
+
+    } catch (
+        error
+    ) {
+
+        showAlert(
+            "error",
+            "Could not copy the route."
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   RAW DATA
+   ========================================================= */
+
+function toggleRawData() {
+
+    if (
+        rawDataSection.classList.contains(
+            "show"
+        )
+    ) {
+
+        rawDataSection.classList.remove(
+            "show"
+        );
+
+        rawButton.textContent =
+            "{ } Raw Data";
+
+    } else {
+
+        rawDataSection.classList.add(
+            "show"
+        );
+
+        rawButton.textContent =
+            "Hide Raw Data";
+
+
+        setTimeout(
+            () => {
+
+                rawDataSection.scrollIntoView({
+                    behavior:
+                        "smooth",
+                    block:
+                        "start"
+                });
+
+            },
+            50
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   SAVE PLAN
+   ========================================================= */
+
+async function savePlan() {
+
+    if (
+        !currentOFP
+    ) {
+
+        showAlert(
+            "warning",
+            "Load a SimBrief OFP before saving it."
+        );
+
+        return;
+
+    }
+
+
+    const general =
+        currentOFP.general ||
+        {};
+
+    const origin =
+        currentOFP.origin ||
+        {};
+
+    const destination =
+        currentOFP.destination ||
+        {};
+
+    const aircraft =
+        currentOFP.aircraft ||
+        {};
+
+
+    const departure =
+        getAirportCode(
+            origin
+        ) ||
+        firstValue(
+            general,
+            [
+                "origin"
+            ]
+        );
+
+
+    const arrival =
+        getAirportCode(
+            destination
+        ) ||
+        firstValue(
+            general,
+            [
+                "destination"
+            ]
+        );
+
+
+    const aircraftICAO =
+        firstValue(
+            aircraft,
+            [
+                "icaocode",
+                "icao",
+                "type"
+            ]
+        );
+
+
+    const route =
+        firstValue(
+            general,
+            [
+                "route",
+                "route_string",
+                "route_text"
+            ]
+        );
+
+
+    const distance =
+        firstValue(
+            general,
+            [
+                "route_distance",
+                "distance"
+            ]
+        );
+
+
+    const estimatedMinutes =
+        firstValue(
+            currentOFP.times,
+            [
+                "enroute",
+                "flight_time",
+                "ete"
+            ]
+        );
+
+
+    const ofpId =
+        firstValue(
+            general,
+            [
+                "ofp_id",
+                "ofp",
+                "id"
+            ]
+        );
+
+
+    const name =
+        (
+            String(
+                departure ||
+                "----"
+            ).toUpperCase() +
+            " → " +
+            String(
+                arrival ||
+                "----"
+            ).toUpperCase()
+        );
+
+
+    const backend =
+        getBackendURL();
+
+
+    try {
+
+        const response =
+            await fetch(
+                backend +
+                "/api/plans",
+                {
+                    method:
+                        "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json",
+
+                        Accept:
+                            "application/json"
+                    },
+
+                    body:
+                        JSON.stringify({
+
+                            name,
+
+                            departure_icao:
+                                departure,
+
+                            arrival_icao:
+                                arrival,
+
+                            aircraft_icao:
+                                aircraftICAO,
+
+                            cruise_altitude:
+                                numberValue(
+                                    firstValue(
+                                        currentOFP.params ||
+                                        {},
+                                        [
+                                            "cruise_altitude",
+                                            "cruisealt"
+                                        ]
+                                    )
+                                ),
+
+                            route,
+
+                            distance_nm:
+                                numberValue(
+                                    distance
+                                ),
+
+                            estimated_minutes:
+                                numberValue(
+                                    estimatedMinutes
+                                ),
+
+                            simbrief_ofp_id:
+                                ofpId
+
+                        })
+
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (
+            !response.ok ||
+            data?.available === false
+        ) {
+
+            throw new Error(
+                data?.error ||
+                "Could not save flight plan."
+            );
 
         }
-    );
+
+
+        showAlert(
+            "success",
+            "SimBrief flight plan saved successfully."
+        );
+
+
+    } catch (
+        error
+    ) {
+
+        console.error(
+            error
+        );
+
+
+        showAlert(
+            "error",
+            error.message ||
+            "Could not save flight plan."
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE MENU
+   ========================================================= */
+
+mobileMenu.addEventListener(
+    "click",
+    () => {
+
+        navigation.classList.toggle(
+            "open"
+        );
+
+    }
+);
+
+
+/* =========================================================
+   EVENTS
+   ========================================================= */
+
+loadButton.addEventListener(
+    "click",
+    loadOFP
+);
+
+
+clearButton.addEventListener(
+    "click",
+    clearOFP
+);
+
+
+refreshButton.addEventListener(
+    "click",
+    refreshOFP
+);
+
+
+printButton.addEventListener(
+    "click",
+    () => {
+
+        window.print();
+
+    }
+);
+
+
+rawButton.addEventListener(
+    "click",
+    toggleRawData
+);
+
+
+saveButton.addEventListener(
+    "click",
+    savePlan
+);
+
+
+copyRouteButton.addEventListener(
+    "click",
+    copyRoute
+);
+
+
+usernameInput.addEventListener(
+    "keydown",
+    event => {
+
+        if (
+            event.key === "Enter"
+        ) {
+
+            loadOFP();
+
+        }
+
+    }
+);
+
+
+backendInput.addEventListener(
+    "change",
+    saveSettings
+);
+
+
+usernameInput.addEventListener(
+    "change",
+    saveSettings
+);
+
+
+/* =========================================================
+   INITIALIZE
+   ========================================================= */
+
+loadSettings();
+
+
+/*
+ * If a username already exists, keep the page ready.
+ * We deliberately do NOT automatically call SimBrief on
+ * page load, so the user remains in control of API calls.
+ */
+
+setStatus(
+    "",
+    "Ready"
+);
+
+
+/* =========================================================
+   OPTIONAL BACKEND AUTO-DETECTION
+   ========================================================= */
+
+/*
+ * When this HTML page itself is hosted by the same Express
+ * backend, location.origin automatically points to the API.
+ *
+ * When it is hosted on a separate static frontend, the user
+ * can enter the Render URL manually.
+ */
+
+if (
+    !backendInput.value.trim()
+) {
+
+    /*
+     * If the page is being served from the same origin as the
+     * backend, use that origin.
+     *
+     * For example:
+     *
+     * https://flight-app-backend.onrender.com
+     */
+
+    if (
+        window.location.protocol ===
+            "http:" ||
+        window.location.protocol ===
+            "https:"
+    ) {
+
+        const hostname =
+            window.location.hostname;
+
+
+        /*
+         * Do not automatically use file:// paths.
+         */
+
+        if (
+            hostname &&
+            hostname !== "localhost" &&
+            hostname !== "127.0.0.1"
+        ) {
+
+            backendInput.value =
+                window.location.origin;
+
+        }
+
+    }
+
+}
 
 </script>
 
