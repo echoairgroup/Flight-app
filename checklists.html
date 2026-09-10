@@ -1,20 +1,2051 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Checklists | Flight App</title><style>
-*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f4f7fb;color:#172033}button,input,select{font:inherit}header{height:72px;background:#fff;border-bottom:1px solid #e1e7ef;display:flex;align-items:center;padding:0 30px;position:sticky;top:0;z-index:20}.brand{font-size:21px;font-weight:750;color:#1769d1;text-decoration:none}.nav{margin-left:35px;display:flex;gap:8px}.nav a{text-decoration:none;color:#5e6878;padding:9px 13px;border-radius:8px;font-size:14px;font-weight:600}.nav a:hover,.nav a.active{background:#e9f2ff;color:#1769d1}.status{margin-left:auto;display:flex;align-items:center;gap:8px;color:#687386;font-size:13px}.dot{width:9px;height:9px;border-radius:50%;background:#f59e0b}.dot.online{background:#16a34a}.dot.offline{background:#dc2626}main{max-width:1450px;margin:auto;padding:32px}.heading{margin-bottom:25px}.heading h1{margin:0 0 7px;font-size:32px}.heading p{margin:0;color:#6c7686;font-size:15px}.controls{background:#fff;border:1px solid #e1e7ef;border-radius:14px;padding:18px;display:grid;grid-template-columns:minmax(240px,1fr) 260px 220px;gap:12px;margin-bottom:24px}input,select{width:100%;height:44px;border:1px solid #d8e0ea;border-radius:9px;background:#fff;color:#172033;padding:0 13px;outline:none}.content{display:grid;grid-template-columns:330px minmax(0,1fr);gap:22px;min-height:650px}.panel{background:#fff;border:1px solid #e1e7ef;border-radius:14px;overflow:hidden}.panel-head{padding:17px 18px;border-bottom:1px solid #e7ebf1;display:flex;align-items:center;justify-content:space-between}.panel-head h2{margin:0;font-size:16px}.count{background:#edf3fa;color:#607086;border-radius:20px;padding:4px 9px;font-size:12px;font-weight:700}.aircraft-list{padding:8px;max-height:670px;overflow-y:auto}.aircraft-item{width:100%;border:0;background:transparent;text-align:left;padding:13px;border-radius:9px;cursor:pointer;margin-bottom:3px}.aircraft-item:hover{background:#f3f7fc}.aircraft-item.selected{background:#eaf3ff}.aircraft-manufacturer{color:#7b8797;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px}.aircraft-name{font-size:14px;font-weight:700;color:#253149}.aircraft-icao{font-size:11px;color:#8993a3;margin-top:3px}.empty{min-height:500px;display:flex;align-items:center;justify-content:center;text-align:center;padding:40px;color:#7c8797}.empty-inner{max-width:450px}.empty h3{margin:0 0 8px;color:#29354a;font-size:19px}.empty p{margin:0;line-height:1.6;font-size:14px}.selected-aircraft{padding:21px;border-bottom:1px solid #e7ebf1}.selected-aircraft small{display:block;color:#7b8797;text-transform:uppercase;font-size:10px;font-weight:800;letter-spacing:.7px;margin-bottom:5px}.selected-aircraft h2{margin:0;font-size:24px}.selected-aircraft p{margin:5px 0 0;color:#778294;font-size:13px}.category-grid{padding:18px;display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;border-bottom:1px solid #e7ebf1}.category-button{border:1px solid #dce4ee;background:#fff;border-radius:10px;padding:13px;text-align:left;cursor:pointer}.category-button:hover{border-color:#8eb8e9;background:#f7fbff}.category-button.selected{border-color:#1769d1;background:#edf5ff}.category-name{font-size:13px;font-weight:750;color:#2a3549}.category-count{margin-top:4px;color:#7d8999;font-size:11px}.checklist-list{padding:18px}.category-heading{margin:18px 0 10px;padding:0 2px;font-size:12px;font-weight:800;color:#1769d1;text-transform:uppercase;letter-spacing:.7px}.checklist-card{border:1px solid #dfe6ef;border-radius:12px;padding:15px;margin-bottom:10px;display:flex;align-items:center;gap:15px;background:#fff;cursor:pointer}.checklist-card:hover{border-color:#91b8e5;background:#fafcff}.icon{width:48px;height:48px;border-radius:10px;background:#edf4fc;color:#1769d1;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}.card-info{min-width:0;flex:1}.card-title{font-size:14px;font-weight:750;margin-bottom:4px}.card-meta{color:#7b8797;font-size:12px}.open{border:0;background:#1769d1;color:#fff;padding:9px 13px;border-radius:8px;font-size:12px;font-weight:700}.viewer{display:none;position:fixed;inset:0;background:rgba(10,18,30,.88);z-index:100;padding:35px}.viewer.open{display:flex;flex-direction:column}.viewer-head{display:flex;align-items:center;justify-content:space-between;color:#fff;margin-bottom:15px}.viewer-head button{border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:#fff;border-radius:8px;width:40px;height:38px}.viewer-body{flex:1;min-height:0;display:flex;justify-content:center;align-items:center;overflow:auto}.viewer-body img{max-width:95%;max-height:95%;object-fit:contain}@media(max-width:950px){header{padding:0 17px}.nav{display:none}main{padding:20px}.controls{grid-template-columns:1fr}.content{grid-template-columns:1fr}.aircraft-list{max-height:300px}}@media(max-width:600px){main{padding:13px}.category-grid{grid-template-columns:1fr}.checklist-card{align-items:flex-start}.open{display:none}.viewer{padding:15px}}
-</style></head><body>
-<header><a href="index.html" class="brand">Flight App</a><nav class="nav"><a href="index.html">Home</a><a href="planner.html">Planner</a><a href="weather.html">Weather</a><a href="charts.html">Charts</a><a href="checklists.html" class="active">Checklists</a><a href="simbrief.html">SimBrief</a></nav><div class="status"><span class="dot" id="statusDot"></span><span id="statusText">Connecting...</span></div></header>
-<main><div class="heading"><h1>Aircraft Checklists</h1><p>Browse and view checklists for your aircraft.</p></div><section class="controls"><input id="searchInput" type="search" placeholder="Search checklists..."><select id="aircraftFilter"><option value="">All aircraft</option></select><select id="categoryFilter"><option value="">All categories</option></select></section><div class="content"><section class="panel"><div class="panel-head"><h2>Aircraft</h2><span class="count" id="aircraftCount">0</span></div><div class="aircraft-list" id="aircraftList"></div></section><section class="panel"><div id="checklistContent"><div class="empty"><div class="empty-inner"><h3>Select an aircraft</h3><p>Choose an aircraft to see its available checklists.</p></div></div></div></section></div></main>
-<div class="viewer" id="viewer"><div class="viewer-head"><strong id="viewerTitle">Checklist</strong><button id="closeViewer">×</button></div><div class="viewer-body"><img id="viewerImage" alt="Checklist"></div></div>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Checklists | Flight App</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family:
+                Inter,
+                system-ui,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                sans-serif;
+            background: #f4f7fb;
+            color: #172033;
+        }
+
+        button,
+        input,
+        select {
+            font: inherit;
+        }
+
+        /* -------------------------------------------------
+           HEADER
+        ------------------------------------------------- */
+
+        header {
+            height: 72px;
+            background: #ffffff;
+            border-bottom: 1px solid #e1e7ef;
+            display: flex;
+            align-items: center;
+            padding: 0 30px;
+            position: sticky;
+            top: 0;
+            z-index: 20;
+        }
+
+        .brand {
+            font-size: 21px;
+            font-weight: 750;
+            color: #1769d1;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        nav {
+            margin-left: 35px;
+            display: flex;
+            gap: 8px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #5e6878;
+            padding: 9px 13px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        nav a:hover {
+            background: #f0f5fb;
+            color: #1769d1;
+        }
+
+        nav a.active {
+            background: #e9f2ff;
+            color: #1769d1;
+        }
+
+        .header-status {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #687386;
+            font-size: 13px;
+        }
+
+        .status-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: #f59e0b;
+        }
+
+        .status-dot.online {
+            background: #16a34a;
+        }
+
+        .status-dot.offline {
+            background: #dc2626;
+        }
+
+        /* -------------------------------------------------
+           PAGE
+        ------------------------------------------------- */
+
+        main {
+            max-width: 1450px;
+            margin: 0 auto;
+            padding: 32px;
+        }
+
+        .page-heading {
+            margin-bottom: 25px;
+        }
+
+        .page-heading h1 {
+            margin: 0 0 7px;
+            font-size: 32px;
+            letter-spacing: -0.5px;
+        }
+
+        .page-heading p {
+            margin: 0;
+            color: #6c7686;
+            font-size: 15px;
+        }
+
+        /* -------------------------------------------------
+           CONTROLS
+        ------------------------------------------------- */
+
+        .controls {
+            background: #ffffff;
+            border: 1px solid #e1e7ef;
+            border-radius: 14px;
+            padding: 18px;
+            display: grid;
+            grid-template-columns: minmax(240px, 1fr) 260px 220px;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper span {
+            position: absolute;
+            left: 13px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #8993a3;
+            font-size: 15px;
+            pointer-events: none;
+        }
+
+        input,
+        select {
+            width: 100%;
+            height: 44px;
+            border: 1px solid #d8e0ea;
+            border-radius: 9px;
+            background: #ffffff;
+            color: #172033;
+            padding: 0 13px;
+            outline: none;
+        }
+
+        .input-wrapper input {
+            padding-left: 38px;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: #5d9de8;
+            box-shadow: 0 0 0 3px rgba(23, 105, 209, 0.08);
+        }
+
+        /* -------------------------------------------------
+           CONTENT LAYOUT
+        ------------------------------------------------- */
+
+        .content {
+            display: grid;
+            grid-template-columns: 330px minmax(0, 1fr);
+            gap: 22px;
+            min-height: 650px;
+        }
+
+        .panel {
+            background: #ffffff;
+            border: 1px solid #e1e7ef;
+            border-radius: 14px;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            padding: 17px 18px;
+            border-bottom: 1px solid #e7ebf1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .panel-header h2 {
+            margin: 0;
+            font-size: 16px;
+        }
+
+        .count {
+            background: #edf3fa;
+            color: #607086;
+            border-radius: 20px;
+            padding: 4px 9px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        /* -------------------------------------------------
+           AIRCRAFT LIST
+        ------------------------------------------------- */
+
+        .aircraft-list {
+            padding: 8px;
+            max-height: 670px;
+            overflow-y: auto;
+        }
+
+        .aircraft-item {
+            width: 100%;
+            border: 0;
+            background: transparent;
+            text-align: left;
+            padding: 13px;
+            border-radius: 9px;
+            cursor: pointer;
+            margin-bottom: 3px;
+        }
+
+        .aircraft-item:hover {
+            background: #f3f7fc;
+        }
+
+        .aircraft-item.selected {
+            background: #eaf3ff;
+        }
+
+        .aircraft-manufacturer {
+            color: #7b8797;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            margin-bottom: 3px;
+        }
+
+        .aircraft-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: #253149;
+        }
+
+        .aircraft-icao {
+            font-size: 11px;
+            color: #8993a3;
+            margin-top: 3px;
+        }
+
+        /* -------------------------------------------------
+           CHECKLIST CONTENT
+        ------------------------------------------------- */
+
+        .checklist-panel {
+            min-width: 0;
+        }
+
+        .empty-state {
+            min-height: 600px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 40px;
+            color: #7c8797;
+        }
+
+        .empty-state-inner {
+            max-width: 450px;
+        }
+
+        .empty-icon {
+            width: 65px;
+            height: 65px;
+            margin: 0 auto 18px;
+            border-radius: 16px;
+            background: #edf4fc;
+            color: #1769d1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 29px;
+        }
+
+        .empty-state h3 {
+            margin: 0 0 8px;
+            color: #29354a;
+            font-size: 19px;
+        }
+
+        .empty-state p {
+            margin: 0;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        /* -------------------------------------------------
+           CHECKLIST HEADER
+        ------------------------------------------------- */
+
+        .selected-aircraft {
+            padding: 21px;
+            border-bottom: 1px solid #e7ebf1;
+        }
+
+        .selected-aircraft small {
+            display: block;
+            color: #7b8797;
+            text-transform: uppercase;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.7px;
+            margin-bottom: 5px;
+        }
+
+        .selected-aircraft h2 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .selected-aircraft p {
+            margin: 5px 0 0;
+            color: #778294;
+            font-size: 13px;
+        }
+
+        /* -------------------------------------------------
+           CATEGORY GRID
+        ------------------------------------------------- */
+
+        .category-grid {
+            padding: 18px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+            gap: 10px;
+            border-bottom: 1px solid #e7ebf1;
+        }
+
+        .category-button {
+            border: 1px solid #dce4ee;
+            background: #ffffff;
+            border-radius: 10px;
+            padding: 13px;
+            text-align: left;
+            cursor: pointer;
+            transition: 0.15s ease;
+        }
+
+        .category-button:hover {
+            border-color: #8eb8e9;
+            background: #f7fbff;
+        }
+
+        .category-button.selected {
+            border-color: #1769d1;
+            background: #edf5ff;
+        }
+
+        .category-name {
+            font-size: 13px;
+            font-weight: 750;
+            color: #2a3549;
+        }
+
+        .category-count {
+            margin-top: 4px;
+            color: #7d8999;
+            font-size: 11px;
+        }
+
+        /* -------------------------------------------------
+           CHECKLIST LIST
+        ------------------------------------------------- */
+
+        .checklist-list {
+            padding: 18px;
+        }
+
+        .checklist-card {
+            border: 1px solid #dfe6ef;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            background: #ffffff;
+        }
+
+        .checklist-card:hover {
+            border-color: #91b8e5;
+            background: #fafcff;
+        }
+
+        .checklist-card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            background: #edf4fc;
+            color: #1769d1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .checklist-card-info {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .checklist-card-title {
+            font-size: 14px;
+            font-weight: 750;
+            margin-bottom: 4px;
+        }
+
+        .checklist-card-meta {
+            color: #7b8797;
+            font-size: 12px;
+        }
+
+        .open-button {
+            border: 0;
+            background: #1769d1;
+            color: #ffffff;
+            padding: 9px 13px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .open-button:hover {
+            background: #0f58b5;
+        }
+
+        /* -------------------------------------------------
+           IMAGE VIEWER
+        ------------------------------------------------- */
+
+        .viewer {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 18, 30, 0.88);
+            z-index: 100;
+            padding: 35px;
+        }
+
+        .viewer.visible {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .viewer-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: #ffffff;
+            margin-bottom: 15px;
+        }
+
+        .viewer-title {
+            font-size: 17px;
+            font-weight: 700;
+        }
+
+        .viewer-controls {
+            display: flex;
+            gap: 7px;
+        }
+
+        .viewer-controls button {
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.1);
+            color: #ffffff;
+            border-radius: 8px;
+            width: 40px;
+            height: 38px;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        .viewer-controls button:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .viewer-content {
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: auto;
+        }
+
+        .viewer-content img {
+            max-width: none;
+            max-height: none;
+            width: auto;
+            height: auto;
+            transform-origin: center center;
+            transition: transform 0.15s ease;
+            user-select: none;
+        }
+
+        .viewer-placeholder {
+            color: #ffffff;
+            text-align: center;
+        }
+
+        .viewer-footer {
+            color: rgba(255,255,255,0.7);
+            text-align: center;
+            font-size: 12px;
+            margin-top: 12px;
+        }
+
+        /* -------------------------------------------------
+           RESPONSIVE
+        ------------------------------------------------- */
+
+        @media (max-width: 950px) {
+            header {
+                padding: 0 17px;
+            }
+
+            nav {
+                display: none;
+            }
+
+            main {
+                padding: 20px;
+            }
+
+            .controls {
+                grid-template-columns: 1fr;
+            }
+
+            .content {
+                grid-template-columns: 1fr;
+            }
+
+            .aircraft-list {
+                max-height: 300px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            main {
+                padding: 13px;
+            }
+
+            .page-heading h1 {
+                font-size: 26px;
+            }
+
+            .category-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .checklist-card {
+                align-items: flex-start;
+            }
+
+            .open-button {
+                display: none;
+            }
+
+            .viewer {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <a href="index.html" class="brand">Flight App</a>
+
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="planner.html">Planner</a>
+        <a href="weather.html">Weather</a>
+        <a href="charts.html">Charts</a>
+        <a href="checklists.html" class="active">Checklists</a>
+        <a href="simbrief.html">SimBrief</a>
+    </nav>
+
+    <div class="header-status">
+        <span class="status-dot" id="statusDot"></span>
+        <span id="statusText">Connecting...</span>
+    </div>
+</header>
+
+<main>
+
+    <section class="page-heading">
+        <h1>Aircraft Checklists</h1>
+        <p>
+            Browse and view checklists for your aircraft.
+        </p>
+    </section>
+
+    <section class="controls">
+
+        <div class="input-wrapper">
+            <span>⌕</span>
+            <input
+                id="searchInput"
+                type="search"
+                placeholder="Search aircraft..."
+                autocomplete="off"
+            >
+        </div>
+
+        <select id="manufacturerFilter">
+            <option value="">All manufacturers</option>
+        </select>
+
+        <select id="icaoFilter">
+            <option value="">All aircraft types</option>
+        </select>
+
+    </section>
+
+    <section class="content">
+
+        <div class="panel">
+
+            <div class="panel-header">
+                <h2>Aircraft</h2>
+                <span class="count" id="aircraftCount">0</span>
+            </div>
+
+            <div
+                class="aircraft-list"
+                id="aircraftList"
+            ></div>
+
+        </div>
+
+        <div class="panel checklist-panel">
+
+            <div
+                class="empty-state"
+                id="emptyState"
+            >
+                <div class="empty-state-inner">
+
+                    <div class="empty-icon">
+                        ✓
+                    </div>
+
+                    <h3>Select an aircraft</h3>
+
+                    <p>
+                        Select an aircraft from the list to see
+                        its available checklists.
+                    </p>
+
+                </div>
+            </div>
+
+            <div
+                id="checklistContent"
+                style="display:none;"
+            >
+
+                <div class="selected-aircraft">
+
+                    <small>Selected aircraft</small>
+
+                    <h2 id="selectedAircraftName">
+                        —
+                    </h2>
+
+                    <p id="selectedAircraftDetails">
+                        —
+                    </p>
+
+                </div>
+
+                <div
+                    class="category-grid"
+                    id="categoryGrid"
+                ></div>
+
+                <div
+                    class="checklist-list"
+                    id="checklistList"
+                ></div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+<!-- -------------------------------------------------------
+     IMAGE VIEWER
+-------------------------------------------------------- -->
+
+<div
+    class="viewer"
+    id="viewer"
+>
+
+    <div class="viewer-header">
+
+        <div
+            class="viewer-title"
+            id="viewerTitle"
+        >
+            Checklist
+        </div>
+
+        <div class="viewer-controls">
+
+            <button
+                id="zoomOut"
+                title="Zoom out"
+            >
+                −
+            </button>
+
+            <button
+                id="zoomReset"
+                title="Reset zoom"
+            >
+                100%
+            </button>
+
+            <button
+                id="zoomIn"
+                title="Zoom in"
+            >
+                +
+            </button>
+
+            <button
+                id="closeViewer"
+                title="Close"
+            >
+                ✕
+            </button>
+
+        </div>
+
+    </div>
+
+    <div
+        class="viewer-content"
+        id="viewerContent"
+    ></div>
+
+    <div class="viewer-footer">
+        Scroll to move around the checklist · Use + and − to zoom
+    </div>
+
+</div>
+
 <script>
-const API_BASE="https://echo-msfs-charts.onrender.com";
-const CATEGORIES=["PREFLIGHT","COCKPIT","BEFORE_START","START","TAXI","TAKEOFF","CLIMB","CRUISE","DESCENT","APPROACH","LANDING","SHUTDOWN","EMERGENCY","OTHER"].map((id,i)=>({id,name:{PREFLIGHT:"Preflight",COCKPIT:"Cockpit Preparation",BEFORE_START:"Before Start",START:"Engine Start",TAXI:"Taxi",TAKEOFF:"Takeoff",CLIMB:"Climb",CRUISE:"Cruise",DESCENT:"Descent",APPROACH:"Approach",LANDING:"Landing",SHUTDOWN:"Shutdown",EMERGENCY:"Emergency",OTHER:"Other"}[id],order:i}));
-const state={aircraft:[],checklists:[],selectedAircraft:null,selectedCategory:""};const $=id=>document.getElementById(id);const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
-async function api(url){const r=await fetch(url,{headers:{Accept:"application/json"}});let d=null;try{d=await r.json()}catch{}if(!r.ok)throw new Error(d?.error||`HTTP ${r.status}`);return d}
-function cat(v){return String(v||"").trim().toUpperCase()||"OTHER"}function catDef(v){return CATEGORIES.find(x=>x.id===cat(v))||CATEGORIES[CATEGORIES.length-1]}function catName(v){return catDef(v).name}function catOrder(v){return catDef(v).order}
-async function init(){try{const h=await api(`${API_BASE}/api/health`);if(h.status!=="ok")throw Error("API unavailable");$("statusDot").className="dot online";$("statusText").textContent="API Online"}catch(e){$("statusDot").className="dot offline";$("statusText").textContent="API Offline"}try{const d=await api(`${API_BASE}/api/aircraft`);state.aircraft=Array.isArray(d.aircraft)?d.aircraft:[];populateAircraft();renderAircraft()}catch(e){console.error(e)}}
-function populateAircraft(){const selects=[$("aircraftFilter")];selects.forEach(s=>{s.innerHTML='<option value="">All aircraft</option>';state.aircraft.slice().sort((a,b)=>String(a.name||"").localeCompare(String(b.name||""))).forEach(a=>{const o=document.createElement("option");o.value=a.id;o.textContent=[a.manufacturer,a.name].filter(Boolean).join(" ");s.appendChild(o)})})$("aircraftCount").textContent=state.aircraft.length}
-function renderAircraft(){const list=$("aircraftList");list.innerHTML="";if(!state.aircraft.length){list.innerHTML='<div class="empty" style="min-height:200px">No aircraft available.</div>';return}state.aircraft.slice().sort((a,b)=>String(a.name||"").localeCompare(String(b.name||""))).forEach(a=>{const b=document.createElement("button");b.className="aircraft-item"+(Number(state.selectedAircraft)===Number(a.id)?" selected":"");b.innerHTML=`<div class="aircraft-manufacturer">${esc(a.manufacturer||"Unknown")}</div><div class="aircraft-name">${esc(a.name||"Unknown")}</div>${a.icao_type?`<div class="aircraft-icao">${esc(a.icao_type)}</div>`:""}`;b.onclick=()=>selectAircraft(a.id);list.appendChild(b)})}
-async function selectAircraft(id){state.selectedAircraft=Number(id);state.selectedCategory="";renderAircraft();try{const d=await api(`${API_BASE}/api/checklists?aircraft_id=${encodeURIComponent(id)}`);state.checklists=Array.isArray(d.checklists)?d.checklists:[];renderContent()}catch(e){state.checklists=[];renderContent();console.error(e)}}
-function renderContent(){const a=state.aircraft.find(x=>Number(x.id)===Number(state.selectedAircraft));const root=$("checklistContent");if(!a){root.innerHTML='<div class="empty"><div class="empty-inner"><h3>Select an aircraft</h3><p>Choose an aircraft to see its available checklists.</p></div></div>';return}let rows=state.checklists.slice();const q=$("searchInput").value.trim().toLowerCase();const cf=$("categoryFilter").value;if(q)rows=rows.filter(c=>[c.name,c.category].filter(Boolean).join(" ").toLowerCase().includes(q));if(cf)rows=rows.filter(c=>cat(c.category)===cf);rows.sort((x,y)=>catOrder(x.category)-catOrder(y.category)||String(x.name||"").localeCompare(String(y.name||"")));const used=[...new Set(rows.map(c=>cat(c.category)))].sort((x,y)=>catOrder(x)-catOrder(y));root.innerHTML=`<div class="selected-aircraft"><small>Selected aircraft</small><h2>${esc([a.manufacturer,a.name].filter(Boolean).join(" "))}</h2><p>${rows.length} checklist${rows.length===1?"":"s"}</p></div><div class="category-grid" id="categoryGrid"></div><div class="checklist-list" id="checklistList"></div>`;const cg=$("categoryGrid");const all=document.createElement("button");all.className="category-button"+(!state.selectedCategory?" selected":"");all.innerHTML=`<div class="category-name">All checklists</div><div class="category-count">${state.checklists.length} available</div>`;all.onclick=()=>{state.selectedCategory="";renderContent()};cg.appendChild(all);used.forEach(id=>{const b=document.createElement("button");b.className="category-button"+(state.selectedCategory===id?" selected":"");const n=state.checklists.filter(c=>cat(c.category)===id).length;b.innerHTML=`<div class="category-name">${esc(catName(id))}</div><div class="category-count">${n} checklist${n===1?"":"s"}</div>`;b.onclick=()=>{state.selectedCategory=state.selectedCategory===id?"":id;renderContent()};cg.appendChild(b)});if(state.selectedCategory)rows=rows.filter(c=>cat(c.category)===state.selectedCategory);const list=$("checklistList");if(!rows.length){list.innerHTML='<div class="empty" style="min-height:250px">No checklists found.</div>';return}let current="";rows.forEach(c=>{const id=cat(c.category);if(id!==current){current=id;const h=document.createElement("div");h.className="category-heading";h.textContent=catName(id);list.appendChild(h)}const card=document.createElement("div");card.className="checklist-card";card.innerHTML=`<div class="icon">✓</div><div class="card-info"><div class="card-title">${esc(c.name||"Checklist")}</div><div class="card-meta">${esc(catName(id))}</div></div><button class="open" type="button">Open</button>`;card.onclick=()=>openViewer(c);list.appendChild(card)})}
-function openViewer(c){$("viewerTitle").textContent=c.name||"Checklist";$("viewerImage").src=`${API_BASE}/api/checklists/${encodeURIComponent(c.id)}/image`;$("viewer").classList.add("open")};$("closeViewer").onclick=()=>$("viewer").classList.remove("open");$("viewer").onclick=e=>{if(e.target.id==="viewer")$("viewer").classList.remove("open")};["searchInput","categoryFilter","aircraftFilter"].forEach(id=>$(id).addEventListener("input",()=>{if(id==="aircraftFilter"&&$(id).value){selectAircraft($(id).value)}else renderContent()}));init();
-</script></body></html>
+/* =========================================================
+   CONFIGURATION
+========================================================= */
+
+const API_BASE =
+    "https://echo-msfs-charts.onrender.com";
+
+
+/* =========================================================
+   STATE
+========================================================= */
+
+const state = {
+    aircraft: [],
+    checklists: [],
+    categories: [],
+    selectedAircraft: null,
+    selectedCategory: null,
+    zoom: 1
+};
+
+
+/* =========================================================
+   DOM
+========================================================= */
+
+const aircraftList =
+    document.getElementById("aircraftList");
+
+const aircraftCount =
+    document.getElementById("aircraftCount");
+
+const searchInput =
+    document.getElementById("searchInput");
+
+const manufacturerFilter =
+    document.getElementById("manufacturerFilter");
+
+const icaoFilter =
+    document.getElementById("icaoFilter");
+
+const emptyState =
+    document.getElementById("emptyState");
+
+const checklistContent =
+    document.getElementById("checklistContent");
+
+const selectedAircraftName =
+    document.getElementById("selectedAircraftName");
+
+const selectedAircraftDetails =
+    document.getElementById("selectedAircraftDetails");
+
+const categoryGrid =
+    document.getElementById("categoryGrid");
+
+const checklistList =
+    document.getElementById("checklistList");
+
+const statusDot =
+    document.getElementById("statusDot");
+
+const statusText =
+    document.getElementById("statusText");
+
+const viewer =
+    document.getElementById("viewer");
+
+const viewerTitle =
+    document.getElementById("viewerTitle");
+
+const viewerContent =
+    document.getElementById("viewerContent");
+
+
+/* =========================================================
+   API
+========================================================= */
+
+async function fetchJSON(url, options = {}) {
+
+    const response = await fetch(url, {
+        ...options,
+        headers: {
+            Accept: "application/json",
+            ...(options.headers || {})
+        }
+    });
+
+    let data = null;
+
+    try {
+        data = await response.json();
+    } catch {
+        data = null;
+    }
+
+    if (!response.ok) {
+
+        throw new Error(
+            data?.error ||
+            data?.message ||
+            `HTTP ${response.status}`
+        );
+    }
+
+    return data;
+}
+
+
+/* =========================================================
+   API STATUS
+========================================================= */
+
+async function checkAPI() {
+
+    try {
+
+        const data =
+            await fetchJSON(
+                `${API_BASE}/api/health`
+            );
+
+        if (data?.status === "ok") {
+
+            statusDot.className =
+                "status-dot online";
+
+            statusText.textContent =
+                "API Online";
+
+        } else {
+
+            throw new Error(
+                "API unavailable"
+            );
+        }
+
+    } catch (error) {
+
+        console.debug(
+            "API unavailable:",
+            error
+        );
+
+        statusDot.className =
+            "status-dot offline";
+
+        statusText.textContent =
+            "API Offline";
+    }
+}
+
+
+/* =========================================================
+   LOAD AIRCRAFT
+========================================================= */
+
+async function loadAircraft() {
+
+    try {
+
+        const data =
+            await fetchJSON(
+                `${API_BASE}/api/aircraft`
+            );
+
+        state.aircraft =
+            Array.isArray(data?.aircraft)
+                ? data.aircraft
+                : [];
+
+        populateFilters();
+        renderAircraft();
+
+    } catch (error) {
+
+        console.error(
+            "Could not load aircraft:",
+            error
+        );
+
+        state.aircraft = [];
+
+        renderAircraftError();
+    }
+}
+
+
+/* =========================================================
+   FILTERS
+========================================================= */
+
+function populateFilters() {
+
+    manufacturerFilter.innerHTML =
+        `<option value="">All manufacturers</option>`;
+
+    icaoFilter.innerHTML =
+        `<option value="">All aircraft types</option>`;
+
+    const manufacturers =
+        [...new Set(
+            state.aircraft
+                .map(a => a.manufacturer)
+                .filter(Boolean)
+        )]
+        .sort();
+
+    manufacturers.forEach(
+        manufacturer => {
+
+            const option =
+                document.createElement("option");
+
+            option.value =
+                manufacturer;
+
+            option.textContent =
+                manufacturer;
+
+            manufacturerFilter.appendChild(
+                option
+            );
+        }
+    );
+
+    const icaoTypes =
+        [...new Set(
+            state.aircraft
+                .map(a => a.icao_type)
+                .filter(Boolean)
+        )]
+        .sort();
+
+    icaoTypes.forEach(
+        icao => {
+
+            const option =
+                document.createElement("option");
+
+            option.value =
+                icao;
+
+            option.textContent =
+                icao;
+
+            icaoFilter.appendChild(
+                option
+            );
+        }
+    );
+}
+
+
+/* =========================================================
+   RENDER AIRCRAFT
+========================================================= */
+
+function getFilteredAircraft() {
+
+    const search =
+        searchInput.value
+            .trim()
+            .toLowerCase();
+
+    const manufacturer =
+        manufacturerFilter.value;
+
+    const icao =
+        icaoFilter.value;
+
+    return state.aircraft.filter(
+        aircraft => {
+
+            const matchesSearch =
+                !search ||
+                `${aircraft.manufacturer || ""} ${aircraft.name || ""} ${aircraft.icao_type || ""}`
+                    .toLowerCase()
+                    .includes(search);
+
+            const matchesManufacturer =
+                !manufacturer ||
+                aircraft.manufacturer === manufacturer;
+
+            const matchesICAO =
+                !icao ||
+                aircraft.icao_type === icao;
+
+            return (
+                matchesSearch &&
+                matchesManufacturer &&
+                matchesICAO
+            );
+        }
+    );
+}
+
+
+function renderAircraft() {
+
+    const aircraft =
+        getFilteredAircraft();
+
+    aircraftCount.textContent =
+        aircraft.length;
+
+    aircraftList.innerHTML = "";
+
+    if (!aircraft.length) {
+
+        aircraftList.innerHTML = `
+            <div style="
+                padding:25px 15px;
+                text-align:center;
+                color:#7d8797;
+                font-size:13px;
+            ">
+                No aircraft found.
+            </div>
+        `;
+
+        return;
+    }
+
+    aircraft.forEach(
+        item => {
+
+            const button =
+                document.createElement("button");
+
+            button.className =
+                "aircraft-item";
+
+            if (
+                state.selectedAircraft &&
+                state.selectedAircraft.id === item.id
+            ) {
+                button.classList.add("selected");
+            }
+
+            button.innerHTML = `
+                <div class="aircraft-manufacturer">
+                    ${escapeHTML(item.manufacturer || "Unknown")}
+                </div>
+
+                <div class="aircraft-name">
+                    ${escapeHTML(item.name || "Unknown aircraft")}
+                </div>
+
+                ${
+                    item.icao_type
+                        ? `
+                            <div class="aircraft-icao">
+                                ICAO: ${escapeHTML(item.icao_type)}
+                            </div>
+                        `
+                        : ""
+                }
+            `;
+
+            button.addEventListener(
+                "click",
+                () => selectAircraft(item)
+            );
+
+            aircraftList.appendChild(button);
+        }
+    );
+}
+
+
+function renderAircraftError() {
+
+    aircraftCount.textContent = "0";
+
+    aircraftList.innerHTML = `
+        <div style="
+            padding:25px 15px;
+            text-align:center;
+            color:#c24141;
+            font-size:13px;
+        ">
+            Could not load aircraft.
+        </div>
+    `;
+}
+
+
+/* =========================================================
+   SELECT AIRCRAFT
+========================================================= */
+
+async function selectAircraft(aircraft) {
+
+    state.selectedAircraft =
+        aircraft;
+
+    state.selectedCategory =
+        null;
+
+    renderAircraft();
+
+    emptyState.style.display =
+        "none";
+
+    checklistContent.style.display =
+        "block";
+
+    selectedAircraftName.textContent =
+        aircraft.name || "Unknown aircraft";
+
+    selectedAircraftDetails.textContent =
+        [
+            aircraft.manufacturer,
+            aircraft.icao_type
+                ? `ICAO ${aircraft.icao_type}`
+                : null
+        ]
+        .filter(Boolean)
+        .join(" · ");
+
+    categoryGrid.innerHTML = "";
+    checklistList.innerHTML = `
+        <div style="
+            padding:35px;
+            text-align:center;
+            color:#7b8797;
+        ">
+            Loading checklists...
+        </div>
+    `;
+
+    try {
+
+        const data =
+            await fetchJSON(
+                `${API_BASE}/api/checklists?aircraft_id=${encodeURIComponent(aircraft.id)}`
+            );
+
+        state.checklists =
+            Array.isArray(data?.checklists)
+                ? data.checklists
+                : [];
+
+        state.categories = [];
+
+buildCategories();
+renderChecklists();
+
+    } catch (error) {
+
+        console.error(
+            "Could not load checklists:",
+            error
+        );
+
+        state.checklists = [];
+        state.categories = [];
+
+        categoryGrid.innerHTML = "";
+
+        checklistList.innerHTML = `
+            <div style="
+                padding:35px;
+                text-align:center;
+                color:#c24141;
+            ">
+                Could not load checklists.
+            </div>
+        `;
+    }
+}
+
+
+/* =========================================================
+   CHECKLIST CATEGORY SYSTEM
+========================================================= */
+
+const CHECKLIST_CATEGORIES = [
+    {
+        id: "PREFLIGHT",
+        name: "Preflight"
+    },
+    {
+        id: "COCKPIT",
+        name: "Cockpit Preparation"
+    },
+    {
+        id: "BEFORE_START",
+        name: "Before Start"
+    },
+    {
+        id: "START",
+        name: "Engine Start"
+    },
+    {
+        id: "TAXI",
+        name: "Taxi"
+    },
+    {
+        id: "TAKEOFF",
+        name: "Takeoff"
+    },
+    {
+        id: "CLIMB",
+        name: "Climb"
+    },
+    {
+        id: "CRUISE",
+        name: "Cruise"
+    },
+    {
+        id: "DESCENT",
+        name: "Descent"
+    },
+    {
+        id: "APPROACH",
+        name: "Approach"
+    },
+    {
+        id: "LANDING",
+        name: "Landing"
+    },
+    {
+        id: "SHUTDOWN",
+        name: "Shutdown"
+    },
+    {
+        id: "EMERGENCY",
+        name: "Emergency"
+    },
+    {
+        id: "OTHER",
+        name: "Other"
+    }
+];
+
+
+/* =========================================================
+   CATEGORY HELPERS
+========================================================= */
+
+function normalizeChecklistCategory(value) {
+
+    const normalized =
+        String(value || "")
+            .trim()
+            .toUpperCase()
+            .replace(/\s+/g, "_");
+
+    const exists =
+        CHECKLIST_CATEGORIES.some(
+            category =>
+                category.id === normalized
+        );
+
+    return exists
+        ? normalized
+        : "OTHER";
+}
+
+
+function getCategoryDefinition(category) {
+
+    const normalized =
+        normalizeChecklistCategory(category);
+
+    return (
+        CHECKLIST_CATEGORIES.find(
+            item =>
+                item.id === normalized
+        ) ||
+        CHECKLIST_CATEGORIES[
+            CHECKLIST_CATEGORIES.length - 1
+        ]
+    );
+}
+
+
+function getCategoryName(category) {
+
+    return getCategoryDefinition(category).name;
+}
+
+
+function getCategoryOrder(category) {
+
+    const normalized =
+        normalizeChecklistCategory(category);
+
+    const index =
+        CHECKLIST_CATEGORIES.findIndex(
+            item =>
+                item.id === normalized
+        );
+
+    return index === -1
+        ? 999
+        : index;
+}
+
+
+/*
+ * The backend uses `category`.
+ *
+ * This also accepts a few older field names so that
+ * existing data doesn't immediately break.
+ */
+function getChecklistCategory(checklist) {
+
+    return normalizeChecklistCategory(
+        checklist.category ||
+        checklist.category_name ||
+        checklist.categoryName ||
+        ""
+    );
+}
+
+
+/* =========================================================
+   BUILD CATEGORY FILTER
+========================================================= */
+
+function buildCategories() {
+
+    categoryGrid.innerHTML = "";
+
+    if (!state.checklists.length) {
+        return;
+    }
+
+    /*
+     * Only show categories that actually contain
+     * at least one checklist.
+     */
+    const usedCategories =
+        [
+            ...new Set(
+                state.checklists.map(
+                    checklist =>
+                        getChecklistCategory(
+                            checklist
+                        )
+                )
+            )
+        ]
+        .sort(
+            (a, b) =>
+                getCategoryOrder(a) -
+                getCategoryOrder(b)
+        );
+
+    usedCategories.forEach(
+        categoryId => {
+
+            const definition =
+                getCategoryDefinition(
+                    categoryId
+                );
+
+            const count =
+                state.checklists.filter(
+                    checklist =>
+                        getChecklistCategory(
+                            checklist
+                        ) === categoryId
+                ).length;
+
+            const button =
+                document.createElement(
+                    "button"
+                );
+
+            button.type = "button";
+
+            button.className =
+                "category-button";
+
+            if (
+                state.selectedCategory ===
+                categoryId
+            ) {
+                button.classList.add(
+                    "selected"
+                );
+            }
+
+            button.innerHTML = `
+                <div class="category-name">
+                    ${escapeHTML(
+                        definition.name
+                    )}
+                </div>
+
+                <div class="category-count">
+                    ${count}
+                    ${
+                        count === 1
+                            ? "checklist"
+                            : "checklists"
+                    }
+                </div>
+            `;
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    if (
+                        state.selectedCategory ===
+                        categoryId
+                    ) {
+                        state.selectedCategory =
+                            null;
+                    } else {
+                        state.selectedCategory =
+                            categoryId;
+                    }
+
+                    buildCategories();
+                    renderChecklists();
+
+                }
+            );
+
+            categoryGrid.appendChild(
+                button
+            );
+
+        }
+    );
+}
+
+
+/* =========================================================
+   RENDER CHECKLISTS
+========================================================= */
+
+function renderChecklists() {
+
+    checklistList.innerHTML = "";
+
+    let checklists =
+        [...state.checklists];
+
+
+    /*
+     * Category filter
+     */
+    if (
+        state.selectedCategory !== null
+    ) {
+
+        checklists =
+            checklists.filter(
+                checklist =>
+                    getChecklistCategory(
+                        checklist
+                    ) ===
+                    state.selectedCategory
+            );
+
+    }
+
+
+    /*
+     * IMPORTANT:
+     *
+     * First sort by the predefined
+     * checklist category order.
+     *
+     * Then sort alphabetically inside
+     * the same category.
+     */
+    checklists.sort(
+        (a, b) => {
+
+            const categoryDifference =
+                getCategoryOrder(
+                    getChecklistCategory(a)
+                ) -
+                getCategoryOrder(
+                    getChecklistCategory(b)
+                );
+
+            if (
+                categoryDifference !== 0
+            ) {
+                return categoryDifference;
+            }
+
+            return String(
+                a.name || ""
+            ).localeCompare(
+                String(
+                    b.name || ""
+                )
+            );
+
+        }
+    );
+
+
+    if (!checklists.length) {
+
+        checklistList.innerHTML = `
+            <div style="
+                padding:35px;
+                text-align:center;
+                color:#7b8797;
+            ">
+                No checklists available for
+                this selection.
+            </div>
+        `;
+
+        return;
+    }
+
+
+    let currentCategory = null;
+
+
+    checklists.forEach(
+        checklist => {
+
+            const category =
+                getChecklistCategory(
+                    checklist
+                );
+
+            /*
+             * Add a large category heading
+             * whenever the category changes.
+             */
+            if (
+                category !==
+                currentCategory
+            ) {
+
+                currentCategory =
+                    category;
+
+                const heading =
+                    document.createElement(
+                        "div"
+                    );
+
+                heading.style.cssText = `
+                    margin:
+                        18px 0 10px;
+
+                    padding:
+                        0 2px;
+
+                    font-size:
+                        12px;
+
+                    font-weight:
+                        800;
+
+                    color:
+                        #1769d1;
+
+                    text-transform:
+                        uppercase;
+
+                    letter-spacing:
+                        0.7px;
+                `;
+
+                heading.textContent =
+                    getCategoryName(
+                        category
+                    );
+
+                checklistList.appendChild(
+                    heading
+                );
+            }
+
+
+            const card =
+                document.createElement(
+                    "div"
+                );
+
+            card.className =
+                "checklist-card";
+
+
+            const categoryName =
+                getCategoryName(
+                    category
+                );
+
+
+            card.innerHTML = `
+                <div class="checklist-card-icon">
+                    ✓
+                </div>
+
+                <div class="checklist-card-info">
+
+                    <div class="checklist-card-title">
+                        ${escapeHTML(
+                            checklist.name ||
+                            "Checklist"
+                        )}
+                    </div>
+
+                    <div class="checklist-card-meta">
+                        ${escapeHTML(
+                            categoryName
+                        )}
+                    </div>
+
+                </div>
+
+                <button
+                    class="open-button"
+                    type="button"
+                >
+                    Open
+                </button>
+            `;
+
+
+            card.addEventListener(
+                "click",
+                event => {
+
+                    /*
+                     * Don't trigger twice when
+                     * clicking the Open button.
+                     */
+                    event.stopPropagation();
+
+                    openChecklist(
+                        checklist
+                    );
+
+                }
+            );
+
+
+            checklistList.appendChild(
+                card
+            );
+
+        }
+    );
+}
+
+/* =========================================================
+   RENDER CHECKLISTS
+========================================================= */
+
+function renderChecklists() {
+
+    checklistList.innerHTML = "";
+
+    let checklists =
+        [...state.checklists];
+
+    if (state.selectedCategory !== null) {
+
+        checklists =
+            checklists.filter(
+                checklist =>
+                    checklist.category_id ===
+                    state.selectedCategory
+            );
+    }
+
+    if (!checklists.length) {
+
+        checklistList.innerHTML = `
+            <div style="
+                padding:35px;
+                text-align:center;
+                color:#7b8797;
+            ">
+                No checklists available for this selection.
+            </div>
+        `;
+
+        return;
+    }
+
+    checklists.forEach(
+        checklist => {
+
+            const card =
+                document.createElement("div");
+
+            card.className =
+                "checklist-card";
+
+            const category =
+                state.categories.find(
+                    item =>
+                        item.id ===
+                        checklist.category_id
+                );
+
+            card.innerHTML = `
+                <div class="checklist-card-icon">
+                    ✓
+                </div>
+
+                <div class="checklist-card-info">
+
+                    <div class="checklist-card-title">
+                        ${escapeHTML(
+                            checklist.name ||
+                            "Checklist"
+                        )}
+                    </div>
+
+                    <div class="checklist-card-meta">
+                        ${escapeHTML(
+                            category?.name ||
+                            "Checklist"
+                        )}
+                    </div>
+
+                </div>
+
+                <button
+                    class="open-button"
+                    type="button"
+                >
+                    Open
+                </button>
+            `;
+
+            card.addEventListener(
+                "click",
+                () => openChecklist(checklist)
+            );
+
+            checklistList.appendChild(card);
+        }
+    );
+}
+
+
+/* =========================================================
+   OPEN CHECKLIST
+========================================================= */
+
+function openChecklist(checklist) {
+
+    viewerTitle.textContent =
+        checklist.name || "Checklist";
+
+    viewer.classList.add("visible");
+
+    viewerContent.innerHTML = `
+        <img
+            id="checklistImage"
+            src="${escapeAttribute(
+                getImageURL(checklist)
+            )}"
+            alt="${escapeAttribute(
+                checklist.name || "Checklist"
+            )}"
+        >
+    `;
+
+    state.zoom = 1;
+
+    updateZoom();
+}
+
+
+function getImageURL(checklist) {
+
+    if (checklist.imageUrl) {
+        return checklist.imageUrl;
+    }
+
+    if (checklist.image_url) {
+        return checklist.image_url;
+    }
+
+    if (checklist.id) {
+        return `${API_BASE}/api/checklists/${checklist.id}/image`;
+    }
+
+    return "";
+}
+
+
+/* =========================================================
+   VIEWER
+========================================================= */
+
+function closeViewer() {
+
+    viewer.classList.remove("visible");
+    viewerContent.innerHTML = "";
+}
+
+
+function updateZoom() {
+
+    const image =
+        document.getElementById(
+            "checklistImage"
+        );
+
+    if (!image) return;
+
+    image.style.transform =
+        `scale(${state.zoom})`;
+}
+
+
+document
+    .getElementById("zoomIn")
+    .addEventListener(
+        "click",
+        () => {
+
+            state.zoom =
+                Math.min(
+                    state.zoom + 0.25,
+                    4
+                );
+
+            updateZoom();
+        }
+    );
+
+
+document
+    .getElementById("zoomOut")
+    .addEventListener(
+        "click",
+        () => {
+
+            state.zoom =
+                Math.max(
+                    state.zoom - 0.25,
+                    0.25
+                );
+
+            updateZoom();
+        }
+    );
+
+
+document
+    .getElementById("zoomReset")
+    .addEventListener(
+        "click",
+        () => {
+
+            state.zoom = 1;
+
+            updateZoom();
+        }
+    );
+
+
+document
+    .getElementById("closeViewer")
+    .addEventListener(
+        "click",
+        closeViewer
+    );
+
+
+viewer.addEventListener(
+    "click",
+    event => {
+
+        if (event.target === viewer) {
+            closeViewer();
+        }
+    }
+);
+
+
+document.addEventListener(
+    "keydown",
+    event => {
+
+        if (
+            event.key === "Escape" &&
+            viewer.classList.contains("visible")
+        ) {
+            closeViewer();
+        }
+    }
+);
+
+
+/* =========================================================
+   EVENTS
+========================================================= */
+
+searchInput.addEventListener(
+    "input",
+    renderAircraft
+);
+
+manufacturerFilter.addEventListener(
+    "change",
+    renderAircraft
+);
+
+icaoFilter.addEventListener(
+    "change",
+    renderAircraft
+);
+
+
+/* =========================================================
+   SECURITY HELPERS
+========================================================= */
+
+function escapeHTML(value) {
+
+    return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+}
+
+
+function escapeAttribute(value) {
+    return escapeHTML(value);
+}
+
+
+/* =========================================================
+   START
+========================================================= */
+
+async function init() {
+
+    await checkAPI();
+    await loadAircraft();
+}
+
+init();
+</script>
+
+</body>
+</html>
