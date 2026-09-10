@@ -16,44 +16,20 @@
 <div id="viewer" class="viewer"><div class="viewer-head"><strong id="viewerTitle">Checklist</strong><button id="close" class="close">×</button></div><div class="viewer-body"><img id="viewerImage" alt="Checklist"></div></div>
 <script>
 const API='https://echo-msfs-charts.onrender.com';
-const CATEGORY_KEY='flightapp_checklist_categories';
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c]));
 const oldNames={PREFLIGHT:'Preflight',COCKPIT:'Cockpit Preparation',BEFORE_START:'Before Start',START:'Engine Start',TAXI:'Taxi',TAKEOFF:'Takeoff',CLIMB:'Climb',CRUISE:'Cruise',DESCENT:'Descent',APPROACH:'Approach',LANDING:'Landing',SHUTDOWN:'Shutdown',EMERGENCY:'Emergency',OTHER:'Other'};
 let aircraft=[],checklists=[],selectedAircraft='';
-function category(c){if(c?.notes&&String(c.notes).startsWith('FLIGHTAPP_CATEGORY:'))return String(c.notes).slice(20).trim();return oldNames[String(c?.category||'OTHER').toUpperCase()]||'Other'}
-function localCategories(){try{const x=JSON.parse(localStorage.getItem(CATEGORY_KEY)||'[]');return Array.isArray(x)?x.filter(x=>String(x).trim()).map(x=>String(x).trim()):[]}catch{return[]}}
-function allCategories(){const names=[...localCategories(),...checklists.map(category)];return [...new Map(names.map(n=>[n.toLowerCase(),n])).values()].filter(n=>n.toLowerCase()!=='irbus checklists').sort((a,b)=>a.localeCompare(b))}
-
-// Prefer the image URL returned by the API. Fall back to the public image endpoint.
-// A small version parameter prevents an old cached image from being shown after an upload/update.
-function image(c){
-    const url=String(c?.imageUrl||`${API}/api/checklists/${encodeURIComponent(c.id)}/image`);
-    const version=c?.updated_at||c?.updatedAt||c?.image_size||c?.imageSize||c?.id||'';
-    return url+(url.includes('?')?'&':'?')+'v='+encodeURIComponent(String(version));
-}
-
-function setImageError(img){
-    const thumb=img.closest('.thumb');
-    if(thumb){
-        thumb.classList.add('no-image');
-        thumb.innerHTML='<span>Checklist image unavailable</span>';
-        thumb.onclick=null;
-    }
-}
-
+function category(c){const note=String(c?.notes||'');if(note.toUpperCase().startsWith('FLIGHTAPP_CATEGORY:'))return note.slice('FLIGHTAPP_CATEGORY:'.length).trim();return oldNames[String(c?.category||'OTHER').toUpperCase()]||'Other'}
+function image(c){return `${API}/api/checklists/${encodeURIComponent(c.id)}/image?v=${encodeURIComponent(c.created_at||Date.now())}`}
 async function api(path){const r=await fetch(API+path,{headers:{Accept:'application/json'}});let d={};try{d=await r.json()}catch{}if(!r.ok)throw new Error(d.error||'Request failed');return d}
-function renderAircraft(){const box=$('aircrafts');box.innerHTML='<button class="aircraft '+(!selectedAircraft?'active':'')+'" data-id=""><small>All aircraft</small><strong>All checklists</strong></button>';aircraft.forEach(a=>{const b=document.createElement('button');b.className='aircraft '+(String(selectedAircraft)===String(a.id)?'active':'');b.dataset.id=a.id;b.innerHTML='<small>'+esc(a.manufacturer||'')+'</small><strong>'+esc(a.name||'Aircraft')+'</strong>';box.appendChild(b)});box.querySelectorAll('.aircraft').forEach(b=>b.onclick=()=>{selectedAircraft=b.dataset.id;renderAircraft();render()})}
-function renderCategories(){const names=allCategories();const current=$('categoryFilter').value;$('categoryFilter').innerHTML='<option value="">All categories</option>'+names.map(n=>'<option value="'+esc(n)+'">'+esc(n)+'</option>').join('');if(names.includes(current))$('categoryFilter').value=current}
-function render(){renderCategories();const q=$('search').value.trim().toLowerCase(),cf=$('categoryFilter').value;let rows=checklists.filter(c=>(!selectedAircraft||String(c.aircraft_id)===String(selectedAircraft))&&(!cf||category(c)===cf)&&(!q||String(c.name||'').toLowerCase().includes(q)));const grouped={};rows.forEach(c=>(grouped[category(c)]??=[]).push(c));const names=Object.keys(grouped).filter(n=>n.toLowerCase()!=='irbus checklists').sort((a,b)=>a.localeCompare(b));if(!names.length){$('content').innerHTML='<div class="empty">No checklists found.</div>';return}$('content').innerHTML=names.map(n=>'<section class="category"><h3 class="category-title">'+esc(n)+'</h3><div class="cards">'+grouped[n].map(c=>{const a=aircraft.find(x=>String(x.id)===String(c.aircraft_id));return '<article class="card"><div class="thumb" data-view="'+c.id+'"><img src="'+esc(image(c))+'" alt="'+esc(c.name||'Checklist')+'" loading="lazy"></div><div class="info"><div class="name">'+esc(c.name||'Checklist')+'</div><div class="meta">'+esc([a?.manufacturer,a?.name].filter(Boolean).join(' ')||'Unknown aircraft')+'</div><button class="open" data-view="'+c.id+'">Open checklist</button></div></article>'}).join('')+'</div></section>').join('');
-    $('content').querySelectorAll('.thumb img').forEach(img=>img.addEventListener('error',()=>setImageError(img),{once:true}));
-    $('content').querySelectorAll('[data-view]').forEach(e=>e.onclick=()=>open(Number(e.dataset.view)));
-}
-function open(id){const c=checklists.find(x=>Number(x.id)===id);if(!c)return;$('viewerTitle').textContent=c.name||'Checklist';$('viewerImage').style.display='block';$('viewerImage').src=image(c);$('viewerImage').onerror=()=>{$('viewerImage').style.display='none';$('viewerImage').parentElement.innerHTML='<div class="viewer-error">This checklist image could not be loaded.</div>'};$('viewer').classList.add('show')}
-function closeViewer(){$('viewer').classList.remove('show');$('viewerImage').src='';$('viewerImage').style.display='block';const body=$('viewerImage').parentElement;body.innerHTML='<img id="viewerImage" alt="Checklist">'}
+function renderAircraft(){const box=$('aircrafts');box.innerHTML='<button class="aircraft '+(!selectedAircraft?'active':'')+'" data-id=""><small>All aircraft</small><strong>All checklists</strong></button>';aircraft.forEach(a=>{const b=document.createElement('button');b.className='aircraft '+(String(selectedAircraft)===String(a.id)?'active':'');b.dataset.id=a.id;b.innerHTML='<small>'+esc(a.manufacturer||'')+'</small><strong>'+esc(a.name||a.aircraft_name||'Aircraft')+'</strong>';box.appendChild(b)});box.querySelectorAll('.aircraft').forEach(b=>b.onclick=()=>{selectedAircraft=b.dataset.id;renderAircraft();render()})}
+function renderCategories(){const names=[...new Map(checklists.map(category).map(n=>[n.toLowerCase(),n])).values()].sort((a,b)=>a.localeCompare(b));const select=$('categoryFilter'),current=select.value;select.innerHTML='<option value="">All categories</option>'+names.map(n=>'<option value="'+esc(n)+'">'+esc(n)+'</option>').join('');if(names.includes(current))select.value=current}
+function render(){renderCategories();const q=$('search').value.trim().toLowerCase(),cf=$('categoryFilter').value;const rows=checklists.filter(c=>(!selectedAircraft||String(c.aircraft_id)===String(selectedAircraft))&&(!cf||category(c)===cf)&&(!q||String(c.name||'').toLowerCase().includes(q)));const grouped={};rows.forEach(c=>(grouped[category(c)]??=[]).push(c));const names=Object.keys(grouped).sort((a,b)=>a.localeCompare(b));if(!names.length){$('content').innerHTML='<div class="empty">No checklists found.</div>';return}$('content').innerHTML=names.map(n=>'<section class="category"><h3 class="category-title">'+esc(n)+'</h3><div class="cards">'+grouped[n].map(c=>{const a=aircraft.find(x=>String(x.id)===String(c.aircraft_id));return '<article class="card"><div class="thumb" data-view="'+c.id+'"><img src="'+esc(image(c))+'" alt="'+esc(c.name||'Checklist')+'" loading="lazy"></div><div class="info"><div class="name">'+esc(c.name||'Checklist')+'</div><div class="meta">'+esc([a?.manufacturer||c.manufacturer,a?.name||c.aircraft_name].filter(Boolean).join(' ')||'Unknown aircraft')+'</div><button class="open" data-view="'+c.id+'">Open checklist</button></div></article>'}).join('')+'</div></section>').join('');$('content').querySelectorAll('.thumb img').forEach(img=>img.addEventListener('error',()=>{const t=img.closest('.thumb');t.classList.add('no-image');t.innerHTML='<span>Checklist image unavailable</span>';t.onclick=null},{once:true}));$('content').querySelectorAll('[data-view]').forEach(e=>e.onclick=()=>open(Number(e.dataset.view)))}
+function open(id){const c=checklists.find(x=>Number(x.id)===id);if(!c)return;const body=$('viewer').querySelector('.viewer-body');body.innerHTML='<img id="viewerImage" alt="Checklist">';$('viewerTitle').textContent=c.name||'Checklist';const img=$('viewerImage');img.src=image(c);img.onerror=()=>{body.innerHTML='<div class="viewer-error">This checklist image could not be loaded.</div>'};$('viewer').classList.add('show')}
+function closeViewer(){$('viewer').classList.remove('show')}
 $('close').onclick=closeViewer;$('viewer').onclick=e=>{if(e.target.id==='viewer')closeViewer()};$('search').oninput=render;$('categoryFilter').onchange=render;
-window.addEventListener('storage',e=>{if(e.key===CATEGORY_KEY){renderCategories();render()}});
-async function load(){try{const h=await api('/api/health');$('dot').className='dot ok';$('status').textContent='Backend online';const a=await api('/api/aircraft');aircraft=Array.isArray(a.aircraft)?a.aircraft:[];const c=await api('/api/checklists');checklists=Array.isArray(c.checklists)?c.checklists:[];renderAircraft();render()}catch(e){console.error('Checklist load error:',e);$('dot').className='dot bad';$('status').textContent='Backend unavailable';$('content').innerHTML='<div class="empty">Could not load checklists.</div>';renderCategories()}}load();
+async function load(){try{$('dot').className='dot ok';$('status').textContent='Backend online';const a=await api('/api/aircraft');aircraft=Array.isArray(a.aircraft)?a.aircraft:[];const c=await api('/api/checklists');checklists=Array.isArray(c.checklists)?c.checklists:[];renderAircraft();render()}catch(e){console.error('Checklist load error:',e);$('dot').className='dot bad';$('status').textContent='Backend unavailable';$('content').innerHTML='<div class="empty">Could not load checklists.</div>'}}load();
 </script>
 </body>
 </html>
