@@ -126,7 +126,10 @@ const VALID_CHART_PROVIDERS = [
     "FAA"
 ];
 
-function validChartType(type) {
+
+function validChartType(
+    type
+) {
 
     return VALID_CHART_TYPES.includes(
         String(type || "")
@@ -136,7 +139,10 @@ function validChartType(type) {
 
 }
 
-function validChartProvider(provider) {
+
+function validChartProvider(
+    provider
+) {
 
     return VALID_CHART_PROVIDERS.includes(
         String(provider || "")
@@ -145,6 +151,7 @@ function validChartProvider(provider) {
     );
 
 }
+
 
 /*
 |--------------------------------------------------------------------------
@@ -184,7 +191,8 @@ function fetchJSON(url) {
                             "data",
                             chunk => {
 
-                                data += chunk;
+                                data +=
+                                    chunk;
 
                             }
                         );
@@ -208,6 +216,12 @@ function fetchJSON(url) {
 
                                 }
 
+                                /*
+                                |--------------------------------------------------------------------------
+                                | HTTP 204 = NO CONTENT
+                                |--------------------------------------------------------------------------
+                                */
+
                                 if (
                                     response.statusCode === 204 ||
                                     !data.trim()
@@ -222,7 +236,9 @@ function fetchJSON(url) {
                                 try {
 
                                     resolve(
-                                        JSON.parse(data)
+                                        JSON.parse(
+                                            data
+                                        )
                                     );
 
                                 } catch (error) {
@@ -265,6 +281,7 @@ function fetchJSON(url) {
     );
 
 }
+
 
 /*
 |--------------------------------------------------------------------------
@@ -337,7 +354,9 @@ function fetchGzipJSON(url) {
                                 try {
 
                                     resolve(
-                                        JSON.parse(output)
+                                        JSON.parse(
+                                            output
+                                        )
                                     );
 
                                 } catch (error) {
@@ -386,15 +405,18 @@ function fetchGzipJSON(url) {
 
 }
 
+
 /*
 |--------------------------------------------------------------------------
 | AIRPORT CACHE
 |--------------------------------------------------------------------------
 */
 
-let airportStationsCache = null;
+let airportStationsCache =
+    null;
 
-let airportStationsCacheUpdated = 0;
+let airportStationsCacheUpdated =
+    0;
 
 const AIRPORT_STATIONS_CACHE_URL =
     "https://aviationweather.gov/data/cache/stations.cache.json.gz";
@@ -402,13 +424,16 @@ const AIRPORT_STATIONS_CACHE_URL =
 const AIRPORT_CACHE_MAX_AGE =
     24 * 60 * 60 * 1000;
 
+
 /*
 |--------------------------------------------------------------------------
 | AIRPORT DATA NORMALIZER
 |--------------------------------------------------------------------------
 */
 
-function normalizeAirport(raw) {
+function normalizeAirport(
+    raw
+) {
 
     if (
         !raw ||
@@ -558,13 +583,16 @@ function normalizeAirport(raw) {
 
 }
 
+
 /*
 |--------------------------------------------------------------------------
 | EXTRACT AIRPORT ARRAY FROM CACHE
 |--------------------------------------------------------------------------
 */
 
-function extractAirportArray(data) {
+function extractAirportArray(
+    data
+) {
 
     if (
         Array.isArray(data)
@@ -609,7 +637,9 @@ function extractAirportArray(data) {
     }
 
     if (
-        Array.isArray(data.features)
+        Array.isArray(
+            data.features
+        )
     ) {
 
         return data.features.map(
@@ -644,14 +674,17 @@ function extractAirportArray(data) {
     }
 
     const values =
-        Object.values(data);
+        Object.values(
+            data
+        );
 
     if (
         values.length > 0 &&
         values.some(
             value =>
                 value &&
-                typeof value === "object"
+                typeof value ===
+                    "object"
         )
     ) {
 
@@ -662,6 +695,7 @@ function extractAirportArray(data) {
     return [];
 
 }
+
 
 /*
 |--------------------------------------------------------------------------
@@ -703,7 +737,9 @@ async function getAirportStations() {
 
         const normalized =
             rawAirports
-                .map(normalizeAirport)
+                .map(
+                    normalizeAirport
+                )
                 .filter(Boolean)
                 .filter(
                     airport =>
@@ -758,6 +794,7 @@ async function getAirportStations() {
     }
 
 }
+
 
 /*
 |--------------------------------------------------------------------------
@@ -908,6 +945,7 @@ function airportSearchScore(
 
 }
 
+
 /*
 |--------------------------------------------------------------------------
 | HEALTH
@@ -956,6 +994,7 @@ app.get(
 
     }
 );
+
 
 /*
 |--------------------------------------------------------------------------
@@ -1009,9 +1048,19 @@ app.get(
     }
 );
 
+
 /*
 |--------------------------------------------------------------------------
 | CHARTS - PUBLIC LIST
+|--------------------------------------------------------------------------
+|
+| Examples:
+|
+| /api/charts
+| /api/charts?icao=EHAM
+| /api/charts?icao=EHAM&provider=LIDO
+| /api/charts?icao=EHAM&provider=LIDO&category=APPROACH
+|
 |--------------------------------------------------------------------------
 */
 
@@ -1062,7 +1111,9 @@ app.get(
 
         if (
             provider &&
-            !validChartProvider(provider)
+            !validChartProvider(
+                provider
+            )
         ) {
 
             return res.status(400).json({
@@ -1079,7 +1130,9 @@ app.get(
 
         if (
             category !== "ALL" &&
-            !validChartType(category)
+            !validChartType(
+                category
+            )
         ) {
 
             return res.status(400).json({
@@ -1100,7 +1153,8 @@ app.get(
 
             const values = [];
 
-            let parameter = 1;
+            let parameter =
+                1;
 
             if (
                 icao
@@ -1263,9 +1317,14 @@ app.get(
     }
 );
 
+
 /*
 |--------------------------------------------------------------------------
 | CHARTS - ADMIN LIST
+|--------------------------------------------------------------------------
+|
+| Public because chart admin authentication has been removed.
+|
 |--------------------------------------------------------------------------
 */
 
@@ -1343,6 +1402,7 @@ app.get(
 
     }
 );
+
 
 /*
 |--------------------------------------------------------------------------
@@ -1459,9 +1519,14 @@ app.get(
     }
 );
 
+
 /*
 |--------------------------------------------------------------------------
 | UPLOAD CHART
+|--------------------------------------------------------------------------
+|
+| Public because chart admin authentication has been removed.
+|
 |--------------------------------------------------------------------------
 */
 
@@ -1540,6 +1605,13 @@ app.post(
                             req.body.validity ||
                             ""
                         ).trim();
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | VALIDATION
+                    |--------------------------------------------------------------------------
+                    */
 
                     if (
                         !validICAO(
@@ -1626,6 +1698,13 @@ app.post(
                         });
 
                     }
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | DATABASE INSERT
+                    |--------------------------------------------------------------------------
+                    */
 
                     const result =
                         await pool.query(
@@ -1742,9 +1821,14 @@ app.post(
     }
 );
 
+
 /*
 |--------------------------------------------------------------------------
 | DELETE CHART
+|--------------------------------------------------------------------------
+|
+| Public because chart admin authentication has been removed.
+|
 |--------------------------------------------------------------------------
 */
 
@@ -1843,6 +1927,7 @@ app.delete(
 
     }
 );
+
 
 /*
 |--------------------------------------------------------------------------
@@ -1981,286 +2066,177 @@ app.get(
     }
 );
 
+
 /*
-|--------------------------------------------------------------------------
-| WEATHER - LIVE METAR + DATABASE CACHE
-|--------------------------------------------------------------------------
-*/
+app.get("/api/weather/:icao", async (req, res) => {
+    const icao = String(req.params.icao || "")
+        .trim()
+        .toUpperCase();
 
-app.get(
-    "/api/weather/:icao",
-    async (req, res) => {
+    if (!validICAO(icao)) {
+        return res.status(400).json({
+            available: false,
+            icao,
+            source: "unavailable",
+            message: "Invalid ICAO code"
+        });
+    }
 
-        const icao =
-            String(
-                req.params.icao || ""
-            )
-                .trim()
-                .toUpperCase();
+    /*
+    |--------------------------------------------------------------------------
+    | TRY LIVE METAR
+    |--------------------------------------------------------------------------
+    */
 
-        if (
-            !validICAO(icao)
-        ) {
+    try {
+        const url =
+            "https://aviationweather.gov/api/data/metar" +
+            `?ids=${encodeURIComponent(icao)}` +
+            "&format=json";
 
-            return res.status(400).json({
+        const data = await fetchJSON(url);
 
-                available:
-                    false,
+        if (Array.isArray(data) && data.length > 0) {
+            const metar = data[0];
 
-                icao,
-
-                source:
-                    "unavailable",
-
-                message:
-                    "Invalid ICAO code"
-
-            });
-
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | TRY LIVE METAR
-        |--------------------------------------------------------------------------
-        */
-
-        try {
-
-            const url =
-                "https://aviationweather.gov/api/data/metar" +
-                `?ids=${encodeURIComponent(
-                    icao
-                )}` +
-                "&format=json";
-
-            const data =
-                await fetchJSON(
-                    url
-                );
-
-            if (
-                Array.isArray(data) &&
-                data.length > 0
-            ) {
-
-                const metar =
-                    data[0];
-
-                /*
-                |--------------------------------------------------------------------------
-                | SAVE COMPLETE METAR RESPONSE
-                |--------------------------------------------------------------------------
-                */
-
-                try {
-
-                    await pool.query(
-                        `
-                        INSERT INTO weather_cache
-                        (
-                            icao,
-                            metar,
-                            raw_metar,
-                            fetched_at
-                        )
-                        VALUES
-                        (
-                            $1,
-                            $2,
-                            $3,
-                            NOW()
-                        )
-                        `,
-                        [
-
-                            icao,
-
-                            metar.rawOb ||
-                                metar.raw_text ||
-                                null,
-
-                            JSON.stringify(
-                                metar
-                            )
-
-                        ]
-                    );
-
-                } catch (databaseError) {
-
-                    console.error(
-                        "Could not cache METAR:",
-                        databaseError.message
-                    );
-
-                }
-
-                return res.json({
-
-                    available:
-                        true,
-
-                    source:
-                        "live",
-
-                    icao,
-
-                    metar
-
-                });
-
-            }
-
-            console.warn(
-                `No live METAR returned for ${icao}`
-            );
-
-        } catch (error) {
-
-            console.error(
-                `Live METAR request failed for ${icao}:`,
-                error.message
-            );
-
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | LIVE FAILED -> TRY DATABASE CACHE
-        |--------------------------------------------------------------------------
-        */
-
-        try {
-
-            const cached =
+            /*
+             * Save the complete METAR response in the database.
+             * This allows us to use it when the live API is unavailable.
+             */
+            try {
                 await pool.query(
                     `
-                    SELECT
+                    INSERT INTO weather_cache
+                    (
                         icao,
                         metar,
                         raw_metar,
                         fetched_at
-                    FROM weather_cache
-                    WHERE icao = $1
-                    AND raw_metar IS NOT NULL
-                    ORDER BY fetched_at DESC
-                    LIMIT 1
+                    )
+                    VALUES ($1, $2, $3, NOW())
                     `,
-                    [icao]
-                );
-
-            if (
-                cached.rows.length > 0
-            ) {
-
-                const row =
-                    cached.rows[0];
-
-                let metar = null;
-
-                if (
-                    row.raw_metar
-                ) {
-
-                    try {
-
-                        metar =
-                            typeof row.raw_metar === "string"
-                                ? JSON.parse(
-                                    row.raw_metar
-                                )
-                                : row.raw_metar;
-
-                    } catch (parseError) {
-
-                        console.error(
-                            "Could not parse cached METAR:",
-                            parseError.message
-                        );
-
-                    }
-
-                }
-
-                if (
-                    !metar &&
-                    row.metar
-                ) {
-
-                    metar = {
-
-                        rawOb:
-                            row.metar,
-
-                        raw_text:
-                            row.metar
-
-                    };
-
-                }
-
-                if (
-                    metar
-                ) {
-
-                    console.log(
-                        `Using cached METAR for ${icao}`
-                    );
-
-                    return res.json({
-
-                        available:
-                            true,
-
-                        source:
-                            "cached",
-
+                    [
                         icao,
-
-                        cachedAt:
-                            row.fetched_at,
-
-                        metar
-
-                    });
-
-                }
-
+                        metar.rawOb ||
+                            metar.raw_text ||
+                            null,
+                        JSON.stringify(metar)
+                    ]
+                );
+            } catch (databaseError) {
+                console.error(
+                    "Could not cache METAR:",
+                    databaseError.message
+                );
             }
 
-        } catch (databaseError) {
-
-            console.error(
-                `Could not read cached METAR for ${icao}:`,
-                databaseError.message
-            );
-
+            return res.json({
+                available: true,
+                source: "live",
+                icao,
+                metar
+            });
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | NOTHING AVAILABLE
-        |--------------------------------------------------------------------------
-        */
-
-        return res.json({
-
-            available:
-                false,
-
-            source:
-                "unavailable",
-
-            icao,
-
-            message:
-                "No METAR available"
-
-        });
-
+        console.warn(
+            `No live METAR returned for ${icao}`
+        );
+    } catch (error) {
+        console.error(
+            `Live METAR request failed for ${icao}:`,
+            error.message
+        );
     }
-);
+
+    /*
+    |--------------------------------------------------------------------------
+    | LIVE FAILED → TRY DATABASE CACHE
+    |--------------------------------------------------------------------------
+    */
+
+    try {
+        const cached = await pool.query(
+            `
+            SELECT
+                icao,
+                metar,
+                raw_metar,
+                fetched_at
+            FROM weather_cache
+            WHERE icao = $1
+            ORDER BY fetched_at DESC
+            LIMIT 1
+            `,
+            [icao]
+        );
+
+        if (cached.rows.length > 0) {
+            const row = cached.rows[0];
+
+            let metar = null;
+
+            /*
+             * raw_metar contains the complete JSON object.
+             */
+            if (row.raw_metar) {
+                try {
+                    metar =
+                        typeof row.raw_metar === "string"
+                            ? JSON.parse(row.raw_metar)
+                            : row.raw_metar;
+                } catch (parseError) {
+                    console.error(
+                        "Could not parse cached METAR:",
+                        parseError.message
+                    );
+                }
+            }
+
+            /*
+             * If raw_metar somehow isn't available,
+             * create a minimal METAR object from the stored text.
+             */
+            if (!metar && row.metar) {
+                metar = {
+                    rawOb: row.metar,
+                    raw_text: row.metar
+                };
+            }
+
+            if (metar) {
+                console.log(
+                    `Using cached METAR for ${icao}`
+                );
+
+                return res.json({
+                    available: true,
+                    source: "cached",
+                    icao,
+                    cachedAt: row.fetched_at,
+                    metar
+                });
+            }
+        }
+    } catch (databaseError) {
+        console.error(
+            `Could not read cached METAR for ${icao}:`,
+            databaseError.message
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | NOTHING AVAILABLE
+    |--------------------------------------------------------------------------
+    */
+
+    return res.json({
+        available: false,
+        source: "unavailable",
+        icao,
+        message: "No METAR available"
+    });
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -2273,14 +2249,14 @@ app.get(
     async (req, res) => {
 
         const icao =
-            String(
-                req.params.icao || ""
-            )
+            req.params.icao
                 .toUpperCase()
                 .trim();
 
         if (
-            !validICAO(icao)
+            !validICAO(
+                icao
+            )
         ) {
 
             return res.status(400).json({
@@ -2345,12 +2321,7 @@ app.get(
                         fetched_at
                     )
                     VALUES
-                    (
-                        $1,
-                        $2,
-                        $3,
-                        NOW()
-                    )
+                    ($1, $2, $3, NOW())
                     `,
                     [
 
@@ -2367,7 +2338,9 @@ app.get(
                     ]
                 );
 
-            } catch (databaseError) {
+            } catch (
+                databaseError
+            ) {
 
                 console.error(
                     "Could not cache TAF:",
@@ -2376,7 +2349,7 @@ app.get(
 
             }
 
-            return res.json({
+            res.json({
 
                 available:
                     true,
@@ -2394,116 +2367,7 @@ app.get(
                 error.message
             );
 
-            /*
-            |--------------------------------------------------------------------------
-            | TAF LIVE FAILED -> TRY CACHE
-            |--------------------------------------------------------------------------
-            */
-
-            try {
-
-                const cached =
-                    await pool.query(
-                        `
-                        SELECT
-                            icao,
-                            taf,
-                            raw_taf,
-                            fetched_at
-                        FROM weather_cache
-                        WHERE icao = $1
-                        AND raw_taf IS NOT NULL
-                        ORDER BY fetched_at DESC
-                        LIMIT 1
-                        `,
-                        [icao]
-                    );
-
-                if (
-                    cached.rows.length > 0
-                ) {
-
-                    const row =
-                        cached.rows[0];
-
-                    let taf = null;
-
-                    if (
-                        row.raw_taf
-                    ) {
-
-                        try {
-
-                            taf =
-                                typeof row.raw_taf === "string"
-                                    ? JSON.parse(
-                                        row.raw_taf
-                                    )
-                                    : row.raw_taf;
-
-                        } catch (parseError) {
-
-                            console.error(
-                                "Could not parse cached TAF:",
-                                parseError.message
-                            );
-
-                        }
-
-                    }
-
-                    if (
-                        !taf &&
-                        row.taf
-                    ) {
-
-                        taf = {
-
-                            rawTAF:
-                                row.taf,
-
-                            raw_text:
-                                row.taf
-
-                        };
-
-                    }
-
-                    if (
-                        taf
-                    ) {
-
-                        return res.json({
-
-                            available:
-                                true,
-
-                            source:
-                                "cached",
-
-                            icao,
-
-                            cachedAt:
-                                row.fetched_at,
-
-                            taf
-
-                        });
-
-                    }
-
-                }
-
-            } catch (databaseError) {
-
-                console.error(
-                    `Could not read cached TAF for ${icao}:`,
-                    databaseError.message
-                );
-
-            }
-
-            return res.json({
+            res.status(502).json({
 
                 available:
                     false,
@@ -2520,6 +2384,7 @@ app.get(
     }
 );
 
+
 /*
 |--------------------------------------------------------------------------
 | CACHED WEATHER
@@ -2531,14 +2396,14 @@ app.get(
     async (req, res) => {
 
         const icao =
-            String(
-                req.params.icao || ""
-            )
+            req.params.icao
                 .toUpperCase()
                 .trim();
 
         if (
-            !validICAO(icao)
+            !validICAO(
+                icao
+            )
         ) {
 
             return res.status(400).json({
@@ -2591,7 +2456,7 @@ app.get(
 
             }
 
-            return res.json({
+            res.json({
 
                 available:
                     true,
@@ -2608,7 +2473,7 @@ app.get(
                 error.message
             );
 
-            return res.status(503).json({
+            res.status(503).json({
 
                 available:
                     false,
@@ -2622,6 +2487,7 @@ app.get(
 
     }
 );
+
 
 /*
 |--------------------------------------------------------------------------
@@ -2689,7 +2555,8 @@ app.get(
                 `Airport search: "${query}"`
             );
 
-            let directResults = [];
+            let directResults =
+                [];
 
             const looksLikeICAO =
                 /^[A-Za-z]{4}$/.test(
@@ -2728,12 +2595,15 @@ app.get(
 
                         directResults =
                             airportData
-                                .map(normalizeAirport)
+                                .map(
+                                    normalizeAirport
+                                )
                                 .filter(Boolean);
 
                     } else if (
                         airportData &&
-                        typeof airportData === "object"
+                        typeof airportData ===
+                            "object"
                     ) {
 
                         const extracted =
@@ -2743,12 +2613,16 @@ app.get(
 
                         directResults =
                             extracted
-                                .map(normalizeAirport)
+                                .map(
+                                    normalizeAirport
+                                )
                                 .filter(Boolean);
 
                     }
 
-                } catch (directError) {
+                } catch (
+                    directError
+                ) {
 
                     console.warn(
                         "Direct airport API lookup failed:",
@@ -2796,7 +2670,9 @@ app.get(
                                     ...cleanAirport
                                 } = airport;
 
-                                return cleanAirport;
+                                return {
+                                    ...cleanAirport
+                                };
 
                             }
                         );
@@ -2963,6 +2839,7 @@ app.get(
     }
 );
 
+
 /*
 |--------------------------------------------------------------------------
 | AIRPORT INFORMATION
@@ -2974,14 +2851,14 @@ app.get(
     async (req, res) => {
 
         const icao =
-            String(
-                req.params.icao || ""
-            )
+            req.params.icao
                 .toUpperCase()
                 .trim();
 
         if (
-            !validICAO(icao)
+            !validICAO(
+                icao
+            )
         ) {
 
             return res.status(400).json({
@@ -3111,7 +2988,9 @@ app.get(
 
                 }
 
-            } catch (airportApiError) {
+            } catch (
+                airportApiError
+            ) {
 
                 console.warn(
                     `Airport API lookup for ${icao} failed:`,
@@ -3183,7 +3062,9 @@ app.get(
 
                 }
 
-            } catch (stationError) {
+            } catch (
+                stationError
+            ) {
 
                 console.warn(
                     "Airport station cache lookup failed:",
@@ -3200,7 +3081,7 @@ app.get(
                         fetched_at
                     FROM weather_cache
                     WHERE icao = $1
-                    AND raw_metar IS NOT NULL
+                      AND raw_metar IS NOT NULL
                     ORDER BY fetched_at DESC
                     LIMIT 1
                     `,
@@ -3230,7 +3111,8 @@ app.get(
             try {
 
                 metarData =
-                    typeof weatherResult.rows[0].raw_metar === "string"
+                    typeof weatherResult.rows[0].raw_metar ===
+                    "string"
 
                         ? JSON.parse(
                             weatherResult.rows[0].raw_metar
@@ -3238,7 +3120,9 @@ app.get(
 
                         : weatherResult.rows[0].raw_metar;
 
-            } catch (parseError) {
+            } catch (
+                parseError
+            ) {
 
                 console.error(
                     "Could not parse cached METAR:",
@@ -3342,6 +3226,7 @@ app.get(
     }
 );
 
+
 /*
 |--------------------------------------------------------------------------
 | SAVED PLANS
@@ -3363,7 +3248,7 @@ app.get(
                     `
                 );
 
-            return res.json({
+            res.json({
 
                 available:
                     true,
@@ -3380,7 +3265,7 @@ app.get(
                 error.message
             );
 
-            return res.status(503).json({
+            res.status(503).json({
 
                 available:
                     false,
@@ -3394,6 +3279,7 @@ app.get(
 
     }
 );
+
 
 /*
 |--------------------------------------------------------------------------
@@ -3616,6 +3502,7 @@ app.post(
     }
 );
 
+
 /*
 |--------------------------------------------------------------------------
 | DELETE SAVED PLAN
@@ -3709,19 +3596,20 @@ app.delete(
     }
 );
 
+
 /*
 |--------------------------------------------------------------------------
 | DATABASE INITIALIZATION
 |--------------------------------------------------------------------------
+|
+| Creates the charts table automatically.
+|
+| Existing tables are NOT modified.
+|
+|--------------------------------------------------------------------------
 */
 
 async function initializeDatabase() {
-
-    /*
-    |--------------------------------------------------------------------------
-    | CHARTS TABLE
-    |--------------------------------------------------------------------------
-    */
 
     await pool.query(
         `
@@ -3779,132 +3667,12 @@ async function initializeDatabase() {
         `
     );
 
-    /*
-    |--------------------------------------------------------------------------
-    | WEATHER CACHE TABLE
-    |--------------------------------------------------------------------------
-    */
-
-    await pool.query(
-        `
-        CREATE TABLE IF NOT EXISTS weather_cache
-        (
-            id BIGSERIAL PRIMARY KEY,
-
-            icao VARCHAR(4) NOT NULL,
-
-            metar TEXT,
-
-            taf TEXT,
-
-            raw_metar JSONB,
-
-            raw_taf JSONB,
-
-            fetched_at TIMESTAMPTZ NOT NULL
-                DEFAULT NOW()
-        )
-        `
-    );
-
-    await pool.query(
-        `
-        CREATE INDEX IF NOT EXISTS
-        weather_cache_icao_fetched_idx
-        ON weather_cache
-        (
-            icao,
-            fetched_at DESC
-        )
-        `
-    );
-
-    /*
-    |--------------------------------------------------------------------------
-    | AIRPORT CACHE TABLE
-    |--------------------------------------------------------------------------
-    */
-
-    await pool.query(
-        `
-        CREATE TABLE IF NOT EXISTS airport_cache
-        (
-            icao VARCHAR(4) PRIMARY KEY,
-
-            name TEXT,
-
-            iata VARCHAR(3),
-
-            latitude DOUBLE PRECISION,
-
-            longitude DOUBLE PRECISION,
-
-            elevation_ft DOUBLE PRECISION,
-
-            country TEXT,
-
-            city TEXT,
-
-            raw_data JSONB,
-
-            updated_at TIMESTAMPTZ NOT NULL
-                DEFAULT NOW()
-        )
-        `
-    );
-
-    /*
-    |--------------------------------------------------------------------------
-    | SAVED PLANS TABLE
-    |--------------------------------------------------------------------------
-    */
-
-    await pool.query(
-        `
-        CREATE TABLE IF NOT EXISTS saved_plans
-        (
-            id BIGSERIAL PRIMARY KEY,
-
-            name TEXT NOT NULL,
-
-            departure_icao VARCHAR(4),
-
-            arrival_icao VARCHAR(4),
-
-            aircraft_icao VARCHAR(10),
-
-            cruise_altitude INTEGER,
-
-            route TEXT,
-
-            distance_nm DOUBLE PRECISION,
-
-            estimated_minutes INTEGER,
-
-            simbrief_ofp_id TEXT,
-
-            created_at TIMESTAMPTZ NOT NULL
-                DEFAULT NOW()
-        )
-        `
-    );
-
-    await pool.query(
-        `
-        CREATE INDEX IF NOT EXISTS
-        saved_plans_created_at_idx
-        ON saved_plans
-        (
-            created_at DESC
-        )
-        `
-    );
-
     console.log(
-        "Database tables and indexes are ready."
+        "Charts database table is ready."
     );
 
 }
+
 
 /*
 |--------------------------------------------------------------------------
@@ -3948,7 +3716,7 @@ app.get(
             database,
 
             version:
-                "1.4.0",
+                "1.3.0",
 
             endpoints: {
 
@@ -3995,6 +3763,7 @@ app.get(
     }
 );
 
+
 /*
 |--------------------------------------------------------------------------
 | 404
@@ -4016,6 +3785,7 @@ app.use(
 
     }
 );
+
 
 /*
 |--------------------------------------------------------------------------
@@ -4049,6 +3819,7 @@ app.use(
     }
 );
 
+
 /*
 |--------------------------------------------------------------------------
 | START SERVER
@@ -4066,6 +3837,12 @@ async function startServer() {
         console.log(
             "Successfully connected to Neon PostgreSQL."
         );
+
+        /*
+        |--------------------------------------------------------------------------
+        | CREATE CHART TABLE / INDEXES
+        |--------------------------------------------------------------------------
+        */
 
         await initializeDatabase();
 
@@ -4095,6 +3872,7 @@ async function startServer() {
 
 startServer();
 
+
 /*
 |--------------------------------------------------------------------------
 | GRACEFUL SHUTDOWN
@@ -4115,6 +3893,7 @@ process.on(
 
     }
 );
+
 
 process.on(
     "SIGINT",
