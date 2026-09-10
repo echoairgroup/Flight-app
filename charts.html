@@ -3987,98 +3987,153 @@ function renderAirportInfo(
 |--------------------------------------------------------------------------
 */
 
-async function loadWeather(
-    icao
-) {
-
+async function loadWeather(icao) {
     const metarText = $("metarText");
     const tafText = $("tafText");
-    const windElement = $("weatherWind");
-    const visibilityElement = $("weatherVisibility");
+    const weatherWind = $("weatherWind");
+    const weatherVisibility = $("weatherVisibility");
 
-    if (!icao) {
-        return;
+    /*
+     * Initial state
+     */
+    if (metarText) {
+        metarText.textContent = "Loading METAR...";
     }
 
-    metarText.textContent = "Loading METAR...";
-    tafText.textContent = "Loading TAF...";
-    windElement.textContent = "—";
-    visibilityElement.textContent = "—";
+    if (tafText) {
+        tafText.textContent = "Loading TAF...";
+    }
+
+    if (weatherWind) {
+        weatherWind.textContent = "—";
+    }
+
+    if (weatherVisibility) {
+        weatherVisibility.textContent = "—";
+    }
 
     try {
-        const [metarData, tafData] = await Promise.allSettled([
-            fetchJson(
-                `${API_BASE}/api/weather/${encodeURIComponent(icao)}`
-            ),
-            fetchJson(
-                `${API_BASE}/api/weather/${encodeURIComponent(icao)}/taf`
-            )
-        ]);
+        /*
+         * METAR and TAF can load independently.
+         */
+        const metarPromise = fetchJson(
+            `${API_BASE}/api/weather/${encodeURIComponent(icao)}`
+        );
 
-        /* METAR */
+        const tafPromise = fetchJson(
+            `${API_BASE}/api/weather/${encodeURIComponent(icao)}/taf`
+        );
+
+        const [metarResult, tafResult] =
+            await Promise.allSettled([
+                metarPromise,
+                tafPromise
+            ]);
+
+        /*
+         |--------------------------------------------------------------------------
+         | METAR
+         |--------------------------------------------------------------------------
+         */
+
         if (
-            metarData.status === "fulfilled" &&
-            metarData.value?.available === true &&
-            metarData.value?.metar
+            metarResult.status === "fulfilled" &&
+            metarResult.value &&
+            metarResult.value.available &&
+            metarResult.value.metar
         ) {
-            renderWeather(metarData.value.metar);
+            const data = metarResult.value;
+            const metar = data.metar;
 
-            if (metarData.value.source === "cache") {
-                const cachedAt = metarData.value.cachedAt
-                    ? new Date(metarData.value.cachedAt).toLocaleString()
-                    : "previously cached";
+            renderWeather(metar);
 
-                metarText.textContent =
-                    (metarData.value.metar.rawOb ||
-                        metarData.value.metar.raw_text ||
-                        "METAR received.") +
-                    `\n(Cached: ${cachedAt})`;
+            /*
+             * Update weather status if the element exists.
+             */
+            const weatherStatus =
+                $("weatherStatus");
+
+            if (weatherStatus) {
+                if (data.source === "cached") {
+                    weatherStatus.textContent =
+                        "Cached";
+                } else {
+                    weatherStatus.textContent =
+                        "Live";
+                }
             }
+
         } else {
-            metarText.textContent =
-                "No live or cached METAR available.";
-            windElement.textContent = "—";
-            visibilityElement.textContent = "—";
+            if (metarText) {
+                metarText.textContent =
+                    "No METAR available.";
+            }
+
+            if (weatherWind) {
+                weatherWind.textContent = "—";
+            }
+
+            if (weatherVisibility) {
+                weatherVisibility.textContent = "—";
+            }
+
+            console.error(
+                "METAR unavailable:",
+                metarResult
+            );
         }
 
-        /* TAF */
+        /*
+         |--------------------------------------------------------------------------
+         | TAF
+         |--------------------------------------------------------------------------
+         */
+
         if (
-            tafData.status === "fulfilled" &&
-            tafData.value?.available === true &&
-            tafData.value?.taf
+            tafResult.status === "fulfilled" &&
+            tafResult.value &&
+            tafResult.value.available &&
+            tafResult.value.taf
         ) {
-            const taf = tafData.value.taf;
+            const taf = tafResult.value.taf;
 
-            tafText.textContent =
-                taf.rawTAF ||
-                taf.raw_text ||
-                "TAF available.";
-
-            if (tafData.value.source === "cache") {
-                const cachedAt = tafData.value.cachedAt
-                    ? new Date(tafData.value.cachedAt).toLocaleString()
-                    : "previously cached";
-
-                tafText.textContent +=
-                    `\n(Cached: ${cachedAt})`;
+            if (tafText) {
+                tafText.textContent =
+                    taf.rawTAF ||
+                    taf.raw_text ||
+                    taf.rawOb ||
+                    "TAF received.";
             }
+
         } else {
-            tafText.textContent =
-                "No live or cached TAF available.";
+            if (tafText) {
+                tafText.textContent =
+                    "No TAF available.";
+            }
+
+            console.error(
+                "TAF unavailable:",
+                tafResult
+            );
         }
 
     } catch (error) {
-        console.error("Weather failed:", error);
+        console.error(
+            "Weather loading failed:",
+            error
+        );
 
-        metarText.textContent =
-            "Unable to load METAR.";
-        tafText.textContent =
-            "Unable to load TAF.";
-        windElement.textContent = "—";
-        visibilityElement.textContent = "—";
+        if (metarText) {
+            metarText.textContent =
+                "Weather unavailable.";
+        }
+
+        if (tafText) {
+            tafText.textContent =
+                "TAF unavailable.";
+        }
     }
 }
-
 
 /*
 |--------------------------------------------------------------------------
@@ -4086,55 +4141,39 @@ async function loadWeather(
 |--------------------------------------------------------------------------
 */
 
-function renderWeather(
-    metar
-) {
-
+function renderWeather(metar) {
     if (!metar) {
         return;
     }
 
-    let wind =
-        "—";
+    let wind = "—";
 
     if (
         metar.wdir != null &&
         metar.wspd != null
     ) {
-
         wind =
             `${metar.wdir}° / ${metar.wspd} kt`;
 
-        if (metar.wgst) {
-
-            wind +=
-                ` G${metar.wgst}`;
+        if (metar.wgst != null) {
+            wind += ` G${metar.wgst}`;
         }
     }
 
-    let visibility =
-        "—";
+    let visibility = "—";
 
-    if (
-        metar.visib != null
-    ) {
-
-        visibility =
-            `${metar.visib}`;
+    if (metar.visib != null) {
+        visibility = String(metar.visib);
     }
 
-    $("weatherWind").textContent =
-        wind;
-
-    $("weatherVisibility").textContent =
-        visibility;
+    $("weatherWind").textContent = wind;
+    $("weatherVisibility").textContent = visibility;
 
     $("metarText").textContent =
         metar.rawOb ||
         metar.raw_text ||
         "METAR received.";
 }
-
 
 /*
 |--------------------------------------------------------------------------
