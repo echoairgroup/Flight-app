@@ -1238,13 +1238,10 @@ async function selectAircraft(aircraft) {
                 ? data.checklists
                 : [];
 
-        state.categories =
-            Array.isArray(data?.categories)
-                ? data.categories
-                : [];
+        state.categories = [];
 
-        buildCategories();
-        renderChecklists();
+buildCategories();
+renderChecklists();
 
     } catch (error) {
 
@@ -1272,57 +1269,232 @@ async function selectAircraft(aircraft) {
 
 
 /* =========================================================
-   CATEGORIES
+   CHECKLIST CATEGORY SYSTEM
+========================================================= */
+
+const CHECKLIST_CATEGORIES = [
+    {
+        id: "PREFLIGHT",
+        name: "Preflight"
+    },
+    {
+        id: "COCKPIT",
+        name: "Cockpit Preparation"
+    },
+    {
+        id: "BEFORE_START",
+        name: "Before Start"
+    },
+    {
+        id: "START",
+        name: "Engine Start"
+    },
+    {
+        id: "TAXI",
+        name: "Taxi"
+    },
+    {
+        id: "TAKEOFF",
+        name: "Takeoff"
+    },
+    {
+        id: "CLIMB",
+        name: "Climb"
+    },
+    {
+        id: "CRUISE",
+        name: "Cruise"
+    },
+    {
+        id: "DESCENT",
+        name: "Descent"
+    },
+    {
+        id: "APPROACH",
+        name: "Approach"
+    },
+    {
+        id: "LANDING",
+        name: "Landing"
+    },
+    {
+        id: "SHUTDOWN",
+        name: "Shutdown"
+    },
+    {
+        id: "EMERGENCY",
+        name: "Emergency"
+    },
+    {
+        id: "OTHER",
+        name: "Other"
+    }
+];
+
+
+/* =========================================================
+   CATEGORY HELPERS
+========================================================= */
+
+function normalizeChecklistCategory(value) {
+
+    const normalized =
+        String(value || "")
+            .trim()
+            .toUpperCase()
+            .replace(/\s+/g, "_");
+
+    const exists =
+        CHECKLIST_CATEGORIES.some(
+            category =>
+                category.id === normalized
+        );
+
+    return exists
+        ? normalized
+        : "OTHER";
+}
+
+
+function getCategoryDefinition(category) {
+
+    const normalized =
+        normalizeChecklistCategory(category);
+
+    return (
+        CHECKLIST_CATEGORIES.find(
+            item =>
+                item.id === normalized
+        ) ||
+        CHECKLIST_CATEGORIES[
+            CHECKLIST_CATEGORIES.length - 1
+        ]
+    );
+}
+
+
+function getCategoryName(category) {
+
+    return getCategoryDefinition(category).name;
+}
+
+
+function getCategoryOrder(category) {
+
+    const normalized =
+        normalizeChecklistCategory(category);
+
+    const index =
+        CHECKLIST_CATEGORIES.findIndex(
+            item =>
+                item.id === normalized
+        );
+
+    return index === -1
+        ? 999
+        : index;
+}
+
+
+/*
+ * The backend uses `category`.
+ *
+ * This also accepts a few older field names so that
+ * existing data doesn't immediately break.
+ */
+function getChecklistCategory(checklist) {
+
+    return normalizeChecklistCategory(
+        checklist.category ||
+        checklist.category_name ||
+        checklist.categoryName ||
+        ""
+    );
+}
+
+
+/* =========================================================
+   BUILD CATEGORY FILTER
 ========================================================= */
 
 function buildCategories() {
 
     categoryGrid.innerHTML = "";
 
-    if (!state.categories.length) {
-
-        categoryGrid.innerHTML = `
-            <div style="
-                grid-column:1/-1;
-                color:#7b8797;
-                font-size:13px;
-            ">
-                No checklist categories available.
-            </div>
-        `;
-
+    if (!state.checklists.length) {
         return;
     }
 
-    state.categories.forEach(
-        category => {
+    /*
+     * Only show categories that actually contain
+     * at least one checklist.
+     */
+    const usedCategories =
+        [
+            ...new Set(
+                state.checklists.map(
+                    checklist =>
+                        getChecklistCategory(
+                            checklist
+                        )
+                )
+            )
+        ]
+        .sort(
+            (a, b) =>
+                getCategoryOrder(a) -
+                getCategoryOrder(b)
+        );
+
+    usedCategories.forEach(
+        categoryId => {
+
+            const definition =
+                getCategoryDefinition(
+                    categoryId
+                );
 
             const count =
                 state.checklists.filter(
                     checklist =>
-                        checklist.category_id === category.id
+                        getChecklistCategory(
+                            checklist
+                        ) === categoryId
                 ).length;
 
             const button =
-                document.createElement("button");
+                document.createElement(
+                    "button"
+                );
+
+            button.type = "button";
 
             button.className =
                 "category-button";
 
             if (
-                state.selectedCategory === category.id
+                state.selectedCategory ===
+                categoryId
             ) {
-                button.classList.add("selected");
+                button.classList.add(
+                    "selected"
+                );
             }
 
             button.innerHTML = `
                 <div class="category-name">
-                    ${escapeHTML(category.name)}
+                    ${escapeHTML(
+                        definition.name
+                    )}
                 </div>
 
                 <div class="category-count">
                     ${count}
-                    ${count === 1 ? "checklist" : "checklists"}
+                    ${
+                        count === 1
+                            ? "checklist"
+                            : "checklists"
+                    }
                 </div>
             `;
 
@@ -1331,24 +1503,250 @@ function buildCategories() {
                 () => {
 
                     if (
-                        state.selectedCategory === category.id
+                        state.selectedCategory ===
+                        categoryId
                     ) {
-                        state.selectedCategory = null;
+                        state.selectedCategory =
+                            null;
                     } else {
                         state.selectedCategory =
-                            category.id;
+                            categoryId;
                     }
 
                     buildCategories();
                     renderChecklists();
+
                 }
             );
 
-            categoryGrid.appendChild(button);
+            categoryGrid.appendChild(
+                button
+            );
+
         }
     );
 }
 
+
+/* =========================================================
+   RENDER CHECKLISTS
+========================================================= */
+
+function renderChecklists() {
+
+    checklistList.innerHTML = "";
+
+    let checklists =
+        [...state.checklists];
+
+
+    /*
+     * Category filter
+     */
+    if (
+        state.selectedCategory !== null
+    ) {
+
+        checklists =
+            checklists.filter(
+                checklist =>
+                    getChecklistCategory(
+                        checklist
+                    ) ===
+                    state.selectedCategory
+            );
+
+    }
+
+
+    /*
+     * IMPORTANT:
+     *
+     * First sort by the predefined
+     * checklist category order.
+     *
+     * Then sort alphabetically inside
+     * the same category.
+     */
+    checklists.sort(
+        (a, b) => {
+
+            const categoryDifference =
+                getCategoryOrder(
+                    getChecklistCategory(a)
+                ) -
+                getCategoryOrder(
+                    getChecklistCategory(b)
+                );
+
+            if (
+                categoryDifference !== 0
+            ) {
+                return categoryDifference;
+            }
+
+            return String(
+                a.name || ""
+            ).localeCompare(
+                String(
+                    b.name || ""
+                )
+            );
+
+        }
+    );
+
+
+    if (!checklists.length) {
+
+        checklistList.innerHTML = `
+            <div style="
+                padding:35px;
+                text-align:center;
+                color:#7b8797;
+            ">
+                No checklists available for
+                this selection.
+            </div>
+        `;
+
+        return;
+    }
+
+
+    let currentCategory = null;
+
+
+    checklists.forEach(
+        checklist => {
+
+            const category =
+                getChecklistCategory(
+                    checklist
+                );
+
+            /*
+             * Add a large category heading
+             * whenever the category changes.
+             */
+            if (
+                category !==
+                currentCategory
+            ) {
+
+                currentCategory =
+                    category;
+
+                const heading =
+                    document.createElement(
+                        "div"
+                    );
+
+                heading.style.cssText = `
+                    margin:
+                        18px 0 10px;
+
+                    padding:
+                        0 2px;
+
+                    font-size:
+                        12px;
+
+                    font-weight:
+                        800;
+
+                    color:
+                        #1769d1;
+
+                    text-transform:
+                        uppercase;
+
+                    letter-spacing:
+                        0.7px;
+                `;
+
+                heading.textContent =
+                    getCategoryName(
+                        category
+                    );
+
+                checklistList.appendChild(
+                    heading
+                );
+            }
+
+
+            const card =
+                document.createElement(
+                    "div"
+                );
+
+            card.className =
+                "checklist-card";
+
+
+            const categoryName =
+                getCategoryName(
+                    category
+                );
+
+
+            card.innerHTML = `
+                <div class="checklist-card-icon">
+                    ✓
+                </div>
+
+                <div class="checklist-card-info">
+
+                    <div class="checklist-card-title">
+                        ${escapeHTML(
+                            checklist.name ||
+                            "Checklist"
+                        )}
+                    </div>
+
+                    <div class="checklist-card-meta">
+                        ${escapeHTML(
+                            categoryName
+                        )}
+                    </div>
+
+                </div>
+
+                <button
+                    class="open-button"
+                    type="button"
+                >
+                    Open
+                </button>
+            `;
+
+
+            card.addEventListener(
+                "click",
+                event => {
+
+                    /*
+                     * Don't trigger twice when
+                     * clicking the Open button.
+                     */
+                    event.stopPropagation();
+
+                    openChecklist(
+                        checklist
+                    );
+
+                }
+            );
+
+
+            checklistList.appendChild(
+                card
+            );
+
+        }
+    );
+}
 
 /* =========================================================
    RENDER CHECKLISTS
