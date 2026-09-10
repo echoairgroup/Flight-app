@@ -2240,6 +2240,242 @@ app.get("/api/weather/:icao", async (req, res) => {
 
 /*
 |--------------------------------------------------------------------------
+| WEATHER - METAR
+|--------------------------------------------------------------------------
+*/
+
+app.get(
+    "/api/weather/:icao",
+    async (req, res) => {
+
+        const icao =
+            String(req.params.icao || "")
+                .trim()
+                .toUpperCase();
+
+        if (!validICAO(icao)) {
+
+            return res.status(400).json({
+                available: false,
+                icao,
+                source: "unavailable",
+                message: "Invalid ICAO code"
+            });
+
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | LIVE METAR
+        |--------------------------------------------------------------------------
+        */
+
+        try {
+
+            const url =
+                "https://aviationweather.gov/api/data/metar" +
+                `?ids=${encodeURIComponent(icao)}` +
+                "&format=json";
+
+            console.log(
+                `Fetching live METAR for ${icao}...`
+            );
+
+            const data =
+                await fetchJSON(url);
+
+            if (
+                Array.isArray(data) &&
+                data.length > 0
+            ) {
+
+                const metar = data[0];
+
+                /*
+                |--------------------------------------------------------------------------
+                | CACHE METAR
+                |--------------------------------------------------------------------------
+                */
+
+                try {
+
+                    await pool.query(
+                        `
+                        INSERT INTO weather_cache
+                        (
+                            icao,
+                            metar,
+                            raw_metar,
+                            fetched_at
+                        )
+                        VALUES
+                        (
+                            $1,
+                            $2,
+                            $3,
+                            NOW()
+                        )
+                        `,
+                        [
+                            icao,
+
+                            metar.rawOb ||
+                                metar.raw_text ||
+                                metar.rawObText ||
+                                null,
+
+                            JSON.stringify(metar)
+                        ]
+                    );
+
+                } catch (databaseError) {
+
+                    console.error(
+                        `Could not cache METAR for ${icao}:`,
+                        databaseError.message
+                    );
+
+                }
+
+                console.log(
+                    `Live METAR found for ${icao}.`
+                );
+
+                return res.json({
+
+                    available: true,
+
+                    source: "live",
+
+                    icao,
+
+                    metar
+
+                });
+
+            }
+
+            console.warn(
+                `No live METAR returned for ${icao}.`
+            );
+
+        } catch (error) {
+
+            console.error(
+                `Live METAR request failed for ${icao}:`,
+                error.message
+            );
+
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | DATABASE CACHE FALLBACK
+        |--------------------------------------------------------------------------
+        */
+
+        try {
+
+            const cached =
+                await pool.query(
+                    `
+                    SELECT
+                        icao,
+                        metar,
+                        raw_metar,
+                        fetched_at
+                    FROM weather_cache
+                    WHERE icao = $1
+                    AND raw_metar IS NOT NULL
+                    ORDER BY fetched_at DESC
+                    LIMIT 1
+                    `,
+                    [icao]
+                );
+
+            if (
+                cached.rows.length > 0
+            ) {
+
+                const row =
+                    cached.rows[0];
+
+                let metar = null;
+
+                try {
+
+                    metar =
+                        typeof row.raw_metar === "string"
+                            ? JSON.parse(row.raw_metar)
+                            : row.raw_metar;
+
+                } catch (parseError) {
+
+                    console.error(
+                        `Could not parse cached METAR for ${icao}:`,
+                        parseError.message
+                    );
+
+                }
+
+                if (metar) {
+
+                    console.log(
+                        `Using cached METAR for ${icao}.`
+                    );
+
+                    return res.json({
+
+                        available: true,
+
+                        source: "cached",
+
+                        icao,
+
+                        cachedAt:
+                            row.fetched_at,
+
+                        metar
+
+                    });
+
+                }
+
+            }
+
+        } catch (databaseError) {
+
+            console.error(
+                `Could not read cached METAR for ${icao}:`,
+                databaseError.message
+            );
+
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | NOTHING AVAILABLE
+        |--------------------------------------------------------------------------
+        */
+
+        return res.json({
+
+            available: false,
+
+            source: "unavailable",
+
+            icao,
+
+            message: "No METAR available"
+
+        });
+
+    }
+);
+
+
+/*
+|--------------------------------------------------------------------------
 | WEATHER - TAF
 |--------------------------------------------------------------------------
 */
@@ -2249,137 +2485,229 @@ app.get(
     async (req, res) => {
 
         const icao =
-            req.params.icao
-                .toUpperCase()
-                .trim();
+            String(req.params.icao || "")
+                .trim()
+                .toUpperCase();
 
-        if (
-            !validICAO(
-                icao
-            )
-        ) {
+        if (!validICAO(icao)) {
 
             return res.status(400).json({
 
-                available:
-                    false,
+                available: false,
 
                 icao,
 
-                message:
-                    "Invalid ICAO code"
+                message: "Invalid ICAO code"
 
             });
 
         }
+
+        /*
+        |--------------------------------------------------------------------------
+        | LIVE TAF
+        |--------------------------------------------------------------------------
+        */
 
         try {
 
             const url =
                 "https://aviationweather.gov/api/data/taf" +
-                `?ids=${encodeURIComponent(
-                    icao
-                )}` +
+                `?ids=${encodeURIComponent(icao)}` +
                 "&format=json";
 
+            console.log(
+                `Fetching live TAF for ${icao}...`
+            );
+
             const data =
-                await fetchJSON(
-                    url
-                );
+                await fetchJSON(url);
 
             if (
-                !Array.isArray(data) ||
-                data.length === 0
+                Array.isArray(data) &&
+                data.length > 0
             ) {
+
+                const taf = data[0];
+
+                /*
+                |--------------------------------------------------------------------------
+                | CACHE TAF
+                |--------------------------------------------------------------------------
+                */
+
+                try {
+
+                    await pool.query(
+                        `
+                        INSERT INTO weather_cache
+                        (
+                            icao,
+                            taf,
+                            raw_taf,
+                            fetched_at
+                        )
+                        VALUES
+                        (
+                            $1,
+                            $2,
+                            $3,
+                            NOW()
+                        )
+                        `,
+                        [
+                            icao,
+
+                            taf.rawTAF ||
+                                taf.raw_taf ||
+                                taf.raw_text ||
+                                null,
+
+                            JSON.stringify(taf)
+                        ]
+                    );
+
+                } catch (databaseError) {
+
+                    console.error(
+                        `Could not cache TAF for ${icao}:`,
+                        databaseError.message
+                    );
+
+                }
+
+                console.log(
+                    `Live TAF found for ${icao}.`
+                );
 
                 return res.json({
 
-                    available:
-                        false,
+                    available: true,
+
+                    source: "live",
 
                     icao,
 
-                    message:
-                        "Unavailable"
+                    taf
 
                 });
 
             }
 
-            const taf =
-                data[0];
-
-            try {
-
-                await pool.query(
-                    `
-                    INSERT INTO weather_cache
-                    (
-                        icao,
-                        taf,
-                        raw_taf,
-                        fetched_at
-                    )
-                    VALUES
-                    ($1, $2, $3, NOW())
-                    `,
-                    [
-
-                        icao,
-
-                        taf.rawTAF ||
-                            taf.raw_text ||
-                            null,
-
-                        JSON.stringify(
-                            taf
-                        )
-
-                    ]
-                );
-
-            } catch (
-                databaseError
-            ) {
-
-                console.error(
-                    "Could not cache TAF:",
-                    databaseError.message
-                );
-
-            }
-
-            res.json({
-
-                available:
-                    true,
-
-                icao,
-
-                taf
-
-            });
+            console.warn(
+                `No live TAF returned for ${icao}.`
+            );
 
         } catch (error) {
 
             console.error(
-                "TAF request failed:",
+                `Live TAF request failed for ${icao}:`,
                 error.message
             );
 
-            res.status(502).json({
+        }
 
-                available:
-                    false,
+        /*
+        |--------------------------------------------------------------------------
+        | DATABASE CACHE FALLBACK
+        |--------------------------------------------------------------------------
+        */
 
-                icao,
+        try {
 
-                message:
-                    "Unavailable"
+            const cached =
+                await pool.query(
+                    `
+                    SELECT
+                        icao,
+                        taf,
+                        raw_taf,
+                        fetched_at
+                    FROM weather_cache
+                    WHERE icao = $1
+                    AND raw_taf IS NOT NULL
+                    ORDER BY fetched_at DESC
+                    LIMIT 1
+                    `,
+                    [icao]
+                );
 
-            });
+            if (
+                cached.rows.length > 0
+            ) {
+
+                const row =
+                    cached.rows[0];
+
+                let taf = null;
+
+                try {
+
+                    taf =
+                        typeof row.raw_taf === "string"
+                            ? JSON.parse(row.raw_taf)
+                            : row.raw_taf;
+
+                } catch (parseError) {
+
+                    console.error(
+                        `Could not parse cached TAF for ${icao}:`,
+                        parseError.message
+                    );
+
+                }
+
+                if (taf) {
+
+                    console.log(
+                        `Using cached TAF for ${icao}.`
+                    );
+
+                    return res.json({
+
+                        available: true,
+
+                        source: "cached",
+
+                        icao,
+
+                        cachedAt:
+                            row.fetched_at,
+
+                        taf
+
+                    });
+
+                }
+
+            }
+
+        } catch (databaseError) {
+
+            console.error(
+                `Could not read cached TAF for ${icao}:`,
+                databaseError.message
+            );
 
         }
+
+        /*
+        |--------------------------------------------------------------------------
+        | NOTHING AVAILABLE
+        |--------------------------------------------------------------------------
+        */
+
+        return res.json({
+
+            available: false,
+
+            source: "unavailable",
+
+            icao,
+
+            message: "No TAF available"
+
+        });
 
     }
 );
@@ -3667,12 +3995,55 @@ async function initializeDatabase() {
         `
     );
 
+
+    // ============================================================
+    // WEATHER CACHE
+    // ============================================================
+
+    await pool.query(
+        `
+        CREATE TABLE IF NOT EXISTS weather_cache
+        (
+            id BIGSERIAL PRIMARY KEY,
+
+            icao VARCHAR(4) NOT NULL,
+
+            metar TEXT,
+
+            taf TEXT,
+
+            raw_metar JSONB,
+
+            raw_taf JSONB,
+
+            fetched_at TIMESTAMPTZ NOT NULL
+                DEFAULT NOW()
+        )
+        `
+    );
+
+    await pool.query(
+        `
+        CREATE INDEX IF NOT EXISTS
+        weather_cache_icao_fetched_at_idx
+        ON weather_cache
+        (
+            icao,
+            fetched_at DESC
+        )
+        `
+    );
+
+
     console.log(
         "Charts database table is ready."
     );
 
-}
+    console.log(
+        "Weather cache database table is ready."
+    );
 
+}
 
 /*
 |--------------------------------------------------------------------------
