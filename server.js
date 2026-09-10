@@ -2068,78 +2068,42 @@ app.get(
 
 
 /*
-|--------------------------------------------------------------------------
-| WEATHER - METAR
-|--------------------------------------------------------------------------
-*/
+app.get("/api/weather/:icao", async (req, res) => {
+    const icao = String(req.params.icao || "")
+        .trim()
+        .toUpperCase();
 
-app.get(
-    "/api/weather/:icao",
-    async (req, res) => {
+    if (!validICAO(icao)) {
+        return res.status(400).json({
+            available: false,
+            icao,
+            source: "unavailable",
+            message: "Invalid ICAO code"
+        });
+    }
 
-        const icao =
-            req.params.icao
-                .toUpperCase()
-                .trim();
+    /*
+    |--------------------------------------------------------------------------
+    | TRY LIVE METAR
+    |--------------------------------------------------------------------------
+    */
 
-        if (
-            !validICAO(
-                icao
-            )
-        ) {
+    try {
+        const url =
+            "https://aviationweather.gov/api/data/metar" +
+            `?ids=${encodeURIComponent(icao)}` +
+            "&format=json";
 
-            return res.status(400).json({
+        const data = await fetchJSON(url);
 
-                available:
-                    false,
+        if (Array.isArray(data) && data.length > 0) {
+            const metar = data[0];
 
-                icao,
-
-                message:
-                    "Invalid ICAO code"
-
-            });
-
-        }
-
-        try {
-
-            const url =
-                "https://aviationweather.gov/api/data/metar" +
-                `?ids=${encodeURIComponent(
-                    icao
-                )}` +
-                "&format=json";
-
-            const data =
-                await fetchJSON(
-                    url
-                );
-
-            if (
-                !Array.isArray(data) ||
-                data.length === 0
-            ) {
-
-                return res.json({
-
-                    available:
-                        false,
-
-                    icao,
-
-                    message:
-                        "Unavailable"
-
-                });
-
-            }
-
-            const metar =
-                data[0];
-
+            /*
+             * Save the complete METAR response in the database.
+             * This allows us to use it when the live API is unavailable.
+             */
             try {
-
                 await pool.query(
                     `
                     INSERT INTO weather_cache
@@ -2149,70 +2113,130 @@ app.get(
                         raw_metar,
                         fetched_at
                     )
-                    VALUES
-                    ($1, $2, $3, NOW())
+                    VALUES ($1, $2, $3, NOW())
                     `,
                     [
-
                         icao,
-
                         metar.rawOb ||
                             metar.raw_text ||
                             null,
-
-                        JSON.stringify(
-                            metar
-                        )
-
+                        JSON.stringify(metar)
                     ]
                 );
-
-            } catch (
-                databaseError
-            ) {
-
+            } catch (databaseError) {
                 console.error(
                     "Could not cache METAR:",
                     databaseError.message
                 );
-
             }
 
-            res.json({
-
-                available:
-                    true,
-
+            return res.json({
+                available: true,
+                source: "live",
                 icao,
-
                 metar
-
             });
-
-        } catch (error) {
-
-            console.error(
-                "METAR request failed:",
-                error.message
-            );
-
-            res.status(502).json({
-
-                available:
-                    false,
-
-                icao,
-
-                message:
-                    "Unavailable"
-
-            });
-
         }
 
+        console.warn(
+            `No live METAR returned for ${icao}`
+        );
+    } catch (error) {
+        console.error(
+            `Live METAR request failed for ${icao}:`,
+            error.message
+        );
     }
-);
 
+    /*
+    |--------------------------------------------------------------------------
+    | LIVE FAILED → TRY DATABASE CACHE
+    |--------------------------------------------------------------------------
+    */
+
+    try {
+        const cached = await pool.query(
+            `
+            SELECT
+                icao,
+                metar,
+                raw_metar,
+                fetched_at
+            FROM weather_cache
+            WHERE icao = $1
+            ORDER BY fetched_at DESC
+            LIMIT 1
+            `,
+            [icao]
+        );
+
+        if (cached.rows.length > 0) {
+            const row = cached.rows[0];
+
+            let metar = null;
+
+            /*
+             * raw_metar contains the complete JSON object.
+             */
+            if (row.raw_metar) {
+                try {
+                    metar =
+                        typeof row.raw_metar === "string"
+                            ? JSON.parse(row.raw_metar)
+                            : row.raw_metar;
+                } catch (parseError) {
+                    console.error(
+                        "Could not parse cached METAR:",
+                        parseError.message
+                    );
+                }
+            }
+
+            /*
+             * If raw_metar somehow isn't available,
+             * create a minimal METAR object from the stored text.
+             */
+            if (!metar && row.metar) {
+                metar = {
+                    rawOb: row.metar,
+                    raw_text: row.metar
+                };
+            }
+
+            if (metar) {
+                console.log(
+                    `Using cached METAR for ${icao}`
+                );
+
+                return res.json({
+                    available: true,
+                    source: "cached",
+                    icao,
+                    cachedAt: row.fetched_at,
+                    metar
+                });
+            }
+        }
+    } catch (databaseError) {
+        console.error(
+            `Could not read cached METAR for ${icao}:`,
+            databaseError.message
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | NOTHING AVAILABLE
+    |--------------------------------------------------------------------------
+    */
+
+    return res.json({
+        available: false,
+        source: "unavailable",
+        icao,
+        message: "No METAR available"
+    });
+});
 
 /*
 |--------------------------------------------------------------------------
