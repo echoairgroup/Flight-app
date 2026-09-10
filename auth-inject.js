@@ -68,6 +68,12 @@ async function ensureAuthTables() {
         created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
         updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     )`);
+
+    // Existing Flight App databases may already have a users table created by an older version.
+    // CREATE TABLE IF NOT EXISTS does not add columns to an existing table, so migrate it here.
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS simbrief_username VARCHAR(80)`);
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()`);
+
     await pool.query(`CREATE UNIQUE INDEX IF NOT EXISTS users_simbrief_username_unique
         ON users (LOWER(simbrief_username))
         WHERE simbrief_username IS NOT NULL AND simbrief_username <> ''`);
