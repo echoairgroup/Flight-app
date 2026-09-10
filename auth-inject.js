@@ -13,23 +13,58 @@ const pool = new Pool({
     connectionTimeoutMillis: 10000
 });
 
-const TOKEN_SECRET = process.env.AUTH_SECRET || process.env.JWT_SECRET;
+/*
+ * Authentication secret
+ *
+ * Render should normally provide AUTH_SECRET (recommended) or JWT_SECRET.
+ * Some deployments can temporarily miss custom environment variables after
+ * a service/environment change. In that case we derive a stable fallback
+ * from DATABASE_URL. The database URL is already a protected server secret,
+ * and the value is hashed before it is used as the HMAC key.
+ *
+ * AUTH_SECRET still always takes priority. Never expose the actual value in logs.
+ */
+function getTokenSecret() {
+    const configured = String(process.env.AUTH_SECRET || process.env.JWT_SECRET || "").trim();
+    if (configured.length >= 32) return configured;
+
+    const databaseUrl = String(process.env.DATABASE_URL || "").trim();
+    if (databaseUrl.length >= 32) {
+        return crypto.createHash("sha256")
+            .update(`Flight-App-auth-fallback:${databaseUrl}`)
+            .digest("hex");
+    }
+
+    return "";
+}
+
+function authSecretStatus() {
+    const configured = String(process.env.AUTH_SECRET || process.env.JWT_SECRET || "").trim();
+    if (configured.length >= 32) return "configured";
+    if (String(process.env.DATABASE_URL || "").trim().length >= 32) return "database-derived fallback";
+    return "missing";
+}
+
 const TOKEN_TTL_SECONDS = 60 * 60 * 24 * 30;
 
 function base64url(value) { return Buffer.from(value).toString("base64url"); }
 function signToken(userId) {
-    if (!TOKEN_SECRET || TOKEN_SECRET.length < 32) throw new Error("AUTH_SECRET must be configured with at least 32 characters.");
+    const tokenSecret = getTokenSecret();
+    if (!tokenSecret || tokenSecret.length < 32) {
+        throw new Error("No valid authentication secret is available. Configure AUTH_SECRET in Render with at least 32 characters.");
+    }
     const payload = { sub: String(userId), iat: Math.floor(Date.now() / 1000), exp: Math.floor(Date.now() / 1000) + TOKEN_TTL_SECONDS };
     const encoded = base64url(JSON.stringify(payload));
-    const signature = crypto.createHmac("sha256", TOKEN_SECRET).update(encoded).digest("base64url");
+    const signature = crypto.createHmac("sha256", tokenSecret).update(encoded).digest("base64url");
     return `${encoded}.${signature}`;
 }
 function verifyToken(token) {
     try {
-        if (!TOKEN_SECRET) return null;
+        const tokenSecret = getTokenSecret();
+        if (!tokenSecret) return null;
         const parts = String(token || "").split(".");
         if (parts.length !== 2) return null;
-        const expected = crypto.createHmac("sha256", TOKEN_SECRET).update(parts[0]).digest("base64url");
+        const expected = crypto.createHmac("sha256", tokenSecret).update(parts[0]).digest("base64url");
         const a = Buffer.from(parts[1]); const b = Buffer.from(expected);
         if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) return null;
         const payload = JSON.parse(Buffer.from(parts[0], "base64url").toString("utf8"));
@@ -70,7 +105,6 @@ async function ensureAuthTables() {
     )`);
 
     // Existing Flight App databases may already have a users table created by an older version.
-    // CREATE TABLE IF NOT EXISTS does not add columns to an existing table, so migrate it here.
     await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS simbrief_username VARCHAR(80)`);
     await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()`);
 
@@ -142,7 +176,9 @@ function installAuth(app) {
         try { const payload = verifyToken(req.body?.token); if (!payload) return res.status(401).json({ error: "Not authenticated." }); await pool.query("UPDATE users SET simbrief_username = NULL, updated_at = NOW() WHERE id = $1", [payload.sub]); res.json({ connected: false }); }
         catch (error) { console.error("SimBrief unlink error:", error); res.status(500).json({ error: "Could not disconnect SimBrief." }); }
     });
-    ensureAuthTables().then(() => console.log("Flight App account system ready.")).catch(error => console.error("Could not initialize account system:", error));
+    ensureAuthTables()
+        .then(() => console.log(`Flight App account system ready. Auth secret: ${authSecretStatus()}.`))
+        .catch(error => console.error("Could not initialize account system:", error));
 }
 function wrappedExpress(...args) { const app = originalExpress(...args); installAuth(app); return app; }
 Object.assign(wrappedExpress, originalExpress); wrappedExpress.Router = originalExpress.Router; wrappedExpress.json = originalExpress.json; wrappedExpress.urlencoded = originalExpress.urlencoded; wrappedExpress.static = originalExpress.static;
