@@ -16,6 +16,7 @@
 @media(max-width:850px){body{padding:12px}.efb{min-height:calc(100vh - 24px);border-width:6px;border-radius:24px}.screen{min-height:calc(100vh - 36px)}.apps{grid-template-columns:repeat(2,1fr)}.lower{grid-template-columns:1fr}.content{padding:25px 20px}.welcome{align-items:stretch;flex-direction:column}.aircraft{min-width:0}.status-item:not(.online){display:none}}
 @media(max-width:520px){.topbar{padding:0 15px;height:60px}.brand-sub{display:none}.brand-icon{width:35px;height:35px}.content{padding:22px 14px}.apps{gap:9px}.app{min-height:128px;padding:14px}.app-icon{width:40px;height:40px}.quick-row{flex-direction:column}.footer{height:50px}.welcome h1{font-size:30px}}
 </style>
+    <link rel="stylesheet" href="common-header.css?v=1">
 </head>
 <body>
 <div class="efb">
@@ -48,5 +49,6 @@
 function updateClock(){const now=new Date();document.getElementById('clock').textContent=now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});}updateClock();setInterval(updateClock,1000);
 function showAbout(e){e.preventDefault();alert('Flight App EFB\n\nElectronic Flight Bag for Microsoft Flight Simulator.\n\nUse the applications above to access weather, charts, checklists, SimBrief and flight planning.');}
 </script>
+    <script src="common-header.js?v=1"></script>
 </body>
 </html>
