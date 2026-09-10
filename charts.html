@@ -5908,15 +5908,25 @@ async function loadSimBriefCharts() {
         arrivalInput.value =
             route.arrival;
 
-        const airport =
-            await loadAirportInfo(
-                route.departure
-            );
+       const airport =
+    await loadAirportInfo(
+        route.departure
+    );
 
-        if (airport) {
-            airportInputInfo.textContent =
-                `${airport.name || "Airport"} loaded from latest SimBrief flight.`;
-        }
+if (airport) {
+    airportInputInfo.textContent =
+        `${airport.name || "Airport"} loaded from latest SimBrief flight.`;
+}
+
+/*
+|--------------------------------------------------------------------------
+| LOAD WEATHER AUTOMATICALLY
+|--------------------------------------------------------------------------
+*/
+
+await loadWeather(
+    route.departure
+);
 
         await Promise.allSettled([
             lookupSmallAirport(
