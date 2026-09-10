@@ -5687,43 +5687,197 @@ app.use(
 
 async function startServer() {
 
+    console.log(
+        "=================================================="
+    );
+
+    console.log(
+        `Flight-app backend v${API_VERSION} starting...`
+    );
+
+    console.log(
+        "=================================================="
+    );
+
+    console.log(
+        "PORT:",
+        PORT
+    );
+
+    console.log(
+        "DATABASE_URL exists:",
+        Boolean(
+            process.env.DATABASE_URL
+        )
+    );
+
     try {
 
-        await pool.query(
-            "SELECT 1"
+        /*
+        |--------------------------------------------------------------------------
+        | DATABASE CONNECTION TEST
+        |--------------------------------------------------------------------------
+        */
+
+        console.log(
+            "Testing Neon PostgreSQL connection..."
+        );
+
+        const databaseTest =
+            await pool.query(
+                "SELECT NOW() AS current_time"
+            );
+
+        console.log(
+            "Neon PostgreSQL connection successful."
         );
 
         console.log(
-            "Successfully connected to Neon PostgreSQL."
+            "Database time:",
+            databaseTest.rows[0].current_time
+        );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | DATABASE INITIALIZATION
+        |--------------------------------------------------------------------------
+        */
+
+        console.log(
+            "Initializing database tables..."
         );
 
         await initializeDatabase();
 
-        app.listen(
-            PORT,
-            () => {
+        console.log(
+            "Database initialization successful."
+        );
 
-                console.log(
-                    `Flight-app backend v${API_VERSION} running on port ${PORT}`
+
+        /*
+        |--------------------------------------------------------------------------
+        | START EXPRESS
+        |--------------------------------------------------------------------------
+        */
+
+        const server =
+            app.listen(
+                PORT,
+                "0.0.0.0",
+                () => {
+
+                    console.log(
+                        "=================================================="
+                    );
+
+                    console.log(
+                        `Flight-app backend v${API_VERSION} is ONLINE`
+                    );
+
+                    console.log(
+                        `Listening on port ${PORT}`
+                    );
+
+                    console.log(
+                        "Checklist system enabled."
+                    );
+
+                    console.log(
+                        "Aircraft type management enabled."
+                    );
+
+                    console.log(
+                        "Charts system enabled."
+                    );
+
+                    console.log(
+                        "Weather system enabled."
+                    );
+
+                    console.log(
+                        "SimBrief system enabled."
+                    );
+
+                    console.log(
+                        "=================================================="
+                    );
+                }
+            );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | SERVER ERROR
+        |--------------------------------------------------------------------------
+        */
+
+        server.on(
+            "error",
+            error => {
+
+                console.error(
+                    "Express server error:",
+                    error
                 );
 
-                console.log(
-                    "Checklist system enabled."
-                );
-
-                console.log(
-                    "Aircraft type management enabled."
-                );
             }
         );
 
-    } catch (
-        error
-    ) {
+
+    } catch (error) {
 
         console.error(
-            "Could not initialize Flight-app backend:",
-            error.message
+            "=================================================="
+        );
+
+        console.error(
+            "COULD NOT INITIALIZE FLIGHT-APP BACKEND"
+        );
+
+        console.error(
+            "=================================================="
+        );
+
+        console.error(
+            "Full error:",
+            error
+        );
+
+        console.error(
+            "Error message:",
+            error?.message
+        );
+
+        console.error(
+            "Error code:",
+            error?.code
+        );
+
+        console.error(
+            "Error name:",
+            error?.name
+        );
+
+        console.error(
+            "Error stack:",
+            error?.stack
+        );
+
+        console.error(
+            "DATABASE_URL exists:",
+            Boolean(
+                process.env.DATABASE_URL
+            )
+        );
+
+        console.error(
+            "PORT:",
+            PORT
+        );
+
+        console.error(
+            "=================================================="
         );
 
         process.exit(1);
