@@ -1,0 +1,1731 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+```
+<title>SimBrief | Flight App</title>
+
+<style>
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        font-family:
+            Inter,
+            Arial,
+            Helvetica,
+            sans-serif;
+        background: #f4f7fb;
+        color: #172033;
+        min-height: 100vh;
+    }
+
+    /* =========================================================
+       HEADER
+    ========================================================= */
+
+    header {
+        height: 72px;
+        background: #ffffff;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 32px;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+    }
+
+    .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        text-decoration: none;
+        color: #172033;
+    }
+
+    .brand-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 11px;
+        background: #1769e0;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 19px;
+        font-weight: 800;
+    }
+
+    .brand-text {
+        font-size: 20px;
+        font-weight: 800;
+        letter-spacing: -0.4px;
+    }
+
+    nav {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+    }
+
+    nav a {
+        text-decoration: none;
+        color: #657085;
+        font-size: 14px;
+        font-weight: 600;
+        padding: 9px 13px;
+        border-radius: 8px;
+        transition: 0.2s;
+    }
+
+    nav a:hover {
+        background: #eef5ff;
+        color: #1769e0;
+    }
+
+    nav a.active {
+        background: #eaf3ff;
+        color: #1769e0;
+    }
+
+    /* =========================================================
+       PAGE
+    ========================================================= */
+
+    main {
+        max-width: 1250px;
+        margin: 0 auto;
+        padding: 38px 24px 70px;
+    }
+
+    .page-header {
+        margin-bottom: 28px;
+    }
+
+    .page-header h1 {
+        font-size: 32px;
+        letter-spacing: -0.8px;
+        margin-bottom: 8px;
+    }
+
+    .page-header p {
+        color: #718096;
+        font-size: 15px;
+    }
+
+    /* =========================================================
+       CONTROL CARD
+    ========================================================= */
+
+    .control-card {
+        background: #ffffff;
+        border: 1px solid #e1e7ef;
+        border-radius: 15px;
+        padding: 22px;
+        margin-bottom: 24px;
+        box-shadow: 0 4px 18px rgba(25, 55, 95, 0.04);
+    }
+
+    .control-title {
+        font-size: 17px;
+        font-weight: 750;
+        margin-bottom: 5px;
+    }
+
+    .control-description {
+        color: #788499;
+        font-size: 13px;
+        margin-bottom: 18px;
+    }
+
+    .form-row {
+        display: flex;
+        gap: 12px;
+        align-items: end;
+    }
+
+    .field {
+        flex: 1;
+    }
+
+    .field label {
+        display: block;
+        font-size: 12px;
+        font-weight: 700;
+        color: #596579;
+        margin-bottom: 7px;
+    }
+
+    .field input {
+        width: 100%;
+        height: 44px;
+        border: 1px solid #d8e0ea;
+        border-radius: 9px;
+        padding: 0 13px;
+        font-size: 14px;
+        outline: none;
+        background: #fbfcfe;
+        transition: 0.2s;
+    }
+
+    .field input:focus {
+        border-color: #1769e0;
+        box-shadow: 0 0 0 3px rgba(23, 105, 224, 0.10);
+        background: #ffffff;
+    }
+
+    button {
+        height: 44px;
+        border: none;
+        border-radius: 9px;
+        padding: 0 20px;
+        background: #1769e0;
+        color: white;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: 0.2s;
+        white-space: nowrap;
+    }
+
+    button:hover {
+        background: #125bc2;
+        transform: translateY(-1px);
+    }
+
+    button:disabled {
+        opacity: 0.6;
+        cursor: wait;
+        transform: none;
+    }
+
+    .secondary-button {
+        background: #edf4ff;
+        color: #1769e0;
+    }
+
+    .secondary-button:hover {
+        background: #e0edff;
+    }
+
+    /* =========================================================
+       STATUS
+    ========================================================= */
+
+    .status {
+        display: none;
+        padding: 12px 14px;
+        border-radius: 9px;
+        margin-top: 15px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .status.show {
+        display: block;
+    }
+
+    .status.loading {
+        background: #eef5ff;
+        color: #1769e0;
+    }
+
+    .status.success {
+        background: #edf9f1;
+        color: #217a42;
+    }
+
+    .status.error {
+        background: #fff0f0;
+        color: #c0392b;
+    }
+
+    /* =========================================================
+       EMPTY STATE
+    ========================================================= */
+
+    .empty-state {
+        background: #ffffff;
+        border: 1px solid #e1e7ef;
+        border-radius: 15px;
+        padding: 55px 25px;
+        text-align: center;
+        box-shadow: 0 4px 18px rgba(25, 55, 95, 0.04);
+    }
+
+    .empty-icon {
+        width: 62px;
+        height: 62px;
+        margin: 0 auto 17px;
+        border-radius: 16px;
+        background: #edf4ff;
+        color: #1769e0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        font-weight: 800;
+    }
+
+    .empty-state h2 {
+        font-size: 20px;
+        margin-bottom: 8px;
+    }
+
+    .empty-state p {
+        max-width: 520px;
+        margin: 0 auto;
+        color: #7a8598;
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+    /* =========================================================
+       FLIGHT OVERVIEW
+    ========================================================= */
+
+    #flightContent {
+        display: none;
+    }
+
+    .flight-header {
+        background: #ffffff;
+        border: 1px solid #e1e7ef;
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 18px rgba(25, 55, 95, 0.04);
+    }
+
+    .flight-top {
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+        align-items: center;
+    }
+
+    .callsign {
+        color: #1769e0;
+        font-size: 13px;
+        font-weight: 800;
+        letter-spacing: 0.8px;
+        margin-bottom: 8px;
+    }
+
+    .route {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .airport {
+        text-align: center;
+    }
+
+    .airport-code {
+        font-size: 31px;
+        font-weight: 850;
+        letter-spacing: -1px;
+    }
+
+    .airport-name {
+        color: #7b8698;
+        font-size: 12px;
+        margin-top: 3px;
+    }
+
+    .route-line {
+        width: 90px;
+        height: 1px;
+        background: #ccd5e1;
+        position: relative;
+    }
+
+    .route-line::after {
+        content: "✈";
+        position: absolute;
+        top: -10px;
+        left: 37px;
+        background: white;
+        color: #1769e0;
+        padding: 0 6px;
+        font-size: 14px;
+    }
+
+    .aircraft-badge {
+        padding: 10px 14px;
+        background: #f1f5fa;
+        color: #536075;
+        border-radius: 9px;
+        font-size: 13px;
+        font-weight: 750;
+    }
+
+    /* =========================================================
+       CARDS
+    ========================================================= */
+
+    .section-title {
+        font-size: 18px;
+        font-weight: 800;
+        margin: 28px 0 13px;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px;
+    }
+
+    .stat-card {
+        background: #ffffff;
+        border: 1px solid #e1e7ef;
+        border-radius: 13px;
+        padding: 18px;
+        box-shadow: 0 4px 18px rgba(25, 55, 95, 0.03);
+    }
+
+    .stat-label {
+        color: #7a8597;
+        font-size: 12px;
+        font-weight: 650;
+        margin-bottom: 8px;
+    }
+
+    .stat-value {
+        font-size: 20px;
+        font-weight: 800;
+        color: #1b2638;
+    }
+
+    .stat-unit {
+        color: #8791a2;
+        font-size: 12px;
+        margin-left: 3px;
+        font-weight: 600;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+
+    .info-card {
+        background: #ffffff;
+        border: 1px solid #e1e7ef;
+        border-radius: 13px;
+        padding: 20px;
+        box-shadow: 0 4px 18px rgba(25, 55, 95, 0.03);
+    }
+
+    .info-card h3 {
+        font-size: 15px;
+        margin-bottom: 17px;
+    }
+
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 15px;
+        padding: 9px 0;
+        border-bottom: 1px solid #edf0f4;
+        font-size: 13px;
+    }
+
+    .info-row:last-child {
+        border-bottom: none;
+    }
+
+    .info-label {
+        color: #7b8698;
+    }
+
+    .info-value {
+        font-weight: 700;
+        text-align: right;
+        word-break: break-word;
+    }
+
+    .route-card {
+        background: #ffffff;
+        border: 1px solid #e1e7ef;
+        border-radius: 13px;
+        padding: 20px;
+        box-shadow: 0 4px 18px rgba(25, 55, 95, 0.03);
+    }
+
+    .route-text {
+        background: #f6f8fb;
+        border-radius: 9px;
+        padding: 15px;
+        font-family:
+            Consolas,
+            Monaco,
+            monospace;
+        color: #354155;
+        font-size: 13px;
+        line-height: 1.7;
+        overflow-x: auto;
+        white-space: pre-wrap;
+        word-break: break-word;
+    }
+
+    .remarks {
+        color: #606c7e;
+        line-height: 1.6;
+        font-size: 13px;
+    }
+
+    /* =========================================================
+       FOOTER
+    ========================================================= */
+
+    footer {
+        text-align: center;
+        padding: 25px;
+        color: #8a94a4;
+        font-size: 12px;
+    }
+
+    /* =========================================================
+       RESPONSIVE
+    ========================================================= */
+
+    @media (max-width: 850px) {
+        header {
+            padding: 0 18px;
+        }
+
+        nav a {
+            padding: 8px;
+            font-size: 12px;
+        }
+
+        main {
+            padding: 28px 16px 50px;
+        }
+
+        .form-row {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .form-row button {
+            width: 100%;
+        }
+
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .flight-top {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+
+    @media (max-width: 550px) {
+        .brand-text {
+            display: none;
+        }
+
+        nav {
+            gap: 2px;
+        }
+
+        nav a {
+            font-size: 11px;
+            padding: 7px 6px;
+        }
+
+        .page-header h1 {
+            font-size: 27px;
+        }
+
+        .stats-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .route {
+            width: 100%;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .route-line {
+            width: 45px;
+        }
+
+        .route-line::after {
+            left: 14px;
+        }
+
+        .airport-code {
+            font-size: 25px;
+        }
+    }
+</style>
+```
+
+</head>
+
+<body>
+
+<header>
+    <a href="index.html" class="brand">
+        <div class="brand-icon">✈</div>
+        <div class="brand-text">Flight App</div>
+    </a>
+
+```
+<nav>
+    <a href="index.html">Home</a>
+    <a href="weather.html">Weather</a>
+    <a href="charts.html">Charts</a>
+    <a href="simbrief.html" class="active">SimBrief</a>
+</nav>
+```
+
+</header>
+
+<main>
+
+```
+<div class="page-header">
+    <h1>SimBrief Flight</h1>
+    <p>
+        Load and view your latest SimBrief operational flight plan.
+    </p>
+</div>
+
+<section class="control-card">
+
+    <div class="control-title">
+        Load SimBrief OFP
+    </div>
+
+    <div class="control-description">
+        Enter your SimBrief username or pilot ID to retrieve your
+        latest operational flight plan.
+    </div>
+
+    <div class="form-row">
+
+        <div class="field">
+            <label for="username">
+                SimBrief Username / Pilot ID
+            </label>
+
+            <input
+                id="username"
+                type="text"
+                placeholder="Enter your SimBrief username"
+                autocomplete="off"
+            >
+        </div>
+
+        <button id="loadButton" onclick="loadFlight()">
+            Load Flight
+        </button>
+
+        <button
+            class="secondary-button"
+            onclick="clearFlight()"
+        >
+            Clear
+        </button>
+
+    </div>
+
+    <div id="status" class="status"></div>
+
+</section>
+
+<section id="emptyState" class="empty-state">
+
+    <div class="empty-icon">
+        ✈
+    </div>
+
+    <h2>No flight loaded</h2>
+
+    <p>
+        Enter your SimBrief username or pilot ID above and load
+        your latest OFP. Your flight information will appear here.
+    </p>
+
+</section>
+
+<section id="flightContent">
+
+    <div class="flight-header">
+
+        <div class="flight-top">
+
+            <div>
+                <div
+                    id="flightNumber"
+                    class="callsign"
+                >
+                    FLIGHT
+                </div>
+
+                <div class="route">
+
+                    <div class="airport">
+                        <div
+                            id="departure"
+                            class="airport-code"
+                        >
+                            ----
+                        </div>
+
+                        <div
+                            id="departureName"
+                            class="airport-name"
+                        >
+                            Departure
+                        </div>
+                    </div>
+
+                    <div class="route-line"></div>
+
+                    <div class="airport">
+                        <div
+                            id="arrival"
+                            class="airport-code"
+                        >
+                            ----
+                        </div>
+
+                        <div
+                            id="arrivalName"
+                            class="airport-name"
+                        >
+                            Arrival
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div
+                id="aircraft"
+                class="aircraft-badge"
+            >
+                Aircraft unavailable
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="section-title">
+        Flight overview
+    </div>
+
+    <div class="stats-grid">
+
+        <div class="stat-card">
+            <div class="stat-label">
+                Flight time
+            </div>
+
+            <div
+                id="flightTime"
+                class="stat-value"
+            >
+                —
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-label">
+                Distance
+            </div>
+
+            <div class="stat-value">
+                <span id="distance">—</span>
+                <span class="stat-unit">NM</span>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-label">
+                Cruise altitude
+            </div>
+
+            <div class="stat-value">
+                <span id="cruiseAltitude">—</span>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-label">
+                Block fuel
+            </div>
+
+            <div class="stat-value">
+                <span id="blockFuel">—</span>
+                <span class="stat-unit">kg</span>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="section-title">
+        Flight information
+    </div>
+
+    <div class="info-grid">
+
+        <div class="info-card">
+
+            <h3>Aircraft & operation</h3>
+
+            <div class="info-row">
+                <span class="info-label">
+                    Aircraft
+                </span>
+
+                <span
+                    id="infoAircraft"
+                    class="info-value"
+                >
+                    —
+                </span>
+            </div>
+
+            <div class="info-row">
+                <span class="info-label">
+                    Registration
+                </span>
+
+                <span
+                    id="registration"
+                    class="info-value"
+                >
+                    —
+                </span>
+            </div>
+
+            <div class="info-row">
+                <span class="info-label">
+                    Airline
+                </span>
+
+                <span
+                    id="airline"
+                    class="info-value"
+                >
+                    —
+                </span>
+            </div>
+
+            <div class="info-row">
+                <span class="info-label">
+                    Cost index
+                </span>
+
+                <span
+                    id="costIndex"
+                    class="info-value"
+                >
+                    —
+                </span>
+            </div>
+
+            <div class="info-row">
+                <span class="info-label">
+                    Callsign
+                </span>
+
+                <span
+                    id="infoCallsign"
+                    class="info-value"
+                >
+                    —
+                </span>
+            </div>
+
+        </div>
+
+        <div class="info-card">
+
+            <h3>Fuel & payload</h3>
+
+            <div class="info-row">
+                <span class="info-label">
+                    Trip fuel
+                </span>
+
+                <span
+                    id="tripFuel"
+                    class="info-value"
+                >
+                    —
+                </span>
+            </div>
+
+            <div class="info-row">
+                <span class="info-label">
+                    Block fuel
+                </span>
+
+                <span
+                    id="infoBlockFuel"
+                    class="info-value"
+                >
+                    —
+                </span>
+            </div>
+
+            <div class="info-row">
+                <span class="info-label">
+                    Payload
+                </span>
+
+                <span
+                    id="payload"
+                    class="info-value"
+                >
+                    —
+                </span>
+            </div>
+
+            <div class="info-row">
+                <span class="info-label">
+                    Passengers
+                </span>
+
+                <span
+                    id="passengers"
+                    class="info-value"
+                >
+                    —
+                </span>
+            </div>
+
+            <div class="info-row">
+                <span class="info-label">
+                    Zero fuel weight
+                </span>
+
+                <span
+                    id="zeroFuelWeight"
+                    class="info-value"
+                >
+                    —
+                </span>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="section-title">
+        Route
+    </div>
+
+    <div class="route-card">
+
+        <div
+            id="route"
+            class="route-text"
+        >
+            Route unavailable.
+        </div>
+
+    </div>
+
+    <div class="section-title">
+        Additional information
+    </div>
+
+    <div class="info-grid">
+
+        <div class="info-card">
+
+            <h3>Departure</h3>
+
+            <div class="info-row">
+                <span class="info-label">
+                    Airport
+                </span>
+
+                <span
+                    id="departureFull"
+                    class="info-value"
+                >
+                    —
+                </span>
+            </div>
+
+            <div class="info-row">
+                <span class="info-label">
+                    Runway
+                </span>
+
+                <span
+                    id="departureRunway"
+                    class="info-value"
+                >
+                    —
+                </span>
+            </div>
+
+            <div class="info-row">
+                <span class="info-label">
+                    SID
+                </span>
+
+                <span
+                    id="sid"
+                    class="info-value"
+                >
+                    —
+                </span>
+            </div>
+
+        </div>
+
+        <div class="info-card">
+
+            <h3>Arrival</h3>
+
+            <div class="info-row">
+                <span class="info-label">
+                    Airport
+                </span>
+
+                <span
+                    id="arrivalFull"
+                    class="info-value"
+                >
+                    —
+                </span>
+            </div>
+
+            <div class="info-row">
+                <span class="info-label">
+                    Runway
+                </span>
+
+                <span
+                    id="arrivalRunway"
+                    class="info-value"
+                >
+                    —
+                </span>
+            </div>
+
+            <div class="info-row">
+                <span class="info-label">
+                    STAR
+                </span>
+
+                <span
+                    id="star"
+                    class="info-value"
+                >
+                    —
+                </span>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="section-title">
+        Remarks
+    </div>
+
+    <div class="info-card">
+        <div
+            id="remarks"
+            class="remarks"
+        >
+            No remarks available.
+        </div>
+    </div>
+
+</section>
+```
+
+</main>
+
+<footer>
+    Flight App · SimBrief Integration
+</footer>
+
+<script>
+
+/* =========================================================
+   BACKEND CONFIGURATION
+========================================================= */
+
+/*
+    Your Render backend URL.
+
+    If your frontend and backend use different URLs,
+    replace this with your Render backend URL.
+
+    Example:
+    https://your-flight-app-backend.onrender.com
+*/
+
+const API_BASE =
+    "https://flight-app-backend.onrender.com";
+
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+function valueOrUnavailable(value) {
+
+    if (
+        value === undefined ||
+        value === null ||
+        value === "" ||
+        value === "null" ||
+        value === "undefined"
+    ) {
+        return "Unavailable";
+    }
+
+    return value;
+}
+
+
+function numberOrUnavailable(value) {
+
+    if (
+        value === undefined ||
+        value === null ||
+        value === "" ||
+        isNaN(Number(value))
+    ) {
+        return "Unavailable";
+    }
+
+    return Number(value).toLocaleString();
+}
+
+
+function setStatus(message, type) {
+
+    const status =
+        document.getElementById("status");
+
+    status.textContent = message;
+
+    status.className =
+        "status show " + type;
+}
+
+
+/* =========================================================
+   LOAD FLIGHT
+========================================================= */
+
+async function loadFlight() {
+
+    const username =
+        document
+            .getElementById("username")
+            .value
+            .trim();
+
+    const button =
+        document.getElementById("loadButton");
+
+    if (!username) {
+
+        setStatus(
+            "Please enter your SimBrief username or pilot ID.",
+            "error"
+        );
+
+        return;
+    }
+
+    button.disabled = true;
+
+    setStatus(
+        "Loading SimBrief flight plan...",
+        "loading"
+    );
+
+    try {
+
+        /*
+            The frontend first tries the backend endpoint.
+
+            Expected endpoint:
+            GET /api/simbrief?username=USERNAME
+
+            If your server uses another endpoint,
+            only this URL needs to be changed.
+        */
+
+        const response =
+            await fetch(
+                API_BASE +
+                "/api/simbrief?username=" +
+                encodeURIComponent(username)
+            );
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Backend returned HTTP " +
+                response.status
+            );
+        }
+
+        const data =
+            await response.json();
+
+        console.log(
+            "SimBrief response:",
+            data
+        );
+
+        if (!data) {
+
+            throw new Error(
+                "No SimBrief data was returned."
+            );
+        }
+
+        renderFlight(data);
+
+        setStatus(
+            "SimBrief flight plan loaded successfully.",
+            "success"
+        );
+
+    } catch (error) {
+
+        console.error(
+            "SimBrief error:",
+            error
+        );
+
+        setStatus(
+            "Unable to load the SimBrief flight plan. " +
+            error.message,
+            "error"
+        );
+
+    } finally {
+
+        button.disabled = false;
+    }
+}
+
+
+/* =========================================================
+   RENDER FLIGHT
+========================================================= */
+
+function renderFlight(data) {
+
+    /*
+        SimBrief data can arrive either directly or inside
+        an OFP/data object depending on the backend.
+
+        This makes the page tolerant of both formats.
+    */
+
+    const ofp =
+        data.ofp ||
+        data.data ||
+        data;
+
+    const origin =
+        ofp.origin ||
+        ofp.departure ||
+        {};
+
+    const destination =
+        ofp.destination ||
+        ofp.arrival ||
+        {};
+
+    const aircraft =
+        ofp.aircraft ||
+        {};
+
+
+    /* -----------------------------------------------------
+       BASIC FLIGHT
+    ----------------------------------------------------- */
+
+    document.getElementById(
+        "flightNumber"
+    ).textContent =
+        valueOrUnavailable(
+            ofp.flight_number ||
+            ofp.flight ||
+            ofp.callsign
+        );
+
+
+    document.getElementById(
+        "departure"
+    ).textContent =
+        valueOrUnavailable(
+            origin.icao ||
+            ofp.origin_icao ||
+            ofp.dep_icao ||
+            ofp.origin
+        );
+
+
+    document.getElementById(
+        "arrival"
+    ).textContent =
+        valueOrUnavailable(
+            destination.icao ||
+            ofp.destination_icao ||
+            ofp.arr_icao ||
+            ofp.destination
+        );
+
+
+    document.getElementById(
+        "departureName"
+    ).textContent =
+        valueOrUnavailable(
+            origin.name ||
+            ofp.origin_name
+        );
+
+
+    document.getElementById(
+        "arrivalName"
+    ).textContent =
+        valueOrUnavailable(
+            destination.name ||
+            ofp.destination_name
+        );
+
+
+    document.getElementById(
+        "aircraft"
+    ).textContent =
+        valueOrUnavailable(
+            aircraft.icaocode ||
+            aircraft.icao ||
+            ofp.aircraft_type ||
+            ofp.aircraft
+        );
+
+
+    /* -----------------------------------------------------
+       OVERVIEW
+    ----------------------------------------------------- */
+
+    document.getElementById(
+        "flightTime"
+    ).textContent =
+        formatDuration(
+            ofp.times?.est_block_time ||
+            ofp.block_time ||
+            ofp.flight_time
+        );
+
+
+    document.getElementById(
+        "distance"
+    ).textContent =
+        numberOrUnavailable(
+            ofp.general?.route_distance ||
+            ofp.route_distance ||
+            ofp.distance
+        );
+
+
+    document.getElementById(
+        "cruiseAltitude"
+    ).textContent =
+        formatAltitude(
+            ofp.general?.initial_altitude ||
+            ofp.initial_altitude ||
+            ofp.cruise_altitude
+        );
+
+
+    document.getElementById(
+        "blockFuel"
+    ).textContent =
+        numberOrUnavailable(
+            ofp.fuel?.block ||
+            ofp.block_fuel ||
+            ofp.fuel_block
+        );
+
+
+    /* -----------------------------------------------------
+       AIRCRAFT
+    ----------------------------------------------------- */
+
+    document.getElementById(
+        "infoAircraft"
+    ).textContent =
+        valueOrUnavailable(
+            aircraft.icaocode ||
+            aircraft.icao ||
+            ofp.aircraft_type
+        );
+
+
+    document.getElementById(
+        "registration"
+    ).textContent =
+        valueOrUnavailable(
+            aircraft.reg ||
+            aircraft.registration ||
+            ofp.registration
+        );
+
+
+    document.getElementById(
+        "airline"
+    ).textContent =
+        valueOrUnavailable(
+            ofp.airline ||
+            ofp.operator
+        );
+
+
+    document.getElementById(
+        "costIndex"
+    ).textContent =
+        valueOrUnavailable(
+            ofp.general?.costindex ||
+            ofp.cost_index
+        );
+
+
+    document.getElementById(
+        "infoCallsign"
+    ).textContent =
+        valueOrUnavailable(
+            ofp.callsign ||
+            ofp.flight_number
+        );
+
+
+    /* -----------------------------------------------------
+       FUEL & PAYLOAD
+    ----------------------------------------------------- */
+
+    document.getElementById(
+        "tripFuel"
+    ).textContent =
+        numberOrUnavailable(
+            ofp.fuel?.enroute_burn ||
+            ofp.trip_fuel ||
+            ofp.fuel_trip
+        ) + " kg";
+
+
+    document.getElementById(
+        "infoBlockFuel"
+    ).textContent =
+        numberOrUnavailable(
+            ofp.fuel?.block ||
+            ofp.block_fuel ||
+            ofp.fuel_block
+        ) + " kg";
+
+
+    document.getElementById(
+        "payload"
+    ).textContent =
+        numberOrUnavailable(
+            ofp.weights?.payload ||
+            ofp.payload
+        ) + " kg";
+
+
+    document.getElementById(
+        "passengers"
+    ).textContent =
+        numberOrUnavailable(
+            ofp.weights?.pax_count ||
+            ofp.passengers ||
+            ofp.pax
+        );
+
+
+    document.getElementById(
+        "zeroFuelWeight"
+    ).textContent =
+        numberOrUnavailable(
+            ofp.weights?.est_zfw ||
+            ofp.zero_fuel_weight ||
+            ofp.zfw
+        ) + " kg";
+
+
+    /* -----------------------------------------------------
+       ROUTE
+    ----------------------------------------------------- */
+
+    document.getElementById(
+        "route"
+    ).textContent =
+        valueOrUnavailable(
+            ofp.general?.route ||
+            ofp.route ||
+            ofp.fpl?.route
+        );
+
+
+    /* -----------------------------------------------------
+       DEPARTURE
+    ----------------------------------------------------- */
+
+    document.getElementById(
+        "departureFull"
+    ).textContent =
+        valueOrUnavailable(
+            origin.icao ||
+            ofp.origin_icao ||
+            ofp.origin
+        );
+
+
+    document.getElementById(
+        "departureRunway"
+    ).textContent =
+        valueOrUnavailable(
+            ofp.origin_runway ||
+            ofp.departure_runway ||
+            ofp.runway_departure
+        );
+
+
+    document.getElementById(
+        "sid"
+    ).textContent =
+        valueOrUnavailable(
+            ofp.sid ||
+            ofp.departure_sid
+        );
+
+
+    /* -----------------------------------------------------
+       ARRIVAL
+    ----------------------------------------------------- */
+
+    document.getElementById(
+        "arrivalFull"
+    ).textContent =
+        valueOrUnavailable(
+            destination.icao ||
+            ofp.destination_icao ||
+            ofp.destination
+        );
+
+
+    document.getElementById(
+        "arrivalRunway"
+    ).textContent =
+        valueOrUnavailable(
+            ofp.destination_runway ||
+            ofp.arrival_runway ||
+            ofp.runway_arrival
+        );
+
+
+    document.getElementById(
+        "star"
+    ).textContent =
+        valueOrUnavailable(
+            ofp.star ||
+            ofp.arrival_star
+        );
+
+
+    /* -----------------------------------------------------
+       REMARKS
+    ----------------------------------------------------- */
+
+    document.getElementById(
+        "remarks"
+    ).textContent =
+        valueOrUnavailable(
+            ofp.remarks ||
+            ofp.notes ||
+            ofp.general?.remarks
+        );
+
+
+    /* -----------------------------------------------------
+       SHOW PAGE
+    ----------------------------------------------------- */
+
+    document.getElementById(
+        "emptyState"
+    ).style.display = "none";
+
+
+    document.getElementById(
+        "flightContent"
+    ).style.display = "block";
+
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+}
+
+
+/* =========================================================
+   FORMAT DURATION
+========================================================= */
+
+function formatDuration(value) {
+
+    if (
+        value === undefined ||
+        value === null ||
+        value === ""
+    ) {
+        return "Unavailable";
+    }
+
+    const numeric =
+        Number(value);
+
+    if (!isNaN(numeric)) {
+
+        /*
+            SimBrief commonly provides time in minutes.
+        */
+
+        const hours =
+            Math.floor(numeric / 60);
+
+        const minutes =
+            numeric % 60;
+
+        return (
+            hours +
+            "h " +
+            String(minutes).padStart(2, "0") +
+            "m"
+        );
+    }
+
+    return value;
+}
+
+
+/* =========================================================
+   FORMAT ALTITUDE
+========================================================= */
+
+function formatAltitude(value) {
+
+    if (
+        value === undefined ||
+        value === null ||
+        value === ""
+    ) {
+        return "Unavailable";
+    }
+
+    const number =
+        Number(value);
+
+    if (!isNaN(number)) {
+
+        if (number >= 1000) {
+            return "FL" +
+                Math.round(number / 100);
+        }
+
+        return number + " ft";
+    }
+
+    return value;
+}
+
+
+/* =========================================================
+   CLEAR
+========================================================= */
+
+function clearFlight() {
+
+    document.getElementById(
+        "username"
+    ).value = "";
+
+    document.getElementById(
+        "flightContent"
+    ).style.display = "none";
+
+    document.getElementById(
+        "emptyState"
+    ).style.display = "block";
+
+    const status =
+        document.getElementById("status");
+
+    status.className =
+        "status";
+
+    status.textContent = "";
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+}
+
+
+/* =========================================================
+   ENTER KEY
+========================================================= */
+
+document
+    .getElementById("username")
+    .addEventListener(
+        "keydown",
+        function(event) {
+
+            if (event.key === "Enter") {
+                loadFlight();
+            }
+
+        }
+    );
+
+</script>
+
+</body>
+</html>
