@@ -1118,6 +1118,49 @@
                 margin-top: 25px;
             }
         }
+    
+/* FLIGHT_APP_WEATHER_UNITS_V1 */
+.weather-unit-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    min-height: 42px;
+    padding: 0 15px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    color: var(--text);
+    background: rgba(255,255,255,.96);
+    box-shadow: var(--shadow-sm);
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+    transition: .2s ease;
+}
+
+.weather-unit-toggle:hover {
+    color: var(--primary);
+    border-color: #cfd7ee;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+.weather-unit-toggle .unit-toggle-icon {
+    color: var(--primary);
+    font-size: 14px;
+}
+
+@media (max-width: 720px) {
+    .page-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .weather-unit-toggle {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
     </style>
 </head>
 
@@ -3022,6 +3065,154 @@ renderRecentSearches();
 
 loadWeather("EHAM");
 
+</script>
+
+
+<script>
+/* FLIGHT_APP_WEATHER_UNITS_V1 */
+(() => {
+    const STORAGE_KEY = 'flightAppWeatherUnits';
+    let mode = localStorage.getItem(STORAGE_KEY) === 'us' ? 'us' : 'metric';
+    let observerTimer = null;
+
+    const conversions = [
+        { re: /(\\-?\\d+(?:[.,]\\d+)?)\\s*°?C\\b/gi, fn: n => `${fmt(n * 9 / 5 + 32)}°F` },
+        { re: /(\\-?\\d+(?:[.,]\\d+)?)\\s*°?F\\b/gi, fn: n => `${fmt((n - 32) * 5 / 9)}°C` },
+        { re: /(\\-?\\d+(?:[.,]\\d+)?)\\s*(?:km\\/h|kmh)\\b/gi, fn: n => `${fmt(n * 0.621371)} mph` },
+        { re: /(\\-?\\d+(?:[.,]\\d+)?)\\s*m\\/s\\b/gi, fn: n => `${fmt(n * 2.236936)} mph` },
+        { re: /(\\-?\\d+(?:[.,]\\d+)?)\\s*mph\\b/gi, fn: n => `${fmt(n / 0.621371)} km/h` },
+        { re: /(\\-?\\d+(?:[.,]\\d+)?)\\s*km\\b/gi, fn: n => `${fmt(n * 0.621371)} mi` },
+        { re: /(\\-?\\d+(?:[.,]\\d+)?)\\s*mi\\b/gi, fn: n => `${fmt(n / 0.621371)} km` },
+        { re: /(\\-?\\d+(?:[.,]\\d+)?)\\s*mm\\b/gi, fn: n => `${fmt(n / 25.4)} in` },
+        { re: /(\\-?\\d+(?:[.,]\\d+)?)\\s*in(?:ches)?\\b/gi, fn: n => `${fmt(n * 25.4)} mm` },
+        { re: /(\\-?\\d+(?:[.,]\\d+)?)\\s*(?:hPa|mb)\\b/gi, fn: n => `${fmt(n * 0.0295299831, 2)} inHg` },
+        { re: /(\\-?\\d+(?:[.,]\\d+)?)\\s*inHg\\b/gi, fn: n => `${fmt(n / 0.0295299831, 0)} hPa` },
+        { re: /(\\-?\\d+(?:[.,]\\d+)?)\\s*m\\b/gi, fn: n => `${fmt(n * 3.28084)} ft` },
+        { re: /(\\-?\\d+(?:[.,]\\d+)?)\\s*ft\\b/gi, fn: n => `${fmt(n / 3.28084)} m` }
+    ];
+
+    function fmt(value, decimals = 1) {
+        const rounded = Number(value.toFixed(decimals));
+        return String(rounded).replace('.', '.');
+    }
+
+    function convertText(text, targetMode) {
+        let output = text;
+
+        if (targetMode === 'us') {
+            output = output
+                .replace(/(\\-?\\d+(?:[.,]\\d+)?)\\s*°?C\\b/gi, (_, n) => `${fmt(parseFloat(n.replace(',', '.')) * 9 / 5 + 32)}°F`)
+                .replace(/(\\-?\\d+(?:[.,]\\d+)?)\\s*(?:km\\/h|kmh)\\b/gi, (_, n) => `${fmt(parseFloat(n.replace(',', '.')) * 0.621371)} mph`)
+                .replace(/(\\-?\\d+(?:[.,]\\d+)?)\\s*m\\/s\\b/gi, (_, n) => `${fmt(parseFloat(n.replace(',', '.')) * 2.236936)} mph`)
+                .replace(/(\\-?\\d+(?:[.,]\\d+)?)\\s*km\\b/gi, (_, n) => `${fmt(parseFloat(n.replace(',', '.')) * 0.621371)} mi`)
+                .replace(/(\\-?\\d+(?:[.,]\\d+)?)\\s*mm\\b/gi, (_, n) => `${fmt(parseFloat(n.replace(',', '.')) / 25.4, 2)} in`)
+                .replace(/(\\-?\\d+(?:[.,]\\d+)?)\\s*(?:hPa|mb)\\b/gi, (_, n) => `${fmt(parseFloat(n.replace(',', '.')) * 0.0295299831, 2)} inHg`)
+                .replace(/(\\-?\\d+(?:[.,]\\d+)?)\\s*m\\b/gi, (_, n) => `${fmt(parseFloat(n.replace(',', '.')) * 3.28084)} ft`);
+        } else {
+            output = output
+                .replace(/(\\-?\\d+(?:[.,]\\d+)?)\\s*°?F\\b/gi, (_, n) => `${fmt((parseFloat(n.replace(',', '.')) - 32) * 5 / 9)}°C`)
+                .replace(/(\\-?\\d+(?:[.,]\\d+)?)\\s*mph\\b/gi, (_, n) => `${fmt(parseFloat(n.replace(',', '.')) / 0.621371)} km/h`)
+                .replace(/(\\-?\\d+(?:[.,]\\d+)?)\\s*mi\\b/gi, (_, n) => `${fmt(parseFloat(n.replace(',', '.')) / 0.621371)} km`)
+                .replace(/(\\-?\\d+(?:[.,]\\d+)?)\\s*(?:inHg|in(?:ches)?)\\b/gi, (_, n) => `${fmt(parseFloat(n.replace(',', '.')) * 25.4, 2)} mm`)
+                .replace(/(\\-?\\d+(?:[.,]\\d+)?)\\s*inHg\\b/gi, (_, n) => `${fmt(parseFloat(n.replace(',', '.')) / 0.0295299831, 0)} hPa`)
+                .replace(/(\\-?\\d+(?:[.,]\\d+)?)\\s*ft\\b/gi, (_, n) => `${fmt(parseFloat(n.replace(',', '.')) / 3.28084)} m`);
+        }
+
+        return output;
+    }
+
+    function isUnitText(text) {
+        return /(?:°C|°F|km\\/h|kmh|m\\/s|mph|\\bkm\\b|\\bmi\\b|\\bmm\\b|\\bin(?:ches)?\\b|\\bhPa\\b|\\bmb\\b|\\binHg\\b|\\bft\\b)/i.test(text);
+    }
+
+    function applyUnits() {
+        document.querySelectorAll('body *').forEach(el => {
+            if (el.id === 'weatherUnitToggle' || el.closest('#weatherUnitToggle')) return;
+            if (el.children.length > 0) return;
+
+            const current = el.textContent;
+            if (!current || !isUnitText(current)) return;
+
+            if (!el.dataset.weatherMetricText && mode === 'metric') {
+                el.dataset.weatherMetricText = current;
+            }
+
+            if (mode === 'us') {
+                if (el.dataset.weatherMetricText && /(?:°C|km\\/h|kmh|m\\/s|\\bkm\\b|\\bmm\\b|\\bhPa\\b|\\bmb\\b|\\bm\\b)/i.test(current)) {
+                    el.textContent = convertText(el.dataset.weatherMetricText, 'us');
+                } else if (!el.dataset.weatherMetricText && /(?:°C|km\\/h|kmh|m\\/s|\\bkm\\b|\\bmm\\b|\\bhPa\\b|\\bmb\\b|\\bm\\b)/i.test(current)) {
+                    el.dataset.weatherMetricText = current;
+                    el.textContent = convertText(current, 'us');
+                }
+            } else if (el.dataset.weatherMetricText && current !== el.dataset.weatherMetricText) {
+                el.textContent = el.dataset.weatherMetricText;
+            }
+        });
+
+        updateButton();
+    }
+
+    function updateButton() {
+        const button = document.getElementById('weatherUnitToggle');
+        const label = document.getElementById('weatherUnitToggleText');
+        if (!button || !label) return;
+        label.textContent = mode === 'us' ? 'Metric Units' : 'US Units';
+        button.title = mode === 'us' ? 'Switch to metric units' : 'Switch to US units';
+    }
+
+    function installButton() {
+        if (document.getElementById('weatherUnitToggle')) return;
+
+        const button = document.createElement('button');
+        button.className = 'weather-unit-toggle';
+        button.id = 'weatherUnitToggle';
+        button.type = 'button';
+        button.setAttribute('aria-label', 'Switch weather units');
+        button.innerHTML = '<i class="fa-solid fa-temperature-half unit-toggle-icon"></i><span id="weatherUnitToggleText">US Units</span>';
+
+        const header = document.querySelector('.page-header');
+        if (header) {
+            header.appendChild(button);
+        } else {
+            document.body.appendChild(button);
+        }
+
+        button.addEventListener('click', () => {
+            mode = mode === 'metric' ? 'us' : 'metric';
+            localStorage.setItem(STORAGE_KEY, mode);
+            document.querySelectorAll('[data-weather-metric-text]').forEach(el => {
+                if (mode === 'metric') {
+                    el.textContent = el.dataset.weatherMetricText;
+                } else {
+                    el.textContent = convertText(el.dataset.weatherMetricText, 'us');
+                }
+            });
+            applyUnits();
+        });
+
+        updateButton();
+    }
+
+    function scheduleApply() {
+        clearTimeout(observerTimer);
+        observerTimer = setTimeout(() => {
+            installButton();
+            applyUnits();
+        }, 80);
+    }
+
+    function init() {
+        installButton();
+        applyUnits();
+        new MutationObserver(scheduleApply).observe(document.body, { childList: true, subtree: true, characterData: true });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init, { once: true });
+    } else {
+        init();
+    }
+})();
 </script>
 
 </body>
