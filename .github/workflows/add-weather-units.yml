@@ -1,0 +1,210 @@
+name: Add weather unit toggle
+
+on:
+  push:
+    paths:
+      - '.github/workflows/add-weather-units.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Patch weather.html
+        shell: python
+        run: |
+          from pathlib import Path
+
+          path = Path('weather.html')
+          text = path.read_text(encoding='utf-8')
+          marker = '/* FLIGHT_APP_WEATHER_UNITS_V1 */'
+
+          if marker in text:
+              print('Weather unit toggle already installed.')
+              raise SystemExit(0)
+
+          css = '''
+          /* FLIGHT_APP_WEATHER_UNITS_V1 */
+          .weather-unit-toggle {
+              display: inline-flex;
+              align-items: center;
+              gap: 9px;
+              min-height: 42px;
+              padding: 0 15px;
+              border: 1px solid var(--border);
+              border-radius: 12px;
+              color: var(--text);
+              background: rgba(255,255,255,.96);
+              box-shadow: var(--shadow-sm);
+              font-size: 13px;
+              font-weight: 700;
+              white-space: nowrap;
+              transition: .2s ease;
+          }
+          .weather-unit-toggle:hover {
+              color: var(--primary);
+              border-color: #cfd7ee;
+              transform: translateY(-1px);
+              box-shadow: var(--shadow-md);
+          }
+          .weather-unit-toggle .unit-toggle-icon {
+              color: var(--primary);
+              font-size: 14px;
+          }
+          @media (max-width: 720px) {
+              .page-header { align-items: flex-start; flex-direction: column; }
+              .weather-unit-toggle { width: 100%; justify-content: center; }
+          }
+          '''
+
+          js = r'''<script>
+          /* FLIGHT_APP_WEATHER_UNITS_V1 */
+          (() => {
+              const STORAGE_KEY = 'flightAppWeatherUnits';
+              let mode = localStorage.getItem(STORAGE_KEY) === 'us' ? 'us' : 'metric';
+              let timer = null;
+
+              const number = s => parseFloat(String(s).replace(',', '.'));
+              const fmt = (n, decimals = 1) => Number(n.toFixed(decimals)).toString();
+
+              function toUS(text) {
+                  return text
+                      .replace(/(-?\d+(?:[.,]\d+)?)\s*°?C\b/gi, (_, n) => `${fmt(number(n) * 9 / 5 + 32)}°F`)
+                      .replace(/(-?\d+(?:[.,]\d+)?)\s*(?:km\/h|kmh)\b/gi, (_, n) => `${fmt(number(n) * 0.621371)} mph`)
+                      .replace(/(-?\d+(?:[.,]\d+)?)\s*m\/s\b/gi, (_, n) => `${fmt(number(n) * 2.236936)} mph`)
+                      .replace(/(-?\d+(?:[.,]\d+)?)\s*km\b/gi, (_, n) => `${fmt(number(n) * 0.621371)} mi`)
+                      .replace(/(-?\d+(?:[.,]\d+)?)\s*mm\b/gi, (_, n) => `${fmt(number(n) / 25.4, 2)} in`)
+                      .replace(/(-?\d+(?:[.,]\d+)?)\s*(?:hPa|mb)\b/gi, (_, n) => `${fmt(number(n) * 0.0295299831, 2)} inHg`)
+                      .replace(/(-?\d+(?:[.,]\d+)?)\s*m\b/gi, (_, n) => `${fmt(number(n) * 3.28084)} ft`);
+              }
+
+              function toMetric(text) {
+                  return text
+                      .replace(/(-?\d+(?:[.,]\d+)?)\s*°?F\b/gi, (_, n) => `${fmt((number(n) - 32) * 5 / 9)}°C`)
+                      .replace(/(-?\d+(?:[.,]\d+)?)\s*mph\b/gi, (_, n) => `${fmt(number(n) / 0.621371)} km/h`)
+                      .replace(/(-?\d+(?:[.,]\d+)?)\s*mi\b/gi, (_, n) => `${fmt(number(n) / 0.621371)} km`)
+                      .replace(/(-?\d+(?:[.,]\d+)?)\s*inHg\b/gi, (_, n) => `${fmt(number(n) / 0.0295299831, 0)} hPa`)
+                      .replace(/(-?\d+(?:[.,]\d+)?)\s*in\b/gi, (_, n) => `${fmt(number(n) * 25.4, 2)} mm`)
+                      .replace(/(-?\d+(?:[.,]\d+)?)\s*ft\b/gi, (_, n) => `${fmt(number(n) / 3.28084)} m`);
+              }
+
+              function hasWeatherUnit(text) {
+                  return /(?:°C|°F|km\/h|kmh|m\/s|mph|\bkm\b|\bmi\b|\bmm\b|\bin\b|\bhPa\b|\bmb\b|\binHg\b|\bft\b)/i.test(text);
+              }
+
+              function updateButton() {
+                  const label = document.getElementById('weatherUnitToggleText');
+                  if (label) label.textContent = mode === 'us' ? 'Metric Units' : 'US Units';
+              }
+
+              function applyUnits() {
+                  document.querySelectorAll('body *').forEach(el => {
+                      if (el.id === 'weatherUnitToggle' || el.closest('#weatherUnitToggle')) return;
+                      if (el.children.length) return;
+
+                      const current = el.textContent;
+                      if (!current || !hasWeatherUnit(current)) return;
+
+                      const metricPattern = /(?:°C|km\/h|kmh|m\/s|\bkm\b|\bmm\b|\bhPa\b|\bmb\b|\bm\b)/i;
+                      const imperialPattern = /(?:°F|mph|\bmi\b|\bin\b|\binHg\b|\bft\b)/i;
+
+                      if (!el.dataset.weatherMetricText && mode === 'metric' && metricPattern.test(current)) {
+                          el.dataset.weatherMetricText = current;
+                      }
+
+                      if (mode === 'us') {
+                          if (metricPattern.test(current)) {
+                              el.dataset.weatherMetricText = current;
+                              el.textContent = toUS(current);
+                          }
+                      } else if (el.dataset.weatherMetricText && imperialPattern.test(current)) {
+                          el.textContent = el.dataset.weatherMetricText;
+                      }
+                  });
+
+                  updateButton();
+              }
+
+              function installButton() {
+                  if (document.getElementById('weatherUnitToggle')) return;
+
+                  const button = document.createElement('button');
+                  button.className = 'weather-unit-toggle';
+                  button.id = 'weatherUnitToggle';
+                  button.type = 'button';
+                  button.innerHTML = '<i class="fa-solid fa-temperature-half unit-toggle-icon"></i><span id="weatherUnitToggleText"></span>';
+                  button.title = 'Switch weather units';
+
+                  const header = document.querySelector('.page-header');
+                  (header || document.body).appendChild(button);
+
+                  button.addEventListener('click', () => {
+                      mode = mode === 'metric' ? 'us' : 'metric';
+                      localStorage.setItem(STORAGE_KEY, mode);
+
+                      document.querySelectorAll('[data-weather-metric-text]').forEach(el => {
+                          el.textContent = mode === 'us'
+                              ? toUS(el.dataset.weatherMetricText)
+                              : el.dataset.weatherMetricText;
+                      });
+
+                      applyUnits();
+                  });
+
+                  updateButton();
+              }
+
+              function schedule() {
+                  clearTimeout(timer);
+                  timer = setTimeout(() => {
+                      installButton();
+                      applyUnits();
+                  }, 100);
+              }
+
+              function init() {
+                  installButton();
+                  applyUnits();
+                  new MutationObserver(schedule).observe(document.body, {
+                      childList: true,
+                      subtree: true,
+                      characterData: true
+                  });
+              }
+
+              if (document.readyState === 'loading') {
+                  document.addEventListener('DOMContentLoaded', init, { once: true });
+              } else {
+                  init();
+              }
+          })();
+          </script>'''
+
+          if '</style>' not in text or '</body>' not in text:
+              raise SystemExit('Expected HTML insertion points were not found.')
+
+          text = text.replace('</style>', css + '\n    </style>', 1)
+          text = text.replace('</body>', js + '\n</body>', 1)
+          path.write_text(text, encoding='utf-8')
+          print('Weather unit toggle installed.')
+
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add weather.html
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "Add metric US weather unit toggle [skip ci]"
+          git push
+
+      - name: Remove patch workflow
+        if: success()
+        run: |
+          git rm .github/workflows/add-weather-units.yml || true
+          git commit -m "Remove one-time weather units patch workflow [skip ci]" || true
+          git push || true
