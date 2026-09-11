@@ -1,0 +1,97 @@
+name: Repair Weather Units Button
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  repair-weather-units:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Repair weather.html
+        shell: python
+        run: |
+          from pathlib import Path
+          import re
+
+          path = Path('weather.html')
+          text = path.read_text(encoding='utf-8')
+
+          # Remove the broken fallback injection from the previous fix.
+          text = re.sub(
+              r'\\n<script>\\n/\\* FLIGHT_APP_WEATHER_UNITS_FALLBACK_V2 \\*/.*?</script>\\n',
+              '',
+              text,
+              flags=re.S
+          )
+          text = re.sub(
+              r'<script>\\n/\\* FLIGHT_APP_WEATHER_UNITS_FALLBACK_V2 \\*/.*?</script>\\n',
+              '',
+              text,
+              flags=re.S
+          )
+
+          script = '''
+<script>
+/* FLIGHT_APP_WEATHER_UNITS_V3 */
+(function () {
+    function addWeatherUnitButton() {
+        var header = document.querySelector('.page-header');
+        if (!header || document.getElementById('weatherUnitToggleV3')) return;
+
+        var button = document.createElement('button');
+        button.type = 'button';
+        button.id = 'weatherUnitToggleV3';
+        button.className = 'weather-unit-toggle';
+        button.style.cssText = 'display:inline-flex!important;align-items:center;gap:8px;padding:10px 15px;border:1px solid #d9e0ea;border-radius:11px;background:#fff;color:#475467;font-weight:700;font-size:13px;box-shadow:0 4px 14px rgba(16,24,40,.07);white-space:nowrap;cursor:pointer;';
+
+        function updateLabel() {
+            var isUS = localStorage.getItem('flightAppWeatherUnits') === 'us';
+            button.innerHTML = '<i class="fa-solid fa-temperature-half"></i><span>' + (isUS ? 'Metric Units' : 'US Units') + '</span>';
+            button.title = isUS ? 'Switch to metric units' : 'Switch to US units';
+        }
+
+        updateLabel();
+        button.addEventListener('click', function () {
+            var isUS = localStorage.getItem('flightAppWeatherUnits') === 'us';
+            localStorage.setItem('flightAppWeatherUnits', isUS ? 'metric' : 'us');
+            window.location.reload();
+        });
+
+        header.appendChild(button);
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', addWeatherUnitButton);
+    } else {
+        addWeatherUnitButton();
+    }
+})();
+</script>
+'''
+
+          if 'FLIGHT_APP_WEATHER_UNITS_V3' not in text:
+              if '</body>' not in text:
+                  raise SystemExit('Could not find </body>')
+              text = text.replace('</body>', script + '\n</body>', 1)
+
+          path.write_text(text, encoding='utf-8')
+
+      - name: Commit and remove workflow
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add weather.html
+          git rm .github/workflows/fix-weather-units-v3.yml
+          git diff --cached --quiet && exit 0
+          git commit -m "fix: repair visible weather units switch"
+          git push
