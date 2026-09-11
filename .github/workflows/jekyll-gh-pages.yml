@@ -2,43 +2,93 @@
 name: Deploy Jekyll with GitHub Pages dependencies preinstalled
 
 on:
-  # Runs on pushes targeting the default branch
   push:
     branches: ["main"]
-
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
-# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
-# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
 concurrency:
   group: "pages"
   cancel-in-progress: false
 
 jobs:
-  # Build job
   build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Fix weather unit switch
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          p = Path('weather.html')
+          s = p.read_text(encoding='utf-8')
+
+          # Remove old temporary weather-unit patches.
+          s = re.sub(r'<!-- FLIGHT_APP_WEATHER_UNITS_STATIC_V4 -->.*?<!-- /FLIGHT_APP_WEATHER_UNITS_STATIC_V4 -->\s*', '', s, flags=re.S)
+          s = re.sub(r'<script>\s*/\* FLIGHT_APP_WEATHER_UNITS_STATIC_V4_SCRIPT \*/.*?</script>\s*', '', s, flags=re.S)
+          s = re.sub(r'<script>\s*/\* FLIGHT_APP_WEATHER_UNITS_V3 \*/.*?</script>\s*', '', s, flags=re.S)
+          s = re.sub(r'<script>\s*/\* FLIGHT_APP_WEATHER_UNITS_FALLBACK_V2 \*/.*?</script>\s*', '', s, flags=re.S)
+
+          marker = '<div class="page-header">'
+          if marker not in s:
+              raise SystemExit('page-header not found')
+
+          block = '''<div class="page-header">
+<!-- FLIGHT_APP_WEATHER_UNITS_STATIC_V4 -->
+<button id="weatherUnitToggleStaticV4" type="button" aria-label="Switch weather units" style="margin-left:auto;flex-shrink:0;display:inline-flex!important;align-items:center;justify-content:center;padding:10px 16px;border:1px solid #d9e0ea;border-radius:11px;background:#ffffff;color:#344054;font-weight:700;font-size:13px;line-height:1.2;box-shadow:0 4px 14px rgba(16,24,40,.08);white-space:nowrap;cursor:pointer;">US Units</button>
+<!-- /FLIGHT_APP_WEATHER_UNITS_STATIC_V4 -->'''
+          s = s.replace(marker, block, 1)
+
+          script = '''<script>
+/* FLIGHT_APP_WEATHER_UNITS_STATIC_V4_SCRIPT */
+(function () {
+  var key = 'flightAppWeatherUnits';
+  var button = document.getElementById('weatherUnitToggleStaticV4');
+  if (!button) return;
+  function isUS() { return localStorage.getItem(key) === 'us'; }
+  function updateButton() { button.textContent = isUS() ? 'Metric Units' : 'US Units'; }
+  button.addEventListener('click', function () {
+    localStorage.setItem(key, isUS() ? 'metric' : 'us');
+    window.location.reload();
+  });
+  updateButton();
+})();
+</script>'''
+
+          if '</body>' not in s:
+              raise SystemExit('body end not found')
+          s = s.replace('</body>', script + '\n</body>', 1)
+          p.write_text(s, encoding='utf-8')
+          PY
+
+      - name: Commit weather fix
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add weather.html
+          git diff --cached --quiet || git commit -m 'fix: add visible weather unit switch'
+          git push || true
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
+
       - name: Build with Jekyll
         uses: actions/jekyll-build-pages@v1
         with:
           source: ./
           destination: ./_site
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
 
-  # Deployment job
   deploy:
     environment:
       name: github-pages
