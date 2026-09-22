@@ -14,7 +14,7 @@ input,select,button{font:inherit;padding:11px;border:1px solid #dce3ef;border-ra
 <main>
 <section>
 <h1>MSFS 2024 Bulk Chart Importer</h1>
-<p class="muted">Loads the MSFS Planner chart index through the Flight-app backend and imports the chart PNG pages into the Flight App chart database. No ApiToken or MSFS cookie is required here.</p>
+<p class="muted">MSFS Planner requires your logged-in browser session for the chart index. The Flight-app backend cannot use that session. Use the <b>MSFS Chart Bridge</b> Firefox extension in this repository to load and import charts without exposing your ApiToken.</p>
 <div class="row"><input id="icao" maxlength="4" placeholder="EHAM"><select id="provider"><option>LIDO</option><option>FAA</option></select><button id="load">Load charts</button></div>
 <p id="message" class="muted"></p>
 </section>
@@ -80,7 +80,7 @@ async function loadCharts(){
  }catch(e){
    $("message").textContent="Could not load charts: "+e.message;
    $("message").className="err";
-   log("LOAD FAILED: "+e.message);
+   log("LOAD FAILED: "+e.message);\n   if(/text\/html|Flight Planner|invalid JSON/i.test(e.message)){\n     log("AUTHENTICATION NOTE: MSFS Planner is returning its web app instead of the JSON API. Use the msfs-chart-bridge Firefox extension while logged in to planner.flightsimulator.com.");\n   }
  }finally{
    $("load").disabled=false;
  }
