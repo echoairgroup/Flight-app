@@ -33,25 +33,38 @@ let charts=[];
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 function log(s){$("log").textContent+=s+"\n";$("log").scrollTop=$("log").scrollHeight}
-async function json(url){const r=await fetch(url,{credentials:"include",headers:{Accept:"application/json"}});const t=await r.text();let d;try{d=JSON.parse(t)}catch{d=null}if(!r.ok)throw Error("HTTP "+r.status+" from "+url);return d}
+async function json(url){
+ const r=await fetch(url,{credentials:"include",headers:{Accept:"application/json"}});
+ const t=await r.text();
+ let d;try{d=JSON.parse(t)}catch{d=null}
+ if(!r.ok)throw Error("HTTP "+r.status+" from "+url);
+ return d;
+}
 async function loadCharts(){
  const icao=$("icao").value.trim().toUpperCase(),provider=$("provider").value;
- if(!/^[A-Z]{4}$/.test(icao)){ $("message").textContent="Enter a valid ICAO."; return; }
- $("load").disabled=true;$("message").textContent="Loading…";
+ if(!/^[A-Z]{4}$/.test(icao)){ $("message").textContent="Enter a valid ICAO."; $("message").className="err"; return; }
+ $("load").disabled=true;$("message").className="muted";$("message").textContent="Connecting to MSFS Planner…";
  try{
-  let d=null;
+  let d=null,lastError="";
   const urls=[
    PLANNER+"/api/v1/charts/A/"+encodeURIComponent(icao)+"?provider="+encodeURIComponent(provider),
    PLANNER+"/api/v1/charts/"+encodeURIComponent(icao)+"?provider="+encodeURIComponent(provider)
   ];
-  for(const u of urls){try{d=await json(u);break}catch(e){}}
-  if(!d?.charts)throw Error("Could not load the MSFS chart index. Open this page while logged into the MSFS Planner.");
+  for(const u of urls){
+   try{d=await json(u);if(d?.charts)break}catch(e){lastError=e.message}
+  }
+  if(!d?.charts)throw Error("MSFS Planner could not be reached from this page. "+lastError);
   charts=[];
-  for(const [category,items] of Object.entries(d.charts)){if(!Array.isArray(items))continue;for(const meta of items){if(meta?.guid)charts.push({category,meta})}}
+  for(const [category,items] of Object.entries(d.charts)){
+   if(!Array.isArray(items))continue;
+   for(const meta of items)if(meta?.guid)charts.push({category,meta});
+  }
   $("count").textContent=charts.length+" charts found for "+icao+" / "+provider;
-  $("list").innerHTML=charts.map((c,i)=>'<div class="item"><label><input type="checkbox" data-i="'+i+'" checked> <b>'+esc(c.meta.name||c.meta.chartName||c.category+" chart")+'</b> <span class="muted">'+esc(c.category)+' · '+esc(c.meta.guid)+'</span></label><span id="s'+i+'"></span></div>').join("");
-  $("message").textContent="Chart index loaded.";
- }catch(e){$("message").textContent=e.message;$("message").className="err"}finally{$("load").disabled=false}
+  $("list").innerHTML=charts.length?charts.map((c,i)=>'<div class="item"><label><input type="checkbox" data-i="'+i+'" checked> <b>'+esc(c.meta.name||c.meta.chartName||c.category+" chart")+'</b> <span class="muted">'+esc(c.category)+' · '+esc(c.meta.guid)+'</span></label><span id="s'+i+'"></span></div>').join(""):"<p class='muted'>No charts found.</p>";
+  $("message").textContent="Chart index loaded successfully.";
+  $("message").className="ok";
+ }catch(e){$("message").textContent=e.message;$("message").className="err";log("LOAD FAILED: "+e.message)}
+ finally{$("load").disabled=false}
 }
 $("load").onclick=loadCharts;
 $("icao").oninput=()=>{$("icao").value=$("icao").value.toUpperCase().replace(/[^A-Z]/g,"").slice(0,4)};
