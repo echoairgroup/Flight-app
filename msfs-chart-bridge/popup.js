@@ -50,13 +50,59 @@ async function plannerJSON(url) {
   const tabId = tabs[0].id;
 
   try {
-    return await browser.tabs.sendMessage(tabId, {
-      type: "MSFS_PLANNER_FETCH_JSON",
-      url
+    const results = await browser.scripting.executeScript({
+      target: { tabId },
+      func: async (requestUrl) => {
+        const response = await fetch(requestUrl, {
+          credentials: "include",
+          headers: {
+            Accept: "application/json, text/plain, */*"
+          },
+          cache: "no-store"
+        });
+
+        const text = await response.text();
+        let data = null;
+
+        try {
+          data = JSON.parse(text);
+        } catch {}
+
+        if (!response.ok) {
+          throw new Error("MSFS Planner HTTP " + response.status);
+        }
+
+        if (!data) {
+          const preview = text.replace(/\\s+/g, " ").trim().slice(0, 180);
+          if (/<!doctype html|<html/i.test(text)) {
+            throw new Error(
+              "MSFS Planner returned its web page instead of JSON. Make sure you are logged in."
+            );
+          }
+          throw new Error(
+            "MSFS Planner returned invalid JSON" +
+            (preview ? " — " + preview : ".")
+          );
+        }
+
+        return data;
+      },
+      args: [url]
     });
+
+    if (!results || !results.length) {
+      throw new Error("The Planner tab returned no result.");
+    }
+
+    if (results[0].error) {
+      throw new Error(results[0].error.message || "MSFS Planner request failed.");
+    }
+
+    return results[0].result;
   } catch (error) {
     throw new Error(
-      "Could not connect to the MSFS Planner tab. Open the Planner in Firefox, then reload the extension."
+      error.message ||
+      "Could not connect to the MSFS Planner tab."
     );
   }
 }
