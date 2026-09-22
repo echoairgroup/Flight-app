@@ -1,63 +1,173 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Flight App — Aviation Games</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <style>
-:root{--bg:#f5f8fc;--surface:#fff;--line:#e3eaf3;--text:#142033;--muted:#68778c;--blue:#2563eb;--blue2:#1d4ed8;--green:#16a34a;--red:#dc2626;--shadow:0 12px 35px rgba(25,45,75,.08)}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:"DM Sans",sans-serif}button,input{font:inherit}.nav{height:70px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 28px;position:sticky;top:0;z-index:10}.brand{font-family:Manrope;font-weight:800;font-size:20px;color:#111827;text-decoration:none}.navlinks{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}.navlinks a{padding:10px 13px;border-radius:10px;text-decoration:none;color:#536174;font-weight:600;font-size:14px}.navlinks a:hover,.navlinks a.active{background:#edf4ff;color:var(--blue)}main{max-width:1180px;margin:auto;padding:42px 22px 70px}.hero{display:flex;justify-content:space-between;gap:30px;align-items:end;margin-bottom:28px}.eyebrow{color:var(--blue);font-weight:800;text-transform:uppercase;letter-spacing:.1em;font-size:12px}.hero h1{font:800 42px Manrope;margin:8px 0}.hero p{color:var(--muted);max-width:700px;margin:0;line-height:1.6}.score{background:#fff;border:1px solid var(--line);box-shadow:var(--shadow);border-radius:18px;padding:16px 20px;text-align:center;min-width:150px}.score strong{display:block;font-size:28px}.games{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.game{background:#fff;border:1px solid var(--line);border-radius:20px;padding:22px;box-shadow:var(--shadow);cursor:pointer;transition:.18s}.game:hover{transform:translateY(-3px);border-color:#bfd4fa}.game i{font-size:25px;color:var(--blue);margin-bottom:16px}.game h2{margin:0 0 8px;font:800 21px Manrope}.game p{margin:0;color:var(--muted);line-height:1.5}.panel{margin-top:24px;background:#fff;border:1px solid var(--line);border-radius:22px;padding:28px;box-shadow:var(--shadow);display:none}.panel.show{display:block}.question{font:800 25px Manrope;line-height:1.35;margin:8px 0 22px}.options{display:grid;grid-template-columns:1fr 1fr;gap:12px}.option{border:1px solid var(--line);background:#f8fafc;border-radius:13px;padding:15px;text-align:left;cursor:pointer;font-weight:700}.option:hover{border-color:#9ebdf1;background:#eef5ff}.feedback{margin-top:18px;padding:14px 16px;border-radius:12px;display:none}.feedback.good{display:block;background:#ecfdf3;color:#166534}.feedback.bad{display:block;background:#fef2f2;color:#991b1b}.controls{display:flex;gap:10px;margin-top:20px}.btn{border:0;border-radius:11px;padding:11px 16px;font-weight:800;cursor:pointer}.primary{background:var(--blue);color:#fff}.secondary{background:#edf2f7;color:#334155}.result{text-align:center;padding:18px}.result h2{font:800 30px Manrope}.progress{height:8px;background:#e9eef5;border-radius:99px;overflow:hidden;margin:16px 0}.progress span{display:block;height:100%;background:var(--blue);width:0;transition:.2s}@media(max-width:850px){.games{grid-template-columns:1fr}.hero{align-items:start;flex-direction:column}.options{grid-template-columns:1fr}.nav{padding:0 15px}.navlinks a{display:none}.navlinks a:nth-child(1),.navlinks a:nth-child(2),.navlinks a:nth-child(3){display:block}}
-</style>
-</head>
+:root{--bg:#f4f7fb;--card:#fff;--line:#dfe7f1;--text:#132033;--muted:#68778c;--blue:#2563eb;--blue2:#1d4ed8;--cyan:#0891b2;--green:#16a34a;--red:#dc2626;--orange:#ea580c;--purple:#7c3aed;--shadow:0 12px 35px rgba(25,45,75,.08)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:"DM Sans",sans-serif}button,input,select{font:inherit}.nav{height:70px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 28px;position:sticky;top:0;z-index:1000}.brand{font:800 20px Manrope;color:#111827;text-decoration:none}.navlinks{margin-left:auto;display:flex;gap:6px}.navlinks a{padding:10px 12px;border-radius:10px;color:#536174;text-decoration:none;font-size:14px;font-weight:700}.navlinks a:hover,.navlinks .active{background:#edf4ff;color:var(--blue)}
+main{max-width:1320px;margin:auto;padding:40px 22px 80px}.hero{display:flex;justify-content:space-between;align-items:flex-end;gap:30px;margin-bottom:25px}.eyebrow{color:var(--blue);font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}.hero h1{font:800 44px Manrope;margin:8px 0}.hero p{max-width:780px;color:var(--muted);line-height:1.65;margin:0}.scorebox{background:#fff;border:1px solid var(--line);border-radius:18px;padding:15px 25px;min-width:170px;text-align:center;box-shadow:var(--shadow)}.scorebox strong{font:800 30px Manrope;display:block;color:var(--blue)}
+.games{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}.game{background:#fff;border:1px solid var(--line);border-radius:20px;padding:21px;box-shadow:var(--shadow);cursor:pointer;transition:.18s;min-height:175px}.game:hover{transform:translateY(-4px);border-color:#a9c5f5}.game i{font-size:26px;color:var(--game);margin-bottom:18px}.game h2{font:800 19px Manrope;margin:0 0 8px}.game p{color:var(--muted);font-size:13px;line-height:1.5;margin:0}.blue{--game:#2563eb}.green{--game:#16a34a}.orange{--game:#ea580c}.purple{--game:#7c3aed}.cyan{--game:#0891b2}.pink{--game:#db2777}.dark{--game:#334155}.gold{--game:#ca8a04}
+.panel{display:none;margin-top:20px;background:#fff;border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);overflow:hidden}.panel.show{display:block}.panelhead{padding:20px 25px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:20px}.panelhead h2{font:800 23px Manrope;margin:0}.panelbody{padding:25px}.progress{height:8px;background:#e8eef6;border-radius:99px;margin:0 0 25px;overflow:hidden}.progress span{display:block;height:100%;width:0;background:var(--blue);transition:.25s}.question{font:800 26px Manrope;line-height:1.35;margin-bottom:20px}.options{display:grid;grid-template-columns:1fr 1fr;gap:12px}.option{padding:16px;border:1px solid var(--line);border-radius:13px;background:#f8fafc;text-align:left;font-weight:700;cursor:pointer}.option:hover{background:#eef5ff;border-color:#9bbcf0}.option:disabled{cursor:default}.feedback{display:none;padding:14px;border-radius:12px;margin-top:17px;font-weight:700}.feedback.good{display:block;background:#ecfdf3;color:#166534}.feedback.bad{display:block;background:#fef2f2;color:#991b1b}.controls{display:flex;gap:10px;margin-top:20px}.btn{padding:11px 16px;border:0;border-radius:10px;font-weight:800;cursor:pointer}.primary{background:var(--blue);color:white}.secondary{background:#edf1f6;color:#334155}.result{text-align:center;padding:25px}.result h2{font:800 30px Manrope}
+.mapwrap{display:grid;grid-template-columns:330px 1fr;gap:18px}.mapinfo{background:#f7f9fc;border:1px solid var(--line);border-radius:15px;padding:18px}.code{font:800 40px Manrope;color:var(--blue);letter-spacing:2px}.airportname{font:800 19px Manrope;margin:5px 0}.hint{color:var(--muted);font-size:13px;line-height:1.5}.distance{font:800 23px Manrope;margin-top:18px}.map{height:590px;border-radius:16px;overflow:hidden;border:1px solid var(--line)}.mapbtns{display:flex;gap:8px;margin-top:14px}.mapbtns button{flex:1}.leaflet-container{font-family:"DM Sans",sans-serif}.pinicon{background:#2563eb;border:3px solid #fff;border-radius:50%;width:22px;height:22px;box-shadow:0 2px 8px #0005}
+.memory{display:flex;gap:12px;flex-wrap:wrap;margin-top:16px}.memory div{background:#f1f5f9;border-radius:10px;padding:8px 11px;font-size:12px;font-weight:700}
+.matchgrid{display:grid;grid-template-columns:1fr 1fr;gap:15px}.matchcol{display:grid;gap:9px}.matchitem{padding:15px;border:1px solid var(--line);background:#f8fafc;border-radius:11px;cursor:pointer;font-weight:700}.matchitem.selected{border-color:var(--blue);background:#edf4ff}.matchitem.done{opacity:.55;pointer-events:none}.timer{font:800 24px Manrope;color:var(--orange)}
+.typing{text-align:center}.bigicao{font:800 55px Manrope;letter-spacing:5px;color:var(--blue);margin:20px}.typing input{text-align:center;font:800 24px Manrope;text-transform:uppercase;letter-spacing:3px;max-width:320px;padding:14px;border:1px solid var(--line);border-radius:12px}.statsgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}.stat{background:#f7f9fc;border:1px solid var(--line);border-radius:12px;padding:13px}.stat span{display:block;color:var(--muted);font-size:11px}.stat strong{font:800 21px Manrope}
+@media(max-width:1000px){.games{grid-template-columns:repeat(2,1fr)}.mapwrap{grid-template-columns:1fr}.map{height:500px}}@media(max-width:650px){.navlinks a{display:none}.navlinks a:nth-child(1),.navlinks a:nth-child(2),.navlinks a:nth-child(3){display:block}.nav{padding:0 15px}.hero{align-items:start;flex-direction:column}.hero h1{font-size:34px}.games{grid-template-columns:1fr}.options,.matchgrid{grid-template-columns:1fr}.statsgrid{grid-template-columns:1fr 1fr}.map{height:420px}}
+</style></head>
 <body>
 <nav class="nav"><a class="brand" href="index.html">✈ Flight App</a><div class="navlinks"><a href="weather.html">Weather</a><a href="charts.html">Charts</a><a href="planner.html">Planner</a><a href="checklists.html">Checklists</a><a class="active" href="games.html">Games</a><a href="aircraft.html">Aircraft</a><a href="flight-log.html">Logbook</a></div></nav>
 <main>
-<section class="hero"><div><div class="eyebrow">Aviation Arcade</div><h1>Learn aviation. Have fun.</h1><p>Test your aircraft knowledge, airport knowledge and aviation terminology. Everything runs directly in the browser, so you can play without creating an account.</p></div><div class="score"><span>Total score</span><strong id="totalScore">0</strong><small>points</small></div></section>
+<section class="hero"><div><div class="eyebrow">Aviation Arcade</div><h1>Flight App Games</h1><p>A large collection of aviation mini-games. Test your aircraft knowledge, decode ICAO codes, identify airports, and place airports on the map. Airport rounds use a large global database and avoid recently played airports.</p></div><div class="scorebox"><span>Session score</span><strong id="totalScore">0</strong><small>points</small></div></section>
 <section class="games">
-<div class="game" onclick="startGame('plane')"><i class="fa-solid fa-plane"></i><h2>Quiz the Plane</h2><p>Identify aircraft from descriptions, engines, wings, roles and dimensions.</p></div>
-<div class="game" onclick="startGame('airport')"><i class="fa-solid fa-location-dot"></i><h2>Airport Challenge</h2><p>Match ICAO codes with airports and regions. How well do you know the world’s airports?</p></div>
-<div class="game" onclick="startGame('quick')"><i class="fa-solid fa-bolt"></i><h2>Aviation Quickfire</h2><p>Fast questions about METAR, flight planning, instruments, airspace and aviation basics.</p></div>
+<div class="game blue" onclick="startQuiz('plane')"><i class="fa-solid fa-plane"></i><h2>Quiz the Plane</h2><p>Aircraft, engines, wings, systems, performance and aviation history.</p></div>
+<div class="game green" onclick="startQuiz('airport')"><i class="fa-solid fa-tower-observation"></i><h2>Airport Challenge</h2><p>Identify airports from ICAO codes, names, cities and countries.</p></div>
+<div class="game orange" onclick="startQuiz('quick')"><i class="fa-solid fa-bolt"></i><h2>Aviation Quickfire</h2><p>Fast questions about METAR, TAF, navigation, IFR and flight operations.</p></div>
+<div class="game purple" onclick="startMapGame()"><i class="fa-solid fa-map-location-dot"></i><h2>Pin the Airport</h2><p>Get an ICAO code and place a pin as close as possible to the real airport.</p></div>
+<div class="game cyan" onclick="startIcaoGame()"><i class="fa-solid fa-keyboard"></i><h2>ICAO Code Rush</h2><p>See an airport and type its four-letter ICAO code before time runs out.</p></div>
+<div class="game pink" onclick="startMatchGame()"><i class="fa-solid fa-arrows-left-right"></i><h2>Match the Airport</h2><p>Match ICAO codes to airports and countries as quickly as possible.</p></div>
+<div class="game dark" onclick="startQuiz('instruments')"><i class="fa-solid fa-gauge-high"></i><h2>Cockpit Knowledge</h2><p>Flight instruments, displays, autopilot, navigation and cockpit procedures.</p></div>
+<div class="game gold" onclick="startQuiz('radio')"><i class="fa-solid fa-tower-broadcast"></i><h2>Radio & ATC</h2><p>ATC phrases, squawk codes, clearances and aviation communication.</p></div>
 </section>
-<section id="panel" class="panel">
-<div id="gameTitle" class="eyebrow"></div><div class="progress"><span id="bar"></span></div><div id="question" class="question"></div><div id="options" class="options"></div><div id="feedback" class="feedback"></div><div class="controls"><button class="btn secondary" onclick="backToGames()">Exit game</button><button id="next" class="btn primary" onclick="nextQuestion()" style="display:none">Next question</button></div>
-</section>
+
+<section id="panel" class="panel"><div class="panelhead"><h2 id="gameTitle"></h2><button class="btn secondary" onclick="closeGame()">Exit game</button></div><div class="panelbody"><div class="progress"><span id="bar"></span></div><div id="gameArea"></div></div></section>
 </main>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 const sets={
 plane:[
-["Which aircraft is commonly identified by its four-engine layout and distinctive upper-deck hump?","Airbus A340","Boeing 747","Airbus A330","Boeing 787","Boeing 747"],
+["Which aircraft is commonly identified by a four-engine layout and distinctive upper-deck hump?","Airbus A340","Boeing 747","Airbus A330","Boeing 787","Boeing 747"],
 ["Which manufacturer produces the A320 family?","Boeing","Embraer","Airbus","Bombardier","Airbus"],
-["Which engine option is used on some A320ceo aircraft?","CFM56","GE90","Trent XWB","PW1100G","CFM56"],
-["Which aircraft is a regional jet family produced by Embraer?","E190","A350","747-8","A380","E190"],
-["What is the main purpose of winglets or sharklets?","Increase cabin pressure","Reduce induced drag","Increase fuel weight","Cool the engines","Reduce induced drag"],
-["Which aircraft is a widebody twinjet?","A350","A319","E175","ATR 72","A350"]
+["What is the main aerodynamic purpose of winglets or sharklets?","Increase cabin pressure","Reduce induced drag","Increase fuel weight","Cool the engines","Reduce induced drag"],
+["Which aircraft is a regional jet produced by Embraer?","E190","A350","747-8","A380","E190"],
+["Which aircraft uses the Trent XWB engine?","A350","737 MAX","A320","E190","A350"],
+["Which aircraft has a double-deck full-length fuselage?","A380","A320","737-800","E190","A380"],
+["What is the typical configuration of the Boeing 737 family?","Narrowbody twinjet","Widebody quadjet","Turboprop","Regional trijet","Narrowbody twinjet"],
+["What does neo mean in A320neo?","New Engine Option","New Electronic Operations","Next Engine Output","New European Operator","New Engine Option"],
+["Which aircraft is a turboprop?","ATR 72","A350","787","E195-E2","ATR 72"],
+["Which manufacturer produces the 787 Dreamliner?","Airbus","Boeing","Embraer","Dassault","Boeing"],
+["Which aircraft is designed as a very large widebody?","A380","E175","A319","ATR 42","A380"],
+["What is the A321 a member of?","A320 family","737 family","E-Jet family","747 family","A320 family"],
+["Which aircraft family includes the E190 and E195?","Embraer E-Jets","Airbus A330","Boeing 777","ATR family","Embraer E-Jets"],
+["What is a sharklet?","A type of wingtip device","A cockpit display","A landing gear type","A weather radar","A type of wingtip device"],
+["Which aircraft is a long-haul widebody twinjet?","A350-900","ATR 72","E175","A319","A350-900"]
 ],
 airport:[
 ["What is the ICAO code for Amsterdam Schiphol?","EHAM","EGLL","EDDF","LFPG","EHAM"],
-["Which airport uses the ICAO code EGLL?","Manchester","London Heathrow","Paris Charles de Gaulle","Frankfurt","London Heathrow"],
-["Which ICAO code belongs to Frankfurt Airport?","EDDF","EDDM","EDDH","EDDK","EDDF"],
-["KJFK is the ICAO code for which airport?","Los Angeles","Newark","John F. Kennedy International","Chicago O'Hare","John F. Kennedy International"],
-["What does the first letter E generally indicate in ICAO European codes?","North America","Northern Europe only","Europe","Asia","Europe"],
-["Which airport has the ICAO code LGSM?","Rhodes","Samos","Kos","Corfu","Samos"]
+["Which airport uses EGLL?","London Heathrow","Manchester","Gatwick","Dublin","London Heathrow"],
+["Which airport uses EDDF?","Frankfurt","Munich","Hamburg","Berlin","Frankfurt"],
+["KJFK is which airport?","John F. Kennedy International","Newark","LaGuardia","Boston Logan","John F. Kennedy International"],
+["Which airport uses LGSM?","Samos","Rhodes","Kos","Corfu","Samos"],
+["Which airport uses LIRF?","Rome Fiumicino","Milan Malpensa","Venice","Naples","Rome Fiumicino"],
+["Which airport uses LFPG?","Paris Charles de Gaulle","Paris Orly","Lyon","Nice","Paris Charles de Gaulle"],
+["Which airport uses EDDM?","Munich","Frankfurt","Cologne","Stuttgart","Munich"],
+["Which airport uses LOWW?","Vienna","Salzburg","Prague","Budapest","Vienna"],
+["Which airport uses LSZH?","Zurich","Geneva","Basel","Bern","Zurich"],
+["Which airport uses EKCH?","Copenhagen","Stockholm","Oslo","Helsinki","Copenhagen"],
+["Which airport uses ENGM?","Oslo Gardermoen","Bergen","Stavanger","Tromso","Oslo Gardermoen"],
+["Which airport uses LPPT?","Lisbon","Porto","Faro","Madrid","Lisbon"],
+["Which airport uses LEPA?","Palma de Mallorca","Madrid","Barcelona","Ibiza","Palma de Mallorca"],
+["Which airport uses GCFV?","Fuerteventura","Gran Canaria","Tenerife South","Lanzarote","Fuerteventura"],
+["Which airport uses WSSS?","Singapore Changi","Kuala Lumpur","Jakarta","Bangkok","Singapore Changi"],
+["Which airport uses RJTT?","Tokyo Haneda","Tokyo Narita","Osaka Kansai","Nagoya","Tokyo Haneda"],
+["Which airport uses YSSY?","Sydney","Melbourne","Brisbane","Perth","Sydney"],
+["Which airport uses OMDB?","Dubai","Doha","Abu Dhabi","Muscat","Dubai"],
+["Which airport uses CYYZ?","Toronto Pearson","Vancouver","Montreal","Calgary","Toronto Pearson"]
 ],
 quick:[
-["What does METAR primarily provide?","Current aerodrome weather","A full flight plan","Passenger information","Aircraft maintenance data","Current aerodrome weather"],
-["What does TAF provide?","An airport diagram","An aerodrome weather forecast","A fuel receipt","A NOTAM list","An aerodrome weather forecast"],
-["What does VOR stand for?","Very Operational Radar","VHF Omnidirectional Range","Visual Operations Route","Vertical Orientation Receiver","VHF Omnidirectional Range"],
-["On an IFR flight, what does an SID normally describe?","A standard instrument departure","A standard cabin announcement","A maintenance procedure","A passenger route","A standard instrument departure"],
-["What is QNH used for?","Setting the altimeter to indicate altitude above mean sea level","Setting cabin temperature","Calculating fuel density","Selecting an ILS frequency","Setting the altimeter to indicate altitude above mean sea level"],
-["What is the purpose of a checklist?","Replace all pilot decisions","Provide a structured verification of required actions","Automatically fly the aircraft","Calculate passenger baggage","Provide a structured verification of required actions"]
+["What does METAR provide?","Current aerodrome weather","A full flight plan","Passenger information","Maintenance data","Current aerodrome weather"],
+["What does TAF provide?","An aerodrome weather forecast","An airport diagram","A fuel receipt","A NOTAM list","An aerodrome weather forecast"],
+["What does VOR stand for?","VHF Omnidirectional Range","Very Operational Radar","Visual Operations Route","Vertical Orientation Receiver","VHF Omnidirectional Range"],
+["What does an SID normally describe?","A standard instrument departure","A cabin announcement","A maintenance procedure","A passenger route","A standard instrument departure"],
+["What is QNH used for?","Altimeter setting for altitude above mean sea level","Cabin temperature","Fuel density","ILS selection","Altimeter setting for altitude above mean sea level"],
+["What is a STAR?","A standard instrument arrival","A type of engine","A weather report","A runway light","A standard instrument arrival"],
+["What is an ILS used for?","Precision instrument approach","Fuel planning","Radio entertainment","Cabin pressure","Precision instrument approach"],
+["What does VMC mean?","Visual meteorological conditions","Very maximum climb","Vertical magnetic course","Variable meter control","Visual meteorological conditions"],
+["What does ATC stand for?","Air Traffic Control","Aircraft Technical Crew","Airport Taxi Coordination","Air Transport Computer","Air Traffic Control"],
+["What is a NOTAM?","Notice containing operational information","A weather forecast","A flight ticket","An aircraft manual","Notice containing operational information"],
+["What is a squawk code?","A transponder code","A runway number","A fuel code","An engine setting","A transponder code"],
+["What is decision altitude associated with?","Instrument approaches","Baggage loading","Cruise fuel","Pushback","Instrument approaches"]
+],
+instruments:[
+["What does the PFD primarily display?","Primary flight information","Passenger data","Fuel invoices","Airport maps","Primary flight information"],
+["What does the ND primarily show?","Navigation information","Engine oil only","Cabin temperature","Passenger seating","Navigation information"],
+["What does the altimeter indicate?","Altitude","Airspeed","Heading","Vertical speed","Altitude"],
+["What does the airspeed indicator show?","Indicated airspeed","Altitude","Heading","Fuel flow","Indicated airspeed"],
+["What does the heading indicator show?","Aircraft heading","Vertical speed","Engine temperature","Altitude","Aircraft heading"],
+["What does the VSI indicate?","Vertical speed","True airspeed","Heading","Fuel remaining","Vertical speed"],
+["What does an autopilot do?","Controls selected flight parameters automatically","Loads baggage","Starts boarding","Reads METAR aloud","Controls selected flight parameters automatically"],
+["What does TCAS help prevent?","Mid-air collisions","Fuel leaks","Runway flooding","Engine icing","Mid-air collisions"],
+["What does a flight director provide?","Guidance cues for the pilot","Weather forecasts","Engine lubrication","Cabin announcements","Guidance cues for the pilot"],
+["What does an FMC/FMS manage?","Flight management and navigation functions","Cabin lighting only","Passenger meals","Ground vehicles","Flight management and navigation functions"]
+],
+radio:[
+["What does squawk 7700 indicate?","General emergency","Radio failure","Unlawful interference","VFR","General emergency"],
+["What does squawk 7600 indicate?","Radio communication failure","General emergency","Hijacking","VFR","Radio communication failure"],
+["What does squawk 7500 indicate?","Unlawful interference","Radio failure","Medical emergency","VFR","Unlawful interference"],
+["What does 'stand by' mean on the radio?","Wait","Change frequency","Repeat immediately","Taxi","Wait"],
+["What does 'wilco' mean?","Will comply","Unable","Wait","Repeat","Will comply"],
+["What does 'unable' mean?","The instruction cannot be complied with","The aircraft is ready","Repeat the clearance","Change runway","The instruction cannot be complied with"],
+["Who normally issues an IFR departure clearance?","ATC","Cabin crew","Ramp agent","Passengers","ATC"],
+["What is a readback?","Repeating a clearance or instruction","Reading a chart silently","Checking fuel","Calling passengers","Repeating a clearance or instruction"],
+["What does 'roger' indicate?","Message received","Permission to land","Unable","Emergency","Message received"],
+["What does 'say again' request?","Repeat the transmission","Change runway","Give heading","Cancel IFR","Repeat the transmission"]
 ]};
-let current=[],index=0,score=0,answered=false;
-function startGame(type){current=sets[type].sort(()=>Math.random()-.5).slice(0,6);index=0;score=0;answered=false;document.getElementById('panel').classList.add('show');document.getElementById('gameTitle').textContent=type==='plane'?'Quiz the Plane':type==='airport'?'Airport Challenge':'Aviation Quickfire';render()}
-function render(){const q=current[index];document.getElementById('question').textContent=q[0];document.getElementById('bar').style.width=((index)/current.length*100)+'%';const opts=[...q.slice(1,5)].sort(()=>Math.random()-.5);document.getElementById('options').innerHTML=opts.map(o=>'<button class="option" onclick="answer(this, '+JSON.stringify(o).replaceAll('"','&quot;')+')">'+o+'</button>').join('');document.getElementById('feedback').className='feedback';document.getElementById('feedback').textContent='';document.getElementById('next').style.display='none';answered=false}
-function answer(btn,value){if(answered)return;answered=true;const correct=current[index][5];document.querySelectorAll('.option').forEach(b=>b.disabled=true);const fb=document.getElementById('feedback');if(value===correct){score++;fb.textContent='Correct! +1 point';fb.className='feedback good'}else{fb.textContent='Not quite. The correct answer is '+correct+'.';fb.className='feedback bad'}document.getElementById('next').style.display='inline-block';document.getElementById('totalScore').textContent=score}
-function nextQuestion(){index++;if(index>=current.length){document.getElementById('question').innerHTML='<div class="result"><h2>Game complete</h2><p>You scored <strong>'+score+' / '+current.length+'</strong>.</p></div>';document.getElementById('options').innerHTML='';document.getElementById('feedback').className='feedback';document.getElementById('next').style.display='none';document.getElementById('bar').style.width='100%';return}render()}
-function backToGames(){document.getElementById('panel').classList.remove('show');window.scrollTo({top:0,behavior:'smooth'})}
+
+let current=[],qIndex=0,gameScore=0,gameType='',answered=false;
+let map=null,marker=null,target=null,mapRounds=0,mapScore=0,usedAirports=[];
+let airportPool=[
+["EHAM","Amsterdam Airport Schiphol","Amsterdam","Netherlands",52.3086,4.7639],["EGLL","London Heathrow","London","United Kingdom",51.4700,-0.4543],
+["EGKK","London Gatwick","London","United Kingdom",51.1537,-0.1821],["EGCC","Manchester Airport","Manchester","United Kingdom",53.3537,-2.2750],
+["LFPG","Paris Charles de Gaulle","Paris","France",49.0097,2.5479],["LFPO","Paris Orly","Paris","France",48.7233,2.3794],
+["EDDF","Frankfurt Airport","Frankfurt","Germany",50.0379,8.5622],["EDDM","Munich Airport","Munich","Germany",48.3538,11.7861],
+["EDDH","Hamburg Airport","Hamburg","Germany",53.6304,9.9882],["EDDB","Berlin Brandenburg","Berlin","Germany",52.3667,13.5033],
+["LIRF","Rome Fiumicino","Rome","Italy",41.8003,12.2389],["LIMC","Milan Malpensa","Milan","Italy",45.6306,8.7281],
+["LGSM","Samos Airport","Samos","Greece",37.6900,26.9117],["LGKR","Corfu Airport","Corfu","Greece",39.6019,19.9117],
+["LGTS","Thessaloniki Airport","Thessaloniki","Greece",40.5197,22.9709],["LGAV","Athens International","Athens","Greece",37.9364,23.9445],
+["LEPA","Palma de Mallorca","Palma","Spain",39.5517,2.7388],["LEBL","Barcelona El Prat","Barcelona","Spain",41.2971,2.0785],
+["LEMD","Madrid Barajas","Madrid","Spain",40.4719,-3.5626],["GCFV","Fuerteventura","Fuerteventura","Spain",28.4527,-13.8638],
+["LPPT","Lisbon Airport","Lisbon","Portugal",38.7742,-9.1342],["LPPR","Porto Airport","Porto","Portugal",41.2481,-8.6814],
+["LOWW","Vienna International","Vienna","Austria",48.1103,16.5697],["LSZH","Zurich Airport","Zurich","Switzerland",47.4581,8.5555],
+["EKCH","Copenhagen Airport","Copenhagen","Denmark",55.6181,12.6508],["ENGM","Oslo Gardermoen","Oslo","Norway",60.1976,11.1004],
+["ESSA","Stockholm Arlanda","Stockholm","Sweden",59.6519,17.9186],["EFHK","Helsinki Airport","Helsinki","Finland",60.3172,24.9633],
+["EBBR","Brussels Airport","Brussels","Belgium",50.9010,4.4844],["EIDW","Dublin Airport","Dublin","Ireland",53.4213,-6.2701],
+["KJFK","John F. Kennedy International","New York","USA",40.6413,-73.7781],["KLAX","Los Angeles International","Los Angeles","USA",33.9416,-118.4085],
+["KORD","Chicago O'Hare","Chicago","USA",41.9742,-87.9073],["KATL","Hartsfield-Jackson Atlanta","Atlanta","USA",33.6407,-84.4277],
+["KSEA","Seattle-Tacoma","Seattle","USA",47.4502,-122.3088],["KSFO","San Francisco International","San Francisco","USA",37.6213,-122.3790],
+["CYYZ","Toronto Pearson","Toronto","Canada",43.6777,-79.6248],["CYVR","Vancouver International","Vancouver","Canada",49.1967,-123.1815],
+["MMMX","Mexico City International","Mexico City","Mexico",19.4363,-99.0721],["SBGR","São Paulo Guarulhos","São Paulo","Brazil",-23.4356,-46.4731],
+["SCEL","Santiago International","Santiago","Chile",-33.3930,-70.7858],["FAOR","O.R. Tambo","Johannesburg","South Africa",-26.1337,28.2420],
+["FACT","Cape Town International","Cape Town","South Africa",-33.9715,18.6021],["HKJK","Jomo Kenyatta","Nairobi","Kenya",-1.3192,36.9278],
+["OMDB","Dubai International","Dubai","UAE",25.2532,55.3657],["OTHH","Hamad International","Doha","Qatar",25.2731,51.6081],
+["OERK","King Khalid International","Riyadh","Saudi Arabia",24.9576,46.6988],["VIDP","Indira Gandhi International","Delhi","India",28.5562,77.1000],
+["VABB","Chhatrapati Shivaji Maharaj","Mumbai","India",19.0896,72.8656],["WSSS","Singapore Changi","Singapore","Singapore",1.3644,103.9915],
+["WMKK","Kuala Lumpur International","Kuala Lumpur","Malaysia",2.7456,101.7072],["VTBS","Suvarnabhumi","Bangkok","Thailand",13.6900,100.7501],
+["RJTT","Tokyo Haneda","Tokyo","Japan",35.5494,139.7798],["RJAA","Narita International","Tokyo","Japan",35.7719,140.3929],
+["RKSI","Incheon International","Seoul","South Korea",37.4602,126.4407],["YSSY","Sydney Kingsford Smith","Sydney","Australia",-33.9399,151.1753],
+["YMML","Melbourne Airport","Melbourne","Australia",-37.6733,144.8433],["NZAA","Auckland Airport","Auckland","New Zealand",-37.0082,174.7850],
+["ZBAA","Beijing Capital","Beijing","China",40.0799,116.6031],["ZSPD","Shanghai Pudong","Shanghai","China",31.1443,121.8083],
+["UUEE","Sheremetyevo","Moscow","Russia",55.9726,37.4146],["UUDD","Domodedovo","Moscow","Russia",55.4088,37.9063]
+];
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function showPanel(title,html){document.getElementById('panel').classList.add('show');document.getElementById('gameTitle').textContent=title;document.getElementById('gameArea').innerHTML=html;window.scrollTo({top:document.getElementById('panel').offsetTop-90,behavior:'smooth'})}
+function startQuiz(type){current=[...sets[type]].sort(()=>Math.random()-.5).slice(0,10);qIndex=0;gameScore=0;gameType=type;answered=false;showPanel(type==='plane'?'Quiz the Plane':type==='airport'?'Airport Challenge':type==='quick'?'Aviation Quickfire':type==='instruments'?'Cockpit Knowledge':'Radio & ATC','<div id="quiz"></div>');renderQuiz()}
+function renderQuiz(){const q=current[qIndex],opts=q.slice(1,5).sort(()=>Math.random()-.5);document.getElementById('bar').style.width=(qIndex/current.length*100)+'%';document.getElementById('quiz').innerHTML='<div class="question">'+esc(q[0])+'</div><div class="options">'+opts.map(o=>'<button class="option" data-answer="'+esc(o)+'">'+esc(o)+'</button>').join('')+'</div><div id="feedback" class="feedback"></div><div class="controls"><button class="btn secondary" onclick="closeGame()">Exit</button><button id="nextBtn" class="btn primary" style="display:none" onclick="nextQuiz()">Next question</button></div>';document.querySelectorAll('.option').forEach(b=>b.onclick=()=>answerQuiz(b,b.dataset.answer))}
+function answerQuiz(btn,value){if(answered)return;answered=true;const correct=current[qIndex][5];document.querySelectorAll('.option').forEach(b=>b.disabled=true);const fb=document.getElementById('feedback');if(value===correct){gameScore++;fb.textContent='Correct! +1 point';fb.className='feedback good'}else{fb.textContent='Incorrect. Correct answer: '+correct;fb.className='feedback bad'}document.getElementById('totalScore').textContent=gameScore;document.getElementById('nextBtn').style.display='inline-block'}
+function nextQuiz(){qIndex++;answered=false;if(qIndex>=current.length){document.getElementById('bar').style.width='100%';document.getElementById('quiz').innerHTML='<div class="result"><h2>Round complete</h2><p>You scored <strong>'+gameScore+' / '+current.length+'</strong>.</p><button class="btn primary" onclick="startQuiz(\''+gameType+'\')">Play again</button></div>';return}renderQuiz()}
+
+function hav(a,b,c,d){const R=6371,x=(c-a)*Math.PI/180,y=(d-b)*Math.PI/180;const z=Math.sin(x/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(y/2)**2;return R*2*Math.atan2(Math.sqrt(z),Math.sqrt(1-z))}
+function startMapGame(){mapRounds=0;mapScore=0;usedAirports=[];showPanel('Pin the Airport','<div class="mapwrap"><div class="mapinfo"><div class="eyebrow">Round <span id="mapRound">1</span> / 10</div><div class="code" id="mapCode">----</div><div class="airportname" id="mapName">Loading…</div><div class="hint" id="mapHint">Click on the map where you think this airport is located. You only get one pin per round.</div><div class="distance" id="distance">—</div><div class="memory" id="mapMemory"></div><div class="mapbtns"><button class="btn secondary" onclick="closeGame()">Exit</button><button id="mapNext" class="btn primary" style="display:none" onclick="nextMap()">Next airport</button></div></div><div id="airportMap" class="map"></div></div>');initMap();nextMap(true)}
+function initMap(){if(map)map.remove();map=L.map('airportMap',{worldCopyJump:true,minZoom:2}).setView([25,10],2);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap contributors',maxZoom:18}).addTo(map);map.on('click',mapClick)}
+function nextMap(first=false){if(!first){mapRounds++;}if(mapRounds>=10){document.getElementById('mapRound').textContent='10';document.getElementById('mapName').innerHTML='<div class="result"><h2>Map complete</h2><p>You scored <strong>'+mapScore+' / 10</strong>.</p><button class="btn primary" onclick="startMapGame()">Play another 10</button></div>';document.getElementById('mapCode').textContent='DONE';document.getElementById('mapHint').textContent='';document.getElementById('mapNext').style.display='none';return}let available=airportPool.filter(a=>!usedAirports.includes(a[0]));target=available[Math.floor(Math.random()*available.length)];usedAirports.push(target[0]);document.getElementById('mapRound').textContent=mapRounds+1;document.getElementById('mapCode').textContent=target[0];document.getElementById('mapName').textContent='Airport location challenge';document.getElementById('mapHint').textContent='Place one pin as close as possible to '+target[0]+'. You will see the distance after clicking.';document.getElementById('distance').textContent='—';document.getElementById('mapNext').style.display='none';if(marker){map.removeLayer(marker);marker=null}map.setView([25,10],2);document.getElementById('mapMemory').innerHTML='<div>Global airport pool: '+airportPool.length+'</div><div>Used this session: '+usedAirports.length+'</div>'}
+function mapClick(e){if(!target||marker)return;marker=L.marker(e.latlng,{title:'Your guess'}).addTo(map);const km=hav(e.latlng.lat,e.latlng.lng,target[4],target[5]);let pts=Math.max(0,Math.round(1000*Math.exp(-km/600)));mapScore+=pts;document.getElementById('distance').innerHTML=km<1?'<strong>'+Math.round(km*1000)+' m away</strong>':'<strong>'+Math.round(km)+' km away</strong>';const actual=L.circleMarker([target[4],target[5]],{radius:8,color:'#dc2626',fillColor:'#dc2626',fillOpacity:.9}).addTo(map);L.polyline([e.latlng,[target[4],target[5]]],{color:'#2563eb',weight:3,dashArray:'7 7'}).addTo(map);map.fitBounds(L.latLngBounds([e.latlng,[target[4],target[5]]]),{padding:[35,35]});document.getElementById('mapHint').innerHTML='<strong>'+esc(target[1])+'</strong>, '+esc(target[2])+', '+esc(target[3])+'<br>Correct location shown with the red marker.<br><strong>+'+pts+' points</strong>';document.getElementById('totalScore').textContent=mapScore;document.getElementById('mapNext').style.display='inline-block'}
+
+function startIcaoGame(){let list=[...airportPool].sort(()=>Math.random()-.5).slice(0,12);let i=0,sc=0;showPanel('ICAO Code Rush','<div id="icaoGame"></div>');function render(){if(i>=list.length){document.getElementById('icaoGame').innerHTML='<div class="result"><h2>Code Rush complete</h2><p>You scored <strong>'+sc+' / '+list.length+'</strong>.</p><button class="btn primary" onclick="startIcaoGame()">Play again</button></div>';return}let a=list[i];document.getElementById('bar').style.width=(i/list.length*100)+'%';document.getElementById('icaoGame').innerHTML='<div class="typing"><div class="eyebrow">'+(i+1)+' / '+list.length+'</div><div class="airportname">'+esc(a[1])+'</div><p class="hint">'+esc(a[2])+', '+esc(a[3])+'</p><div class="bigicao">????</div><input id="icaoInput" maxlength="4" autocomplete="off" autofocus placeholder="ICAO"><div class="controls" style="justify-content:center"><button class="btn primary" id="icaoSubmit">Check code</button></div><div id="icaoFb" class="feedback"></div></div>';const inp=document.getElementById('icaoInput');document.getElementById('icaoSubmit').onclick=check;inp.onkeydown=e=>{if(e.key==='Enter')check()};function check(){if(inp.disabled)return;let v=inp.value.trim().toUpperCase();inp.disabled=true;const fb=document.getElementById('icaoFb');if(v===a[0]){sc++;fb.textContent='Correct! '+a[0];fb.className='feedback good'}else{fb.textContent='Correct code: '+a[0];fb.className='feedback bad'}document.getElementById('totalScore').textContent=sc;setTimeout(()=>{i++;render()},900)}}render()}
+function startMatchGame(){let arr=[...airportPool].sort(()=>Math.random()-.5).slice(0,8),left=arr.map(a=>[a[0],a[1]]).sort(()=>Math.random()-.5),right=arr.map(a=>[a[0],a[3]]).sort(()=>Math.random()-.5);let selected=null,done=0,started=Date.now();showPanel('Airport Match','<div class="statsgrid"><div class="stat"><span>Pairs</span><strong>8</strong></div><div class="stat"><span>Matched</span><strong id="matched">0</strong></div><div class="stat"><span>Time</span><strong id="matchTime">0s</strong></div><div class="stat"><span>Errors</span><strong id="errors">0</strong></div></div><div class="matchgrid"><div class="matchcol" id="leftMatch"></div><div class="matchcol" id="rightMatch"></div></div>');document.getElementById('leftMatch').innerHTML=left.map(a=>'<button class="matchitem" data-code="'+a[0]+'">'+a[0]+' — '+a[1]+'</button>').join('');document.getElementById('rightMatch').innerHTML=right.map(a=>'<button class="matchitem" data-code="'+a[0]+'">'+a[1]+'</button>').join('');let errors=0;document.querySelectorAll('.matchitem').forEach(b=>b.onclick=()=>{if(b.classList.contains('done'))return;if(!selected&&b.parentElement.id==='leftMatch'){selected=b;b.classList.add('selected');return}if(selected&&b.parentElement.id==='rightMatch'){if(selected.dataset.code===b.dataset.code){selected.classList.remove('selected');selected.classList.add('done');b.classList.add('done');done++;document.getElementById('matched').textContent=done;selected=null;if(done===8){const sec=Math.round((Date.now()-started)/1000);document.getElementById('gameArea').insertAdjacentHTML('beforeend','<div class="result"><h2>All matched!</h2><p>Finished in <strong>'+sec+' seconds</strong>.</p><button class="btn primary" onclick="startMatchGame()">Play again</button></div>')}}else{errors++;document.getElementById('errors').textContent=errors;b.classList.add('selected');setTimeout(()=>{b.classList.remove('selected');selected.classList.remove('selected');selected=null},350)}}});setInterval(()=>{const el=document.getElementById('matchTime');if(el)el.textContent=Math.round((Date.now()-started)/1000)+'s'},500)}
+function closeGame(){document.getElementById('panel').classList.remove('show');if(map){map.remove();map=null}target=null}
+function nextMap(){if(mapRounds>=9){mapRounds=10;document.getElementById('mapNext').style.display='none';document.getElementById('mapCode').textContent='DONE';document.getElementById('mapName').innerHTML='<div class="result"><h2>Map complete</h2><p>You scored <strong>'+mapScore+' / 10</strong>.</p><button class="btn primary" onclick="startMapGame()">Play another 10</button></div>';return}mapRounds++;let available=airportPool.filter(a=>!usedAirports.includes(a[0]));target=available[Math.floor(Math.random()*available.length)];usedAirports.push(target[0]);document.getElementById('mapRound').textContent=mapRounds+1;document.getElementById('mapCode').textContent=target[0];document.getElementById('mapName').textContent='Airport location challenge';document.getElementById('mapHint').textContent='Place one pin as close as possible to the airport.';document.getElementById('distance').textContent='—';document.getElementById('mapNext').style.display='none';if(marker){map.removeLayer(marker);marker=null}map.setView([25,10],2)}
 </script>
-</body>
-</html>
+</body></html>
