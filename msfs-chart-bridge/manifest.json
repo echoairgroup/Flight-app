@@ -1,17 +1,25 @@
 {
   "manifest_version": 3,
   "name": "Flight-app MSFS Chart Bridge",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Imports MSFS 2024 Planner charts into Flight-app without exposing the MSFS session token to the Flight-app backend.",
   "permissions": [
     "scripting",
-    "tabs"
+    "tabs",
+    "webRequest",
+    "webRequestBlocking",
+    "webRequestFilterResponse"
   ],
   "host_permissions": [
     "https://planner.flightsimulator.com/*",
     "https://foxtrotatlasprod.blob.core.windows.net/*",
     "https://echo-msfs-charts.onrender.com/*"
   ],
+  "background": {
+    "scripts": [
+      "background.js"
+    ]
+  },
   "action": {
     "default_title": "Flight-app MSFS Chart Bridge",
     "default_popup": "popup.html"
