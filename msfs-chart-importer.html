@@ -26,7 +26,7 @@ input,select,button{font:inherit;padding:11px;border:1px solid #dce3ef;border-ra
 <section><strong>Import log</strong><div id="log"></div></section>
 </main>
 <script>
-const API="https://flight-app-api-g36e.onrender.com";
+const API="https://echo-msfs-charts.onrender.com";
 const PLANNER="https://planner.flightsimulator.com";
 const map={IAC:"APPROACH",SID:"SID",SIDPT:"SID",STAR:"STAR",AOI:"AIRPORT",AGC:"AIRPORT",APC:"AIRPORT",AFC:"AIRPORT",MRC:"ENROUTE"};
 let charts=[];
@@ -105,7 +105,10 @@ async function importCharts(){
     const image=pages[n]?.urls?.light_png||pages[n]?.urls?.dark_png;
     if(!image)throw Error("no image URL");
     s.textContent=" downloading "+(n+1)+"/"+pages.length+"…";
-    const name=(c.meta.name||c.meta.chartName||c.category+" chart")+(pages.length>1?" — Page "+(n+1):"");\n    const ur=await fetch(API+"/api/charts/import-msfs",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({airport_icao:icao,airport_name:"",chart_name:name,chart_type:map[c.category]||"AIRPORT",provider:provider,validity:String(c.meta.validUntil||c.meta.validFrom||""),image_url:image})});\n    const t=await ur.text();let d;try{d=JSON.parse(t)}catch{d=null}\n    if(!ur.ok)throw Error(d?.error||"upload HTTP "+ur.status);
+    const name=(c.meta.name||c.meta.chartName||c.category+" chart")+(pages.length>1?" — Page "+(n+1):"");
+    const ur=await fetch(API+"/api/charts/import-msfs",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({airport_icao:icao,airport_name:"",chart_name:name,chart_type:map[c.category]||"AIRPORT",provider:provider,validity:String(c.meta.validUntil||c.meta.validFrom||""),image_url:image})});
+    const t=await ur.text();let d;try{d=JSON.parse(t)}catch{d=null}
+    if(!ur.ok)throw Error(d?.error||"upload HTTP "+ur.status);
     ok++;
    }
    s.textContent=" imported";s.className="ok";log("OK "+(c.meta.name||c.category));
