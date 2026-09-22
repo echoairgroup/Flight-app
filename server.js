@@ -2106,9 +2106,26 @@ function fetchPlannerJSON(path, redirectCount = 0) {
                     try {
                         resolve(JSON.parse(data));
                     } catch {
+                        const contentType =
+                            String(
+                                response.headers["content-type"] || ""
+                            );
+
+                        const preview =
+                            data
+                                .replace(/\\s+/g, " ")
+                                .trim()
+                                .slice(0, 300);
+
                         reject(
                             new Error(
-                                "MSFS Planner returned invalid JSON."
+                                "MSFS Planner returned invalid JSON" +
+                                (contentType
+                                    ? " (Content-Type: " + contentType + ")"
+                                    : "") +
+                                (preview
+                                    ? " — response starts with: " + preview
+                                    : ".")
                             )
                         );
                     }
