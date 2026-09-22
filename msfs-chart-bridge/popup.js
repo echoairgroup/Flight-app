@@ -209,6 +209,101 @@ async function plannerPages(guid) {
   );
 }
 
+/*
+ * Azure chart PNGs can return HTTP 409 when fetched from the
+ * extension origin. Fetch the image from the actual MSFS Planner
+ * page context instead. This preserves the normal browser request
+ * context (including the Planner page's referrer) without ever
+ * reading or forwarding cookies/tokens ourselves.
+ */
+async function plannerImage(imageUrl) {
+  const tabs = await browser.tabs.query({
+    url: ["https://planner.flightsimulator.com/*"],
+    active: true,
+    currentWindow: true
+  });
+
+  if (!tabs.length) {
+    throw new Error(
+      "Open planner.flightsimulator.com in a Firefox tab and make sure you are logged in."
+    );
+  }
+
+  const tabId = tabs[0].id;
+
+  const results = await browser.scripting.executeScript({
+    target: { tabId },
+    func: async (requestUrl) => {
+      const response = await fetch(requestUrl, {
+        credentials: "include",
+        cache: "no-store",
+        referrerPolicy: "strict-origin-when-cross-origin"
+      });
+
+      const contentType =
+        response.headers.get("content-type") || "";
+
+      if (!response.ok) {
+        return {
+          ok: false,
+          status: response.status,
+          contentType
+        };
+      }
+
+      const buffer = await response.arrayBuffer();
+
+      return {
+        ok: true,
+        status: response.status,
+        contentType,
+        buffer
+      };
+    },
+    args: [imageUrl]
+  });
+
+  if (!results || !results.length) {
+    throw new Error("The Planner tab returned no image result.");
+  }
+
+  if (results[0].error) {
+    throw new Error(
+      results[0].error.message ||
+      "The Planner page could not download the chart image."
+    );
+  }
+
+  const result = results[0].result;
+
+  if (!result?.ok) {
+    throw new Error(
+      "MSFS chart image returned HTTP " +
+      (result?.status ?? "unknown")
+    );
+  }
+
+  if (!result.buffer) {
+    throw new Error("MSFS Planner returned an empty chart image.");
+  }
+
+  const mime =
+    String(result.contentType || "").split(";")[0].trim().toLowerCase();
+
+  if (!mime.startsWith("image/")) {
+    throw new Error(
+      "MSFS chart response was not an image (" +
+      (mime || "unknown") +
+      ")."
+    );
+  }
+
+  return new Blob(
+    [result.buffer],
+    { type: mime }
+  );
+}
+
 async function getAirportName(icao) {
   try {
     const response = await fetch(
@@ -275,29 +370,9 @@ async function importSelected() {
           name +
           (pages.length > 1 ? " — Page " + (pageIndex + 1) : "");
 
-        log("Downloading image in Firefox: " + pageName);
+        log("Downloading image in MSFS Planner page: " + pageName);
 
-        const imageResponse = await fetch(imageUrl, {
-          credentials: "include",
-          cache: "no-store"
-        });
-
-        if (!imageResponse.ok) {
-          throw new Error(
-            "MSFS chart image returned HTTP " +
-            imageResponse.status
-          );
-        }
-
-        const imageBlob = await imageResponse.blob();
-
-        if (!imageBlob.type.startsWith("image/")) {
-          throw new Error(
-            "MSFS chart response was not an image (" +
-            (imageBlob.type || "unknown") +
-            ")."
-          );
-        }
+        const imageBlob = await plannerImage(imageUrl);
 
         const formData = new FormData();
         formData.append("airport_icao", icao);
