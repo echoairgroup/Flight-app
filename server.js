@@ -1983,7 +1983,7 @@ app.post(
 const MSFS_PLANNER_HOST =
     "planner.flightsimulator.com";
 
-function fetchPlannerJSON(path) {
+function fetchPlannerJSON(path, redirectCount = 0) {
     return new Promise((resolve, reject) => {
         let parsed;
 
@@ -1998,6 +1998,16 @@ function fetchPlannerJSON(path) {
             return;
         }
 
+        if (parsed.hostname !== MSFS_PLANNER_HOST) {
+            reject(new Error("Invalid MSFS Planner redirect host."));
+            return;
+        }
+
+        if (redirectCount > 5) {
+            reject(new Error("Too many MSFS Planner redirects."));
+            return;
+        }
+
         const request = https.get(
             parsed,
             {
@@ -2009,6 +2019,62 @@ function fetchPlannerJSON(path) {
                 }
             },
             response => {
+                const status = response.statusCode || 0;
+
+                // MSFS Planner currently returns a temporary redirect for
+                // some chart API URLs. Node's https.get does not follow
+                // redirects automatically, so follow only same-host HTTPS
+                // redirects and never forward cookies or credentials.
+                if (
+                    [301, 302, 303, 307, 308].includes(status) &&
+                    response.headers.location
+                ) {
+                    const location = response.headers.location;
+
+                    response.resume();
+
+                    let redirectUrl;
+
+                    try {
+                        redirectUrl = new URL(
+                            location,
+                            parsed
+                        );
+                    } catch {
+                        reject(
+                            new Error(
+                                "MSFS Planner returned an invalid redirect."
+                            )
+                        );
+                        return;
+                    }
+
+                    if (
+                        redirectUrl.protocol !== "https:" ||
+                        redirectUrl.hostname !== MSFS_PLANNER_HOST
+                    ) {
+                        reject(
+                            new Error(
+                                "MSFS Planner redirect points outside the official Planner host."
+                            )
+                        );
+                        return;
+                    }
+
+                    const nextPath =
+                        redirectUrl.pathname +
+                        redirectUrl.search;
+
+                    fetchPlannerJSON(
+                        nextPath,
+                        redirectCount + 1
+                    )
+                        .then(resolve)
+                        .catch(reject);
+
+                    return;
+                }
+
                 let data = "";
 
                 response.setEncoding("utf8");
@@ -2025,13 +2091,13 @@ function fetchPlannerJSON(path) {
 
                 response.on("end", () => {
                     if (
-                        response.statusCode < 200 ||
-                        response.statusCode >= 300
+                        status < 200 ||
+                        status >= 300
                     ) {
                         reject(
                             new Error(
                                 "MSFS Planner returned HTTP " +
-                                response.statusCode
+                                status
                             )
                         );
                         return;
