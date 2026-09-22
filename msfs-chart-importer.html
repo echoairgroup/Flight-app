@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MSFS Chart Importer</title>
+<style>
+body{font-family:Arial,sans-serif;background:#f4f7fb;color:#172033;margin:0;padding:32px}
+main{max-width:1100px;margin:auto}section{background:#fff;border:1px solid #e4e9f2;border-radius:16px;padding:24px;margin-bottom:20px}
+input,select,button{font:inherit;padding:11px;border:1px solid #dce3ef;border-radius:9px}input,select{width:220px}button{cursor:pointer;background:#5b7cfa;color:#fff;border:0;font-weight:700}.row{display:flex;gap:10px;flex-wrap:wrap}.item{padding:10px;border:1px solid #e4e9f2;border-radius:10px;margin:7px 0}.muted{color:#758096;font-size:13px}.ok{color:#168363}.err{color:#c84450}#log{white-space:pre-wrap;background:#111827;color:#dbe4f0;padding:12px;border-radius:10px;max-height:250px;overflow:auto}
+</style>
+</head>
+<body>
+<main>
+<section>
+<h1>MSFS 2024 Bulk Chart Importer</h1>
+<p class="muted">Loads the MSFS Planner chart index and imports the chart PNG pages into the Flight App chart database. Do not paste an ApiToken here.</p>
+<div class="row"><input id="icao" maxlength="4" placeholder="EHAM"><select id="provider"><option>LIDO</option><option>FAA</option></select><button id="load">Load charts</button></div>
+<p id="message" class="muted"></p>
+</section>
+<section>
+<div class="row"><button id="all">Select all</button><button id="none">Clear</button><button id="import">Import selected</button></div>
+<p id="count" class="muted">No charts loaded.</p>
+<div id="list"></div>
+</section>
+<section><strong>Import log</strong><div id="log"></div></section>
+</main>
+<script>
+const API="https://flight-app-api-g36e.onrender.com";
+const PLANNER="https://planner.flightsimulator.com";
+const map={IAC:"APPROACH",SID:"SID",SIDPT:"SID",STAR:"STAR",AOI:"AIRPORT",AGC:"AIRPORT",APC:"AIRPORT",AFC:"AIRPORT",MRC:"ENROUTE"};
+let charts=[];
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function log(s){$("log").textContent+=s+"\n";$("log").scrollTop=$("log").scrollHeight}
+async function json(url){const r=await fetch(url,{credentials:"include",headers:{Accept:"application/json"}});const t=await r.text();let d;try{d=JSON.parse(t)}catch{d=null}if(!r.ok)throw Error("HTTP "+r.status+" from "+url);return d}
+async function loadCharts(){
+ const icao=$("icao").value.trim().toUpperCase(),provider=$("provider").value;
+ if(!/^[A-Z]{4}$/.test(icao)){ $("message").textContent="Enter a valid ICAO."; return; }
+ $("load").disabled=true;$("message").textContent="Loading…";
+ try{
+  let d=null;
+  const urls=[
+   PLANNER+"/api/v1/charts/A/"+encodeURIComponent(icao)+"?provider="+encodeURIComponent(provider),
+   PLANNER+"/api/v1/charts/"+encodeURIComponent(icao)+"?provider="+encodeURIComponent(provider)
+  ];
+  for(const u of urls){try{d=await json(u);break}catch(e){}}
+  if(!d?.charts)throw Error("Could not load the MSFS chart index. Open this page while logged into the MSFS Planner.");
+  charts=[];
+  for(const [category,items] of Object.entries(d.charts)){if(!Array.isArray(items))continue;for(const meta of items){if(meta?.guid)charts.push({category,meta})}}
+  $("count").textContent=charts.length+" charts found for "+icao+" / "+provider;
+  $("list").innerHTML=charts.map((c,i)=>'<div class="item"><label><input type="checkbox" data-i="'+i+'" checked> <b>'+esc(c.meta.name||c.meta.chartName||c.category+" chart")+'</b> <span class="muted">'+esc(c.category)+' · '+esc(c.meta.guid)+'</span></label><span id="s'+i+'"></span></div>').join("");
+  $("message").textContent="Chart index loaded.";
+ }catch(e){$("message").textContent=e.message;$("message").className="err"}finally{$("load").disabled=false}
+}
+$("load").onclick=loadCharts;
+$("icao").oninput=()=>{$("icao").value=$("icao").value.toUpperCase().replace(/[^A-Z]/g,"").slice(0,4)};
+$("all").onclick=()=>document.querySelectorAll('[data-i]').forEach(x=>x.checked=true);
+$("none").onclick=()=>document.querySelectorAll('[data-i]').forEach(x=>x.checked=false);
+async function importCharts(){
+ const icao=$("icao").value.trim().toUpperCase(),provider=$("provider").value;
+ const selected=[...document.querySelectorAll('[data-i]:checked')].map(x=>+x.dataset.i);
+ if(!selected.length)return;
+ $("import").disabled=true;
+ let ok=0,fail=0;
+ for(const i of selected){
+  const c=charts[i],s=$("s"+i);
+  try{
+   s.textContent=" loading pages…";
+   const p=await json(PLANNER+"/api/v1/charts/pages/"+encodeURIComponent(c.meta.guid));
+   const pages=p?.pages||[];
+   for(let n=0;n<pages.length;n++){
+    const image=pages[n]?.urls?.light_png||pages[n]?.urls?.dark_png;
+    if(!image)throw Error("no image URL");
+    s.textContent=" downloading "+(n+1)+"/"+pages.length+"…";
+    const ir=await fetch(image);if(!ir.ok)throw Error("image HTTP "+ir.status);
+    const blob=await ir.blob();
+    const name=(c.meta.name||c.meta.chartName||c.category+" chart")+(pages.length>1?" — Page "+(n+1):"");
+    const fd=new FormData();
+    fd.append("airport_icao",icao);fd.append("chart_name",name);fd.append("chart_type",map[c.category]||"AIRPORT");fd.append("provider",provider);
+    fd.append("image",new File([blob],icao+"_"+c.meta.guid+"_"+(n+1)+".png",{type:blob.type||"image/png"}));
+    const ur=await fetch(API+"/api/charts",{method:"POST",body:fd});const t=await ur.text();let d;try{d=JSON.parse(t)}catch{d=null}
+    if(!ur.ok)throw Error(d?.error||"upload HTTP "+ur.status);
+    ok++;
+   }
+   s.textContent=" imported";s.className="ok";log("OK "+(c.meta.name||c.category));
+  }catch(e){fail++;s.textContent=" failed";s.className="err";log("FAIL "+(c.meta.name||c.category)+": "+e.message)}
+ }
+ $("import").disabled=false;$("message").textContent="Finished: "+ok+" pages imported, "+fail+" chart entries failed.";
+}
+$("import").onclick=importCharts;
+</script>
+</body>
+</html>
