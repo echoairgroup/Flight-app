@@ -1611,6 +1611,362 @@ app.get(
 
 /*
 |--------------------------------------------------------------------------
+| MSFS CHART IMPORT - REMOTE IMAGE
+|--------------------------------------------------------------------------
+|
+| The MSFS Planner returns Azure Blob PNG URLs. The browser importer sends
+| the selected image URL here so the backend can download the image without
+| relying on browser CORS. Only the official MSFS chart blob host is allowed.
+|
+|--------------------------------------------------------------------------
+*/
+
+const MSFS_CHART_HOST =
+    "foxtrotatlasprod.blob.core.windows.net";
+
+function fetchBinary(
+    url
+) {
+
+    return new Promise(
+        (
+            resolve,
+            reject
+        ) => {
+
+            let parsed;
+
+            try {
+                parsed = new URL(url);
+            } catch {
+                reject(
+                    new Error("Invalid image URL.")
+                );
+                return;
+            }
+
+            if (
+                parsed.protocol !== "https:" ||
+                parsed.hostname !== MSFS_CHART_HOST
+            ) {
+                reject(
+                    new Error(
+                        "Only official MSFS chart image URLs are allowed."
+                    )
+                );
+                return;
+            }
+
+            const request =
+                https.get(
+                    parsed,
+                    {
+                        headers: {
+                            "User-Agent":
+                                "Flight-App/1.0",
+                            Accept:
+                                "image/png,image/jpeg,image/webp"
+                        }
+                    },
+                    response => {
+
+                        if (
+                            response.statusCode < 200 ||
+                            response.statusCode >= 300
+                        ) {
+                            response.resume();
+                            reject(
+                                new Error(
+                                    `MSFS chart image returned HTTP ${response.statusCode}`
+                                )
+                            );
+                            return;
+                        }
+
+                        const chunks = [];
+                        let total = 0;
+                        const maxBytes =
+                            15 * 1024 * 1024;
+
+                        response.on(
+                            "data",
+                            chunk => {
+
+                                total += chunk.length;
+
+                                if (
+                                    total > maxBytes
+                                ) {
+                                    request.destroy(
+                                        new Error(
+                                            "MSFS chart image exceeds the 15 MB limit."
+                                        )
+                                    );
+                                    return;
+                                }
+
+                                chunks.push(chunk);
+                            }
+                        );
+
+                        response.on(
+                            "end",
+                            () => {
+
+                                resolve(
+                                    {
+                                        buffer:
+                                            Buffer.concat(
+                                                chunks
+                                            ),
+                                        contentType:
+                                            String(
+                                                response.headers[
+                                                    "content-type"
+                                                ] ||
+                                                "image/png"
+                                            )
+                                                .split(";")[0]
+                                    }
+                                );
+
+                            }
+                        );
+                    }
+                );
+
+            request.on(
+                "error",
+                reject
+            );
+
+            request.setTimeout(
+                30000,
+                () => {
+
+                    request.destroy();
+
+                    reject(
+                        new Error(
+                            "MSFS chart image request timed out."
+                        )
+                    );
+                }
+            );
+        }
+    );
+}
+
+app.post(
+    "/api/charts/import-msfs",
+    async (
+        req,
+        res
+    ) => {
+
+        try {
+
+            const airportICAO =
+                String(
+                    req.body.airport_icao ||
+                    ""
+                )
+                    .trim()
+                    .toUpperCase();
+
+            const airportName =
+                cleanString(
+                    req.body.airport_name,
+                    200
+                );
+
+            const chartName =
+                cleanString(
+                    req.body.chart_name,
+                    200
+                );
+
+            const chartType =
+                String(
+                    req.body.chart_type ||
+                    "AIRPORT"
+                )
+                    .trim()
+                    .toUpperCase();
+
+            const provider =
+                String(
+                    req.body.provider ||
+                    "LIDO"
+                )
+                    .trim()
+                    .toUpperCase();
+
+            const validity =
+                cleanString(
+                    req.body.validity,
+                    200
+                );
+
+            const imageUrl =
+                cleanString(
+                    req.body.image_url,
+                    2000
+                );
+
+            if (
+                !validICAO(
+                    airportICAO
+                )
+            ) {
+                return res.status(400).json({
+                    available: false,
+                    error:
+                        "A valid 4-letter ICAO code is required."
+                });
+            }
+
+            if (
+                !chartName
+            ) {
+                return res.status(400).json({
+                    available: false,
+                    error:
+                        "Chart name is required."
+                });
+            }
+
+            if (
+                !validChartType(chartType)
+            ) {
+                return res.status(400).json({
+                    available: false,
+                    error:
+                        "Invalid chart type."
+                });
+            }
+
+            if (
+                !validChartProvider(provider)
+            ) {
+                return res.status(400).json({
+                    available: false,
+                    error:
+                        "Invalid chart provider."
+                });
+            }
+
+            if (
+                !imageUrl
+            ) {
+                return res.status(400).json({
+                    available: false,
+                    error:
+                        "MSFS chart image URL is required."
+                });
+            }
+
+            const remote =
+                await fetchBinary(
+                    imageUrl
+                );
+
+            const mimeType =
+                [
+                    "image/png",
+                    "image/jpeg",
+                    "image/webp"
+                ].includes(
+                    remote.contentType
+                )
+                    ? remote.contentType
+                    : "image/png";
+
+            const extension =
+                mimeType === "image/jpeg"
+                    ? "jpg"
+                    : mimeType === "image/webp"
+                        ? "webp"
+                        : "png";
+
+            const safeFileName =
+                `${airportICAO}_MSFS_${provider}_${Date.now()}.${extension}`;
+
+            const result =
+                await pool.query(
+                    `
+                    INSERT INTO charts
+                    (
+                        airport_icao,
+                        airport_name,
+                        chart_name,
+                        chart_type,
+                        provider,
+                        file_name,
+                        mime_type,
+                        image_data,
+                        validity
+                    )
+                    VALUES
+                    ($1,$2,$3,$4,$5,$6,$7,$8,$9)
+                    RETURNING
+                        id,
+                        airport_icao,
+                        airport_name,
+                        chart_name,
+                        chart_type,
+                        provider,
+                        file_name,
+                        mime_type,
+                        validity,
+                        created_at
+                    `,
+                    [
+                        airportICAO,
+                        airportName || null,
+                        chartName,
+                        chartType,
+                        provider,
+                        safeFileName,
+                        mimeType,
+                        remote.buffer,
+                        validity || null
+                    ]
+                );
+
+            const chart =
+                result.rows[0];
+
+            return res.status(201).json({
+                available: true,
+                message:
+                    "MSFS chart imported successfully.",
+                chart: {
+                    ...chart,
+                    imageUrl:
+                        `${getBaseUrl(req)}/api/charts/${chart.id}/image`
+                }
+            });
+
+        } catch (error) {
+
+            console.error(
+                "MSFS chart import failed:",
+                error.message
+            );
+
+            return res.status(500).json({
+                available: false,
+                error:
+                    error.message ||
+                    "Could not import MSFS chart."
+            });
+        }
+    }
+);
+
+/*
+|--------------------------------------------------------------------------
 | UPLOAD CHART
 |--------------------------------------------------------------------------
 */
