@@ -37,34 +37,28 @@ function esc(value) {
 }
 
 async function plannerJSON(url) {
-  const response = await fetch(url, {
-    credentials: "include",
-    headers: { Accept: "application/json" }
+  const tabs = await browser.tabs.query({
+    url: ["https://planner.flightsimulator.com/*"],
+    active: true,
+    currentWindow: true
   });
 
-  const text = await response.text();
-  let data = null;
-
-  try { data = JSON.parse(text); } catch {}
-
-  if (!response.ok) {
-    throw new Error("MSFS Planner HTTP " + response.status);
+  if (!tabs.length) {
+    throw new Error("Open planner.flightsimulator.com in a Firefox tab and make sure you are logged in.");
   }
 
-  if (!data) {
-    const preview = text.replace(/\s+/g, " ").trim().slice(0, 180);
-    if (/<!doctype html|<html/i.test(text)) {
-      throw new Error(
-        "MSFS Planner returned its web page instead of JSON. Make sure you are logged in to planner.flightsimulator.com."
-      );
-    }
+  const tabId = tabs[0].id;
+
+  try {
+    return await browser.tabs.sendMessage(tabId, {
+      type: "MSFS_PLANNER_FETCH_JSON",
+      url
+    });
+  } catch (error) {
     throw new Error(
-      "MSFS Planner returned invalid JSON" +
-      (preview ? " — " + preview : ".")
+      "Could not connect to the MSFS Planner tab. Open the Planner in Firefox, then reload the extension."
     );
   }
-
-  return data;
 }
 
 function msfsAirportIdentifier(icao) {
