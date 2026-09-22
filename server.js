@@ -1759,6 +1759,7 @@ function fetchBinary(
 
 app.post(
     "/api/charts/import-msfs",
+    imageUpload.single("image"),
     async (
         req,
         res
@@ -1857,19 +1858,33 @@ app.post(
             }
 
             if (
-                !imageUrl
+                !imageUrl &&
+                !req.file
             ) {
                 return res.status(400).json({
                     available: false,
                     error:
-                        "MSFS chart image URL is required."
+                        "MSFS chart image is required."
                 });
             }
 
-            const remote =
-                await fetchBinary(
-                    imageUrl
-                );
+            let remote;
+
+            if (req.file) {
+                remote = {
+                    buffer: req.file.buffer,
+                    contentType:
+                        String(
+                            req.file.mimetype ||
+                            "image/png"
+                        ).split(";")[0]
+                };
+            } else {
+                remote =
+                    await fetchBinary(
+                        imageUrl
+                    );
+            }
 
             const mimeType =
                 [
