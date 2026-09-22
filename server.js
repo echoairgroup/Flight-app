@@ -11,7 +11,7 @@ const app = express();
 
 const PORT = process.env.PORT || 3000;
 
-const API_VERSION = "1.4.0";
+const API_VERSION = "1.5.0";
 
 /*
 |--------------------------------------------------------------------------
@@ -1960,6 +1960,236 @@ app.post(
                 error:
                     error.message ||
                     "Could not import MSFS chart."
+            });
+        }
+    }
+);
+
+/*
+|--------------------------------------------------------------------------
+| MSFS PLANNER CHART PROXY
+|--------------------------------------------------------------------------
+|
+| The MSFS Planner chart service is not CORS-enabled for Flight-app pages.
+| Keep Planner communication on the backend instead of trying to read it
+| directly from the browser. No user ApiToken/cookie is accepted or stored.
+|
+| The airport value used by the Planner API is the fixed-width FsIcao value
+| ("A      EHAM "), which is why a normal /EHAM URL does not work.
+|
+|--------------------------------------------------------------------------
+*/
+
+const MSFS_PLANNER_HOST =
+    "planner.flightsimulator.com";
+
+function fetchPlannerJSON(path) {
+    return new Promise((resolve, reject) => {
+        let parsed;
+
+        try {
+            parsed = new URL(
+                "https://" +
+                MSFS_PLANNER_HOST +
+                path
+            );
+        } catch {
+            reject(new Error("Invalid MSFS Planner URL."));
+            return;
+        }
+
+        const request = https.get(
+            parsed,
+            {
+                headers: {
+                    "User-Agent":
+                        "Flight-App/1.0 (MSFS chart importer)",
+                    Accept: "application/json",
+                    "Accept-Encoding": "identity"
+                }
+            },
+            response => {
+                let data = "";
+
+                response.setEncoding("utf8");
+
+                response.on("data", chunk => {
+                    data += chunk;
+
+                    if (data.length > 10 * 1024 * 1024) {
+                        request.destroy(
+                            new Error("MSFS Planner response is too large.")
+                        );
+                    }
+                });
+
+                response.on("end", () => {
+                    if (
+                        response.statusCode < 200 ||
+                        response.statusCode >= 300
+                    ) {
+                        reject(
+                            new Error(
+                                "MSFS Planner returned HTTP " +
+                                response.statusCode
+                            )
+                        );
+                        return;
+                    }
+
+                    try {
+                        resolve(JSON.parse(data));
+                    } catch {
+                        reject(
+                            new Error(
+                                "MSFS Planner returned invalid JSON."
+                            )
+                        );
+                    }
+                });
+            }
+        );
+
+        request.on("error", reject);
+
+        request.setTimeout(20000, () => {
+            request.destroy();
+            reject(
+                new Error("MSFS Planner request timed out.")
+            );
+        });
+    });
+}
+
+function msfsAirportIdentifier(icao) {
+    return (
+        "A" +
+        " ".repeat(6) +
+        String(icao).trim().toUpperCase() +
+        " "
+    );
+}
+
+app.get(
+    "/api/msfs/charts/index",
+    async (req, res) => {
+        try {
+            const airport = String(req.query.icao || "")
+                .trim()
+                .toUpperCase();
+
+            const provider = String(req.query.provider || "LIDO")
+                .trim()
+                .toUpperCase();
+
+            if (!validICAO(airport)) {
+                return res.status(400).json({
+                    available: false,
+                    error: "A valid 4-letter ICAO code is required."
+                });
+            }
+
+            if (!validChartProvider(provider)) {
+                return res.status(400).json({
+                    available: false,
+                    error: "Provider must be LIDO or FAA."
+                });
+            }
+
+            const fixedAirport = msfsAirportIdentifier(airport);
+            const encodedAirport = encodeURIComponent(fixedAirport);
+
+            const candidates = [
+                "/api/v1/charts/" +
+                    encodedAirport +
+                    "?provider=" +
+                    encodeURIComponent(provider),
+                "/api/v1/charts/A/" +
+                    encodeURIComponent(airport) +
+                    "?provider=" +
+                    encodeURIComponent(provider),
+                "/api/v1/charts/" +
+                    encodeURIComponent(airport) +
+                    "?provider=" +
+                    encodeURIComponent(provider)
+            ];
+
+            let lastError = null;
+
+            for (const path of candidates) {
+                try {
+                    const data = await fetchPlannerJSON(path);
+
+                    if (data && data.charts) {
+                        return res.json({
+                            available: true,
+                            airport_icao: airport,
+                            provider,
+                            data
+                        });
+                    }
+
+                    lastError = new Error(
+                        "Planner response did not contain charts."
+                    );
+                } catch (error) {
+                    lastError = error;
+                }
+            }
+
+            throw lastError ||
+                new Error("Could not load MSFS chart index.");
+        } catch (error) {
+            console.error(
+                "MSFS Planner index proxy failed:",
+                error.message
+            );
+
+            return res.status(502).json({
+                available: false,
+                error:
+                    "Could not load the MSFS Planner chart index: " +
+                    error.message
+            });
+        }
+    }
+);
+
+app.get(
+    "/api/msfs/charts/pages/:guid",
+    async (req, res) => {
+        try {
+            const guid = String(req.params.guid || "").trim();
+
+            if (
+                !/^[0-9a-fA-F-]{36}$/.test(guid)
+            ) {
+                return res.status(400).json({
+                    available: false,
+                    error: "Invalid chart GUID."
+                });
+            }
+
+            const data = await fetchPlannerJSON(
+                "/api/v1/charts/pages/" +
+                    encodeURIComponent(guid)
+            );
+
+            return res.json({
+                available: true,
+                data
+            });
+        } catch (error) {
+            console.error(
+                "MSFS Planner pages proxy failed:",
+                error.message
+            );
+
+            return res.status(502).json({
+                available: false,
+                error:
+                    "Could not load MSFS chart pages: " +
+                    error.message
             });
         }
     }
