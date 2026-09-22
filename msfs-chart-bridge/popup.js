@@ -154,11 +154,11 @@ async function loadCharts() {
   try {
     const encodedAirport = encodeURIComponent(msfsAirportIdentifier(icao));
     const candidates = [
+      PLANNER + "/api/v1/charts/index/" + encodedAirport +
+        "?provider=" + encodeURIComponent(provider),
       PLANNER + "/api/v1/charts/" + encodedAirport +
         "?provider=" + encodeURIComponent(provider),
-      PLANNER + "/api/v1/charts/A/" + encodeURIComponent(icao) +
-        "?provider=" + encodeURIComponent(provider),
-      PLANNER + "/api/v1/charts/" + encodeURIComponent(icao) +
+      PLANNER + "/api/v1/charts/index/A/" + encodeURIComponent(icao) +
         "?provider=" + encodeURIComponent(provider)
     ];
 
