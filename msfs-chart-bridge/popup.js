@@ -210,11 +210,12 @@ async function plannerPages(guid) {
 }
 
 /*
- * Azure chart PNGs can return HTTP 409 when fetched from the
- * extension origin. Fetch the image from the actual MSFS Planner
- * page context instead. This preserves the normal browser request
- * context (including the Planner page's referrer) without ever
- * reading or forwarding cookies/tokens ourselves.
+ * The Planner loads chart PNGs as normal cross-origin image resources.
+ * Firefox's webRequest.filterResponseData API lets the extension observe
+ * those exact response bytes while still passing them through to Planner.
+ *
+ * We deliberately do NOT fetch the Azure URL ourselves and we never read
+ * or forward the Planner session cookies/tokens.
  */
 async function plannerImage(imageUrl) {
   const tabs = await browser.tabs.query({
@@ -229,74 +230,38 @@ async function plannerImage(imageUrl) {
     );
   }
 
-  const tabId = tabs[0].id;
-
-  const results = await browser.scripting.executeScript({
-    target: { tabId },
-    func: async (requestUrl) => {
-      const response = await fetch(requestUrl, {
-        credentials: "include",
-        cache: "no-store",
-        referrerPolicy: "strict-origin-when-cross-origin"
-      });
-
-      const contentType =
-        response.headers.get("content-type") || "";
-
-      if (!response.ok) {
-        return {
-          ok: false,
-          status: response.status,
-          contentType
-        };
-      }
-
-      const buffer = await response.arrayBuffer();
-
-      return {
-        ok: true,
-        status: response.status,
-        contentType,
-        buffer
-      };
-    },
-    args: [imageUrl]
+  const result = await browser.runtime.sendMessage({
+    type: "capturePlannerImage",
+    imageUrl,
+    tabId: tabs[0].id
   });
 
-  if (!results || !results.length) {
-    throw new Error("The Planner tab returned no image result.");
-  }
-
-  if (results[0].error) {
+  if (!result?.buffer) {
     throw new Error(
-      results[0].error.message ||
-      "The Planner page could not download the chart image."
+      result?.error ||
+      "Firefox did not return the MSFS chart image."
     );
-  }
-
-  const result = results[0].result;
-
-  if (!result?.ok) {
-    throw new Error(
-      "MSFS chart image returned HTTP " +
-      (result?.status ?? "unknown")
-    );
-  }
-
-  if (!result.buffer) {
-    throw new Error("MSFS Planner returned an empty chart image.");
   }
 
   const mime =
-    String(result.contentType || "").split(";")[0].trim().toLowerCase();
+    String(result.contentType || "image/png")
+      .split(";")[0]
+      .trim()
+      .toLowerCase();
 
   if (!mime.startsWith("image/")) {
     throw new Error(
-      "MSFS chart response was not an image (" +
+      "MSFS Planner returned an unexpected image type (" +
       (mime || "unknown") +
       ")."
     );
   }
+
+  log(
+    "Captured " +
+    Math.round((result.size || result.buffer.byteLength) / 1024) +
+    " KB from Planner."
+  );
 
   return new Blob(
     [result.buffer],
