@@ -14,7 +14,7 @@ input,select,button{font:inherit;padding:11px;border:1px solid #dce3ef;border-ra
 <main>
 <section>
 <h1>MSFS 2024 Bulk Chart Importer</h1>
-<p class="muted">Loads the MSFS Planner chart index and imports the chart PNG pages into the Flight App chart database. Do not paste an ApiToken here.</p>
+<p class="muted">Loads the MSFS Planner chart index through the Flight-app backend and imports the chart PNG pages into the Flight App chart database. No ApiToken or MSFS cookie is required here.</p>
 <div class="row"><input id="icao" maxlength="4" placeholder="EHAM"><select id="provider"><option>LIDO</option><option>FAA</option></select><button id="load">Load charts</button></div>
 <p id="message" class="muted"></p>
 </section>
@@ -42,29 +42,48 @@ async function json(url){
 }
 async function loadCharts(){
  const icao=$("icao").value.trim().toUpperCase(),provider=$("provider").value;
- if(!/^[A-Z]{4}$/.test(icao)){ $("message").textContent="Enter a valid ICAO."; $("message").className="err"; return; }
- $("load").disabled=true;$("message").className="muted";$("message").textContent="Connecting to MSFS Planner…";
+ if(!/^[A-Z]{4}$/.test(icao)){
+   $("message").textContent="Enter a valid ICAO.";
+   $("message").className="err";
+   return;
+ }
+ $("load").disabled=true;
+ $("message").className="muted";
+ $("message").textContent="Loading MSFS Planner chart index…";
+ log("Loading "+icao+" / "+provider+" through Flight-app backend…");
  try{
-  let d=null,lastError="";
-  const urls=[
-   PLANNER+"/api/v1/charts/A/"+encodeURIComponent(icao)+"?provider="+encodeURIComponent(provider),
-   PLANNER+"/api/v1/charts/"+encodeURIComponent(icao)+"?provider="+encodeURIComponent(provider)
-  ];
-  for(const u of urls){
-   try{d=await json(u);if(d?.charts)break}catch(e){lastError=e.message}
-  }
-  if(!d?.charts)throw Error("MSFS Planner could not be reached from this page. "+lastError);
-  charts=[];
-  for(const [category,items] of Object.entries(d.charts)){
-   if(!Array.isArray(items))continue;
-   for(const meta of items)if(meta?.guid)charts.push({category,meta});
-  }
-  $("count").textContent=charts.length+" charts found for "+icao+" / "+provider;
-  $("list").innerHTML=charts.length?charts.map((c,i)=>'<div class="item"><label><input type="checkbox" data-i="'+i+'" checked> <b>'+esc(c.meta.name||c.meta.chartName||c.category+" chart")+'</b> <span class="muted">'+esc(c.category)+' · '+esc(c.meta.guid)+'</span></label><span id="s'+i+'"></span></div>').join(""):"<p class='muted'>No charts found.</p>";
-  $("message").textContent="Chart index loaded successfully.";
-  $("message").className="ok";
- }catch(e){$("message").textContent=e.message;$("message").className="err";log("LOAD FAILED: "+e.message)}
- finally{$("load").disabled=false}
+   const url=API+"/api/msfs/charts/index?icao="+encodeURIComponent(icao)+"&provider="+encodeURIComponent(provider);
+   const r=await fetch(url,{headers:{Accept:"application/json"}});
+   const text=await r.text();
+   let d=null;
+   try{d=JSON.parse(text)}catch{}
+   if(!r.ok || !d?.available || !d?.data?.charts){
+     throw Error(d?.error||("Backend returned HTTP "+r.status));
+   }
+
+   charts=[];
+   for(const [category,items] of Object.entries(d.data.charts)){
+     if(!Array.isArray(items))continue;
+     for(const meta of items){
+       if(meta?.guid) charts.push({category,meta});
+     }
+   }
+
+   $("count").textContent=charts.length+" charts found for "+icao+" / "+provider;
+   $("list").innerHTML=charts.length
+     ?charts.map((c,i)=>'<div class="item"><label><input type="checkbox" data-i="'+i+'" checked> <b>'+esc(c.meta.name||c.meta.chartName||c.category+" chart")+'</b> <span class="muted">'+esc(c.category)+' · '+esc(c.meta.guid)+'</span></label><span id="s'+i+'"></span></div>').join("")
+     :"<p class='muted'>No charts found.</p>";
+
+   $("message").textContent="Chart index loaded successfully.";
+   $("message").className="ok";
+   log("SUCCESS: "+charts.length+" charts found.");
+ }catch(e){
+   $("message").textContent="Could not load charts: "+e.message;
+   $("message").className="err";
+   log("LOAD FAILED: "+e.message);
+ }finally{
+   $("load").disabled=false;
+ }
 }
 $("load").onclick=loadCharts;
 $("icao").oninput=()=>{$("icao").value=$("icao").value.toUpperCase().replace(/[^A-Z]/g,"").slice(0,4)};
@@ -80,7 +99,7 @@ async function importCharts(){
   const c=charts[i],s=$("s"+i);
   try{
    s.textContent=" loading pages…";
-   const p=await json(PLANNER+"/api/v1/charts/pages/"+encodeURIComponent(c.meta.guid));
+   const p=await json(API+"/api/msfs/charts/pages/"+encodeURIComponent(c.meta.guid));
    const pages=p?.pages||[];
    for(let n=0;n<pages.length;n++){
     const image=pages[n]?.urls?.light_png||pages[n]?.urls?.dark_png;
