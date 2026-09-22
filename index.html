@@ -22,7 +22,7 @@
 <div class="screen">
 <header class="topbar">
 <a class="brand" href="index.html" aria-label="Flight App Home"><div class="brand-icon"><i class="fa-solid fa-plane-up"></i></div><div><div class="brand-title">FLIGHT APP</div><div class="brand-sub">Electronic Flight Bag</div></div></a>
-<div class="status"><div class="status-item online"><i class="fa-solid fa-circle"></i> ONLINE</div><div class="status-item"><i class="fa-solid fa-wifi"></i> CONNECTED</div><div class="status-item clock" id="clock">--:--</div><div class="status-item"><div class="battery"><div class="battery-level"></div></div></div></div>
+<div class="status"><div class="status-item online"><i class="fa-solid fa-circle"></i> ONLINE</div><div class="status-item"><i class="fa-solid fa-wifi"></i> CONNECTED</div><div class="status-item clock" id="clock">--:--</div><button class="settings-button" type="button" onclick="openSettings()" aria-label="Home settings" title="Home settings"><i class="fa-solid fa-gear"></i></button><div class="status-item"><div class="battery"><div class="battery-level"></div></div></div></div>
 </header>
 <main class="content">
 <section class="welcome"><div><div class="eyebrow">Flight operations</div><h1>Welcome to your EFB</h1><p>All your flight-simulation tools in one cockpit-ready interface.</p></div><div class="aircraft"><div class="aircraft-label">Current profile</div><div class="aircraft-value"><i class="fa-solid fa-plane"></i> Flight Simulator</div></div></section>
@@ -36,8 +36,6 @@
 <a class="app cyan" href="aircraft.html"><div class="app-icon"><i class="fa-solid fa-plane"></i></div><div><div class="app-name">Aircraft Library</div><div class="app-desc">Aircraft specs &amp; reference</div></div><i class="fa-solid fa-chevron-right app-arrow"></i></a>
 <a class="app green" href="flight-log.html"><div class="app-icon"><i class="fa-solid fa-book"></i></div><div><div class="app-name">Flight Logbook</div><div class="app-desc">Track your simulator flights</div></div><i class="fa-solid fa-chevron-right app-arrow"></i></a>
 <a class="app purple" href="planner.html"><div class="app-icon"><i class="fa-solid fa-compass"></i></div><div><div class="app-name">Flight Planner</div><div class="app-desc">Plan your next flight</div></div><i class="fa-solid fa-chevron-right app-arrow"></i></a>
-<a class="app pink" href="charts.html"><div class="app-icon"><i class="fa-solid fa-book-open"></i></div><div><div class="app-name">Documents</div><div class="app-desc">Charts &amp; references</div></div><i class="fa-solid fa-chevron-right app-arrow"></i></a>
-<a class="app gray" href="checklists.html"><div class="app-icon"><i class="fa-solid fa-plane-circle-check"></i></div><div><div class="app-name">Aircraft</div><div class="app-desc">Aircraft checklists</div></div><i class="fa-solid fa-chevron-right app-arrow"></i></a>
 <a class="app red" href="index.html" onclick="showAbout(event)"><div class="app-icon"><i class="fa-solid fa-circle-info"></i></div><div><div class="app-name">About EFB</div><div class="app-desc">System information</div></div><i class="fa-solid fa-chevron-right app-arrow"></i></a>
 </section>
 <section class="lower">
@@ -50,6 +48,111 @@
 <script>
 function updateClock(){const now=new Date();document.getElementById('clock').textContent=now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});}updateClock();setInterval(updateClock,1000);
 function showAbout(e){e.preventDefault();alert('Flight App EFB\n\nElectronic Flight Bag for Microsoft Flight Simulator.\n\nUse the applications above to access weather, charts, checklists, SimBrief and flight planning.');}
+
+const BACKGROUND_KEY='flightAppHomeBackground';
+
+function openSettings(){
+  document.getElementById('settingsOverlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeSettings(e){
+  if(e && e.target!==e.currentTarget) return;
+  document.getElementById('settingsOverlay').classList.remove('open');
+  document.body.style.overflow='';
+}
+function applySavedBackground(){
+  const saved=localStorage.getItem(BACKGROUND_KEY);
+  const screen=document.querySelector('.screen');
+  const preview=document.getElementById('backgroundPreview');
+  if(saved){
+    screen.classList.add('custom-background');
+    screen.style.setProperty('--custom-bg', 'url("'+saved.replace(/"/g,'\\\"')+'")');
+    preview.classList.add('has-image');
+    preview.style.backgroundImage='url("'+saved.replace(/"/g,'\\\"')+'")';
+    preview.innerHTML='';
+    document.getElementById('backgroundStatus').textContent='Custom background active';
+  }else{
+    screen.classList.remove('custom-background');
+    screen.style.removeProperty('--custom-bg');
+    preview.classList.remove('has-image');
+    preview.style.backgroundImage='';
+    preview.innerHTML='<div class="preview-empty"><i class="fa-regular fa-image"></i><span>No custom background selected</span></div>';
+    document.getElementById('backgroundStatus').textContent='Saved on this device';
+  }
+}
+function handleBackgroundUpload(event){
+  const file=event.target.files && event.target.files[0];
+  if(!file) return;
+  if(!/^image\/(jpeg|png|webp)$/.test(file.type)){
+    alert('Please choose a JPG, PNG or WebP image.');
+    event.target.value='';
+    return;
+  }
+  const reader=new FileReader();
+  reader.onload=function(){
+    const img=new Image();
+    img.onload=function(){
+      const max=2400;
+      const scale=Math.min(1,max/Math.max(img.width,img.height));
+      const canvas=document.createElement('canvas');
+      canvas.width=Math.max(1,Math.round(img.width*scale));
+      canvas.height=Math.max(1,Math.round(img.height*scale));
+      const ctx=canvas.getContext('2d');
+      ctx.drawImage(img,0,0,canvas.width,canvas.height);
+      const compressed=canvas.toDataURL('image/jpeg',.82);
+      try{
+        localStorage.setItem(BACKGROUND_KEY,compressed);
+        applySavedBackground();
+      }catch(err){
+        alert('This image is too large for browser storage. Please choose a smaller image.');
+      }
+      event.target.value='';
+    };
+    img.src=reader.result;
+  };
+  reader.readAsDataURL(file);
+}
+function resetBackground(){
+  localStorage.removeItem(BACKGROUND_KEY);
+  applySavedBackground();
+}
+applySavedBackground();
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeSettings();});
 </script>
+
+<div class="settings-overlay" id="settingsOverlay" onclick="closeSettings(event)">
+  <section class="settings-panel" role="dialog" aria-modal="true" aria-labelledby="settingsTitle" onclick="event.stopPropagation()">
+    <div class="settings-head">
+      <div>
+        <div class="settings-kicker">Home page</div>
+        <h2 id="settingsTitle">Home settings</h2>
+        <p>Personalize the EFB home screen without changing the rest of Flight App.</p>
+      </div>
+      <button class="settings-close" type="button" onclick="closeSettings()" aria-label="Close settings"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-title"><i class="fa-solid fa-image"></i><div><strong>Custom background</strong><span>Use your own image behind the EFB screen.</span></div></div>
+      <label class="upload-box" for="backgroundInput">
+        <i class="fa-solid fa-cloud-arrow-up"></i>
+        <strong>Choose background image</strong>
+        <span>JPG, PNG or WebP • automatically resized for performance</span>
+        <input id="backgroundInput" type="file" accept="image/jpeg,image/png,image/webp" onchange="handleBackgroundUpload(event)">
+      </label>
+      <div class="background-preview" id="backgroundPreview">
+        <div class="preview-empty"><i class="fa-regular fa-image"></i><span>No custom background selected</span></div>
+      </div>
+      <div class="settings-actions">
+        <button class="settings-action secondary" type="button" onclick="resetBackground()"><i class="fa-solid fa-trash-can"></i> Remove background</button>
+        <span class="settings-note" id="backgroundStatus">Saved on this device</span>
+      </div>
+    </div>
+
+    <div class="settings-footer">
+      <span><i class="fa-solid fa-lock"></i> Your background is stored locally in this browser.</span>
+      <button class="settings-done" type="button" onclick="closeSettings()">Done</button>
+    </div>
+  </section>
+</div>
 </body>
 </html>
