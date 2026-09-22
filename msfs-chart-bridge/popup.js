@@ -275,27 +275,61 @@ async function importSelected() {
           name +
           (pages.length > 1 ? " — Page " + (pageIndex + 1) : "");
 
+        log("Downloading image in Firefox: " + pageName);
+
+        const imageResponse = await fetch(imageUrl, {
+          credentials: "include",
+          cache: "no-store"
+        });
+
+        if (!imageResponse.ok) {
+          throw new Error(
+            "MSFS chart image returned HTTP " +
+            imageResponse.status
+          );
+        }
+
+        const imageBlob = await imageResponse.blob();
+
+        if (!imageBlob.type.startsWith("image/")) {
+          throw new Error(
+            "MSFS chart response was not an image (" +
+            (imageBlob.type || "unknown") +
+            ")."
+          );
+        }
+
+        const formData = new FormData();
+        formData.append("airport_icao", icao);
+        formData.append("airport_name", airportName);
+        formData.append("chart_name", pageName);
+        formData.append(
+          "chart_type",
+          MAP[chart.category] || "AIRPORT"
+        );
+        formData.append("provider", provider);
+        formData.append(
+          "validity",
+          String(
+            chart.meta?.validUntil ||
+            chart.meta?.validFrom ||
+            ""
+          )
+        );
+        formData.append(
+          "image",
+          imageBlob,
+          pageName.replace(/[^a-z0-9]+/gi, "_") + ".png"
+        );
+
         const response = await fetch(
           API + "/api/charts/import-msfs",
           {
             method: "POST",
             headers: {
-              "Content-Type": "application/json",
               Accept: "application/json"
             },
-            body: JSON.stringify({
-              airport_icao: icao,
-              airport_name: airportName,
-              chart_name: pageName,
-              chart_type: MAP[chart.category] || "AIRPORT",
-              provider,
-              validity: String(
-                chart.meta?.validUntil ||
-                chart.meta?.validFrom ||
-                ""
-              ),
-              image_url: imageUrl
-            })
+            body: formData
           }
         );
 
