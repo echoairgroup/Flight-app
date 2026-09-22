@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Flight-app MSFS Chart Bridge</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;width:420px;background:#f5f8fc;color:#152238;font:14px/1.45 Arial,sans-serif}
+header{padding:18px 20px;background:#fff;border-bottom:1px solid #e2e8f0}
+h1{font-size:18px;margin:0 0 4px}
+p{margin:0;color:#68758a}
+main{padding:16px}
+.card{background:#fff;border:1px solid #e1e8f1;border-radius:14px;padding:15px;margin-bottom:12px}
+.row{display:flex;gap:8px}
+input,select,button{font:inherit;border-radius:9px}
+input,select{border:1px solid #d4ddea;padding:10px;background:#fff}
+input{width:110px}
+select{flex:1}
+button{border:0;padding:10px 13px;background:#087ff5;color:#fff;font-weight:700;cursor:pointer}
+button:disabled{opacity:.55;cursor:not-allowed}
+.secondary{background:#e9f2ff;color:#086bd1}
+.toolbar{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+.toolbar button{font-size:12px;padding:8px 10px}
+#list{max-height:310px;overflow:auto;margin-top:10px}
+.item{padding:9px;border:1px solid #e4e9f0;border-radius:9px;margin:5px 0;background:#fbfdff}
+.item label{display:flex;gap:8px;align-items:flex-start}
+.name{font-weight:700}
+.meta{font-size:11px;color:#7a8798;margin-top:2px}
+.ok{color:#16845d}.err{color:#c53e4d}.muted{color:#718096}
+#log{white-space:pre-wrap;background:#111827;color:#dce6f3;border-radius:9px;padding:10px;max-height:150px;overflow:auto;font:11px/1.4 Consolas,monospace}
+.small{font-size:12px}
+</style>
+</head>
+<body>
+<header>
+  <h1>Flight-app MSFS Chart Bridge</h1>
+  <p>Uses your logged-in MSFS Planner browser session. The session token is never sent to Flight-app.</p>
+</header>
+<main>
+  <section class="card">
+    <div class="row">
+      <input id="icao" maxlength="4" placeholder="EHAM">
+      <select id="provider"><option>LIDO</option><option>FAA</option></select>
+      <button id="load">Load</button>
+    </div>
+    <div id="status" class="small muted" style="margin-top:9px">Log in to MSFS Planner in Firefox first, then load an airport.</div>
+  </section>
+  <section class="card">
+    <div class="toolbar">
+      <button id="all" class="secondary">Select all</button>
+      <button id="none" class="secondary">Clear</button>
+      <button id="import">Import selected</button>
+    </div>
+    <div id="count" class="small muted" style="margin-top:8px">No charts loaded.</div>
+    <div id="list"></div>
+  </section>
+  <section class="card">
+    <strong>Import log</strong>
+    <div id="log" style="margin-top:8px"></div>
+  </section>
+</main>
+<script src="popup.js"></script>
+</body>
+</html>
