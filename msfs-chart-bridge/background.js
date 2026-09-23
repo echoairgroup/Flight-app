@@ -219,7 +219,7 @@ browser.runtime.onMessage.addListener((message) => {
       if (!current) return;
 
       pendingCaptures.delete(requestUrl);
-      clearTimeout(requestTimeout);
+      clearTimeout(timeout);
       reject(
         new Error(
           "Could not trigger the Planner image request: " +
