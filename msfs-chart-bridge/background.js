@@ -58,6 +58,12 @@ browser.webRequest.onBeforeRequest.addListener(
           offset += chunk.byteLength;
         }
 
+        if (!totalBytes) {
+          throw new Error(
+            "Firefox received a 0-byte MSFS chart response. Retrying with a cache-busting image request may be required."
+          );
+        }
+
         capture.resolve({
           buffer: output.buffer,
           contentType: capture.contentType || "image/png",
@@ -131,8 +137,19 @@ browser.runtime.onMessage.addListener((message) => {
   }
 
   return new Promise((resolve, reject) => {
+    const cacheBuster =
+      "__flight_app_chart_bridge=" +
+      Date.now() +
+      "_" +
+      Math.random().toString(36).slice(2);
+
+    const requestUrl =
+      imageUrl +
+      (imageUrl.includes("?") ? "&" : "?") +
+      cacheBuster;
+
     const timeout = setTimeout(() => {
-      pendingCaptures.delete(imageUrl);
+      pendingCaptures.delete(requestUrl);
       reject(
         new Error(
           "Timed out waiting for the MSFS Planner chart image."
@@ -140,7 +157,7 @@ browser.runtime.onMessage.addListener((message) => {
       );
     }, 30000);
 
-    pendingCaptures.set(imageUrl, {
+    pendingCaptures.set(requestUrl, {
       contentType: "image/png",
       resolve: result => {
         clearTimeout(timeout);
@@ -196,13 +213,13 @@ browser.runtime.onMessage.addListener((message) => {
           image.src = requestUrl;
         });
       },
-      args: [imageUrl]
+      args: [requestUrl]
     }).catch(error => {
-      const current = pendingCaptures.get(imageUrl);
+      const current = pendingCaptures.get(requestUrl);
       if (!current) return;
 
-      pendingCaptures.delete(imageUrl);
-      clearTimeout(timeout);
+      pendingCaptures.delete(requestUrl);
+      clearTimeout(requestTimeout);
       reject(
         new Error(
           "Could not trigger the Planner image request: " +
