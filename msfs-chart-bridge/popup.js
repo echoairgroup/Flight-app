@@ -217,7 +217,7 @@ async function plannerPages(guid) {
  * We deliberately do NOT fetch the Azure URL ourselves and we never read
  * or forward the Planner session cookies/tokens.
  */
-async function plannerImage(imageUrl) {
+async function plannerImage(imageUrl, chart, pageIndex = 0) {
   const tabs = await browser.tabs.query({
     url: ["https://planner.flightsimulator.com/*"],
     active: true,
@@ -231,13 +231,16 @@ async function plannerImage(imageUrl) {
   }
 
   const tabId = tabs[0].id;
+  const chartName =
+    chart?.meta?.name ||
+    chart?.meta?.chartName ||
+    chart?.category + " chart";
 
   /*
-   * IMPORTANT: /pages returns an FsChartPageUrl handle, not the final
-   * downloadable Azure URL. However, once Planner has rendered a chart,
-   * the browser Performance API contains the exact signed Azure request
-   * that Planner made. Reusing that already-authorized URL is much more
-   * reliable than trying to make Planner render a chart on demand.
+   * A page URL returned by /api/v1/charts/pages is an FsChartPageUrl
+   * handle, not the actual Azure image URL. We can still reuse a signed
+   * request that Planner has already made, which avoids another network
+   * round-trip when this exact chart is already open.
    */
   const handlePath = (() => {
     try {
@@ -263,11 +266,6 @@ async function plannerImage(imageUrl) {
             /\.png(?:\?|$)/i.test(url)
           );
 
-        /*
-         * Prefer the exact chart page path. If the Planner has rendered
-         * another page from the same chart, the suffix/path comparison
-         * lets us avoid accidentally importing that other chart.
-         */
         const exact = candidates.find(url => {
           try {
             return new URL(url).pathname === wantedPath;
@@ -276,18 +274,15 @@ async function plannerImage(imageUrl) {
           }
         });
 
-        return {
-          exact: exact || null,
-          candidates: candidates.slice(-20)
-        };
+        return exact || null;
       },
       args: [handlePath]
     });
 
-    const found = results?.[0]?.result?.exact;
+    const found = results?.[0]?.result || null;
 
     if (found) {
-      log("Found Planner's existing signed chart request in browser cache.");
+      log("Found an existing signed Planner image request for " + chartName + ".");
 
       const response = await fetch(found, {
         credentials: "include",
@@ -301,7 +296,7 @@ async function plannerImage(imageUrl) {
           log(
             "Downloaded " +
             Math.round(buffer.byteLength / 1024) +
-            " KB from Planner's authorized chart URL."
+            " KB from Planner's existing chart image."
           );
 
           return new Blob([buffer], { type: "image/png" });
@@ -309,26 +304,24 @@ async function plannerImage(imageUrl) {
       }
 
       log(
-        "The cached signed URL was no longer usable (HTTP " +
+        "The existing signed image was no longer usable (HTTP " +
         response.status +
-        "). Falling back to live response capture."
+        "). Planner will render the chart again."
       );
     }
   } catch (error) {
     log(
-      "Could not reuse Planner's cached chart request: " +
-      (error?.message || error)
+      "Existing signed image lookup failed: " +
+      (error?.message || error) +
+      ". Continuing with live Planner rendering."
     );
   }
 
-  /*
-   * No existing signed request was found. Arm the Firefox response
-   * interceptor before asking Planner to render the chart. We deliberately
-   * do not fetch the unsigned FsChartPageUrl handle ourselves.
-   */
   log(
-    "Waiting for the real MSFS Planner chart request. " +
-    "Open/render the selected chart in Planner if it is not already open."
+    "Opening " +
+    chartName +
+    (pageIndex ? " — Page " + (pageIndex + 1) : "") +
+    " in MSFS Planner and capturing its real image request…"
   );
 
   let result;
@@ -340,8 +333,7 @@ async function plannerImage(imageUrl) {
 
     if (!ping?.ok) {
       throw new Error(
-        "The MSFS Chart Bridge background process is not responding. " +
-        "Reload the extension in about:debugging and try again."
+        "The MSFS Chart Bridge background process is not responding. Reload the extension and try again."
       );
     }
 
@@ -354,7 +346,9 @@ async function plannerImage(imageUrl) {
     result = await browser.runtime.sendMessage({
       type: "capturePlannerImage",
       imageUrl,
-      tabId
+      tabId,
+      chartName,
+      category: chart?.category || ""
     });
   } catch (error) {
     throw new Error(
@@ -372,7 +366,7 @@ async function plannerImage(imageUrl) {
   log(
     "Captured " +
     Math.round(result.buffer.byteLength / 1024) +
-    " KB from Planner's real chart request."
+    " KB from the real Planner image request."
   );
 
   return new Blob(
@@ -459,7 +453,7 @@ async function importSelected() {
          * The raw image is then uploaded to Flight-app as multipart/form-data.
          * The signed MSFS URL is never sent to or stored by the backend.
          */
-        const imageBlob = await plannerImage(imageUrl);
+        const imageBlob = await plannerImage(imageUrl, chart, pageIndex);
 
         const formData = new FormData();
         formData.append("airport_icao", icao);
