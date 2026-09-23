@@ -247,6 +247,24 @@ async function plannerImage(imageUrl) {
   let result;
 
   try {
+    const ping = await browser.runtime.sendMessage({
+      type: "bridgePing"
+    });
+
+    if (!ping?.ok) {
+      throw new Error(
+        "The MSFS Chart Bridge background process is not responding. " +
+        "Reload the extension in about:debugging and try again."
+      );
+    }
+
+    if (!ping.captureApi) {
+      throw new Error(
+        "Firefox loaded the bridge, but webRequest.filterResponseData is unavailable. " +
+        "Reload the extension after installing the latest bridge version."
+      );
+    }
+
     result = await browser.runtime.sendMessage({
       type: "capturePlannerImage",
       imageUrl,
