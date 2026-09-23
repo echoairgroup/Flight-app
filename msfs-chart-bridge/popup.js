@@ -371,16 +371,20 @@ async function importSelected() {
           name +
           (pages.length > 1 ? " — Page " + (pageIndex + 1) : "");
 
-        log("Sending signed MSFS chart URL to Flight-app backend: " + pageName);
+        log("Downloading chart image from MSFS Planner: " + pageName);
 
         /*
-         * The Planner's PNG URL is a short-lived signed Azure Blob URL.
-         * We do not download it in the page context because that request is
-         * cross-origin and Firefox blocks reading the response body there.
+         * The signed Azure URL can be used successfully from the user's
+         * browser session, but Microsoft/Azure may reject a server-side
+         * Render request (for example because the SAS is tied to the
+         * originating client). Therefore the browser extension downloads
+         * the image bytes itself.
          *
-         * The backend downloads the signed URL immediately using the Planner
-         * referrer and image request headers. The URL is never stored.
+         * The raw image is then uploaded to Flight-app as multipart/form-data.
+         * The signed MSFS URL is never sent to or stored by the backend.
          */
+        const imageBlob = await plannerImage(imageUrl);
+
         const formData = new FormData();
         formData.append("airport_icao", icao);
         formData.append("airport_name", airportName);
@@ -398,7 +402,19 @@ async function importSelected() {
             ""
           )
         );
-        formData.append("image_url", imageUrl);
+
+        const extension =
+          imageBlob.type === "image/jpeg"
+            ? "jpg"
+            : imageBlob.type === "image/webp"
+              ? "webp"
+              : "png";
+
+        formData.append(
+          "image",
+          imageBlob,
+          "msfs-" + icao + "-" + chart.meta.guid + "-" + (pageIndex + 1) + "." + extension
+        );
 
         const response = await fetch(
           API + "/api/charts/import-msfs",
