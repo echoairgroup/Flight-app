@@ -117,7 +117,9 @@ browser.runtime.onMessage.addListener(message => {
       if (result.imageUrl) {
         try {
           const response = await fetch(result.imageUrl, {
-            cache: "no-store"
+            cache: "no-store",
+            referrer: "https://planner.flightsimulator.com/",
+            referrerPolicy: "strict-origin-when-cross-origin"
           });
 
           if (response.ok) {
