@@ -1663,9 +1663,15 @@ function fetchBinary(
                     {
                         headers: {
                             "User-Agent":
-                                "Flight-App/1.0",
+                                "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:156.0) Gecko/20100101 Firefox/156.0",
+                            Referer:
+                                "https://planner.flightsimulator.com/",
                             Accept:
-                                "image/png,image/jpeg,image/webp"
+                                "image/avif,image/webp,image/png,image/svg+xml,image/*;q=0.8,*/*;q=0.5",
+                            "Cache-Control":
+                                "no-cache",
+                            "Accept-Encoding":
+                                "identity"
                         }
                     },
                     response => {
