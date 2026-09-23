@@ -30,12 +30,21 @@ function finishCaptureError(error) {
   reject?.(error);
 }
 
-/*
- * Keep the message listener registered before the webRequest listener.
- * This means the popup can always ping the background context and gives
- * us a useful error instead of Firefox's generic "Receiving end does not
- * exist" message if a network API is unavailable.
- */
+function finishCaptureSuccess(value) {
+  if (!pendingCapture.active) return;
+
+  const resolve = pendingCapture.resolve;
+
+  clearTimeout(pendingCapture.timeout);
+  pendingCapture.active = false;
+  pendingCapture.expectedPath = null;
+  pendingCapture.resolve = null;
+  pendingCapture.reject = null;
+  pendingCapture.timeout = null;
+
+  resolve?.(value);
+}
+
 browser.runtime.onMessage.addListener(message => {
   if (message?.type === "bridgePing") {
     return Promise.resolve({
@@ -55,6 +64,14 @@ browser.runtime.onMessage.addListener(message => {
     );
   }
 
+  const tabId = Number(message.tabId);
+  const chartName = String(message.chartName || "").trim();
+  const category = String(message.category || "").trim();
+
+  if (!Number.isInteger(tabId)) {
+    return Promise.reject(new Error("No valid MSFS Planner tab was supplied."));
+  }
+
   return new Promise((resolve, reject) => {
     pendingCapture.active = true;
     pendingCapture.expectedPath = message.imageUrl || null;
@@ -64,23 +81,50 @@ browser.runtime.onMessage.addListener(message => {
     pendingCapture.timeout = setTimeout(() => {
       finishCaptureError(
         new Error(
-          "No real MSFS chart image request was observed within 30 seconds. " +
-          "The chart must be opened/rendered in the MSFS Planner tab so Planner itself makes the authorized Azure request."
+          "Planner was opened for the selected chart, but Firefox did not observe the chart image response within 30 seconds."
         )
       );
     }, 30000);
+
+    /*
+     * This is the missing half of the old bridge:
+     * /pages returns a handle, not a downloadable URL. The Planner UI must
+     * actually open the corresponding chart row before Azure serves its
+     * signed image request.
+     */
+    browser.tabs.sendMessage(tabId, {
+      type: "openPlannerChart",
+      chartName,
+      category
+    }).then(result => {
+      if (!result?.ok) {
+        finishCaptureError(
+          new Error("Planner did not confirm that the selected chart was opened.")
+        );
+        return;
+      }
+
+      /*
+       * If the content script already sees a fully loaded chart image, the
+       * request may have completed before webRequest delivered the response
+       * to us. In the normal path this is harmless because webRequest catches
+       * the same response. Keep the diagnostic result for debugging, but do
+       * not resolve with it: the popup needs the actual response bytes.
+       */
+    }).catch(error => {
+      finishCaptureError(
+        new Error(
+          "Could not drive the MSFS Planner chart list: " +
+          (error?.message || error)
+        )
+      );
+    });
   });
 });
 
 /*
- * IMPORTANT:
- * responseHeaders is NOT a valid extraInfoSpec for onBeforeRequest.
- * Using it here can make Firefox reject the listener during background
- * startup, which then leaves the popup with:
- * "Receiving end does not exist."
- *
- * We therefore attach the response filter in onBeforeRequest with no
- * extraInfoSpec. Content type is inferred as PNG later.
+ * responseHeaders is not valid here. We only need the requestId so Firefox
+ * can attach a response-body filter to the real Azure PNG request.
  */
 browser.webRequest.onBeforeRequest.addListener(
   details => {
@@ -88,22 +132,14 @@ browser.webRequest.onBeforeRequest.addListener(
       return {};
     }
 
-    const resolve = pendingCapture.resolve;
     const reject = pendingCapture.reject;
-
-    clearTimeout(pendingCapture.timeout);
-    pendingCapture.active = false;
-    pendingCapture.expectedPath = null;
-    pendingCapture.resolve = null;
-    pendingCapture.reject = null;
-    pendingCapture.timeout = null;
 
     let filter;
 
     try {
       filter = browser.webRequest.filterResponseData(details.requestId);
     } catch (error) {
-      reject?.(
+      finishCaptureError(
         new Error(
           "Firefox could not attach to the real MSFS chart response: " +
           (error?.message || error)
@@ -120,8 +156,16 @@ browser.webRequest.onBeforeRequest.addListener(
       chunks.push(chunk);
       totalBytes += chunk.byteLength;
 
-      // Always pass the bytes through so Planner itself continues to work.
-      filter.write(event.data);
+      try {
+        filter.write(event.data);
+      } catch (error) {
+        finishCaptureError(
+          new Error(
+            "Firefox could not pass the MSFS chart response through to Planner: " +
+            (error?.message || error)
+          )
+        );
+      }
     };
 
     filter.onstop = () => {
@@ -140,14 +184,14 @@ browser.webRequest.onBeforeRequest.addListener(
           offset += chunk.byteLength;
         }
 
-        resolve?.({
+        finishCaptureSuccess({
           buffer: output.buffer,
           contentType: "image/png",
           size: totalBytes,
           url: details.url
         });
       } catch (error) {
-        reject?.(
+        finishCaptureError(
           new Error(
             "Could not assemble the real MSFS chart image: " +
             (error?.message || error)
@@ -161,7 +205,7 @@ browser.webRequest.onBeforeRequest.addListener(
     };
 
     filter.onerror = () => {
-      reject?.(
+      finishCaptureError(
         new Error(
           "Firefox failed while reading the real MSFS chart response."
         )
