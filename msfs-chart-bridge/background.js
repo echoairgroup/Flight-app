@@ -96,7 +96,7 @@ browser.runtime.onMessage.addListener(message => {
       type: "openPlannerChart",
       chartName,
       category
-    }).then(result => {
+    }).then(async result => {
       if (!result?.ok) {
         finishCaptureError(
           new Error("Planner did not confirm that the selected chart was opened.")
@@ -105,11 +105,44 @@ browser.runtime.onMessage.addListener(message => {
       }
 
       /*
-       * If the content script already sees a fully loaded chart image, the
-       * request may have completed before webRequest delivered the response
-       * to us. In the normal path this is harmless because webRequest catches
-       * the same response. Keep the diagnostic result for debugging, but do
-       * not resolve with it: the popup needs the actual response bytes.
+       * The content script sees the exact signed Azure URL that Planner
+       * assigned to the <img>. Use it from the privileged extension context
+       * whenever possible. This also handles browser-cache cases where no
+       * new network request is emitted after the row is clicked.
+       */
+      if (result.imageUrl) {
+        try {
+          const response = await fetch(result.imageUrl, {
+            cache: "no-store"
+          });
+
+          if (response.ok) {
+            const buffer = await response.arrayBuffer();
+
+            if (buffer.byteLength) {
+              finishCaptureSuccess({
+                buffer,
+                contentType:
+                  response.headers.get("content-type") || "image/png",
+                size: buffer.byteLength,
+                url: result.imageUrl
+              });
+              return;
+            }
+          }
+        } catch (error) {
+          /*
+           * Keep the webRequest path alive. If the chart was freshly
+           * requested, its response body may already be on the way and the
+           * interceptor below can still supply the bytes.
+           */
+        }
+      }
+
+      /*
+       * No direct extension fetch succeeded. Do not reject here: the
+       * webRequest response-body interceptor is the fallback for a fresh
+       * Planner request.
        */
     }).catch(error => {
       finishCaptureError(
