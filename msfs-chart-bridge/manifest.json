@@ -1,14 +1,11 @@
 {
   "manifest_version": 3,
   "name": "Flight-app MSFS Chart Bridge",
-  "version": "1.2.1",
-  "description": "Imports MSFS 2024 Planner charts into Flight-app by driving the Planner chart viewer locally and capturing the real chart image bytes. The MSFS session token stays in Firefox.",
+  "version": "1.3.0",
+  "description": "Imports MSFS 2024 Planner charts into Flight-app by opening the chart in Planner, reading its real signed image URL locally, and uploading only image bytes.",
   "permissions": [
     "scripting",
-    "tabs",
-    "webRequest",
-    "webRequestBlocking",
-    "webRequestFilterResponse"
+    "tabs"
   ],
   "host_permissions": [
     "https://planner.flightsimulator.com/*",
