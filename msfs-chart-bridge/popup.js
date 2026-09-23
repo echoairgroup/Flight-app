@@ -230,14 +230,101 @@ async function plannerImage(imageUrl) {
     );
   }
 
+  const tabId = tabs[0].id;
+
   /*
-   * The /pages endpoint returns an FsChartPageUrl handle. Microsoft
-   * documents that this handle cannot be fetched directly; Planner must
-   * call its chart-image API to turn it into the real authorized Azure
-   * request.
-   *
-   * We therefore arm the background response capture and wait for the
-   * genuine chart-file request made by Planner itself.
+   * IMPORTANT: /pages returns an FsChartPageUrl handle, not the final
+   * downloadable Azure URL. However, once Planner has rendered a chart,
+   * the browser Performance API contains the exact signed Azure request
+   * that Planner made. Reusing that already-authorized URL is much more
+   * reliable than trying to make Planner render a chart on demand.
+   */
+  const handlePath = (() => {
+    try {
+      return new URL(imageUrl).pathname;
+    } catch {
+      return String(imageUrl || "").split("?")[0];
+    }
+  })();
+
+  try {
+    const results = await browser.scripting.executeScript({
+      target: { tabId },
+      func: (wantedPath) => {
+        const entries = performance.getEntriesByType("resource");
+
+        const candidates = entries
+          .map(entry => String(entry.name || ""))
+          .filter(url =>
+            url.startsWith(
+              "https://foxtrotatlasprod.blob.core.windows.net/"
+            ) &&
+            /\/charts\/chart-files\//i.test(url) &&
+            /\.png(?:\?|$)/i.test(url)
+          );
+
+        /*
+         * Prefer the exact chart page path. If the Planner has rendered
+         * another page from the same chart, the suffix/path comparison
+         * lets us avoid accidentally importing that other chart.
+         */
+        const exact = candidates.find(url => {
+          try {
+            return new URL(url).pathname === wantedPath;
+          } catch {
+            return false;
+          }
+        });
+
+        return {
+          exact: exact || null,
+          candidates: candidates.slice(-20)
+        };
+      },
+      args: [handlePath]
+    });
+
+    const found = results?.[0]?.result?.exact;
+
+    if (found) {
+      log("Found Planner's existing signed chart request in browser cache.");
+
+      const response = await fetch(found, {
+        credentials: "include",
+        cache: "no-store"
+      });
+
+      if (response.ok) {
+        const buffer = await response.arrayBuffer();
+
+        if (buffer.byteLength) {
+          log(
+            "Downloaded " +
+            Math.round(buffer.byteLength / 1024) +
+            " KB from Planner's authorized chart URL."
+          );
+
+          return new Blob([buffer], { type: "image/png" });
+        }
+      }
+
+      log(
+        "The cached signed URL was no longer usable (HTTP " +
+        response.status +
+        "). Falling back to live response capture."
+      );
+    }
+  } catch (error) {
+    log(
+      "Could not reuse Planner's cached chart request: " +
+      (error?.message || error)
+    );
+  }
+
+  /*
+   * No existing signed request was found. Arm the Firefox response
+   * interceptor before asking Planner to render the chart. We deliberately
+   * do not fetch the unsigned FsChartPageUrl handle ourselves.
    */
   log(
     "Waiting for the real MSFS Planner chart request. " +
@@ -260,15 +347,14 @@ async function plannerImage(imageUrl) {
 
     if (!ping.captureApi) {
       throw new Error(
-        "Firefox loaded the bridge, but webRequest.filterResponseData is unavailable. " +
-        "Reload the extension after installing the latest bridge version."
+        "Firefox loaded the bridge, but webRequest.filterResponseData is unavailable."
       );
     }
 
     result = await browser.runtime.sendMessage({
       type: "capturePlannerImage",
       imageUrl,
-      tabId: tabs[0].id
+      tabId
     });
   } catch (error) {
     throw new Error(
@@ -283,12 +369,6 @@ async function plannerImage(imageUrl) {
     );
   }
 
-  const mime =
-    String(result.contentType || "image/png")
-      .split(";")[0]
-      .trim()
-      .toLowerCase();
-
   log(
     "Captured " +
     Math.round(result.buffer.byteLength / 1024) +
@@ -297,12 +377,7 @@ async function plannerImage(imageUrl) {
 
   return new Blob(
     [result.buffer],
-    {
-      type:
-        mime === "application/octet-stream"
-          ? "image/png"
-          : (mime || "image/png")
-    }
+    { type: "image/png" }
   );
 }
 
