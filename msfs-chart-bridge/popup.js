@@ -218,54 +218,90 @@ async function plannerPages(guid) {
  * or forward the Planner session cookies/tokens.
  */
 async function plannerImage(imageUrl) {
-  const tabs = await browser.tabs.query({
-    url: ["https://planner.flightsimulator.com/*"],
-    active: true,
-    currentWindow: true
-  });
+  /*
+   * The popup is an extension page, not the Planner web page.
+   * With the Azure blob host permission in manifest.json, Firefox allows
+   * the extension to read the signed PNG response directly. This avoids
+   * both page CORS and the zero-byte webRequest response-filter issue.
+   *
+   * The signed URL is used only for this single request and is never sent
+   * to or stored by the Flight-app backend.
+   */
+  let response;
 
-  if (!tabs.length) {
+  try {
+    response = await fetch(imageUrl, {
+      method: "GET",
+      credentials: "omit",
+      cache: "no-store",
+      referrer: PLANNER + "/",
+      referrerPolicy: "strict-origin-when-cross-origin",
+      headers: {
+        Accept:
+          "image/avif,image/webp,image/png,image/svg+xml,image/*;q=0.8,*/*;q=0.5",
+        "Cache-Control": "no-cache"
+      }
+    });
+  } catch (error) {
     throw new Error(
-      "Open planner.flightsimulator.com in a Firefox tab and make sure you are logged in."
+      "Firefox extension could not fetch the MSFS chart image: " +
+      (error?.message || error)
     );
   }
 
-  const result = await browser.runtime.sendMessage({
-    type: "capturePlannerImage",
-    imageUrl,
-    tabId: tabs[0].id
-  });
+  const contentType =
+    response.headers.get("content-type") || "";
 
-  if (!result?.buffer) {
+  if (!response.ok) {
+    let detail = "";
+
+    try {
+      const body = await response.text();
+      detail = body
+        .replace(/\s+/g, " ")
+        .trim()
+        .slice(0, 240);
+    } catch {}
+
     throw new Error(
-      result?.error ||
-      "Firefox did not return the MSFS chart image."
+      "MSFS chart image returned HTTP " +
+      response.status +
+      (detail ? " — " + detail : "")
+    );
+  }
+
+  const buffer = await response.arrayBuffer();
+
+  if (!buffer.byteLength) {
+    throw new Error(
+      "MSFS Planner returned a 0-byte chart image."
     );
   }
 
   const mime =
-    String(result.contentType || "image/png")
+    String(contentType || "image/png")
       .split(";")[0]
       .trim()
       .toLowerCase();
 
-  if (!mime.startsWith("image/")) {
+  if (!mime.startsWith("image/") &&
+      mime !== "application/octet-stream") {
     throw new Error(
-      "MSFS Planner returned an unexpected image type (" +
+      "MSFS Planner returned an unexpected chart type (" +
       (mime || "unknown") +
       ")."
     );
   }
 
   log(
-    "Captured " +
-    Math.round((result.size || result.buffer.byteLength) / 1024) +
-    " KB from Planner."
+    "Downloaded " +
+    Math.round(buffer.byteLength / 1024) +
+    " KB from MSFS Planner."
   );
 
   return new Blob(
-    [result.buffer],
-    { type: mime }
+    [buffer],
+    { type: mime === "application/octet-stream" ? "image/png" : mime }
   );
 }
 
