@@ -3,7 +3,8 @@ const pendingCapture = {
   expectedPath: null,
   timeout: null,
   resolve: null,
-  reject: null
+  reject: null,
+  tabId: null
 };
 
 function isPlannerChartUrl(url) {
@@ -26,6 +27,7 @@ function finishCaptureError(error) {
   pendingCapture.resolve = null;
   pendingCapture.reject = null;
   pendingCapture.timeout = null;
+  pendingCapture.tabId = null;
 
   reject?.(error);
 }
@@ -41,6 +43,7 @@ function finishCaptureSuccess(value) {
   pendingCapture.resolve = null;
   pendingCapture.reject = null;
   pendingCapture.timeout = null;
+  pendingCapture.tabId = null;
 
   resolve?.(value);
 }
@@ -77,6 +80,7 @@ browser.runtime.onMessage.addListener(message => {
     pendingCapture.expectedPath = message.imageUrl || null;
     pendingCapture.resolve = resolve;
     pendingCapture.reject = reject;
+    pendingCapture.tabId = tabId;
 
     pendingCapture.timeout = setTimeout(() => {
       finishCaptureError(
@@ -161,7 +165,12 @@ browser.runtime.onMessage.addListener(message => {
  */
 browser.webRequest.onBeforeRequest.addListener(
   details => {
-    if (!pendingCapture.active || !isPlannerChartUrl(details.url)) {
+    if (
+      !pendingCapture.active ||
+      !isPlannerChartUrl(details.url) ||
+      Number(details.tabId) !== Number(pendingCapture.tabId) ||
+      details.type !== "image"
+    ) {
       return {};
     }
 
@@ -238,9 +247,10 @@ browser.webRequest.onBeforeRequest.addListener(
     };
 
     filter.onerror = () => {
+      const detail = filter.error ? " — " + filter.error : "";
       finishCaptureError(
         new Error(
-          "Firefox failed while reading the real MSFS chart response."
+          "Firefox failed while reading the real MSFS chart response" + detail + "."
         )
       );
 
