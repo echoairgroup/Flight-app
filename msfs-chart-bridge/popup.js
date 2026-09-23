@@ -230,35 +230,38 @@ async function plannerImage(imageUrl) {
     );
   }
 
-  const tabId = tabs[0].id;
-
   /*
-   * The URL returned by MSFS is an FsChartPageUrl handle. Microsoft
-   * explicitly documents that it must be passed to the Charts API rather
-   * than fetched as a normal public blob URL.
+   * The /pages endpoint returns an FsChartPageUrl handle. Microsoft
+   * documents that this handle cannot be fetched directly; Planner must
+   * call its chart-image API to turn it into the real authorized Azure
+   * request.
    *
-   * The Planner itself can request the image successfully. The background
-   * bridge therefore triggers that exact request from the authenticated
-   * Planner tab and captures the response bytes with webRequest.
+   * We therefore arm the background response capture and wait for the
+   * genuine chart-file request made by Planner itself.
    */
+  log(
+    "Waiting for the real MSFS Planner chart request. " +
+    "Open/render the selected chart in Planner if it is not already open."
+  );
+
   let result;
 
   try {
     result = await browser.runtime.sendMessage({
       type: "capturePlannerImage",
       imageUrl,
-      tabId
+      tabId: tabs[0].id
     });
   } catch (error) {
     throw new Error(
       error?.message ||
-      "Firefox could not capture the MSFS Planner chart image."
+      "Firefox could not capture the real MSFS Planner chart image."
     );
   }
 
   if (!result?.buffer || !result.buffer.byteLength) {
     throw new Error(
-      "MSFS Planner chart capture returned 0 bytes."
+      "The real MSFS Planner chart capture returned 0 bytes."
     );
   }
 
@@ -271,7 +274,7 @@ async function plannerImage(imageUrl) {
   log(
     "Captured " +
     Math.round(result.buffer.byteLength / 1024) +
-    " KB from the MSFS Planner request."
+    " KB from Planner's real chart request."
   );
 
   return new Blob(
