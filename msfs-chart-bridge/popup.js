@@ -337,12 +337,6 @@ async function plannerImage(imageUrl, chart, pageIndex = 0) {
       );
     }
 
-    if (!ping.captureApi) {
-      throw new Error(
-        "Firefox loaded the bridge, but webRequest.filterResponseData is unavailable."
-      );
-    }
-
     result = await browser.runtime.sendMessage({
       type: "capturePlannerImage",
       imageUrl,
