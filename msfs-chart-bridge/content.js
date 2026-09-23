@@ -245,16 +245,82 @@ function chartImages() {
     .sort((a, b) => b.pixels - a.pixels);
 }
 
-async function waitForRenderedChart() {
+async function waitForRenderedChart(wantedPath = "") {
+  const before = new Set(chartImages().map(entry => entry.url));
+
   for (let elapsed = 0; elapsed < CHART_TIMEOUT_MS; elapsed += 150) {
-    const loaded = chartImages().find(entry => entry.loaded && entry.pixels > 0);
-    if (loaded) {
+    const loaded = chartImages().filter(entry => entry.loaded && entry.pixels > 0);
+
+    // Best case: Planner's rendered image maps to the page handle path.
+    if (wantedPath) {
+      const exact = loaded.find(entry => {
+        try {
+          return new URL(entry.url).pathname === wantedPath;
+        } catch {
+          return false;
+        }
+      });
+
+      if (exact) {
+        return {
+          url: exact.url,
+          width: exact.image.naturalWidth,
+          height: exact.image.naturalHeight
+        };
+      }
+    }
+
+    // Normal case: the viewer swaps in a new chart image after the row click.
+    const fresh = loaded.find(entry => !before.has(entry.url));
+    if (fresh) {
       return {
-        url: loaded.url,
-        width: loaded.image.naturalWidth,
-        height: loaded.image.naturalHeight
+        url: fresh.url,
+        width: fresh.image.naturalWidth,
+        height: fresh.image.naturalHeight
       };
     }
+
+    // Planner can reuse a browser-cached signed image and keep the same DOM node.
+    // Its Resource Timing entry still exposes the exact URL.
+    const resources = performance
+      .getEntriesByType("resource")
+      .map(entry => String(entry.name || ""))
+      .filter(url =>
+        /^https:\/\/foxtrotatlasprod\.blob\.core\.windows\.net\//i.test(url) &&
+        /\/charts\/chart-files\//i.test(url) &&
+        /\.png(?:\?|$)/i.test(url)
+      );
+
+    if (wantedPath) {
+      const exactResource = resources.find(url => {
+        try {
+          return new URL(url).pathname === wantedPath;
+        } catch {
+          return false;
+        }
+      });
+
+      if (exactResource) {
+        return {
+          url: exactResource,
+          width: loaded[0]?.image.naturalWidth || 0,
+          height: loaded[0]?.image.naturalHeight || 0
+        };
+      }
+    }
+
+    const newest = resources.find(url => !before.has(url));
+    if (newest) {
+      const matchingImage =
+        loaded.find(entry => entry.url === newest);
+
+      return {
+        url: newest,
+        width: matchingImage?.image.naturalWidth || 0,
+        height: matchingImage?.image.naturalHeight || 0
+      };
+    }
+
     await wait(150);
   }
 
@@ -264,6 +330,13 @@ async function waitForRenderedChart() {
 async function openPlannerChart(message) {
   const category = message?.category || '';
   const targetName = message?.chartName || '';
+  const handlePath = (() => {
+    try {
+      return new URL(String(message?.imageUrl || "")).pathname;
+    } catch {
+      return String(message?.imageUrl || "").split("?")[0];
+    }
+  })();
 
   if (!targetName) {
     throw new Error('No chart name was supplied to the Planner bridge.');
@@ -281,7 +354,7 @@ async function openPlannerChart(message) {
 
   await findAndClickChart(targetName, category);
 
-  const rendered = await waitForRenderedChart();
+  const rendered = await waitForRenderedChart(handlePath);
   if (!rendered) {
     throw new Error(
       'Planner opened the chart control, but no rendered Azure chart image appeared within ' +
