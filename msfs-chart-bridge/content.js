@@ -245,8 +245,7 @@ function chartImages() {
     .sort((a, b) => b.pixels - a.pixels);
 }
 
-async function waitForRenderedChart(wantedPath = "") {
-  const before = new Set(chartImages().map(entry => entry.url));
+async function waitForRenderedChart(wantedPath = "", before = new Set()) {
 
   for (let elapsed = 0; elapsed < CHART_TIMEOUT_MS; elapsed += 150) {
     const loaded = chartImages().filter(entry => entry.loaded && entry.pixels > 0);
@@ -352,9 +351,24 @@ async function openPlannerChart(message) {
   }));
   await wait(200);
 
+  const before = new Set(
+    chartImages().map(entry => entry.url)
+  );
+
+  const beforeResources = performance
+    .getEntriesByType("resource")
+    .map(entry => String(entry.name || ""))
+    .filter(url =>
+      /^https:\/\/foxtrotatlasprod\.blob\.core\.windows\.net\//i.test(url) &&
+      /\/charts\/chart-files\//i.test(url) &&
+      /\.png(?:\?|$)/i.test(url)
+    );
+
+  for (const url of beforeResources) before.add(url);
+
   await findAndClickChart(targetName, category);
 
-  const rendered = await waitForRenderedChart(handlePath);
+  const rendered = await waitForRenderedChart(handlePath, before);
   if (!rendered) {
     throw new Error(
       'Planner opened the chart control, but no rendered Azure chart image appeared within ' +
