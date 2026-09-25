@@ -31,5 +31,6 @@ function closeViewer(){$('viewer').classList.remove('show')}
 $('close').onclick=closeViewer;$('viewer').onclick=e=>{if(e.target.id==='viewer')closeViewer()};$('search').oninput=render;$('categoryFilter').onchange=render;
 async function load(){try{$('dot').className='dot ok';$('status').textContent='Backend online';const a=await api('/api/aircraft');aircraft=Array.isArray(a.aircraft)?a.aircraft:[];const c=await api('/api/checklists');checklists=Array.isArray(c.checklists)?c.checklists:[];renderAircraft();render()}catch(e){console.error('Checklist load error:',e);$('dot').className='dot bad';$('status').textContent='Backend unavailable';$('content').innerHTML='<div class="empty">Could not load checklists.</div>'}}load();
 </script>
+<script src="auth-client.js"></script>
 </body>
 </html>
