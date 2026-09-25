@@ -1298,6 +1298,13 @@
     |--------------------------------------------------------------------------
     */
 
+    async function adminFetch(url, options = {}) {
+        const headers = new Headers(options.headers || {});
+        const token = localStorage.getItem("flightAppToken");
+        if (token) headers.set("Authorization", "Bearer " + token);
+        return fetch(url, { ...options, headers });
+    }
+
     const API_BASE =
         "https://flight-app-api-g36e.onrender.com";
 
@@ -1608,7 +1615,7 @@
         try {
 
             const response =
-                await fetch(
+                await adminFetch(
                     `${API_BASE}/api/charts/admin/all`
                 );
 
@@ -2057,7 +2064,7 @@
              */
 
             const response =
-                await fetch(
+                await adminFetch(
                     `${API_BASE}/api/charts`,
                     {
                         method:
@@ -2182,7 +2189,7 @@
         try {
 
             const response =
-                await fetch(
+                await adminFetch(
                     `${API_BASE}/api/charts/${id}`,
                     {
                         method:
@@ -2282,6 +2289,6 @@
 
 </script>
 
-<script src="auth-client.js"></script>
+<script src="auth-client.js"></script><script>(async()=>{if(!(await FlightAppAuth.requireAdmin()))return;})();</script>
 </body>
 </html>
