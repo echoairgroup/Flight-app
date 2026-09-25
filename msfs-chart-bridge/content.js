@@ -87,39 +87,50 @@ function categoryAliases(category) {
 
 function categoryTabs() {
   /*
-   * Do not depend on Tailwind class names here. Planner has changed its
-   * generated class names between builds, while the visible category labels
-   * remain stable.
+   * Planner's chart navigation is not guaranteed to use native buttons.
+   * Some builds put the visible label on a div/span and make a parent
+   * element clickable. Therefore we first inspect normal interactive
+   * elements and then fall back to visible elements whose complete text is
+   * exactly a known category label.
    */
-  const selectors = [
-    'button',
-    '[role="tab"]',
-    '[role="button"]',
-    'a'
-  ];
+  const aliases = new Set([
+    'departure', 'departures', 'sid', 'sids',
+    'arrival', 'arrivals', 'star', 'stars',
+    'approach', 'approaches', 'apch', 'iac', 'iacs',
+    'airport', 'airports', 'airport charts',
+    'misc', 'miscellaneous', 'enroute', 'en route', 'en-route'
+  ]);
 
   const seen = new Set();
   const result = [];
 
-  for (const selector of selectors) {
-    for (const element of document.querySelectorAll(selector)) {
-      if (seen.has(element) || !isVisible(element)) continue;
+  const add = element => {
+    if (!element || seen.has(element) || !isVisible(element)) return;
+    const label = elementLabel(element);
+    if (!aliases.has(label)) return;
+    seen.add(element);
+    result.push(element);
+  };
 
-      const label = elementLabel(element);
-      if (!label || label.length > 30) continue;
+  // Normal interactive controls.
+  for (const element of document.querySelectorAll(
+    'button,[role="tab"],[role="button"],a,[tabindex]'
+  )) {
+    add(element);
+  }
 
-      // Category controls are short labels. Exclude obvious unrelated controls.
-      if (/^(settings|close|search|menu|zoom|fullscreen|next|previous|light|dark)$/i.test(label)) {
-        continue;
-      }
+  // Fallback: the category text itself may live on a div/span.
+  for (const element of document.querySelectorAll('div,span')) {
+    if (!isVisible(element)) continue;
+    const label = normalize(textOf(element));
+    if (!aliases.has(label)) continue;
 
-      if (
-        /^(departure|departures|arrival|arrivals|approach|approaches|airport|airports|misc|miscellaneous|enroute|en route|en-route|sid|sids|star|stars|iac)$/i.test(label)
-      ) {
-        seen.add(element);
-        result.push(element);
-      }
-    }
+    // Prefer the nearest genuinely clickable ancestor.
+    const clickable = element.closest(
+      'button,[role="tab"],[role="button"],a,[tabindex]'
+    );
+
+    add(clickable || element);
   }
 
   return result;
@@ -218,7 +229,24 @@ async function switchToCategory(category) {
   }
 
   if (!tab) {
-    const visibleLabels = tabs.map(elementLabel).filter(Boolean);
+    // Last-resort DOM text scan. This is deliberately broad because Planner
+    // has used non-semantic div/span navigation controls in different builds.
+    for (const element of document.querySelectorAll('div,span')) {
+      if (!isVisible(element)) continue;
+      const label = normalize(textOf(element));
+      if (!aliases.includes(label)) continue;
+
+      const clickable = element.closest(
+        'button,[role="tab"],[role="button"],a,[tabindex]'
+      ) || element;
+
+      tab = clickable;
+      break;
+    }
+  }
+
+  if (!tab) {
+    const visibleLabels = categoryTabs().map(elementLabel).filter(Boolean);
     throw new Error(
       'Could not find the Planner chart category "' +
       aliases[0].toUpperCase() +
