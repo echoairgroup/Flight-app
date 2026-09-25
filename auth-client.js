@@ -50,5 +50,18 @@
     return user;
   }
 
-  window.FlightAppAuth = { API, TOKEN_KEY, getToken, clearToken, request, me, logout, requireLogin };
+  async function isAdmin() {
+    try { const data = await request("/api/auth/admin", {method:"GET"}); return data?.admin === true; }
+    catch { return false; }
+  }
+  async function requireAdmin() {
+    const user = await requireLogin();
+    if (!user) return null;
+    if (!(await isAdmin())) {
+      location.href = "index.html";
+      return null;
+    }
+    return user;
+  }
+  window.FlightAppAuth = { API, TOKEN_KEY, getToken, clearToken, request, me, logout, requireLogin, isAdmin, requireAdmin };
 })();
