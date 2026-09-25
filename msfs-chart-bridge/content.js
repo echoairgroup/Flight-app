@@ -87,11 +87,13 @@ function categoryAliases(category) {
 
 function categoryTabs() {
   /*
-   * Planner's chart navigation is not guaranteed to use native buttons.
-   * Some builds put the visible label on a div/span and make a parent
-   * element clickable. Therefore we first inspect normal interactive
-   * elements and then fall back to visible elements whose complete text is
-   * exactly a known category label.
+   * MSFS Planner has changed its navigation markup between builds. In some
+   * builds the chart-category control is inside an open ShadowRoot, and in
+   * others the visible label is a child of the actual clickable element.
+   *
+   * querySelectorAll(document) does not cross Shadow DOM boundaries, so this
+   * helper walks every open shadow root as well. We keep the returned
+   * elements themselves so .click() still happens in the Planner's DOM.
    */
   const aliases = new Set([
     'departure', 'departures', 'sid', 'sids',
@@ -100,6 +102,28 @@ function categoryTabs() {
     'airport', 'airports', 'airport charts',
     'misc', 'miscellaneous', 'enroute', 'en route', 'en-route'
   ]);
+
+  const roots = [];
+  const visitedRoots = new Set();
+
+  const collectRoots = root => {
+    if (!root || visitedRoots.has(root)) return;
+    visitedRoots.add(root);
+    roots.push(root);
+
+    let elements;
+    try {
+      elements = root.querySelectorAll('*');
+    } catch {
+      return;
+    }
+
+    for (const element of elements) {
+      if (element.shadowRoot) collectRoots(element.shadowRoot);
+    }
+  };
+
+  collectRoots(document);
 
   const seen = new Set();
   const result = [];
@@ -112,25 +136,65 @@ function categoryTabs() {
     result.push(element);
   };
 
-  // Normal interactive controls.
-  for (const element of document.querySelectorAll(
-    'button,[role="tab"],[role="button"],a,[tabindex]'
-  )) {
-    add(element);
-  }
+  const nearestClickable = element => {
+    let node = element;
+    for (let depth = 0; node && depth < 8; depth += 1) {
+      if (
+        node.nodeType === Node.ELEMENT_NODE &&
+        (
+          node.matches?.('button,[role="tab"],[role="button"],a,[tabindex]') ||
+          typeof node.onclick === 'function'
+        )
+      ) {
+        return node;
+      }
 
-  // Fallback: the category text itself may live on a div/span.
-  for (const element of document.querySelectorAll('div,span')) {
-    if (!isVisible(element)) continue;
-    const label = normalize(textOf(element));
-    if (!aliases.has(label)) continue;
+      if (node.parentElement) {
+        node = node.parentElement;
+      } else if (node.parentNode?.host) {
+        node = node.parentNode.host;
+      } else {
+        node = null;
+      }
+    }
+    return null;
+  };
 
-    // Prefer the nearest genuinely clickable ancestor.
-    const clickable = element.closest(
+  for (const root of roots) {
+    // Normal interactive controls.
+    for (const element of root.querySelectorAll(
       'button,[role="tab"],[role="button"],a,[tabindex]'
-    );
+    )) {
+      add(element);
+    }
 
-    add(clickable || element);
+    // The category text may be a div/span child rather than the control.
+    for (const element of root.querySelectorAll('div,span')) {
+      if (!isVisible(element)) continue;
+
+      const label = normalize(textOf(element));
+      if (!aliases.has(label)) continue;
+
+      add(nearestClickable(element) || element);
+    }
+
+    // Also inspect any element with a direct accessibility/name attribute.
+    for (const element of root.querySelectorAll(
+      '[aria-label],[title],[data-category],[data-chart-category]'
+    )) {
+      if (!isVisible(element)) continue;
+
+      const labels = [
+        element.getAttribute('aria-label'),
+        element.getAttribute('title'),
+        element.getAttribute('data-category'),
+        element.getAttribute('data-chart-category')
+      ].map(normalize);
+
+      if (labels.some(label => aliases.has(label))) {
+        add(nearestClickable(element) || element);
+      }
+    }
   }
 
   return result;
