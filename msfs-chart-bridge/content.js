@@ -85,6 +85,35 @@ function categoryAliases(category) {
   return [wanted.toLowerCase()];
 }
 
+function plannerDocuments() {
+  const docs = [document];
+  const seen = new Set(docs);
+
+  for (let i = 0; i < docs.length; i++) {
+    let frames = [];
+    try { frames = [...docs[i].querySelectorAll('iframe,frame')]; } catch {}
+    for (const frame of frames) {
+      try {
+        const doc = frame.contentDocument;
+        if (doc && !seen.has(doc)) {
+          seen.add(doc);
+          docs.push(doc);
+        }
+      } catch {}
+    }
+  }
+
+  return docs;
+}
+
+function plannerAllElements(selector) {
+  const result = [];
+  for (const doc of plannerDocuments()) {
+    try { result.push(...doc.querySelectorAll(selector)); } catch {}
+  }
+  return result;
+}
+
 function plannerDomDiagnostics() {
   const roots = [];
   const visited = new Set();
@@ -288,9 +317,7 @@ function chartRows() {
    * not part of the public DOM contract and breaks when Planner is rebuilt.
    * Instead locate actual preview buttons and their nearest meaningful row.
    */
-  const buttons = [
-    ...document.querySelectorAll('img[alt="Preview chart"]')
-  ]
+  const buttons = plannerAllElements('img[alt="Preview chart"]')
     .map(image => image.closest('button') || image)
     .filter(isVisible);
 
@@ -505,7 +532,7 @@ async function findChartAnywhere(targetName) {
 
   // Search visible text nodes/containers for the exact API chart name and
   // climb to the nearest element containing a Preview chart control.
-  const all = [...document.querySelectorAll('body *')].filter(isVisible);
+  const all = plannerAllElements('body *').filter(isVisible);
   for (const element of all) {
     const own = normalize(textOf(element));
     if (!own || own.length > 600) continue;
@@ -662,7 +689,7 @@ async function findAndClickChart(targetName, category) {
 }
 
 function chartImages() {
-  return [...document.images]
+  return plannerAllElements('img')
     .map(image => ({
       image,
       url: image.currentSrc || image.src || '',
