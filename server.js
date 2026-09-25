@@ -1418,6 +1418,7 @@ app.get(
 
 app.get(
     "/api/charts/admin/all",
+    app.requireAdmin,
     async (
         req,
         res
@@ -2307,6 +2308,7 @@ app.get(
 
 app.post(
     "/api/charts",
+    app.requireAdmin,
     (
         req,
         res
@@ -2572,6 +2574,7 @@ app.post(
 
 app.delete(
     "/api/charts/:id",
+    app.requireAdmin,
     async (
         req,
         res
@@ -4543,6 +4546,7 @@ app.get(
 
 app.post(
     "/api/aircraft",
+    app.requireAdmin,
     async (
         req,
         res
@@ -4735,6 +4739,7 @@ app.post(
 
 app.delete(
     "/api/aircraft/:id",
+    app.requireAdmin,
     async (
         req,
         res
@@ -5188,6 +5193,7 @@ app.get(
 
 app.get(
     "/api/checklists/:id",
+    app.requireAdmin,
     async (
         req,
         res
@@ -5427,6 +5433,7 @@ app.get(
 
 app.post(
     "/api/checklists",
+    app.requireAdmin,
     (
         req,
         res
@@ -5783,6 +5790,7 @@ app.delete(
 
 app.get(
     "/api/checklists/admin/all",
+    app.requireAdmin,
     async (
         req,
         res
