@@ -118,6 +118,7 @@
   .settings-actions{align-items:flex-start;flex-direction:column}
 }
 </style>
+<link rel="stylesheet" href="site-shell.css">
 </head>
 <body>
 <div class="efb">
@@ -145,7 +146,7 @@
 <div class="info-panel"><div class="panel-heading"><strong>System status</strong><span>Live</span></div><div class="system-list"><div class="system-row"><span>EFB core</span><strong class="ready">Operational</strong></div><div class="system-row"><span>Weather service</span><strong class="ready">Available</strong></div><div class="system-row"><span>Flight tools</span><strong class="ready">Available</strong></div></div></div>
 </section>
 </main>
-<footer class="footer"><span class="home-dot"></span>Flight App EFB &nbsp;•&nbsp; Home</footer>
+<footer class="fa-shell-footer"><span>© 2026 Flight App · Electronic Flight Bag</span><span><a href="index.html">Dashboard</a> · <a href="account.html">Account</a></span></footer>
 </div></div>
 <script>
 function updateClock(){const now=new Date();document.getElementById('clock').textContent=now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});}updateClock();setInterval(updateClock,1000);
