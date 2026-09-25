@@ -85,6 +85,79 @@ function categoryAliases(category) {
   return [wanted.toLowerCase()];
 }
 
+function plannerDomDiagnostics() {
+  const roots = [];
+  const visited = new Set();
+
+  const walk = root => {
+    if (!root || visited.has(root)) return;
+    visited.add(root);
+    roots.push(root);
+    let all = [];
+    try { all = root.querySelectorAll('*'); } catch { return; }
+    for (const el of all) {
+      if (el.shadowRoot) walk(el.shadowRoot);
+    }
+  };
+
+  walk(document);
+
+  const interesting = [];
+  const seen = new Set();
+
+  for (const root of roots) {
+    let elements = [];
+    try {
+      elements = root.querySelectorAll(
+        'button,[role],[aria-label],[title],[data-category],[data-chart-category],[tabindex],a'
+      );
+    } catch { continue; }
+
+    for (const el of elements) {
+      if (seen.has(el) || !isVisible(el)) continue;
+      seen.add(el);
+
+      const text = textOf(el).replace(/\\s+/g, ' ').trim();
+      const aria = el.getAttribute('aria-label') || '';
+      const title = el.getAttribute('title') || '';
+      const role = el.getAttribute('role') || '';
+      const category = el.getAttribute('data-category') || '';
+      const chartCategory = el.getAttribute('data-chart-category') || '';
+
+      if (!text && !aria && !title && !category && !chartCategory) continue;
+
+      const combined = normalize(
+        [text, aria, title, category, chartCategory].filter(Boolean).join(' | ')
+      );
+
+      if (
+        /departure|arrival|approach|airport|enroute|misc|sid|star|iac|aoi|agc|apc|afc|lvc/.test(combined)
+      ) {
+        interesting.push({
+          tag: el.tagName.toLowerCase(),
+          text: text.slice(0, 120),
+          aria: aria.slice(0, 120),
+          title: title.slice(0, 120),
+          role,
+          category,
+          chartCategory,
+          cls: String(el.className || '').slice(0, 160)
+        });
+      }
+
+      if (interesting.length >= 30) break;
+    }
+    if (interesting.length >= 30) break;
+  }
+
+  return {
+    url: location.href,
+    title: document.title,
+    roots: roots.length,
+    candidates: interesting
+  };
+}
+
 function categoryTabs() {
   /*
    * MSFS Planner has changed its navigation markup between builds. In some
@@ -311,11 +384,27 @@ async function switchToCategory(category) {
 
   if (!tab) {
     const visibleLabels = categoryTabs().map(elementLabel).filter(Boolean);
+    const diagnostics = plannerDomDiagnostics();
+
+    console.warn('[Flight-app Chart Bridge] Planner category detection failed', diagnostics);
+
+    const sample = diagnostics.candidates
+      .slice(0, 12)
+      .map(item => {
+        const label = [item.text, item.aria, item.title, item.category, item.chartCategory]
+          .filter(Boolean)
+          .join(' | ');
+        return item.tag + (item.role ? '[role=' + item.role + ']' : '') + ': ' + label;
+      })
+      .join(' || ');
+
     throw new Error(
       'Could not find the Planner chart category "' +
       aliases[0].toUpperCase() +
       '". Visible chart categories: ' +
       (visibleLabels.length ? visibleLabels.join(', ') : 'none') +
+      '. DOM candidates: ' +
+      (sample || 'none') +
       '.'
     );
   }
