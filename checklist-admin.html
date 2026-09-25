@@ -43,5 +43,6 @@ $('addAircraft').onclick=async()=>{const manufacturer=$('manufacturer').value.tr
 window.addEventListener('storage',e=>{if(e.key===CATEGORY_KEY){try{const list=JSON.parse(e.newValue||'[]');saveCategories(Array.isArray(list)?list:[])}catch{}renderCategories()}});
 load();
 </script>
+<script src="auth-client.js"></script>
 </body>
 </html>
