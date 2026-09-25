@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Flight-app MSFS Chart Bridge",
-  "version": "1.3.0",
-  "description": "Imports MSFS 2024 Planner charts into Flight-app by opening the chart in Planner, reading its real signed image URL locally, and uploading only image bytes.",
+  "version": "1.4.0",
+  "description": "Imports MSFS 2024 Planner charts into Flight-app by driving the Planner UI, reading the real signed image URL locally, and uploading only image bytes.",
   "permissions": [
     "scripting",
     "tabs"
