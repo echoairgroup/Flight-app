@@ -39,18 +39,144 @@ function providerButtons() {
     .filter(button => SOURCE_LABELS.test(textOf(button)));
 }
 
+function isVisible(element) {
+  if (!element) return false;
+  const style = window.getComputedStyle(element);
+  const rect = element.getBoundingClientRect();
+  return style.display !== 'none' &&
+    style.visibility !== 'hidden' &&
+    rect.width > 0 &&
+    rect.height > 0;
+}
+
+function elementLabel(element) {
+  if (!element) return '';
+  return normalize(
+    element.getAttribute('aria-label') ||
+    element.getAttribute('title') ||
+    element.textContent ||
+    ''
+  );
+}
+
+function categoryAliases(category) {
+  const wanted = String(category || '').toUpperCase();
+
+  if (wanted === 'SID' || wanted === 'SIDPT' || wanted === 'EOSID') {
+    return ['departure', 'departures', 'sid', 'sids'];
+  }
+
+  if (wanted === 'STAR' || wanted === 'STARPT') {
+    return ['arrival', 'arrivals', 'star', 'stars'];
+  }
+
+  if (wanted === 'IAC' || wanted === 'VAC') {
+    return ['approach', 'approaches', 'apch', 'iac'];
+  }
+
+  if (['AOI', 'AGC', 'APC', 'AFC', 'LVC'].includes(wanted)) {
+    return ['airport', 'airports', 'airport charts'];
+  }
+
+  if (wanted === 'MRC') {
+    return ['misc', 'miscellaneous', 'enroute', 'en route', 'en-route'];
+  }
+
+  return [wanted.toLowerCase()];
+}
+
 function categoryTabs() {
-  return [...document.querySelectorAll('button')].filter(button => {
-    const label = textOf(button);
-    return /border-b-(msfs|transparent)\b/.test(String(button.className || '')) &&
-      TAB_LABEL.test(label) &&
-      !SOURCE_LABELS.test(label);
-  });
+  /*
+   * Do not depend on Tailwind class names here. Planner has changed its
+   * generated class names between builds, while the visible category labels
+   * remain stable.
+   */
+  const selectors = [
+    'button',
+    '[role="tab"]',
+    '[role="button"]',
+    'a'
+  ];
+
+  const seen = new Set();
+  const result = [];
+
+  for (const selector of selectors) {
+    for (const element of document.querySelectorAll(selector)) {
+      if (seen.has(element) || !isVisible(element)) continue;
+
+      const label = elementLabel(element);
+      if (!label || label.length > 30) continue;
+
+      // Category controls are short labels. Exclude obvious unrelated controls.
+      if (/^(settings|close|search|menu|zoom|fullscreen|next|previous|light|dark)$/i.test(label)) {
+        continue;
+      }
+
+      if (
+        /^(departure|departures|arrival|arrivals|approach|approaches|airport|airports|misc|miscellaneous|enroute|en route|en-route|sid|sids|star|stars|iac)$/i.test(label)
+      ) {
+        seen.add(element);
+        result.push(element);
+      }
+    }
+  }
+
+  return result;
+}
+
+function categoryElementFor(category) {
+  const aliases = categoryAliases(category);
+
+  return categoryTabs().find(element => {
+    const label = elementLabel(element);
+    return aliases.includes(label);
+  }) || null;
 }
 
 function chartRows() {
-  return [...document.querySelectorAll('[data-index]')]
-    .filter(row => row.querySelector(OPEN_BUTTON));
+  /*
+   * The Planner uses a virtualised list. The old [data-index] selector is
+   * not part of the public DOM contract and breaks when Planner is rebuilt.
+   * Instead locate actual preview buttons and their nearest meaningful row.
+   */
+  const buttons = [
+    ...document.querySelectorAll('img[alt="Preview chart"]')
+  ]
+    .map(image => image.closest('button') || image)
+    .filter(isVisible);
+
+  const rows = [];
+  const seen = new Set();
+
+  for (const button of buttons) {
+    let row = button;
+
+    // Walk upward until we reach a compact chart-card/list-item container.
+    for (let level = 0; level < 7 && row.parentElement; level++) {
+      const parent = row.parentElement;
+      const text = textOf(parent);
+
+      if (
+        text.length >= 3 &&
+        text.length <= 500 &&
+        parent.querySelector('img[alt="Preview chart"]') &&
+        parent.clientHeight >= 30 &&
+        parent.clientHeight <= 500
+      ) {
+        row = parent;
+      } else {
+        break;
+      }
+    }
+
+    if (!seen.has(row)) {
+      seen.add(row);
+      rows.push(row);
+    }
+  }
+
+  return rows;
 }
 
 function listScroller(row) {
@@ -63,19 +189,66 @@ function listScroller(row) {
 }
 
 function isSelected(tab) {
-  return /border-b-msfs\b/.test(String(tab.className || ''));
+  if (!tab) return false;
+
+  const ariaSelected = tab.getAttribute('aria-selected');
+  if (ariaSelected === 'true') return true;
+
+  const className = String(tab.className || '');
+  return /border-b-msfs\\b|active|selected/i.test(className);
 }
 
-function tabNameForCategory(category) {
-  const value = String(category || '').toUpperCase();
+async function switchToCategory(category) {
+  const aliases = categoryAliases(category);
+  const tabs = categoryTabs();
 
-  if (value === 'SID' || value === 'SIDPT' || value === 'EOSID') return 'DEPARTURE';
-  if (value === 'STAR' || value === 'STARPT') return 'ARRIVAL';
-  if (value === 'IAC' || value === 'VAC') return 'APPROACH';
-  if (['AOI', 'AGC', 'APC', 'AFC', 'LVC'].includes(value)) return 'AIRPORT';
-  if (value === 'MRC') return 'MISC';
+  let tab = tabs.find(candidate => aliases.includes(elementLabel(candidate)));
 
-  return value;
+  // A few Planner builds render category labels inside a button span. Search
+  // one level upward when the text node itself is not the clickable control.
+  if (!tab) {
+    const textMatches = [...document.querySelectorAll('button,[role="tab"],[role="button"],a')]
+      .filter(isVisible)
+      .filter(element => {
+        const label = normalize(textOf(element));
+        return aliases.includes(label);
+      });
+
+    tab = textMatches[0] || null;
+  }
+
+  if (!tab) {
+    const visibleLabels = tabs.map(elementLabel).filter(Boolean);
+    throw new Error(
+      'Could not find the Planner chart category "' +
+      aliases[0].toUpperCase() +
+      '". Visible chart categories: ' +
+      (visibleLabels.length ? visibleLabels.join(', ') : 'none') +
+      '.'
+    );
+  }
+
+  if (!isSelected(tab)) {
+    tab.scrollIntoView({ block: 'nearest' });
+    tab.click();
+
+    for (let waited = 0; waited < 8000; waited += 150) {
+      await wait(150);
+
+      const current = categoryElementFor(category);
+      if (current && isSelected(current)) {
+        await wait(300);
+        return;
+      }
+
+      // Some builds do not expose aria-selected/classes. If the chart list
+      // changes after the click, that is enough to continue.
+      if (chartRows().length) {
+        await wait(300);
+        return;
+      }
+    }
+  }
 }
 
 function rowName(row) {
@@ -114,11 +287,28 @@ function matchesTarget(row, targetName) {
   const full = normalize(textOf(row));
   const derived = normalize(rowName(row));
 
-  return title === wanted ||
-    derived === wanted ||
-    full.includes(wanted) ||
-    wanted.includes(title) ||
-    wanted.includes(derived);
+  const compact = value => normalize(value)
+    .replace(/\\b(sidpt|sid|starpt|star|iac|aoi|agc|apc|afc|lvc|mrc)\\b/g, '')
+    .replace(/\\s+/g, ' ')
+    .trim();
+
+  const wantedCompact = compact(wanted);
+  const candidates = [
+    title,
+    full,
+    derived,
+    compact(title),
+    compact(full),
+    compact(derived)
+  ].filter(Boolean);
+
+  return candidates.some(candidate =>
+    candidate === wanted ||
+    candidate === wantedCompact ||
+    candidate.includes(wanted) ||
+    wanted.includes(candidate) ||
+    (wantedCompact && candidate.includes(wantedCompact))
+  );
 }
 
 async function switchToCategory(category) {
@@ -159,11 +349,15 @@ async function findAndClickChart(targetName, category) {
 
   let row = findVisible();
   if (row) {
-    const image = row.querySelector(OPEN_BUTTON);
+    const image = row.querySelector('img[alt="Preview chart"]');
     const button = image?.closest('button') || image;
-    if (!button) throw new Error('Found the chart row but not its Preview chart button.');
+
+    if (!button) {
+      throw new Error('Found the chart row but not its Preview chart control.');
+    }
+
     button.scrollIntoView({ block: 'center' });
-    await wait(80);
+    await wait(100);
     button.click();
     return;
   }
@@ -172,61 +366,86 @@ async function findAndClickChart(targetName, category) {
   const scroller = initial ? listScroller(initial) : null;
 
   if (!scroller) {
-    // Give React a chance to mount the virtualised list before failing.
-    for (let retry = 0; retry < 12 && !row; retry += 1) {
+    for (let retry = 0; retry < 20 && !row; retry += 1) {
       await wait(150);
       row = findVisible();
     }
+
     if (row) {
-      const image = row.querySelector(OPEN_BUTTON);
+      const image = row.querySelector('img[alt="Preview chart"]');
       const button = image?.closest('button') || image;
-      button?.click();
+      if (!button) {
+        throw new Error('Found the chart row but not its Preview chart control.');
+      }
+      button.click();
       return;
     }
 
-    throw new Error('The Planner chart list is present, but the requested chart row could not be found.');
+    throw new Error(
+      'The Planner chart list is visible, but the requested chart "' +
+      targetName +
+      '" could not be found.'
+    );
   }
 
   const originalTop = scroller.scrollTop;
-  const step = Math.max(60, Math.floor(scroller.clientHeight * 0.6));
+  const step = Math.max(80, Math.floor(scroller.clientHeight * 0.65));
 
   scroller.scrollTop = 0;
-  await wait(220);
+  await wait(250);
 
-  for (let guard = 0; guard < 350; guard += 1) {
+  for (let guard = 0; guard < 400; guard += 1) {
     row = findVisible();
+
     if (row) {
-      const image = row.querySelector(OPEN_BUTTON);
+      const image = row.querySelector('img[alt="Preview chart"]');
       const button = image?.closest('button') || image;
-      if (!button) throw new Error('Found the chart row but not its Preview chart button.');
+
+      if (!button) {
+        throw new Error('Found the chart row but not its Preview chart control.');
+      }
+
       button.scrollIntoView({ block: 'center' });
-      await wait(80);
+      await wait(100);
       button.click();
       return;
     }
 
     const before = scroller.scrollTop;
     scroller.scrollTop = before + step;
-    await wait(160);
+    await wait(170);
 
     if (scroller.scrollTop === before) break;
-    if (scroller.scrollTop + scroller.clientHeight >= scroller.scrollHeight - 2) {
+
+    if (scroller.scrollTop + scroller.clientHeight >= scroller.scrollHeight - 3) {
       row = findVisible();
+
       if (row) {
-        const image = row.querySelector(OPEN_BUTTON);
+        const image = row.querySelector('img[alt="Preview chart"]');
         const button = image?.closest('button') || image;
-        button?.scrollIntoView({ block: 'center' });
-        await wait(80);
-        button?.click();
+
+        if (!button) {
+          throw new Error('Found the chart row but not its Preview chart control.');
+        }
+
+        button.scrollIntoView({ block: 'center' });
+        await wait(100);
+        button.click();
         return;
       }
+
       break;
     }
   }
 
   scroller.scrollTop = originalTop;
+
   throw new Error(
-    'Could not find "' + targetName + '" in the ' + tabNameForCategory(category) + ' chart list.'
+    'Could not find "' +
+    targetName +
+    '" in the ' +
+    categoryAliases(category)[0] +
+    ' chart list.'
   );
 }
 
