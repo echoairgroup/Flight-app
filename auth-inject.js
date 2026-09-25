@@ -100,6 +100,8 @@ async function ensureAuthTables() {
         password_hash TEXT NOT NULL,
         display_name VARCHAR(80) NOT NULL,
         simbrief_username VARCHAR(80),
+        unit_system VARCHAR(10) NOT NULL DEFAULT 'metric',
+        home_airport VARCHAR(4),
         created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
         updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     )`);
@@ -107,6 +109,8 @@ async function ensureAuthTables() {
     // Existing Flight App databases may already have a users table created by an older version.
     await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS simbrief_username VARCHAR(80)`);
     await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()`);
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS unit_system VARCHAR(10) NOT NULL DEFAULT 'metric'`);
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS home_airport VARCHAR(4)`);
 
     await pool.query(`CREATE UNIQUE INDEX IF NOT EXISTS users_simbrief_username_unique
         ON users (LOWER(simbrief_username))
@@ -144,19 +148,92 @@ function installAuth(app) {
         } catch (error) { console.error("Login error:", error); res.status(500).json({ error: "Could not sign in." }); }
     });
 
-    app.post("/api/auth/me", async (req, res) => {
+    function requestToken(req) {
+        const auth = String(req.headers.authorization || "");
+        if (auth.startsWith("Bearer ")) return auth.slice(7).trim();
+        return String(req.body?.token || req.query?.token || "").trim();
+    }
+    function requestPayload(req) {
+        return verifyToken(requestToken(req));
+    }
+
+    app.get("/api/auth/me", async (req, res) => {
         try {
-            const payload = verifyToken(req.body?.token); if (!payload) return res.status(401).json({ error: "Not authenticated." });
-            const result = await pool.query("SELECT id, username, display_name, simbrief_username, created_at FROM users WHERE id = $1", [payload.sub]);
+            const payload = requestPayload(req);
+            if (!payload) return res.status(401).json({ error: "Not authenticated." });
+            const result = await pool.query(
+                "SELECT id, username, display_name, simbrief_username, created_at FROM users WHERE id = $1",
+                [payload.sub]
+            );
             if (!result.rows.length) return res.status(401).json({ error: "Account no longer exists." });
             res.json({ user: publicUser(result.rows[0]) });
-        } catch (error) { console.error("Session error:", error); res.status(500).json({ error: "Could not load account." }); }
+        } catch (error) {
+            console.error("Session error:", error);
+            res.status(500).json({ error: "Could not load account." });
+        }
+    });
+
+    // POST remains supported for older Flight App clients.
+    app.post("/api/auth/me", async (req, res) => {
+        try {
+            const payload = requestPayload(req);
+            if (!payload) return res.status(401).json({ error: "Not authenticated." });
+            const result = await pool.query(
+                "SELECT id, username, display_name, simbrief_username, created_at FROM users WHERE id = $1",
+                [payload.sub]
+            );
+            if (!result.rows.length) return res.status(401).json({ error: "Account no longer exists." });
+            res.json({ user: publicUser(result.rows[0]) });
+        } catch (error) {
+            console.error("Session error:", error);
+            res.status(500).json({ error: "Could not load account." });
+        }
+    });
+
+    app.get("/api/account/preferences", async (req, res) => {
+        try {
+            const payload = requestPayload(req);
+            if (!payload) return res.status(401).json({ error: "Not authenticated." });
+            const result = await pool.query(
+                "SELECT unit_system, home_airport FROM users WHERE id = $1",
+                [payload.sub]
+            );
+            if (!result.rows.length) return res.status(401).json({ error: "Account no longer exists." });
+            res.json({
+                preferences: {
+                    unitSystem: result.rows[0].unit_system || "metric",
+                    homeAirport: result.rows[0].home_airport || ""
+                }
+            });
+        } catch (error) {
+            console.error("Preferences load error:", error);
+            res.status(500).json({ error: "Could not load preferences." });
+        }
+    });
+
+    app.put("/api/account/preferences", async (req, res) => {
+        try {
+            const payload = requestPayload(req);
+            if (!payload) return res.status(401).json({ error: "Not authenticated." });
+            const unitSystem = String(req.body?.unitSystem || "metric").trim().toLowerCase();
+            const homeAirport = String(req.body?.homeAirport || "").trim().toUpperCase();
+            if (!["metric", "us"].includes(unitSystem)) return res.status(400).json({ error: "Invalid unit system." });
+            if (homeAirport && !/^[A-Z0-9]{4}$/.test(homeAirport)) return res.status(400).json({ error: "Home airport must be a 4-character ICAO code." });
+            await pool.query(
+                "UPDATE users SET unit_system = $1, home_airport = $2, updated_at = NOW() WHERE id = $3",
+                [unitSystem, homeAirport || null, payload.sub]
+            );
+            res.json({ preferences: { unitSystem, homeAirport } });
+        } catch (error) {
+            console.error("Preferences save error:", error);
+            res.status(500).json({ error: "Could not save preferences." });
+        }
     });
     app.post("/api/auth/logout", (req, res) => res.json({ success: true }));
 
     app.get("/api/simbrief/link", async (req, res) => {
         try {
-            const payload = verifyToken(req.query?.token); if (!payload) return res.status(401).json({ error: "Not authenticated." });
+            const payload = requestPayload(req); if (!payload) return res.status(401).json({ error: "Not authenticated." });
             const result = await pool.query("SELECT simbrief_username FROM users WHERE id = $1", [payload.sub]);
             if (!result.rows.length) return res.status(401).json({ error: "Account no longer exists." });
             res.json({ connected: Boolean(result.rows[0].simbrief_username), simbriefUsername: result.rows[0].simbrief_username || null });
@@ -164,7 +241,7 @@ function installAuth(app) {
     });
     app.post("/api/simbrief/link", async (req, res) => {
         try {
-            const payload = verifyToken(req.body?.token); if (!payload) return res.status(401).json({ error: "Not authenticated." });
+            const payload = requestPayload(req); if (!payload) return res.status(401).json({ error: "Not authenticated." });
             const simbriefUsername = String(req.body?.simbriefUsername || "").trim().slice(0, 80);
             if (!/^[A-Za-z0-9._-]{2,80}$/.test(simbriefUsername)) return res.status(400).json({ error: "Enter a valid SimBrief username." });
             const result = await pool.query("UPDATE users SET simbrief_username = $1, updated_at = NOW() WHERE id = $2 RETURNING username, simbrief_username", [simbriefUsername, payload.sub]);
