@@ -1958,7 +1958,7 @@
     <script>
 
         const API_BASE =
-            "https://flight-app-api-g36e.onrender.com";
+            "https://echo-msfs-charts.onrender.com";
 
 
         async function apiFetch(endpoint, options = {}) {
@@ -1970,7 +1970,10 @@
 
                     headers: {
                         Accept: "application/json",
-                        ...(options.headers || {})
+                        ...(options.headers || {}),
+                        ...(localStorage.getItem("flightAppToken")
+                            ? { Authorization: "Bearer " + localStorage.getItem("flightAppToken") }
+                            : {})
                     }
                 }
             );
@@ -4167,5 +4170,5 @@
 
     </script>
 
-</body>
+<script src="auth-client.js"></script></body>
 </html>
