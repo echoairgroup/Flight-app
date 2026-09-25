@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b1018">
+<title>Account | Flight App</title>
+<style>
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:#070b11;color:#eef3f8;font-family:Inter,system-ui,sans-serif;padding:22px}
+.wrap{max-width:920px;margin:auto}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;gap:15px}.brand{display:flex;align-items:center;gap:12px;color:inherit;text-decoration:none}.logo{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#5b8cff,#806df5);display:grid;place-items:center}.brand strong{font-size:13px}.brand span{display:block;color:#778599;font-size:10px;margin-top:2px}.back{color:#9eacbd;text-decoration:none;font-size:11px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}.card{background:#101822;border:1px solid #283647;border-radius:18px;padding:22px}.wide{grid-column:1/-1}.eyebrow{font-size:9px;text-transform:uppercase;letter-spacing:1.7px;color:#5b8cff;font-weight:800}.title{font-size:25px;font-weight:800;margin:6px 0 5px;letter-spacing:-.7px}.muted{color:#8290a1;font-size:11px;line-height:1.6}.row{display:flex;justify-content:space-between;align-items:center;gap:15px;padding:13px 0;border-bottom:1px solid #222e3c}.row:last-child{border-bottom:0}.label{color:#8190a2;font-size:10px}.value{font-size:12px;font-weight:700;text-align:right;word-break:break-word}input,select{width:100%;height:44px;background:#0a1119;border:1px solid #2b394a;border-radius:10px;color:#eef3f8;padding:0 12px;outline:none}input:focus,select:focus{border-color:#5b8cff;box-shadow:0 0 0 3px #5b8cff22}label{display:block;color:#9ba8b8;font-size:10px;font-weight:700;margin:15px 0 7px}.btn{height:43px;border:0;border-radius:10px;padding:0 16px;background:#5b8cff;color:#fff;font-weight:800;cursor:pointer}.btn.secondary{background:#182331;border:1px solid #304052}.btn.danger{background:#3a1820;border:1px solid #6b2935;color:#ffadb5}.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:15px}.status{display:inline-flex;align-items:center;gap:7px;font-size:10px;font-weight:800;padding:6px 9px;border-radius:999px;background:#13271f;color:#62dca5}.status.off{background:#24202a;color:#a5afbd}.notice{display:none;margin-top:13px;padding:10px;border-radius:9px;font-size:10px;background:#15243a;color:#a9c7ff}.notice.error{background:#3a1820;color:#ffadb5}.hidden{display:none!important}@media(max-width:700px){body{padding:12px}.grid{grid-template-columns:1fr}.wide{grid-column:auto}.top{align-items:flex-start}.card{padding:18px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top">
+<a class="brand" href="index.html"><div class="logo">✈</div><div><strong>FLIGHT APP</strong><span>Electronic Flight Bag</span></div></a>
+<a class="back" href="index.html">← Back to EFB</a>
+</header>
+
+<section class="card wide">
+<div class="eyebrow">Pilot account</div>
+<div class="title" id="welcome">Account</div>
+<div class="muted">Your Flight App profile and connected flight-simulation services.</div>
+</section>
+
+<div class="grid" style="margin-top:15px">
+<section class="card">
+<div class="eyebrow">Profile</div>
+<div class="row"><span class="label">Username</span><strong class="value" id="username">—</strong></div>
+<div class="row"><span class="label">Display name</span><strong class="value" id="displayName">—</strong></div>
+<div class="row"><span class="label">Account ID</span><strong class="value" id="userId">—</strong></div>
+<div class="row"><span class="label">Created</span><strong class="value" id="created">—</strong></div>
+</section>
+
+<section class="card">
+<div class="eyebrow">Preferences</div>
+<label for="units">Units</label>
+<select id="units"><option value="metric">Metric (°C, km, hPa)</option><option value="us">US / Aviation (°F, NM, inHg)</option></select>
+<label for="homeAirport">Home airport</label>
+<input id="homeAirport" maxlength="4" placeholder="EHAM">
+<div class="actions"><button class="btn" id="savePrefs">Save preferences</button></div>
+<div class="notice" id="prefsNotice"></div>
+</section>
+
+<section class="card wide">
+<div class="eyebrow">SimBrief connection</div>
+<p class="muted">Link your SimBrief username. Flight App never asks for or stores your SimBrief password.</p>
+<div id="simStatus" class="status off">Not connected</div>
+<label for="simbrief">SimBrief username</label>
+<input id="simbrief" maxlength="80" autocomplete="off" placeholder="Your SimBrief username">
+<div class="actions">
+<button class="btn" id="saveSim">Connect / update</button>
+<button class="btn secondary" id="removeSim">Disconnect</button>
+</div>
+<div class="notice" id="simNotice"></div>
+</section>
+
+<section class="card wide">
+<div class="eyebrow">Session</div>
+<p class="muted">Your current browser session is stored locally and authenticated against the Flight App API.</p>
+<div class="actions"><button class="btn danger" id="logout">Sign out</button></div>
+</section>
+</div>
+</div>
+
+<script src="auth-client.js"></script>
+<script>
+(async()=>{
+  const notice=(id,msg,error=false)=>{const e=document.getElementById(id);e.textContent=msg;e.className="notice"+(error?" error":"");e.style.display="block";};
+  try{
+    const user=await FlightAppAuth.requireLogin();
+    if(!user)return;
+    document.getElementById("welcome").textContent="Welcome, "+(user.displayName||user.username);
+    document.getElementById("username").textContent=user.username;
+    document.getElementById("displayName").textContent=user.displayName||"—";
+    document.getElementById("userId").textContent=user.id;
+    document.getElementById("created").textContent=user.createdAt?new Date(user.createdAt).toLocaleDateString():"—";
+    document.getElementById("simbrief").value=user.simbriefUsername||"";
+
+    try{
+      const p=await FlightAppAuth.request("/api/account/preferences");
+      document.getElementById("units").value=p.preferences?.unitSystem||"metric";
+      document.getElementById("homeAirport").value=p.preferences?.homeAirport||"";
+    }catch(e){ notice("prefsNotice","Could not load preferences: "+e.message,true); }
+
+    const setSim=connected=>{
+      const s=document.getElementById("simStatus");
+      s.textContent=connected?"Connected":"Not connected";
+      s.className="status"+(connected?"":" off");
+    };
+    setSim(Boolean(user.simbriefUsername));
+
+    document.getElementById("savePrefs").onclick=async()=>{
+      try{
+        await FlightAppAuth.request("/api/account/preferences",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({
+          unitSystem:document.getElementById("units").value,
+          homeAirport:document.getElementById("homeAirport").value.trim().toUpperCase()
+        })});
+        notice("prefsNotice","Preferences saved.");
+      }catch(e){notice("prefsNotice",e.message,true);}
+    };
+    document.getElementById("saveSim").onclick=async()=>{
+      try{
+        const d=await FlightAppAuth.request("/api/simbrief/link",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({simbriefUsername:document.getElementById("simbrief").value.trim()})});
+        document.getElementById("simbrief").value=d.simbriefUsername||"";
+        setSim(true); notice("simNotice","SimBrief account connected.");
+      }catch(e){notice("simNotice",e.message,true);}
+    };
+    document.getElementById("removeSim").onclick=async()=>{
+      try{
+        await FlightAppAuth.request("/api/simbrief/unlink",{method:"POST",headers:{"Content-Type":"application/json"}});
+        document.getElementById("simbrief").value=""; setSim(false); notice("simNotice","SimBrief disconnected.");
+      }catch(e){notice("simNotice",e.message,true);}
+    };
+    document.getElementById("logout").onclick=()=>FlightAppAuth.logout();
+  }catch(e){
+    document.body.innerHTML='<div style="max-width:600px;margin:15vh auto;color:#fff;font-family:system-ui"><h2>Account unavailable</h2><p style="color:#9aa8b8">'+e.message+'</p><a href="index.html" style="color:#6da0ff">Back to EFB</a></div>';
+  }
+})();
+</script>
+</body>
+</html>
