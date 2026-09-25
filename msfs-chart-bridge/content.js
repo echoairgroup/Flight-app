@@ -195,7 +195,7 @@ function isSelected(tab) {
   if (ariaSelected === 'true') return true;
 
   const className = String(tab.className || '');
-  return /border-b-msfs\\b|active|selected/i.test(className);
+  return /border-b-msfs\b|active|selected/i.test(className);
 }
 
 async function switchToCategory(category) {
@@ -288,7 +288,7 @@ function matchesTarget(row, targetName) {
   const derived = normalize(rowName(row));
 
   const compact = value => normalize(value)
-    .replace(/\\b(sidpt|sid|starpt|star|iac|aoi|agc|apc|afc|lvc|mrc)\\b/g, '')
+    .replace(/\b(sidpt|sid|starpt|star|iac|aoi|agc|apc|afc|lvc|mrc)\b/g, '')
     .replace(/\\s+/g, ' ')
     .trim();
 
@@ -309,37 +309,6 @@ function matchesTarget(row, targetName) {
     wanted.includes(candidate) ||
     (wantedCompact && candidate.includes(wantedCompact))
   );
-}
-
-async function switchToCategory(category) {
-  const wanted = tabNameForCategory(category);
-  const tabs = categoryTabs();
-  let tab = tabs.find(candidate => textOf(candidate).toUpperCase() === wanted);
-
-  // Some Planner builds use ARRIVAL/DEPARTURE labels, while others can expose a
-  // more direct chart category. Fall back to the raw category when present.
-  if (!tab) {
-    tab = tabs.find(candidate => textOf(candidate).toUpperCase() === String(category || '').toUpperCase());
-  }
-
-  if (!tab) {
-    throw new Error('Could not find the Planner chart category "' + wanted + '".');
-  }
-
-  if (!isSelected(tab)) {
-    tab.click();
-
-    for (let waited = 0; waited < 6000; waited += 150) {
-      await wait(150);
-      const current = categoryTabs().find(candidate =>
-        textOf(candidate).toUpperCase() === wanted
-      );
-      if (current && isSelected(current)) {
-        await wait(300);
-        break;
-      }
-    }
-  }
 }
 
 async function findAndClickChart(targetName, category) {
