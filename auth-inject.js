@@ -231,6 +231,20 @@ function installAuth(app) {
         }
     });
 
+    app.get("/api/auth/admin", async (req, res) => {
+        try {
+            const payload = requestPayload(req);
+            if (!payload) return res.status(401).json({ error: "Not authenticated." });
+            const result = await pool.query("SELECT username FROM users WHERE id = $1", [payload.sub]);
+            if (!result.rows.length) return res.status(401).json({ error: "Account no longer exists." });
+            const username = String(result.rows[0].username || "").toLowerCase();
+            res.json({ isAdmin: getAdminUsernames().has(username) });
+        } catch (error) {
+            console.error("Admin status error:", error);
+            res.status(500).json({ error: "Could not check administrator access." });
+        }
+    });
+
     // POST remains supported for older Flight App clients.
     app.post("/api/auth/me", async (req, res) => {
         try {
