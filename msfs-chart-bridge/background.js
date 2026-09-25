@@ -1,57 +1,89 @@
-/*
- * Flight-app MSFS Chart Bridge background.
- *
- * The MSFS Planner /pages API returns an FsChartPageUrl handle. The Planner
- * UI resolves that handle into a real signed Azure PNG URL when the chart is
- * opened. We ask the Planner tab to open the chart, receive that signed URL,
- * and then fetch the image from this privileged extension context.
- *
- * No MSFS session token/cookie is read or sent to Flight-app.
- */
-
 browser.runtime.onMessage.addListener(message => {
   if (message?.type === "bridgePing") {
     return Promise.resolve({
       ok: true,
-      captureApi: false,
-      mode: "planner-rendered-url"
+      mode: "planner-rendered-url",
+      allFrames: true
     });
   }
 
-  if (message?.type !== "capturePlannerImage") {
-    return undefined;
-  }
+  if (message?.type !== "capturePlannerImage") return undefined;
 
   const tabId = Number(message.tabId);
   const chartName = String(message.chartName || "").trim();
   const category = String(message.category || "").trim();
 
   if (!Number.isInteger(tabId)) {
-    return Promise.reject(
-      new Error("No valid MSFS Planner tab was supplied.")
-    );
+    return Promise.reject(new Error("No valid MSFS Planner tab was supplied."));
   }
 
   return (async () => {
-    let rendered;
+    const request = {
+      type: "openPlannerChart",
+      chartName,
+      category,
+      imageUrl: message.imageUrl || ""
+    };
+
+    let frames = [{ frameId: 0, url: "" }];
 
     try {
-      rendered = await browser.tabs.sendMessage(tabId, {
-        type: "openPlannerChart",
-        chartName,
-        category,
-        imageUrl: message.imageUrl || ""
-      });
+      if (browser.webNavigation?.getAllFrames) {
+        const allFrames = await browser.webNavigation.getAllFrames({ tabId });
+        if (Array.isArray(allFrames) && allFrames.length) {
+          frames = allFrames
+            .map(frame => ({
+              frameId: Number(frame.frameId),
+              url: String(frame.url || "")
+            }))
+            .filter(frame => Number.isInteger(frame.frameId));
+        }
+      }
     } catch (error) {
-      throw new Error(
-        "Could not drive the MSFS Planner chart list: " +
-        (error?.message || error)
-      );
+      console.warn("[Flight-app Chart Bridge] Frame enumeration failed:", error);
     }
 
-    if (!rendered?.ok || !rendered.imageUrl) {
+    // The actual Planner UI is often deeper than the shell document.
+    frames.sort((a, b) => {
+      if (a.frameId === 0) return 1;
+      if (b.frameId === 0) return -1;
+      return b.frameId - a.frameId;
+    });
+
+    let lastError = null;
+    let rendered = null;
+
+    for (const frame of frames) {
+      try {
+        const candidate = await browser.tabs.sendMessage(
+          tabId,
+          request,
+          { frameId: frame.frameId }
+        );
+
+        if (candidate?.ok && candidate.imageUrl) {
+          rendered = candidate;
+          break;
+        }
+
+        lastError = new Error(
+          "Planner frame " + frame.frameId +
+          " did not return a rendered chart image."
+        );
+      } catch (error) {
+        lastError = error;
+      }
+    }
+
+    if (!rendered) {
+      const frameSummary = frames
+        .map(frame => frame.frameId + (frame.url ? " (" + frame.url + ")" : ""))
+        .join(", ");
+
       throw new Error(
-        "MSFS Planner opened the chart, but did not expose the rendered chart image URL."
+        "Could not drive the MSFS Planner chart list in any frame. " +
+        "Frames checked: " + (frameSummary || "0") +
+        (lastError?.message ? ". Last error: " + lastError.message : ".")
       );
     }
 
@@ -62,13 +94,10 @@ browser.runtime.onMessage.addListener(message => {
       !/\/charts\/chart-files\//i.test(imageUrl) ||
       !/\.png(?:\?|$)/i.test(imageUrl)
     ) {
-      throw new Error(
-        "Planner returned an unexpected chart image URL."
-      );
+      throw new Error("Planner returned an unexpected chart image URL.");
     }
 
     let response;
-
     try {
       response = await fetch(imageUrl, {
         method: "GET",
@@ -93,15 +122,11 @@ browser.runtime.onMessage.addListener(message => {
       );
     }
 
-    const contentType =
-      response.headers.get("content-type") || "image/png";
-
+    const contentType = response.headers.get("content-type") || "image/png";
     const buffer = await response.arrayBuffer();
 
     if (!buffer.byteLength) {
-      throw new Error(
-        "Planner returned an empty chart image."
-      );
+      throw new Error("Planner returned an empty chart image.");
     }
 
     return {
