@@ -17,4 +17,5 @@ const aircraft=[
 {name:"E195-E2",maker:"Embraer",role:"Regional jet",engines:"PW1900G",range:"≈ 2,600 nm",seats:"≈ 120–146",span:"35.1 m"},
 {name:"ATR 72-600",maker:"ATR",role:"Turboprop",engines:"PW127XT",range:"≈ 825 nm",seats:"≈ 44–78",span:"27.1 m"}];
 function render(){let q=document.getElementById('search').value.toLowerCase(),f=document.getElementById('filter').value;let a=aircraft.filter(x=>(f==='all'||x.maker===f)&&Object.values(x).join(' ').toLowerCase().includes(q));document.getElementById('grid').innerHTML=a.length?a.map(x=>`<article class="card"><span class="badge">${x.role}</span><h2>${x.name}</h2><div class="maker">${x.maker}</div><div class="specs"><div class="spec"><span>Engines</span><strong>${x.engines}</strong></div><div class="spec"><span>Typical range</span><strong>${x.range}</strong></div><div class="spec"><span>Seats</span><strong>${x.seats}</strong></div><div class="spec"><span>Wingspan</span><strong>${x.span}</strong></div></div></article>`).join(''):'<div class="empty">No aircraft match your search.</div>'}document.getElementById('search').oninput=render;document.getElementById('filter').onchange=render;render();
-</script></body></html>
+</script><script src="auth-client.js"></script>
+</body></html>
