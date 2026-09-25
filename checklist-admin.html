@@ -33,7 +33,7 @@ function getCategories(){let list=[];try{list=JSON.parse(localStorage.getItem(CA
 function saveCategories(list){localStorage.setItem(CATEGORY_KEY,JSON.stringify(list.filter(x=>String(x).trim().toLowerCase()!=='irbus checklists')))}
 function renderCategories(){const list=getCategories();saveCategories(list);$('categories').innerHTML=list.length?list.map((n,i)=>`<div class="category"><span class="category-name">${esc(n)}</span><button class="delete" data-i="${i}">Delete</button></div>`).join(''):'<div class="small">No categories yet. Add your first category below.</div>';$('category').innerHTML='<option value="">Choose category</option>'+list.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('')}
 function msg(text,type){const e=$('message');e.textContent=text;e.className='message show '+type;setTimeout(()=>e.className='message',4000)}
-async function api(path,opt={}){const r=await fetch(API+path,opt);let d={};try{d=await r.json()}catch{}if(!r.ok)throw new Error(d.error||`HTTP ${r.status}`);return d}
+async function api(path,opt={}){const headers=new Headers(opt.headers||{});const token=localStorage.getItem("flightAppToken");if(token)headers.set("Authorization","Bearer "+token);const r=await fetch(API+path,{...opt,headers});let d={};try{d=await r.json()}catch{}if(!r.ok)throw new Error(d.error||`HTTP ${r.status}`);return d}
 async function load(){try{await api('/api/health');$('dot').className='dot ok';$('status').textContent='Backend online'}catch{$('dot').className='dot bad';$('status').textContent='Backend unavailable'}try{const d=await api('/api/aircraft');aircraft=Array.isArray(d.aircraft)?d.aircraft:[];$('aircraft').innerHTML='<option value="">Choose aircraft</option>'+aircraft.map(a=>`<option value="${a.id}">${esc([a.manufacturer,a.name].filter(Boolean).join(' '))}</option>`).join('')}catch(e){msg('Could not load aircraft: '+e.message,'error')}try{const d=await api('/api/checklists');checklists=Array.isArray(d.checklists)?d.checklists:[]}catch{}renderCategories()}
 $('addCategory').onclick=()=>{const input=$('newCategory'),name=input.value.trim();if(!name)return msg('Enter a category name first.','error');const list=getCategories();if(list.some(x=>x.toLowerCase()===name.toLowerCase()))return msg('That category already exists.','error');list.push(name);saveCategories(list);input.value='';renderCategories();msg('Category added.','success')};$('newCategory').addEventListener('keydown',e=>{if(e.key==='Enter'){$('addCategory').click();e.preventDefault()}});
 $('categories').onclick=e=>{const b=e.target.closest('[data-i]');if(!b)return;const list=getCategories(),name=list[Number(b.dataset.i)];if(!confirm(`Delete category “${name}”?`))return;list.splice(Number(b.dataset.i),1);saveCategories(list);renderCategories()};
@@ -43,6 +43,6 @@ $('addAircraft').onclick=async()=>{const manufacturer=$('manufacturer').value.tr
 window.addEventListener('storage',e=>{if(e.key===CATEGORY_KEY){try{const list=JSON.parse(e.newValue||'[]');saveCategories(Array.isArray(list)?list:[])}catch{}renderCategories()}});
 load();
 </script>
-<script src="auth-client.js"></script>
+<script src="auth-client.js"></script><script>FlightAppAuth.requireAdmin();</script>
 </body>
 </html>
