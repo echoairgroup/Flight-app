@@ -124,7 +124,7 @@
 <div class="screen">
 <header class="topbar">
 <a class="brand" href="index.html" aria-label="Flight App Home"><div class="brand-icon"><i class="fa-solid fa-plane-up"></i></div><div><div class="brand-title">FLIGHT APP</div><div class="brand-sub">Electronic Flight Bag</div></div></a>
-<div class="status"><div class="status-item online"><i class="fa-solid fa-circle"></i> ONLINE</div><div class="status-item"><i class="fa-solid fa-wifi"></i> CONNECTED</div><div class="status-item clock" id="clock">--:--</div><button class="settings-button" type="button" onclick="openSettings()" aria-label="Home settings" title="Home settings"><i class="fa-solid fa-gear"></i></button><div class="status-item"><div class="battery"><div class="battery-level"></div></div></div></div>
+<div class="status"><div class="status-item online"><i class="fa-solid fa-circle"></i> ONLINE</div><div class="status-item"><i class="fa-solid fa-wifi"></i> CONNECTED</div><div class="status-item clock" id="clock">--:--</div><button class="settings-button" type="button" onclick="openSettings()" aria-label="Home settings" title="Home settings"><i class="fa-solid fa-gear"></i></button><button class="settings-button" type="button" onclick="openAccount()" aria-label="Account" title="Account"><i class="fa-solid fa-user"></i></button><div class="status-item"><div class="battery"><div class="battery-level"></div></div></div></div>
 </header>
 <main class="content">
 <section class="welcome"><div><div class="eyebrow">Flight operations</div><h1>Welcome to your EFB</h1><p>All your flight-simulation tools in one cockpit-ready interface.</p></div><div class="aircraft"><div class="aircraft-label">Current profile</div><div class="aircraft-value"><i class="fa-solid fa-plane"></i> Flight Simulator</div></div></section>
@@ -149,6 +149,8 @@
 </div></div>
 <script>
 function updateClock(){const now=new Date();document.getElementById('clock').textContent=now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});}updateClock();setInterval(updateClock,1000);
+function openAccount(){window.location.href='account.html';}
+async function updateAccountButton(){const b=document.querySelector('[aria-label="Account"]');if(!b)return;try{const u=await FlightAppAuth.me();b.title=u?'Account: '+(u.displayName||u.username):'Sign in';b.setAttribute('aria-label',u?'Account':'Sign in');b.onclick=()=>window.location.href=u?'account.html':'login.html';}catch{}}setTimeout(updateAccountButton,0);
 function showAbout(e){e.preventDefault();alert('Flight App EFB\n\nElectronic Flight Bag for Microsoft Flight Simulator.\n\nUse the applications above to access weather, charts, checklists, SimBrief and flight planning.');}
 
 const BACKGROUND_KEY='flightAppHomeBackground';
@@ -256,5 +258,6 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeSettings();});
     </div>
   </section>
 </div>
+<script src="auth-client.js"></script>
 </body>
 </html>
