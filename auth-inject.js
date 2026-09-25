@@ -120,6 +120,64 @@ function publicUser(user) {
     return { id: String(user.id), username: user.username, displayName: user.display_name, simbriefUsername: user.simbrief_username || null, createdAt: user.created_at };
 }
 function installAuth(app) {
+    function getAdminUsernames() {
+        return new Set(
+            String(process.env.ADMIN_USERNAMES || "")
+                .split(",")
+                .map(value => value.trim().toLowerCase())
+                .filter(Boolean)
+        );
+    }
+
+    function requestToken(req) {
+        const auth = String(req.headers.authorization || "");
+        if (auth.startsWith("Bearer ")) return auth.slice(7).trim();
+        return String(req.body?.token || req.query?.token || "").trim();
+    }
+    function requestPayload(req) {
+        return verifyToken(requestToken(req));
+    }
+
+    app.requireAuth = async function requireAuth(req, res, next) {
+        try {
+            const payload = requestPayload(req);
+            if (!payload) return res.status(401).json({ error: "Not authenticated." });
+            const result = await pool.query(
+                "SELECT id, username, display_name, simbrief_username, created_at FROM users WHERE id = $1",
+                [payload.sub]
+            );
+            if (!result.rows.length) return res.status(401).json({ error: "Account no longer exists." });
+            req.flightAppUser = result.rows[0];
+            req.flightAppPayload = payload;
+            next();
+        } catch (error) {
+            console.error("Authentication middleware error:", error);
+            return res.status(500).json({ error: "Could not verify account." });
+        }
+    };
+
+    app.requireAdmin = async function requireAdmin(req, res, next) {
+        try {
+            const payload = requestPayload(req);
+            if (!payload) return res.status(401).json({ error: "Not authenticated." });
+            const result = await pool.query(
+                "SELECT id, username, display_name, simbrief_username, created_at FROM users WHERE id = $1",
+                [payload.sub]
+            );
+            if (!result.rows.length) return res.status(401).json({ error: "Account no longer exists." });
+            const username = String(result.rows[0].username || "").toLowerCase();
+            if (!getAdminUsernames().has(username)) {
+                return res.status(403).json({ error: "Administrator access is required." });
+            }
+            req.flightAppUser = result.rows[0];
+            req.flightAppPayload = payload;
+            next();
+        } catch (error) {
+            console.error("Admin authentication middleware error:", error);
+            return res.status(500).json({ error: "Could not verify administrator access." });
+        }
+    };
+
     app.use(express.json({ limit: "100kb" }));
     app.use((req, res, next) => { res.header("Access-Control-Allow-Origin", req.headers.origin || "*"); res.header("Vary", "Origin"); res.header("Access-Control-Allow-Headers", "Content-Type, Accept, Authorization"); res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS"); if (req.method === "OPTIONS") return res.sendStatus(204); next(); });
 
@@ -250,7 +308,7 @@ function installAuth(app) {
         } catch (error) { if (error.code === "23505") return res.status(409).json({ error: "That SimBrief username is already linked to another Flight App account." }); console.error("SimBrief link error:", error); res.status(500).json({ error: "Could not link SimBrief account." }); }
     });
     app.post("/api/simbrief/unlink", async (req, res) => {
-        try { const payload = verifyToken(req.body?.token); if (!payload) return res.status(401).json({ error: "Not authenticated." }); await pool.query("UPDATE users SET simbrief_username = NULL, updated_at = NOW() WHERE id = $1", [payload.sub]); res.json({ connected: false }); }
+        try { const payload = requestPayload(req); if (!payload) return res.status(401).json({ error: "Not authenticated." }); await pool.query("UPDATE users SET simbrief_username = NULL, updated_at = NOW() WHERE id = $1", [payload.sub]); res.json({ connected: false }); }
         catch (error) { console.error("SimBrief unlink error:", error); res.status(500).json({ error: "Could not disconnect SimBrief." }); }
     });
     ensureAuthTables()
