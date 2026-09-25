@@ -492,12 +492,74 @@ function matchesTarget(row, targetName) {
   );
 }
 
+async function findChartAnywhere(targetName) {
+  const wanted = normalize(targetName);
+  if (!wanted) return null;
+
+  // First search every currently-rendered chart row without changing the
+  // Planner category. Some Planner builds render the full virtual list while
+  // the category navigation itself is canvas/SVG based and invisible to the
+  // content script.
+  let row = chartRows().find(candidate => matchesTarget(candidate, targetName));
+  if (row) return row;
+
+  // Search visible text nodes/containers for the exact API chart name and
+  // climb to the nearest element containing a Preview chart control.
+  const all = [...document.querySelectorAll('body *')].filter(isVisible);
+  for (const element of all) {
+    const own = normalize(textOf(element));
+    if (!own || own.length > 600) continue;
+    if (own !== wanted && !own.includes(wanted) && !wanted.includes(own)) continue;
+
+    const rowCandidate =
+      element.closest?.('button') ||
+      element.parentElement?.querySelector?.('img[alt="Preview chart"]')?.closest('button') ||
+      element.closest?.('div')?.querySelector?.('img[alt="Preview chart"]')?.closest('button');
+
+    const preview = rowCandidate?.querySelector?.('img[alt="Preview chart"]') ||
+      rowCandidate?.closest?.('*')?.querySelector?.('img[alt="Preview chart"]');
+
+    if (preview) {
+      const candidateRow =
+        preview.closest('button')?.parentElement ||
+        preview.closest('button') ||
+        preview;
+      if (isVisible(candidateRow)) return candidateRow;
+    }
+  }
+
+  return null;
+}
+
 async function findAndClickChart(targetName, category) {
+  // Do not assume the category navigation is DOM-backed. Try the currently
+  // rendered list first; this works on Planner builds where all chart rows
+  // are already mounted or where the navigation is drawn outside the DOM.
+  let row = await findChartAnywhere(targetName);
+
+  if (row) {
+    const image = row.querySelector?.('img[alt="Preview chart"]') ||
+      row.closest?.('*')?.querySelector?.('img[alt="Preview chart"]');
+
+    const button = image?.closest('button') || image;
+    if (!button) {
+      throw new Error('Found the chart but not its Preview chart control.');
+    }
+
+    button.scrollIntoView({ block: 'center' });
+    await wait(100);
+    button.click();
+    return;
+  }
+
+  // Only fall back to category navigation if the target is not already
+  // rendered. This is important because recent Planner builds may expose the
+  // chart list without exposing category controls as normal DOM elements.
   await switchToCategory(category);
 
   const findVisible = () => chartRows().find(row => matchesTarget(row, targetName));
 
-  let row = findVisible();
+  row = findVisible();
   if (row) {
     const image = row.querySelector('img[alt="Preview chart"]');
     const button = image?.closest('button') || image;
